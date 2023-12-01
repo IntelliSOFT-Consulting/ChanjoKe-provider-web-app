@@ -1,23 +1,16 @@
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+    <div className="bg-white px-6 py-24 sm:py-32 lg:px-8">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          ChanjoKE Web
+        </h2>
+        <p className="mt-6 text-lg leading-8 text-gray-600">
+          Ministry of Health | Kenya
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      </div>
     </div>
   );
 }
