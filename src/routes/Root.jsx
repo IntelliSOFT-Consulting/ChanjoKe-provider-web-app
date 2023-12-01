@@ -10,17 +10,17 @@ import {
   UsersIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { Outlet } from 'react-router-dom'
+import { Outlet, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 
 const navigation = [
-  { name: 'Home', href: '#', icon: HomeIcon },
+  { name: 'Home', href: '/', icon: HomeIcon },
   { name: 'Admin Management', href: '#', icon: UsersIcon },
   { name: 'Vaccination Reports', href: '#', icon: FolderIcon },
-  { name: 'Register Client', href: '#', icon: CalendarIcon },
-  { name: 'Update Client History', href: '#', icon: DocumentDuplicateIcon },
-  { name: 'Administer Vaccine', href: '#', icon: ChartPieIcon },
-  { name: 'AEFI', href: '#', icon: ChartPieIcon },
+  { name: 'Register Client', href: 'register-client', icon: CalendarIcon },
+  { name: 'Update Client History', href: 'update-client-history', icon: DocumentDuplicateIcon },
+  { name: 'Administer Vaccine', href: 'administer-vaccine', icon: ChartPieIcon },
+  { name: 'AEFI', href: 'aefi', icon: ChartPieIcon },
 ]
 
 function classNames(...classes) {
@@ -89,8 +89,8 @@ export default function Root() {
                           <ul role="list" className="-mx-2 space-y-1">
                             {navigation.map((item) => (
                               <li key={item.name}>
-                                <a
-                                  href={item.href}
+                                <Link
+                                  to={item.href}
                                   className={classNames(
                                     item.current
                                       ? 'bg-gray-50 text-indigo-600'
@@ -106,7 +106,7 @@ export default function Root() {
                                     aria-hidden="true"
                                   />
                                   {item.name}
-                                </a>
+                                </Link>
                               </li>
                             ))}
                           </ul>

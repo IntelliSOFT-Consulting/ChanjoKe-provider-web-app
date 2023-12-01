@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom'
 
 const stats = [
   { name: 'Search Client', icon: '', href: 'search-client' },
-  { name: 'Register Client', icon: '', href: '' },
-  { name: 'Update Client History', icon: '', href: '' },
-  { name: 'Administer Vaccine', icon: '', href: '' },
-  { name: 'AEFI', icon: '', href: '' },
+  { name: 'Register Client', icon: '', href: 'register-client' },
+  { name: 'Update Client History', icon: '', href: 'update-client-history' },
+  { name: 'Administer Vaccine', icon: '', href: 'administer-vaccine' },
+  { name: 'AEFI', icon: '', href: 'aefi' },
 ]
 
 const statsTwo = [
@@ -26,7 +26,7 @@ export default function Home() {
         <h3 className="text-base font-semibold leading-6 text-gray-900 mt-10">Ministry of Health</h3>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-5">
           {stats.map((item) => (
-            <Link to='search-client' key={item.name} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+            <Link to={item.href} key={item.name} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
               <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
               <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.stat}</dd>
             </Link>
