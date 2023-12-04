@@ -6,7 +6,7 @@ export default function AEFI() {
           AEFI
         </h2>
         <p className="mt-6 text-lg leading-8 text-gray-600">
-          ???
+          Adverse Event Following Immunization
         </p>
       </div>
     </div>
