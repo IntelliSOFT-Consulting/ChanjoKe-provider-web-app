@@ -1,18 +1,23 @@
-import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/20/solid'
-import { CursorArrowRaysIcon, EnvelopeOpenIcon, UsersIcon } from '@heroicons/react/24/outline'
+import SearchIcon from '../assets/search.svg'
+import RegisterClientIcon from '../assets/register-client.svg'
+import UpdateClientHistoryIcon from '../assets/update-client-history.svg'
+import AdministerVaccineIcon from '../assets/post-treatment.svg'
+import AefiIcon from '../assets/aefi.svg'
+import AppointmentIcon from '../assets/appointments.svg'
 import { Link } from 'react-router-dom'
 
 const stats = [
-  { name: 'Search Client', icon: '', href: 'search-client' },
-  { name: 'Register Client', icon: '', href: 'register-client' },
-  { name: 'Update Client History', icon: '', href: 'update-client-history' },
-  { name: 'Administer Vaccine', icon: '', href: 'administer-vaccine' },
-  { name: 'AEFI', icon: '', href: 'aefi' },
+  { name: 'Search Client', icon: SearchIcon, href: 'search-client' },
+  { name: 'Register Client', icon: RegisterClientIcon, href: 'register-client' },
+  { name: 'Update Client History', icon: UpdateClientHistoryIcon, href: 'update-client-history' },
+  { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'administer-vaccine' },
+  { name: 'AEFI', icon: AefiIcon, href: 'aefi' },
+  { name: 'Appointments', icon: AppointmentIcon, href: 'aefi' }
 ]
 
 const statsTwo = [
-  { id: 1, name: 'Appointments Today', stat: '125', icon: UsersIcon, change: '', changeType: 'increase' },
-  { id: 2, name: 'Vaccines Administered Today', stat: '100', icon: EnvelopeOpenIcon, change: '', changeType: 'increase' },
+  { id: 1, name: 'Appointments Today', stat: '125', icon: AppointmentIcon, change: '', changeType: 'increase' },
+  { id: 2, name: 'Vaccines Administered Today', stat: '100', icon: AdministerVaccineIcon, change: '', changeType: 'increase' },
 ]
 
 function classNames(...classes) {
@@ -23,12 +28,14 @@ export default function Home() {
   return (
     <>
       <div>
-        <h3 className="text-base font-semibold leading-6 text-gray-900 mt-10">Ministry of Health</h3>
-        <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-5">
+        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-5 p-6 rounded-lg shadow-xl border bg-white">
           {stats.map((item) => (
-            <Link to={item.href} key={item.name} className="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+            <Link to={item.href} key={item.name} className="overflow-hidden text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-[#5370B0]">
+              <img
+                className="h-12 mx-auto mb-5"
+                src={item.icon}
+                alt={item.name}/>
               <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
-              <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900">{item.stat}</dd>
             </Link>
           ))}
         </dl>
@@ -38,42 +45,26 @@ export default function Home() {
 
       <div>
 
-        <dl className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2">
+        <dl className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {statsTwo.map((item) => (
             <div
               key={item.id}
               className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6">
-              <dt>
-                <div className="absolute rounded-md bg-indigo-500 p-3">
-                  <item.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                </div>
-                <p className="ml-16 truncate text-sm font-medium text-gray-500">{item.name}</p>
-              </dt>
-              <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-                <p className="text-2xl font-semibold text-gray-900">{item.stat}</p>
-                <p
-                  className={classNames(
-                    item.changeType === 'increase' ? 'text-green-600' : 'text-red-600',
-                    'ml-2 flex items-baseline text-sm font-semibold'
-                  )}
-                >
-                  {item.changeType === 'increase' ? (
-                    <ArrowUpIcon className="h-5 w-5 flex-shrink-0 self-center text-green-500" aria-hidden="true" />
-                  ) : (
-                    <ArrowDownIcon className="h-5 w-5 flex-shrink-0 self-center text-red-500" aria-hidden="true" />
-                  )}
+              <h1 className='font-bold'>{item.name}</h1>
 
-                  <span className="sr-only"> {item.changeType === 'increase' ? 'Increased' : 'Decreased'} by </span>
-                  {item.change}
-                </p>
-                <div className="absolute inset-x-0 bottom-0 bg-gray-50 px-4 py-4 sm:px-6">
-                  <div className="text-sm">
-                    <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                      View<span className="sr-only"> {item.name} stats</span>
-                    </a>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <img
+                  className="h-18 ml-5 mt-6 mb-5"
+                  src={item.icon}
+                  alt={item.name}/>
+                </div>
+                <div>
+                  <div className="text-7xl text-[#163C94] font-bold mt-5">
+                    {item.stat}
                   </div>
                 </div>
-              </dd>
+              </div>
             </div>
           ))}
         </dl>
