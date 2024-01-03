@@ -1,13 +1,47 @@
+import ClientDetails from '../components/RegisterClient/ClientDetails'
+import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
+import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
+import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
+import { useState } from 'react'
+
 export default function RegisterClient() {
+
+  const [step, updateStep] = useState(1)
+
+  const nextForm = () => {
+    if (step < 4) {
+      updateStep(step + 1)
+    }
+  }
+
+  const handleCancel = () => {
+    if (step > 1) {
+      updateStep(step - 1)
+    }
+  }
+
   return (
-    <div className="bg-white px-6 py-24 sm:py-32 lg:px-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-          Register Client Page
-        </h2>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
-          Fill out a form for a client...
-        </p>
+    <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
+      <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
+        Register Client
+      </div>
+      <div className="px-4 py-5 sm:p-6">
+        {step === 1 && <ClientDetails />}
+        {step === 2 && <CareGiverDetails />}
+        {step === 3 && <AdministrativeArea />}
+        {step === 4 && <SubmitClientDetails />}
+      </div>
+      <div className="px-4 py-4 sm:px-6 flex justify-end">
+        <button
+          onClick={handleCancel}
+          className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-3 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          Cancel
+        </button>
+        <button
+          onClick={nextForm}
+          className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          Next
+        </button>
       </div>
     </div>
   );
