@@ -1,6 +1,30 @@
+import SelectMenu from '../../common/forms/SelectMenu'
 import TextInput from '../../common/forms/TextInput'
+import RadioGroup from '../../common/forms/RadioGroup'
 
 export default function ClientDetails() {
+  const identificationTypes = [
+    { id: 1, name: 'Identification Number' },
+    { id: 2, name: 'Birth Certificate Number' },
+    { id: 3, name: 'NEMIS Number' },
+    { id: 4, name: 'Passport Number' },
+  ]
+
+  const polarStatuses = [
+    { id: 1, name: 'Positive' },
+    { id: 2, name: 'Negative' },
+  ]
+
+  const binaryStatuses = [
+    { id: 1, name: 'Yes' },
+    { id: 2, name: 'No' },
+  ]
+
+  const genderOptions = [
+    { id: 1, title: 'Male' },
+    { id: 1, title: 'Female' },
+  ]
+
   return (
     <>
       <h3 className="text-xl font-medium">Client Details</h3>
@@ -16,19 +40,14 @@ export default function ClientDetails() {
             label="First Name"
             inputPlaceholder="First Name"/>
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <RadioGroup
             label="Gender"
-            inputPlaceholder="GENDER"/>
+            data={genderOptions} />
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <SelectMenu
             label="Identification Type"
-            inputPlaceholder="IDENTIFICATION TYPE"/>
+            data={identificationTypes}/>
+
         </div>
 
         {/* Column 2 */}
@@ -79,12 +98,9 @@ export default function ClientDetails() {
       <div className="grid grid-cols-3 gap-10 mt-10">
         {/* Column 1 */}
         <div>
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
-            label="Client HIV Status"
-            inputPlaceholder="Positive"/>
+          <SelectMenu
+            label="Client's HIV Status"
+            data={polarStatuses}/>
 
           <TextInput
             inputType="text"
@@ -97,23 +113,19 @@ export default function ClientDetails() {
         {/* Column 2 */}
         <div>
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <SelectMenu
             label="Client is currently receiving HAART"
-            inputPlaceholder="Yes"/>
+            data={binaryStatuses}/>
+
         </div>
 
         {/* Column 3 */}
         <div>
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <SelectMenu
             label="Maternal HIV Status"
-            inputPlaceholder="Positive"/>
+            data={polarStatuses}/>
+
         </div>
       </div>
     </>
