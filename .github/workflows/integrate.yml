@@ -6,8 +6,8 @@ on:
       - develop
 
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKER_USERNAME: dnjau
+  DOCKER_PASSWORD: Sc281-6736/2014
   SSH_PORT: 22
 
   SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
