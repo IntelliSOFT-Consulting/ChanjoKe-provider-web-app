@@ -1,46 +1,40 @@
-name: Build and Deploy Spring Boot Microservices
+name: React App Deployment # name of the workflo
 
 on:
   push:
     branches:
-      - develop
-
-env:
-  DOCKER_USERNAME: dnjau
-  DOCKER_PASSWORD: Sc281-6736/2014
-  SSH_PORT: 22
-
-  SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
-  SSH_HOST: ${{ secrets.SSH_HOST }}
-  SSH_USER: ${{ secrets.SSH_USER }}
-
-  CONTAINER_NAME: chanjo
-  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/chanjo:latest
+      - deploy-react-app # branch name
 
 jobs:
-  build_microservice_:
-    runs-on: ubuntu-20.04
+  deploy-react-to-gh-pages:
+    runs-on: ubuntu-latest
+    env:
+      EXAMPLE: example # environment variable
 
     steps:
-      - name: Checkout code
+      # checkout the repository content to github runner
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      # setup nodejs environment
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.5
         with:
-          node-version: 14
+          node-version: "18.16.1"
 
-      - name: Build React app
-        run: |
-          npm install
-          npm run build
+      # cache the dependencies to speed up the build
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: Display build logs
-        run: cat /home/runner/.npm/_logs/2024-01-06T17_40_51_494Z-debug.log || echo "No build logs found"
+      # install dependencies
+      - name: Install dependencies
+        run: npm i
 
-      - name: Build & push Docker image
-        run: |
-          echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
-          docker buildx create --use --name workflowBuilder
-          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME }} --push .
-          docker logout
+      # build the react app
+      - name: Build
+        run: npm run build
