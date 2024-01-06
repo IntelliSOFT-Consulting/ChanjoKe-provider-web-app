@@ -36,5 +36,9 @@ jobs:
         run: npm i
 
       # build the react app
-      - name: Build
-        run: npm run build
+      - name: Build & push  Docker image
+        run: |
+          echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
+          docker buildx create --use --name workflowBuilder
+          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME_ }} --push .
+          docker logout

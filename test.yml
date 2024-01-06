@@ -1,40 +1,24 @@
-name: React App Deployment # name of the workflo
-
-on:
-  push:
-    branches:
-      - develop # branch name
-
 jobs:
-  deploy-react-to-gh-pages:
-    runs-on: ubuntu-latest
-    env:
-      EXAMPLE: example # environment variable
+  build_microservice_:
+    runs-on: ubuntu-20.04
 
     steps:
-      # checkout the repository content to github runner
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      # setup nodejs environment
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.5
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: "18.16.1"
+          node-version: 14
 
-      # cache the dependencies to speed up the build
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Build React app
+        run: |
+          npm install
+          npm run build
 
-      # install dependencies
-      - name: Install dependencies
-        run: npm i
-
-      # build the react app
-      - name: Build
-        run: npm run build
+      - name: Build & push  Docker image
+        run: |
+          echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
+          docker buildx create --use --name workflowBuilder
+          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME_ }} --push .
+          docker logout
