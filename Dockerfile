@@ -1,18 +1,20 @@
-FROM node:16 as build
+# Use an official Node.js image as the base image
+FROM node:14-alpine
+
+# Set the working directory in the container
 WORKDIR /app
 
-COPY ./package.json ./
-COPY ./package-lock.json ./
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
-RUN npm install --quiet
+# Install dependencies
+RUN npm install
 
+# Copy the rest of the application code to the working directory
 COPY . .
 
-RUN npm run build
+# Expose the port the app runs on
+EXPOSE 3000
 
-
-FROM nginx:alpine
-COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/build /usr/share/nginx/html
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start the app
+CMD ["npm", "start"]

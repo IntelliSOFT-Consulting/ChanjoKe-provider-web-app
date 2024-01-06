@@ -1,17 +1,33 @@
-name: ChanjoKE Provider CI
+name: Build and Deploy Spring Boot Microservices
 
 on:
-  pull_request:
-    branches: [ develop ]
+  push:
+    branches:
+      - develop
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  SSH_PORT: 22
+
+  SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+
+  CONTAINER_NAME: chanjo
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/chanjo:latest
 
 jobs:
-  test_pull_request:
-    runs-on: ubuntu-latest
+  build_microservice_:
+    runs-on: ubuntu-20.04
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 16
-      - run: npm ci
-      - run: npm run build
-      - run: bash ./dev.sh
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build & push  Docker image
+        run: |
+          echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
+          docker buildx create --use --name workflowBuilder
+          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME_ }} --push .
+          docker logout
