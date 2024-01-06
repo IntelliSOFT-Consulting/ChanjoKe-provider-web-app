@@ -40,5 +40,5 @@ jobs:
         run: |
           docker login -u dnjau -p Sc281-6736/2014
           docker buildx create --use --name workflowBuilder
-          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME_ }} --push .
+          docker buildx build --platform=linux/amd64,linux/arm64 -t dnjau/chanjo:latest --push .
           docker logout
