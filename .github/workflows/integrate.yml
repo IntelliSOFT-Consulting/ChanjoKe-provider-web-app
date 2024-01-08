@@ -5,8 +5,20 @@ on:
     branches:
       - develop # branch name
 
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  SSH_PORT: 22
+
+  CONTAINER_NAME_NATIONAL: chanjoke
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/chanjoke
+
+  SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+
 jobs:
-  deploy-react-to-gh-pages:
+  build_frontend_app:
     runs-on: ubuntu-latest
     env:
       EXAMPLE: example # environment variable
@@ -38,7 +50,7 @@ jobs:
       # build the react app
       - name: Build & push  Docker image
         run: |
-          docker login -u dnjau -p Sc281-6736/2014
+          echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
           docker buildx create --use --name workflowBuilder
-          docker buildx build --platform=linux/amd64,linux/arm64 -t dnjau/chanjo:latest --push .
+          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME }} --push .
           docker logout
