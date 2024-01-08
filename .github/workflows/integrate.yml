@@ -11,7 +11,7 @@ env:
   SSH_PORT: 22
 
   CONTAINER_NAME_NATIONAL: chanjoke
-  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/chanjoke
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/chanjoke:latest
 
   SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
   SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -76,6 +76,15 @@ jobs:
               docker rm ${{ env.CONTAINER_NAME }}
             fi
 
+            # Login to Docker Hub
+            echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
+            if [ $? -eq 0 ]; then
+              echo "Docker login successful"
+            else
+              echo "Error: Docker login failed"
+              exit 1
+            fi
+
             docker pull --quiet ${{ env.IMAGE_NAME }}
             if [ $? -eq 0 ]; then
               echo "Docker image ${{ env.IMAGE_NAME }} pulled successfully"
@@ -85,6 +94,7 @@ jobs:
             fi
 
             # Run Docker commands with sudo and pass the password
-            echo ${{ secrets.SUDO_PASSWORD }} | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
+            echo ${{ env.SUDO_PASSWORD }} | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
             sudo docker logout
             sleep 10
+
