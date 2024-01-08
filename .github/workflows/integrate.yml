@@ -83,8 +83,3 @@ jobs:
               echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME }}"
               exit 1
             fi
-
-            # Run Docker commands with sudo and pass the password
-            echo ${{ secrets.SUDO_PASSWORD }} | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
-            sudo docker logout
-            sleep 10
