@@ -1,4 +1,4 @@
-name: React App Deployment # name of the workflo
+name: React App Deployment # name of the workflow
 
 on:
   push:
@@ -54,3 +54,33 @@ jobs:
           docker buildx create --use --name workflowBuilder
           docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME }} --push .
           docker logout
+
+      - name: Setup SSH keys
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ env.SSH_PASS }}
+
+      - name: Remote ssh to server and update the running container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          port: ${{ env.SSH_PORT }}
+          key: ${{ env.SSH_PASS }}
+          script_stop: true
+          script: |
+            if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME }}; then
+              echo "Check 1"
+              docker stop ${{ env.CONTAINER_NAME }}
+              docker rm ${{ env.CONTAINER_NAME }}
+            fi
+            docker pull --quiet ${{ env.IMAGE_NAME }}
+            if [ $? -eq 0 ]; then
+              echo "Docker image ${{ env.IMAGE_NAME }} pulled successfully"
+            else
+              echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME }}"
+              exit 1
+            fi
+            docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
+            docker logout
+            sleep 10
