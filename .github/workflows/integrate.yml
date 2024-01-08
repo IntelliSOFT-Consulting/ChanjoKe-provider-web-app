@@ -16,6 +16,7 @@ env:
   SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
   SSH_HOST: ${{ secrets.SSH_HOST }}
   SSH_USER: ${{ secrets.SSH_USER }}
+  SUDO_PASSWORD: ${{ secrets.SUDO_PASSWORD }}
 
 jobs:
   build_frontend_app:
@@ -71,16 +72,19 @@ jobs:
           script: |
             if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME }}; then
               echo "Check 1"
-              docker stop ${{ env.CONTAINER_NAME }}
-              docker rm ${{ env.CONTAINER_NAME }}
+              sudo docker stop ${{ env.CONTAINER_NAME }}
+              sudo docker rm ${{ env.CONTAINER_NAME }}
             fi
-            docker pull --quiet ${{ env.IMAGE_NAME }}
+
+            sudo docker pull --quiet ${{ env.IMAGE_NAME }}
             if [ $? -eq 0 ]; then
               echo "Docker image ${{ env.IMAGE_NAME }} pulled successfully"
             else
               echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME }}"
               exit 1
             fi
-            docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
-            docker logout
+
+            # Run Docker commands with sudo and pass the password
+            echo ${{ secrets.SUDO_PASSWORD }} | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
+            sudo docker logout
             sleep 10
