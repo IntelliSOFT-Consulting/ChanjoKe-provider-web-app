@@ -3,6 +3,7 @@ export default function RadioGroup(props) {
     <div>
       <p className="text-sm text-gray-500">
         { props.label }
+        { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
       </p>
       <fieldset className="mt-6 mb-6">
         <legend className="sr-only">{ props.label }</legend>

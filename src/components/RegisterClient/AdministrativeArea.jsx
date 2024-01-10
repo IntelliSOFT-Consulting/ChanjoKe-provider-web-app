@@ -1,6 +1,15 @@
 import TextInput from "../../common/forms/TextInput"
+import SelectMenu from '../../common/forms/SelectMenu'
 
 export default function ClientDetails() {
+
+  const locations = [
+    { id: 1, name: 'Kiambu' }
+  ]
+
+  const wards = [
+    { id: 1, name: 'Juja' }
+  ]
   return (
     <>
       <h3 className="text-xl font-medium">Administrative Area</h3>
@@ -9,12 +18,10 @@ export default function ClientDetails() {
         {/* Column   */}
         <div>
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <SelectMenu
+            required={true}
             label="Residence County"
-            inputPlaceholder="Residence County"/>
+            data={locations}/>
 
           <TextInput
             inputType="text"
@@ -27,12 +34,10 @@ export default function ClientDetails() {
         {/* Column   */}
         <div>
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <SelectMenu
+            required={true}
             label="Subcounty"
-            inputPlaceholder="Subcounty"/>
+            data={locations}/>
 
           <TextInput
             inputType="text"
@@ -45,12 +50,10 @@ export default function ClientDetails() {
         {/* Column   */}
         <div>
 
-          <TextInput
-            inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+          <SelectMenu
+            required={true}
             label="Ward"
-            inputPlaceholder="Ward"/>
+            data={wards}/>
 
         </div>
       </div>
