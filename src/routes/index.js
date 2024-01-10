@@ -6,6 +6,7 @@ import SearchClient from '../pages/SearchClient'
 import RegisterClient from '../pages/RegisterClient'
 import UpdateClientHistory from '../pages/UpdateClientHistory'
 import AdministerVaccine from '../pages/AdministerVaccine'
+import AdminMamagement from '../pages/AdminManagement'
 import AEFI from '../pages/AEFI'
 
 const router = createBrowserRouter([
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: '/search-client',
         element: <SearchClient />
+      },
+      {
+        path: '/admin',
+        element: <AdminMamagement />
       },
       {
         path: '/register-client',

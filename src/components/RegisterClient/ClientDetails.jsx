@@ -38,14 +38,17 @@ export default function ClientDetails() {
             inputName="firstName"
             inputId="firstName"
             label="First Name"
+            required={true}
             inputPlaceholder="First Name"/>
 
           <RadioGroup
             label="Gender"
+            required={true}
             data={genderOptions} />
 
           <SelectMenu
             label="Identification Type"
+            required={true}
             data={identificationTypes}/>
 
         </div>
@@ -61,10 +64,11 @@ export default function ClientDetails() {
             inputPlaceholder="Middle Name"/>
 
           <TextInput
-            inputType="text"
+            inputType="date"
             inputName="middleName"
             inputId="middleName"
             label="Date of Birth"
+            required={true}
             inputPlaceholder="Date of Birth"/>
 
           <TextInput
@@ -72,6 +76,7 @@ export default function ClientDetails() {
             inputName="middleName"
             inputId="middleName"
             label="Identification Number"
+            required={true}
             inputPlaceholder="Identification Number"/>
 
         </div>
@@ -84,6 +89,7 @@ export default function ClientDetails() {
             inputName="lastName"
             inputId="lastName"
             label="Last Name"
+            required={true}
             inputPlaceholder="Last Name"/>
 
           <TextInput
@@ -91,6 +97,7 @@ export default function ClientDetails() {
             inputName="lastName"
             inputId="lastName"
             label="Age"
+            disabled={true}
             inputPlaceholder="Age"/>
         </div>
       </div>
@@ -98,15 +105,14 @@ export default function ClientDetails() {
       <div className="grid grid-cols-3 gap-10 mt-10">
         {/* Column 1 */}
         <div>
-          <SelectMenu
-            label="Client's HIV Status"
-            data={polarStatuses}/>
 
           <TextInput
             inputType="text"
             inputName="firstName"
             inputId="firstName"
             label="Birth Weight"
+            addOn={true}
+            addOnTitle="Kgs"
             inputPlaceholder="Birth Weight"/>
         </div>
 
@@ -114,6 +120,7 @@ export default function ClientDetails() {
         <div>
 
           <SelectMenu
+            required={true}
             label="Client is currently receiving HAART"
             data={binaryStatuses}/>
 
@@ -123,6 +130,7 @@ export default function ClientDetails() {
         <div>
 
           <SelectMenu
+            required={true}
             label="Maternal HIV Status"
             data={polarStatuses}/>
 

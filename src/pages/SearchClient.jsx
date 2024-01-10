@@ -1,7 +1,11 @@
 import SearchTable from "../common/tables/SearchTable"
 import TextInput from "../common/forms/TextInput"
+import useGet from "../api/useGet"
 
 export default function SearchClient() {
+
+  const { data, loading, error } = useGet('Patient')
+
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
       <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
@@ -25,7 +29,9 @@ export default function SearchClient() {
           </div>
         </div>
 
-        <SearchTable />
+        {error && <div>{error}</div>}
+        {loading && <div>loading...</div>}
+        {data && <SearchTable results={data} />}
       </div>
     </div>
   );

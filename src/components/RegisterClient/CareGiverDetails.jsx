@@ -3,6 +3,7 @@ import SelectMenu from '../../common/forms/SelectMenu'
 
 export default function CaregiverDetails() {
   const caregiverTypes = [
+    { id: 0, name: 'Care Giver\'s Type'},
     { id: 1, name: 'Father' },
     { id: 2, name: 'Mother' },
     { id: 3, name: 'Brother' },
@@ -19,6 +20,7 @@ export default function CaregiverDetails() {
 
           <SelectMenu
             label="Care Giver's Type"
+            required={true}
             data={caregiverTypes}/>
 
         </div>
@@ -31,6 +33,7 @@ export default function CaregiverDetails() {
             inputName="firstName"
             inputId="firstName"
             label="Care Giver's name"
+            required={true}
             inputPlaceholder="Care Giver's name"/>
 
         </div>
@@ -43,6 +46,7 @@ export default function CaregiverDetails() {
             inputName="firstName"
             inputId="firstName"
             label="Contact phone number"
+            required={true}
             inputPlaceholder="Contact phone number"/>
 
           <button

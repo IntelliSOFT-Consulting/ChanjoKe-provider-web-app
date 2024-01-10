@@ -13,8 +13,9 @@ export default function SelectMenu(props) {
     <Listbox value={selected} onChange={setSelected}>
       {({ open }) => (
         <>
-          <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">
+          <Listbox.Label className="block text-sm text-[#707070]">
             { props.label }
+            { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
           </Listbox.Label>
           <div className="relative mt-2">
             <Listbox.Button className="relative w-full mb-4 cursor-default rounded-md bg-white py-2.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-[#4E4E4E] focus:outline-none focus:ring-2 focus:ring-[#163C94] sm:text-sm sm:leading-6">
