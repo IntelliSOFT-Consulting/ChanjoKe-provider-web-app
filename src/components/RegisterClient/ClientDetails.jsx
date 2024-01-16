@@ -1,6 +1,7 @@
 import SelectMenu from '../../common/forms/SelectMenu'
 import TextInput from '../../common/forms/TextInput'
 import RadioGroup from '../../common/forms/RadioGroup'
+import { useState } from 'react'
 
 export default function ClientDetails() {
   const identificationTypes = [
@@ -22,8 +23,22 @@ export default function ClientDetails() {
 
   const genderOptions = [
     { id: 1, title: 'Male' },
-    { id: 1, title: 'Female' },
+    { id: 2, title: 'Female' },
   ]
+
+  const [formData, setFormData ] = useState({
+    firstName: '',
+    gender: '',
+    identificationType: '',
+    middleName: '',
+    dateOfBirth: '',
+    identificationNumber: '',
+    lastName: '',
+    age: '',
+    birthWeight: '',
+    receivingHaart: '',
+    maternalHIVStatus: '',
+  })
 
   return (
     <>
@@ -39,6 +54,7 @@ export default function ClientDetails() {
             inputId="firstName"
             label="First Name"
             required={true}
+            onClick
             inputPlaceholder="First Name"/>
 
           <RadioGroup

@@ -8,6 +8,9 @@ import UpdateClientHistory from '../pages/UpdateClientHistory'
 import AdministerVaccine from '../pages/AdministerVaccine'
 import AdminMamagement from '../pages/AdminManagement'
 import AEFI from '../pages/AEFI'
+import StockManagement from '../pages/StockManagement'
+import DefaulterTracing from '../pages/DefaulterTracing'
+import Profile from '../pages/Profile'
 
 const router = createBrowserRouter([
   {
@@ -41,6 +44,18 @@ const router = createBrowserRouter([
       {
         path: '/aefi',
         element: <AEFI />
+      },
+      {
+        path: '/defaulter-tracing',
+        element: <DefaulterTracing />
+      },
+      {
+        path: '/stock-management',
+        element: <StockManagement />
+      },
+      {
+        path: '/profile',
+        element: <Profile />
       }
     ]
   },
