@@ -6,21 +6,33 @@ const useGet = (url) => {
   const [error, setError ] = useState(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoader(true)
-      const data = await fetch(`https://chanjoke.intellisoftkenya.com/hapi/fhir/${url}`)
-      const res = await data.json()
-      setLoader(false)
-      setData(res.entry)
-      setError(null)
 
-      console.log({ res })
-    }
+    const abortController = new AbortController()
 
-    fetchData().catch((error) => {
-      setError(error.message)
-      setLoader(false)
-    })
+    fetch(`https://chanjoke.intellisoftkenya.com/hapi/fhir/${url}`, { signal: abortController.signal })
+      .then((res) => {
+        if (!res.ok) {
+          throw Error('could not fetch data for that resource')
+        }
+        return res.json()
+      })
+      .then((data) => {
+        console.log({ data })
+        setData(data.entry)
+        setLoader(false)
+        setError(false)
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') {
+          console.log('fetch aborted')
+        } else {
+          setLoader(false)
+          setError(err.message)
+        }
+      })
+
+    return () => abortController.abort()
+
   }, [url])
 
   return { data, loading, error }

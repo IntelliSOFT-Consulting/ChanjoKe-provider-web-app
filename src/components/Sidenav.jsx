@@ -31,6 +31,8 @@ const navigation = [
   { name: 'Update Client History', href: 'update-client-history', icon: DocumentDuplicateIcon },
   { name: 'Administer Vaccine', href: 'administer-vaccine', icon: ChartPieIcon },
   { name: 'AEFI', href: 'aefi', icon: ChartPieIcon },
+  { name: 'Defaulter Tracing', href: 'defaulter-tracing', icon: ChartPieIcon },
+  { name: 'Stock Management', href: 'stock-management', icon: ChartPieIcon },
 ]
 
 function classNames(...classes) {
@@ -95,28 +97,6 @@ export default function Sidenav() {
                     </div>
                   </div>
                     <nav className="flex flex-1 flex-col px-6">
-                      {/* <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                        <li>
-                          <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
-                              <li key={item.name}>
-                                <Link
-                                  onClick={() => setSidebarOpen(false)}
-                                  to={item.href}
-                                  className={classNames(
-                                    pathname === item.href
-                                      ? 'bg-gray-50 text-indigo-600'
-                                      : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50',
-                                    'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                                  )}>
-                                  <span className="material-symbols-outlined">{item.icon}</span>
-                                  {item.name}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                      </ul> */}
 
                       <ul role="list" className="-mx-2 space-y-1">
                         {navigation.map((item) => (

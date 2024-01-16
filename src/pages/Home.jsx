@@ -12,7 +12,8 @@ const stats = [
   { name: 'Update Client History', icon: UpdateClientHistoryIcon, href: 'update-client-history' },
   { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'administer-vaccine' },
   { name: 'AEFI', icon: AefiIcon, href: 'aefi' },
-  { name: 'Appointments', icon: AppointmentIcon, href: 'aefi' }
+  { name: 'Appointments', icon: AppointmentIcon, href: 'aefi' },
+  { name: 'Stock Management', icon: AppointmentIcon, href: 'stock-management'}
 ]
 
 const statsTwo = [
