@@ -11,16 +11,6 @@ export default function ClientDetails() {
     { id: 4, name: 'Passport Number' },
   ]
 
-  const polarStatuses = [
-    { id: 1, name: 'Positive' },
-    { id: 2, name: 'Negative' },
-  ]
-
-  const binaryStatuses = [
-    { id: 1, name: 'Yes' },
-    { id: 2, name: 'No' },
-  ]
-
   const genderOptions = [
     { id: 1, title: 'Male' },
     { id: 2, title: 'Female' },
@@ -126,30 +116,18 @@ export default function ClientDetails() {
             inputType="text"
             inputName="firstName"
             inputId="firstName"
-            label="Birth Weight"
+            label="Current Weight"
             addOn={true}
             addOnTitle="Kgs"
-            inputPlaceholder="Birth Weight"/>
+            inputPlaceholder="Current Weight"/>
         </div>
 
         {/* Column 2 */}
         <div>
-
-          <SelectMenu
-            required={true}
-            label="Client is currently receiving HAART"
-            data={binaryStatuses}/>
-
         </div>
 
         {/* Column 3 */}
         <div>
-
-          <SelectMenu
-            required={true}
-            label="Maternal HIV Status"
-            data={polarStatuses}/>
-
         </div>
       </div>
     </>
