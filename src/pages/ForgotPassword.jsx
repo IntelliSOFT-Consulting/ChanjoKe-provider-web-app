@@ -3,7 +3,7 @@ import ChanjoKE from '../assets/chanjoke-img.png'
 import MOHLogo from '../assets/moh-logo.png'
 import TextInput from '../common/forms/TextInput'
 
-export default function Login() {
+export default function ForgotPassword() {
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
       <nav className="hidden md:block">
@@ -22,7 +22,7 @@ export default function Login() {
           src={MOHLogo}
           alt="Ministry of Health"/>
 
-        <h1 className='text-4xl text-[#163C94] text-center'>Login to your account</h1>
+        <h1 className='text-4xl text-[#163C94] text-center'>Enter your email address</h1>
 
         <form className='mt-5 max-w-96'>
           <TextInput
@@ -31,29 +31,15 @@ export default function Login() {
             inputId="email"
             leadingIcon="true"
             leadingIconName="mail"
-            inputPlaceholder="Username"/>
-
-          <br />
-
-          <TextInput
-            inputType="password"
-            inputName="password"
-            inputId="password"
-            leadingIcon="true"
-            leadingIconName="lock"
-            inputPlaceholder="Password"/>
-
-          <div className='text-right mx-10 text-[#707070] mt-3'>
-            <Link to="/forgot-password">Forgot password?</Link>
-          </div>
+            inputPlaceholder="Email Address"/>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div></div>
             <a
-            href='/'
+              href='/'
               className="flex w-full items-center justify-center gap-3 rounded-md bg-[#163C94] px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]">
               <span className="text-sm font-semibold leading-6">
-                Login
+                Reset Password
               </span>
             </a>
           </div>

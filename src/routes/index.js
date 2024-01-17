@@ -11,6 +11,9 @@ import AEFI from '../pages/AEFI'
 import StockManagement from '../pages/StockManagement'
 import DefaulterTracing from '../pages/DefaulterTracing'
 import Profile from '../pages/Profile'
+import ForgotPassword from '../pages/ForgotPassword'
+import ClientDetailsView from '../pages/ClientDetailsView'
+import UpdateVaccineHistory from '../components/UpdateClientHistory/UpdateVaccineHistory'
 
 const router = createBrowserRouter([
   {
@@ -56,12 +59,24 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <Profile />
+      },
+      {
+        path: '/client-details',
+        element: <ClientDetailsView />
+      },
+      {
+        path: '/update-vaccine-history',
+        element: <UpdateVaccineHistory />
       }
     ]
   },
   {
     path: '/auth',
     element: <Login />
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPassword />
   }
 ])
 

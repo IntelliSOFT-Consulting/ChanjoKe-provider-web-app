@@ -3,6 +3,7 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function RegisterClient() {
 
@@ -54,10 +55,11 @@ export default function RegisterClient() {
           </button>
         }
         {step === 4 &&
-          <button
+          <Link
+            to="/client-details"
             className="ml-4 flex-shrink-0 rounded-md bg-[#4E8D6E] border border-[#4E8D6E] outline outline-[#4E8D6E] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4E8D6E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4E8D6E]">
             Submit
-          </button>
+          </Link>
         }
         
       </div>
