@@ -22,7 +22,7 @@ export default function RegisterClient() {
   }
 
   return (
-    <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
+    <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
       <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
         Register Client
       </div>

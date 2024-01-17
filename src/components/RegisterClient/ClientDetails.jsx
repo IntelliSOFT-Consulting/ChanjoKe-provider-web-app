@@ -25,10 +25,32 @@ export default function ClientDetails() {
     identificationNumber: '',
     lastName: '',
     age: '',
-    birthWeight: '',
+    currentWeight: '',
     receivingHaart: '',
     maternalHIVStatus: '',
   })
+
+  const handleChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  function calculateAge(birthDate) {
+    console.log({ birthDate })
+    const currentDate = new Date();
+    const dob = new Date(birthDate);
+    let age = currentDate.getFullYear() - dob.getFullYear();
+  
+    // Adjust age if the birthday hasn't occurred yet this year
+    if (currentDate.getMonth() < dob.getMonth() || (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate())) {
+      age--;
+    }
+  
+    handleChange('age', age)
+  
+  }
 
   return (
     <>
@@ -44,18 +66,23 @@ export default function ClientDetails() {
             inputId="firstName"
             label="First Name"
             required={true}
-            onClick
+            value={formData.firstName}
+            onInputChange={(value) => handleChange('firstName', value)}
             inputPlaceholder="First Name"/>
 
           <RadioGroup
             label="Gender"
             required={true}
+            value={formData.gender}
+            onInputChange={(value) => handleChange('gender', value)}
             data={genderOptions} />
 
           <SelectMenu
             label="Identification Type"
             required={true}
-            data={identificationTypes}/>
+            data={identificationTypes}
+            value={formData.identificationType || 'Identification Type'}
+            onInputChange={(value) => handleChange('identificationType', value)}/>
 
         </div>
 
@@ -67,6 +94,8 @@ export default function ClientDetails() {
             inputName="middleName"
             inputId="middleName"
             label="Middle Name"
+            value={formData.middleName}
+            onInputChange={(value) => handleChange('middleName', value)}
             inputPlaceholder="Middle Name"/>
 
           <TextInput
@@ -75,6 +104,8 @@ export default function ClientDetails() {
             inputId="middleName"
             label="Date of Birth"
             required={true}
+            value={formData.dateOfBirth}
+            onInputChange={(value) => (handleChange('dateOfBirth', value), calculateAge(value))}
             inputPlaceholder="Date of Birth"/>
 
           <TextInput
@@ -82,6 +113,8 @@ export default function ClientDetails() {
             inputName="middleName"
             inputId="middleName"
             label="Identification Number"
+            value={formData.identificationNumber}
+            onInputChange={(value) => handleChange('identificationNumber', value)}
             required={true}
             inputPlaceholder="Identification Number"/>
 
@@ -96,6 +129,8 @@ export default function ClientDetails() {
             inputId="lastName"
             label="Last Name"
             required={true}
+            value={formData.lastName}
+            onInputChange={(value) => handleChange('lastName', value)}
             inputPlaceholder="Last Name"/>
 
           <TextInput
@@ -103,6 +138,7 @@ export default function ClientDetails() {
             inputName="lastName"
             inputId="lastName"
             label="Age"
+            value={formData.age}
             disabled={true}
             inputPlaceholder="Age"/>
         </div>
@@ -117,6 +153,8 @@ export default function ClientDetails() {
             inputName="firstName"
             inputId="firstName"
             label="Current Weight"
+            value={formData.currentWeight}
+            onInputChange={(value) => handleChange('currentWeight', value)}
             addOn={true}
             addOnTitle="Kgs"
             inputPlaceholder="Current Weight"/>
