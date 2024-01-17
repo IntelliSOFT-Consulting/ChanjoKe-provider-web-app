@@ -14,6 +14,7 @@ import Profile from '../pages/Profile'
 import ForgotPassword from '../pages/ForgotPassword'
 import ClientDetailsView from '../pages/ClientDetailsView'
 import UpdateVaccineHistory from '../components/UpdateClientHistory/UpdateVaccineHistory'
+import FAQs from '../pages/FAQs'
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: '/update-vaccine-history',
         element: <UpdateVaccineHistory />
+      },
+      {
+        path: '/frequently-asked-questions',
+        element: <FAQs />
       }
     ]
   },

@@ -21,6 +21,8 @@ export default function TextInput(props) {
           name={props.inputName}
           id={props.inputId}
           disabled={props.disabled}
+          value={props.value}
+          onChange={(e) => props.onInputChange(e.target.value)}
           className={
             props.leadingIcon
             ? 'block w-full rounded-md border-0 py-3 pl-10 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]'

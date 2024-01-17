@@ -8,10 +8,13 @@ export default function SearchTable(props) {
             <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
               <thead>
                 <tr>
-                  <th scope="col" className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-0">
-                    Client Name
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
+                  {props.headers.map((header) => (
+                    <th key={header} scope="col" className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-0">
+                      {header.title}
+                    </th>
+                  ))}
+                  
+                  {/* <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
                     ID Number
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
@@ -19,26 +22,19 @@ export default function SearchTable(props) {
                   </th>
                   <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
                     Actions
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 text-center">
-                {props.results.map((patient) => (
-                  <tr key={patient.fullUrl}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-0">
-                      {patient.resource.name[0].family}
+              {props.data.map((item, index) => (
+                <tr key={index}>
+                  {props.headers.map((header) => (
+                    <td key={header.key} className={`whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class}`}>
+                      {item[header.key]}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {patient.resource.identifier[0].value}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {patient.resource.contact[0]?.telecom.find(item => item.system === 'phone')?.value}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      View
-                    </td>
-                  </tr>
-                ))}
+                  ))}
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>
