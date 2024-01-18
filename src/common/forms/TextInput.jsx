@@ -6,7 +6,7 @@ export default function TextInput(props) {
         { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
       </label>
 
-      <div className="relative mt-2 rounded-md shadow-sm mb-4">
+      <div className="relative mt-2 rounded-md shadow-sm mb-3">
         {
           props.leadingIcon ? (
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -48,6 +48,8 @@ export default function TextInput(props) {
         }
         
       </div>
+
+      <small className='text-red-400'>{props.error}</small>
     </div>
   )
 }
