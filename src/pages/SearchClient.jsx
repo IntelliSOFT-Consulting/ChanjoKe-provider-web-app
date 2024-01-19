@@ -31,7 +31,9 @@ export default function SearchClient() {
 
         {error && <div>{error}</div>}
         {loading && <div>loading...</div>}
-        {data && <SearchTable results={data} />}
+        {data &&
+          <SearchTable
+            data={data} />}
       </div>
     </div>
   );

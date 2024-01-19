@@ -1,9 +1,11 @@
 import SelectMenu from '../../common/forms/SelectMenu'
 import TextInput from '../../common/forms/TextInput'
 import RadioGroup from '../../common/forms/RadioGroup'
-import { useState } from 'react'
+import calculateAge from '../../utils/calculateAge'
+import FormState from '../../utils/formState'
+import { useEffect, useState } from 'react'
 
-export default function ClientDetails() {
+export default function ClientDetails({ setClientDetails, setClientFormErrors }) {
   const identificationTypes = [
     { id: 1, name: 'Identification Number' },
     { id: 2, name: 'Birth Certificate Number' },
@@ -51,7 +53,7 @@ export default function ClientDetails() {
     }
   }
 
-  const [formData, setFormData] = useState({
+  const formStructure = {
     firstName: '',
     gender: '',
     identificationType: '',
@@ -61,93 +63,14 @@ export default function ClientDetails() {
     lastName: '',
     age: '',
     currentWeight: '',
-  })
-  const [formErrors, setFormErrors] = useState({})
-
-  const handleChange = (name, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-
-    validate(name, value, formRules);
-  };
-
-  // PS: Make this a reusable function
-  function calculateAge(birthDate) {
-    const currentDate = new Date();
-    const dob = new Date(birthDate);
-    let age = currentDate.getFullYear() - dob.getFullYear();
-  
-    // Adjust age if the birthday hasn't occurred yet this year
-    if (currentDate.getMonth() < dob.getMonth() || (currentDate.getMonth() === dob.getMonth() && currentDate.getDate() < dob.getDate())) {
-      age--;
-    }
-  
-    handleChange('age', age)
-  
   }
 
-  // PS: Make this a reusable function
-  function validate(currentField, fieldValue, validationRules) {
+  const { formData, formErrors, handleChange } = FormState(formStructure, formRules)
 
-    const rulesToApply = Object.keys(validationRules[currentField])
-
-    rulesToApply.forEach(rule => {
-      if (rule === 'required' && validationRules[currentField].required) {
-        const isRequiredValid = fieldValue !== undefined && fieldValue !== null && fieldValue !== '';
-        if (isRequiredValid) {
-          setFormErrors((errors) => {
-            const updatedErrors = { ...errors };
-            delete updatedErrors[currentField];
-            return updatedErrors;
-          })
-        } else {
-          setFormErrors((errors) => ({
-            ...errors,
-            [currentField]: `${currentField} is a required value`
-          }))
-        }
-      }
-
-      if (rule === 'minLen') {
-        const isMinLenValid = typeof fieldValue === 'string' || typeof fieldValue === 'number';
-
-        // then, check the number of characters in the value are more than 4
-        if (isMinLenValid) {
-          const minLength = validationRules[currentField].minLen;
-          const isMinLengthValid = String(fieldValue).length >= minLength;
-
-          console.log({ minLength, isMinLengthValid, isMinLenValid })
-
-          if (isMinLengthValid) {
-            console.log('what if...')
-            setFormErrors((errors) => {
-              const updatedErrors = { ...errors };
-              delete updatedErrors[currentField];
-              return updatedErrors;
-            })
-          } else {
-            console.log('shouldnt this happen?')
-            setFormErrors({
-              ...formErrors,
-              [currentField]: `the field ${currentField} requires ${validationRules[currentField].minLen} characters`
-            })
-            console.log({ formErrors })
-          }
-        } else {
-          setFormErrors((errors) => ({
-            ...errors,
-            [currentField]: `${currentField} should be a string or number`
-          }))
-        }
-      }
-    })
-
-
-    return {}
-
-  }
+  useEffect(() => {
+    setClientDetails(formData)
+    setClientFormErrors(formErrors)
+  }, [formData])
 
   return (
     <>
@@ -207,7 +130,7 @@ export default function ClientDetails() {
               label="Date of Birth"
               required={true}
               value={formData.dateOfBirth}
-              onInputChange={(value) => (handleChange('dateOfBirth', value), calculateAge(value))}
+              onInputChange={(value) => (handleChange('dateOfBirth', value), handleChange('age', calculateAge(value)))}
               inputPlaceholder="Date of Birth"/>
 
             <TextInput

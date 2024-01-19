@@ -1,8 +1,9 @@
 import TextInput from "../../common/forms/TextInput"
 import SelectMenu from '../../common/forms/SelectMenu'
-import { useState } from "react"
+import FormState from "../../utils/formState"
+import { useEffect } from "react"
 
-export default function ClientDetails() {
+export default function AdministrativeArea({ setAdministrativeAreaDetails, setAdminAreaFormErrors }) {
 
   const locations = [
     { id: 1, name: 'Kiambu' }
@@ -12,20 +13,30 @@ export default function ClientDetails() {
     { id: 1, name: 'Juja' }
   ]
 
-  const [formData, setFormData ] = useState({
+  const formRules = {
+    residenceCounty: {
+      required: true,
+    },
+    subCounty: {
+      required: true,
+    },
+    ward: {
+      required: true,
+    }
+  }
+
+  const { formData, formErrors, handleChange } = FormState({
     residenceCounty: '',
     townCenter: '',
     subCounty: '',
     estateOrHouseNo: '',
     ward: ''
-  })
+  }, formRules)
 
-  const handleChange = (name, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    setAdministrativeAreaDetails(formData)
+    setAdminAreaFormErrors(formErrors)
+  }, [formData])
   return (
     <>
       <h3 className="text-xl font-medium">Administrative Area</h3>
@@ -38,6 +49,7 @@ export default function ClientDetails() {
             required={true}
             label="Residence County"
             value={formData.residenceCounty || 'Residence County'}
+            error={formErrors.residenceCounty}
             onInputChange={(value) => handleChange('residenceCounty', value)}
             data={locations}/>
 
@@ -58,6 +70,7 @@ export default function ClientDetails() {
             required={true}
             label="Subcounty"
             value={formData.subCounty || 'Subcounty'}
+            error={formErrors.residenceCounty}
             onInputChange={(value) => handleChange('subCounty', value)}
             data={locations}/>
 
@@ -76,6 +89,7 @@ export default function ClientDetails() {
 
           <SelectMenu
             required={true}
+            error={formErrors.ward}
             label="Ward"
             value={formData.ward || 'Ward'}
             onInputChange={(value) => handleChange('ward', value)}
