@@ -1,10 +1,25 @@
 import SearchTable from "../common/tables/SearchTable"
 import TextInput from "../common/forms/TextInput"
+import FormState from "../utils/formState"
 import useGet from "../api/useGet"
 
 export default function SearchClient() {
 
   const { data, loading, error } = useGet('Patient')
+  const patients = [
+    {clientName: 'John Doe', idNumber: '32009988', phoneNumber: '0700 000000', actions: 'View'}
+  ]
+
+  const tHeaders = [
+    {title: 'Client Name', class: '', key: 'clientName'},
+    {title: 'ID Number', class: '', key: 'idNumber'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
+    {title: 'Actions', class: '', key: 'actions'},
+  ]
+
+  const { formData, formErrors, handleChange} = FormState({
+    searchInput: '',
+  })
 
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
@@ -18,6 +33,8 @@ export default function SearchClient() {
               inputType="text"
               inputName="searchInput"
               inputId="searchInput"
+              value={formData.searchInput}
+              onInputChange={(value) => handleChange('searchInput', value)}
               label="Enter Client Name/ID"
               inputPlaceholder="Enter Client Name/ID"/>
           </div>
@@ -33,7 +50,8 @@ export default function SearchClient() {
         {loading && <div>loading...</div>}
         {data &&
           <SearchTable
-            data={data} />}
+            headers={tHeaders}
+            data={patients} />}
       </div>
     </div>
   );

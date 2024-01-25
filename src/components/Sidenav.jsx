@@ -17,16 +17,14 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid'
 
 const navigation = [
   { name: 'Home', href: '/', current: true, icon: HomeIcon },
-  { name: 'Admin Management', href: 'admin', icon: UsersIcon },
   {
-    name: 'Vaccination Reports',
-    current: false,
+    name: 'Admin Management',
+    icon: UsersIcon,
     children: [
-      { name: 'AEFI Occurences', href: 'aefi-occurences' },
-      { name: 'Defaulters List', href: 'defaulters-list' },
-    ],
-    icon: FolderIcon,
-  },
+      { name: 'User', href: '/admin-users' },
+      { name: 'Facility', href: 'admin-facilities'}
+    ]},
+  { name: 'Vaccination Reports', current: false, href: '/', icon: FolderIcon },
   { name: 'Register Client', href: 'register-client', icon: CalendarIcon },
   { name: 'Update Client History', href: 'update-client-history', icon: DocumentDuplicateIcon },
   { name: 'Administer Vaccine', href: 'administer-vaccine', icon: ChartPieIcon },
@@ -174,28 +172,60 @@ export default function Sidenav() {
               </div>
             </div>
             <nav className="flex flex-1 flex-col px-6">
-              <ul role="list" className="flex flex-1 flex-col gap-y-7">
-                <li>
-                  <ul role="list" className="-mx-2 space-y-1">
-                    {navigation.map((nav) => (
-                      <li key={nav.name}>
-                        <Link
-                          to={nav.href}
-                          className={classNames(
-                            pathname === nav.href
-                              ? 'bg-gray-50 text-indigo-600'
-                              : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50',
-                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
-                          )}>
-                          {nav.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-                <li className="-mx-6 mt-auto">
-
-                </li>
+              <ul role="list" className="-mx-2 space-y-1">
+                {navigation.map((item) => (
+                  <li key={item.name}>
+                    {!item.children ? (
+                      <a
+                        href={item.href}
+                        className={classNames(
+                          item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
+                          'block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold text-gray-700'
+                        )}
+                      >
+                        {item.name}
+                      </a>
+                    ) : (
+                      <Disclosure as="div">
+                        {({ open }) => (
+                          <>
+                            <Disclosure.Button
+                              className={classNames(
+                                item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
+                                'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700'
+                              )}
+                            >
+                              <ChevronRightIcon
+                                className={classNames(
+                                  open ? 'rotate-90 text-gray-500' : 'text-gray-400',
+                                  'h-5 w-5 shrink-0'
+                                )}
+                                aria-hidden="true"
+                              />
+                              {item.name}
+                            </Disclosure.Button>
+                            <Disclosure.Panel as="ul" className="mt-1 px-2">
+                              {item.children.map((subItem) => (
+                                <li key={subItem.name}>
+                                  <Disclosure.Button
+                                    as="a"
+                                    href={subItem.href}
+                                    className={classNames(
+                                      subItem.current ? 'bg-gray-50' : 'hover:bg-gray-50',
+                                      'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700'
+                                    )}
+                                  >
+                                    {subItem.name}
+                                  </Disclosure.Button>
+                                </li>
+                              ))}
+                            </Disclosure.Panel>
+                          </>
+                        )}
+                      </Disclosure>
+                    )}
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>

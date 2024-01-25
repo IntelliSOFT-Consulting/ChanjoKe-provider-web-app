@@ -8,21 +8,11 @@ export default function SearchTable(props) {
             <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
               <thead>
                 <tr>
-                  {props.headers.map((header) => (
-                    <th key={header} scope="col" className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-0">
+                  {props.headers.map((header, index) => (
+                    <th key={index} scope="col" className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-0">
                       {header.title}
                     </th>
                   ))}
-                  
-                  {/* <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
-                    ID Number
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
-                    Phone Number
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">
-                    Actions
-                  </th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 text-center">

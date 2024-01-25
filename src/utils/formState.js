@@ -10,20 +10,24 @@ export default function FormState(formStructure, formRules) {
       ...prevData,
       [name]: value,
     }));
+
+    if (formRules) {
+
+      const isInvalid = validate(name, value, formRules).find((value) => value.valid !== true);
   
-    const isInvalid = validate(name, value, formRules).find((value) => value.valid !== true);
-  
-    if (isInvalid) {
-      setFormErrors((errors) => ({
-        ...errors,
-        [name]: `${name} is a required value`
-      }))
-    } else {
-      setFormErrors((errors) => {
-        const updatedErrors = { ...errors };
-        delete updatedErrors[name];
-        return updatedErrors;
-      })
+      if (isInvalid) {
+        setFormErrors((errors) => ({
+          ...errors,
+          [name]: `${name} is a required value`
+        }))
+      } else {
+        setFormErrors((errors) => {
+          const updatedErrors = { ...errors };
+          delete updatedErrors[name];
+          return updatedErrors;
+        })
+      }
+
     }
   };
 
