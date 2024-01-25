@@ -18,9 +18,11 @@ const useGet = (url) => {
       })
       .then((data) => {
         console.log({ data })
-        setData(data.entry)
-        setLoader(false)
-        setError(false)
+        if (data) {
+          setData(data.entry)
+          setLoader(false)
+          setError(false)
+        }
       })
       .catch((err) => {
         if (err.name === 'AbortError') {

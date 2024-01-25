@@ -15,24 +15,20 @@ import ForgotPassword from '../pages/ForgotPassword'
 import ClientDetailsView from '../pages/ClientDetailsView'
 import UpdateVaccineHistory from '../components/UpdateClientHistory/UpdateVaccineHistory'
 import FAQs from '../pages/FAQs'
+import User from '../pages/AdminManagement/User'
+import Facility from '../pages/AdminManagement/Facility'
+import AddUser from '../pages/AdminManagement/AddUser'
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root />,
     children: [
-      {
-        path: '/',
-        element: <Home />
-      },
-      {
-        path: '/search-client',
-        element: <SearchClient />
-      },
-      {
-        path: '/admin',
-        element: <AdminMamagement />
-      },
+      { path: '/', element: <Home /> },
+      { path: '/search-client', element: <SearchClient /> },
+      { path: '/admin-users', element: <User /> },
+      { path: '/admin-facilities', element: <Facility /> },
+      { path: '/admin-add-user', element: <AddUser /> },
       {
         path: '/register-client',
         element: <RegisterClient />

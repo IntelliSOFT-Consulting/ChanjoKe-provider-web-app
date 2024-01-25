@@ -8,8 +8,23 @@ import { Link } from 'react-router-dom'
 export default function RegisterClient() {
 
   const [step, updateStep] = useState(1)
+  const [clientDetails, setClientDetails] = useState(null)
+  const [clientErrors, setClientFormErrors] = useState({})
+
+  const [caregiverDetails, setCaregiverDetails] = useState([])
+  const [caregiverErrors, setCaregiverFormErrors] = useState({})
+
+  const [administrativeArea, setAdministrativeAreaDetails] = useState(null)
+  const [adminErrors, setAdminAreaFormErrors] = useState({})
+
 
   const nextForm = () => {
+
+    console.log({ clientDetails })
+    console.log({ clientErrors })
+    console.log({ caregiverDetails })
+    console.log({ administrativeArea })
+
     if (step < 4) {
       updateStep(step + 1)
     }
@@ -27,9 +42,15 @@ export default function RegisterClient() {
         Register Client
       </div>
       <div className="px-4 py-5 sm:p-6">
-        {step === 1 && <ClientDetails />}
-        {step === 2 && <CareGiverDetails />}
-        {step === 3 && <AdministrativeArea />}
+        {step === 1 && <ClientDetails
+          setClientDetails={setClientDetails}
+          setClientFormErrors={setClientFormErrors} />}
+        {step === 2 && <CareGiverDetails
+          setCaregiverDetails={setCaregiverDetails}
+          setCaregiverFormErrors={setCaregiverFormErrors} />}
+        {step === 3 && <AdministrativeArea
+          setAdministrativeAreaDetails={setAdministrativeAreaDetails}
+          setAdminAreaFormErrors={setAdminAreaFormErrors}/>}
         {step === 4 && <SubmitClientDetails />}
       </div>
       <div className="px-4 py-4 sm:px-6 flex justify-end">
@@ -50,6 +71,7 @@ export default function RegisterClient() {
         {(step === 1 || step === 2) && 
           <button
             onClick={nextForm}
+            disabled={Object.keys(clientErrors).length !== 0 || Object.keys(adminErrors).length !== 0}
             className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
             Next
           </button>
