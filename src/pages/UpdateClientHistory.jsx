@@ -7,7 +7,7 @@ export default function SearchClient() {
 
   const { data, loading, error } = useGet('Patient')
   const patients = [
-    {clientName: 'John Doe', idNumber: '32009988', phoneNumber: '0700 000000', actions: 'Update'}
+    {clientName: 'John Doe', idNumber: '32009988', phoneNumber: '0700 000000', actions: ['update'] }
   ]
 
   const tHeaders = [

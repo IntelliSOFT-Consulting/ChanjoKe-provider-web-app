@@ -22,7 +22,7 @@ const navigation = [
     icon: UsersIcon,
     children: [
       { name: 'User', href: '/admin-users' },
-      { name: 'Facility', href: 'admin-facilities'}
+      { name: 'Facility', href: '/admin-add-facility'}
     ]},
   { name: 'Vaccination Reports', current: false, href: '/', icon: FolderIcon },
   { name: 'Register Client', href: 'register-client', icon: CalendarIcon },

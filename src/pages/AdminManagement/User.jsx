@@ -8,12 +8,12 @@ export default function User() {
 
   const { data, loading, error } = useGet('Patient')
   const patients = [
-    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: 'Update  Archive'},
-    {dateRegistered: 'Jan 12 2024', fullNames: 'Jane Doe', actions: 'Update  Archive'}
+    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: ['update', 'archive']},
+    {dateRegistered: 'Jan 12 2024', fullNames: 'Jane Doe', actions: ['update', 'archive']}
   ]
 
   const archived = [
-    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: 'Unarchive'},
+    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: ['unarchive']},
   ]
 
   const tHeaders = [
