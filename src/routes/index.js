@@ -6,7 +6,6 @@ import SearchClient from '../pages/SearchClient'
 import RegisterClient from '../pages/RegisterClient'
 import UpdateClientHistory from '../pages/UpdateClientHistory'
 import AdministerVaccine from '../pages/AdministerVaccine'
-import AdminMamagement from '../pages/AdminManagement'
 import AEFI from '../pages/AEFI'
 import StockManagement from '../pages/StockManagement'
 import DefaulterTracing from '../pages/DefaulterTracing'
@@ -18,6 +17,7 @@ import FAQs from '../pages/FAQs'
 import User from '../pages/AdminManagement/User'
 import Facility from '../pages/AdminManagement/Facility'
 import AddUser from '../pages/AdminManagement/AddUser'
+import AddFacility from '../pages/AdminManagement/AddFacility'
 
 const router = createBrowserRouter([
   {
@@ -29,46 +29,17 @@ const router = createBrowserRouter([
       { path: '/admin-users', element: <User /> },
       { path: '/admin-facilities', element: <Facility /> },
       { path: '/admin-add-user', element: <AddUser /> },
-      {
-        path: '/register-client',
-        element: <RegisterClient />
-      },
-      {
-        path: '/update-client-history',
-        element: <UpdateClientHistory />
-      },
-      {
-        path: '/administer-vaccine',
-        element: <AdministerVaccine />
-      },
-      {
-        path: '/aefi',
-        element: <AEFI />
-      },
-      {
-        path: '/defaulter-tracing',
-        element: <DefaulterTracing />
-      },
-      {
-        path: '/stock-management',
-        element: <StockManagement />
-      },
-      {
-        path: '/profile',
-        element: <Profile />
-      },
-      {
-        path: '/client-details',
-        element: <ClientDetailsView />
-      },
-      {
-        path: '/update-vaccine-history',
-        element: <UpdateVaccineHistory />
-      },
-      {
-        path: '/frequently-asked-questions',
-        element: <FAQs />
-      }
+      { path: '/admin-add-facility', element: <AddFacility /> },
+      { path: '/register-client', element: <RegisterClient /> },
+      { path: '/update-client-history', element: <UpdateClientHistory /> },
+      { path: '/administer-vaccine', element: <AdministerVaccine /> },
+      { path: '/aefi', element: <AEFI /> },
+      { path: '/defaulter-tracing', element: <DefaulterTracing /> },
+      { path: '/stock-management', element: <StockManagement /> },
+      { path: '/profile', element: <Profile /> },
+      { path: '/client-details', element: <ClientDetailsView /> },
+      { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
+      { path: '/frequently-asked-questions', element: <FAQs /> }
     ]
   },
   {

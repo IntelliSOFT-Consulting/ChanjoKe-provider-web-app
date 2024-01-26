@@ -1,3 +1,5 @@
+import RenderActionButton from './RenderActionsButton';
+
 export default function SearchTable(props) {
 
   return (
@@ -20,7 +22,11 @@ export default function SearchTable(props) {
                 <tr key={index}>
                   {props.headers.map((header) => (
                     <td key={header.key} className={`whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class}`}>
-                      {item[header.key]}
+                      {header.key === 'actions' ? (
+                        RenderActionButton(item[header.key])
+                      ) : (
+                        item[header.key]
+                      )}
                     </td>
                   ))}
                 </tr>
