@@ -29,22 +29,6 @@ export default function Home() {
   return (
     <>
       <div>
-        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-5 p-6 rounded-lg shadow-xl border bg-white">
-          {stats.map((item) => (
-            <Link to={item.href} key={item.name} className="overflow-hidden text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-[#5370B0]">
-              <img
-                className="h-12 mx-auto mb-5"
-                src={item.icon}
-                alt={item.name}/>
-              <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
-            </Link>
-          ))}
-        </dl>
-      </div>
-
-      <br />
-
-      <div>
 
         <dl className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {statsTwo.map((item) => (
@@ -67,6 +51,22 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          ))}
+        </dl>
+      </div>
+
+      <br />
+
+      <div>
+        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-5 p-6 rounded-lg shadow-xl border bg-white">
+          {stats.map((item) => (
+            <Link to={item.href} key={item.name} className="overflow-hidden text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-[#5370B0]">
+              <img
+                className="h-12 mx-auto mb-5"
+                src={item.icon}
+                alt={item.name}/>
+              <dt className="truncate text-sm font-medium text-gray-500">{item.name}</dt>
+            </Link>
           ))}
         </dl>
       </div>
