@@ -21,10 +21,10 @@ const navigation = [
     name: 'Admin Management',
     icon: UsersIcon,
     children: [
-      { name: 'User', href: '/admin-users' },
-      { name: 'Facility', href: '/admin-add-facility'}
+      { name: 'User', href: 'admin-users' },
+      { name: 'Facility', href: 'admin-add-facility'}
     ]},
-  { name: 'Vaccination Reports', current: false, href: '/', icon: FolderIcon },
+  { name: 'Vaccination Reports', current: false, href: 'reports', icon: FolderIcon },
   { name: 'Register Client', href: 'register-client', icon: CalendarIcon },
   { name: 'Update Client History', href: 'update-client-history', icon: DocumentDuplicateIcon },
   { name: 'Administer Vaccine', href: 'administer-vaccine', icon: ChartPieIcon },

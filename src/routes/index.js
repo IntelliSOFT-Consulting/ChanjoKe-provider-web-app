@@ -18,6 +18,7 @@ import User from '../pages/AdminManagement/User'
 import Facility from '../pages/AdminManagement/Facility'
 import AddUser from '../pages/AdminManagement/AddUser'
 import AddFacility from '../pages/AdminManagement/AddFacility'
+import VaccinationReports from '../pages/VaccinationReports'
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       { path: '/aefi', element: <AEFI /> },
       { path: '/defaulter-tracing', element: <DefaulterTracing /> },
       { path: '/stock-management', element: <StockManagement /> },
+      { path: '/reports', element: <VaccinationReports />},
       { path: '/profile', element: <Profile /> },
       { path: '/client-details', element: <ClientDetailsView /> },
       { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
