@@ -1,12 +1,9 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, useParams } from 'react-router-dom'
 import Root from './Root'
 import Login from '../pages/Login'
 import Home from '../pages/Home'
 import SearchClient from '../pages/SearchClient'
 import RegisterClient from '../pages/RegisterClient'
-import UpdateClientHistory from '../pages/UpdateClientHistory'
-import AdministerVaccine from '../pages/AdministerVaccine'
-import AEFI from '../pages/AEFI'
 import StockManagement from '../pages/StockManagement'
 import DefaulterTracing from '../pages/DefaulterTracing'
 import Profile from '../pages/Profile'
@@ -14,11 +11,18 @@ import ForgotPassword from '../pages/ForgotPassword'
 import ClientDetailsView from '../pages/ClientDetailsView'
 import UpdateVaccineHistory from '../components/UpdateClientHistory/UpdateVaccineHistory'
 import FAQs from '../pages/FAQs'
-import User from '../pages/AdminManagement/User'
-import Facility from '../pages/AdminManagement/Facility'
-import AddUser from '../pages/AdminManagement/AddUser'
-import AddFacility from '../pages/AdminManagement/AddFacility'
+import User from '../components/AdminManagement/User'
+import Facility from '../components/AdminManagement/Facility'
+import AddUser from '../components/AdminManagement/AddUser'
+import AddFacility from '../components/AdminManagement/AddFacility'
 import VaccinationReports from '../pages/VaccinationReports'
+import SearchInterface from '../pages/SearchInterface'
+
+function SearchInterfaceWrapper() {
+  const { searchType } = useParams()
+
+  return <SearchInterface searchType={searchType} />
+}
 
 const router = createBrowserRouter([
   {
@@ -27,14 +31,12 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home /> },
       { path: '/search-client', element: <SearchClient /> },
+      { path: '/search/:searchType', element: <SearchInterfaceWrapper /> },
       { path: '/admin-users', element: <User /> },
       { path: '/admin-facilities', element: <Facility /> },
       { path: '/admin-add-user', element: <AddUser /> },
       { path: '/admin-add-facility', element: <AddFacility /> },
       { path: '/register-client', element: <RegisterClient /> },
-      { path: '/update-client-history', element: <UpdateClientHistory /> },
-      { path: '/administer-vaccine', element: <AdministerVaccine /> },
-      { path: '/aefi', element: <AEFI /> },
       { path: '/defaulter-tracing', element: <DefaulterTracing /> },
       { path: '/stock-management', element: <StockManagement /> },
       { path: '/reports', element: <VaccinationReports />},

@@ -10,7 +10,7 @@ import {
   HomeIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import ProfileDropdown from './ProfileDropdown'
 import { Disclosure } from '@headlessui/react'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
@@ -21,16 +21,16 @@ const navigation = [
     name: 'Admin Management',
     icon: UsersIcon,
     children: [
-      { name: 'User', href: 'admin-users' },
-      { name: 'Facility', href: 'admin-add-facility'}
+      { name: 'User', href: '/admin-users' },
+      { name: 'Facility', href: '/admin-add-facility'}
     ]},
-  { name: 'Vaccination Reports', current: false, href: 'reports', icon: FolderIcon },
-  { name: 'Register Client', href: 'register-client', icon: CalendarIcon },
-  { name: 'Update Client History', href: 'update-client-history', icon: DocumentDuplicateIcon },
-  { name: 'Administer Vaccine', href: 'administer-vaccine', icon: ChartPieIcon },
-  { name: 'AEFI', href: 'aefi', icon: ChartPieIcon },
-  { name: 'Defaulter Tracing', href: 'defaulter-tracing', icon: ChartPieIcon },
-  { name: 'Stock Management', href: 'stock-management', icon: ChartPieIcon },
+  { name: 'Vaccination Reports', current: false, href: '/reports', icon: FolderIcon },
+  { name: 'Register Client', href: '/register-client', icon: CalendarIcon },
+  { name: 'Update Client History', href: '/search/updateClient', icon: DocumentDuplicateIcon },
+  { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: ChartPieIcon },
+  { name: 'AEFI', href: '/search/aefi', icon: ChartPieIcon },
+  { name: 'Defaulter Tracing', href: '/defaulter-tracing', icon: ChartPieIcon },
+  { name: 'Stock Management', href: '/stock-management', icon: ChartPieIcon },
 ]
 
 function classNames(...classes) {
@@ -40,6 +40,7 @@ function classNames(...classes) {
 export default function Sidenav() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { pathname } = useLocation()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -100,15 +101,15 @@ export default function Sidenav() {
                         {navigation.map((item) => (
                           <li key={item.name}>
                             {!item.children ? (
-                              <a
-                                href={item.href}
+                              <Link
+                                to={item.href}
                                 className={classNames(
                                   item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
                                   'block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold text-gray-700'
                                 )}
                               >
                                 {item.name}
-                              </a>
+                              </Link>
                             ) : (
                               <Disclosure as="div">
                                 {({ open }) => (
