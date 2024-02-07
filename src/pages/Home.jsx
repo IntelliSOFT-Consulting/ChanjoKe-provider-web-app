@@ -7,12 +7,11 @@ import AppointmentIcon from '../assets/appointments.svg'
 import { Link } from 'react-router-dom'
 
 const stats = [
-  { name: 'Search Client', icon: SearchIcon, href: 'search-client' },
+  { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient' },
   { name: 'Register Client', icon: RegisterClientIcon, href: 'register-client' },
-  { name: 'Update Client History', icon: UpdateClientHistoryIcon, href: 'update-client-history' },
-  { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'administer-vaccine' },
-  { name: 'AEFI', icon: AefiIcon, href: 'aefi' },
-  { name: 'Appointments', icon: AppointmentIcon, href: 'aefi' },
+  { name: 'Update Client History', icon: UpdateClientHistoryIcon, href: 'search/updateClient' },
+  { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'search/administerVaccine' },
+  { name: 'AEFI', icon: AefiIcon, href: 'search/aefi' },
   { name: 'Stock Management', icon: AppointmentIcon, href: 'stock-management'}
 ]
 
