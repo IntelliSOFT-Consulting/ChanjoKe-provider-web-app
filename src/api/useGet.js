@@ -9,6 +9,8 @@ const useGet = (url) => {
 
     const abortController = new AbortController()
 
+    setLoader(true)
+
     fetch(`https://chanjoke.intellisoftkenya.com/hapi/fhir/${url}`, { signal: abortController.signal })
       .then((res) => {
         if (!res.ok) {

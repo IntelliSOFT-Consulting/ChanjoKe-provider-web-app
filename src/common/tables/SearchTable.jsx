@@ -23,7 +23,7 @@ export default function SearchTable(props) {
                   {props.headers.map((header) => (
                     <td key={header.key} className={`whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class}`}>
                       {header.key === 'actions' ? (
-                        RenderActionButton(item[header.key])
+                        RenderActionButton(item)
                       ) : (
                         item[header.key]
                       )}

@@ -8,12 +8,20 @@ export default function User() {
 
   const { data, loading, error } = useGet('Patient')
   const patients = [
-    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: ['update', 'archive']},
-    {dateRegistered: 'Jan 12 2024', fullNames: 'Jane Doe', actions: ['update', 'archive']}
+    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: [
+      { title: 'update', url: '/client-details' },
+      { title: 'archive', url: '/client-details' },
+    ] },
+    {dateRegistered: 'Jan 12 2024', fullNames: 'Jane Doe', actions: [
+      { title: 'update', url: '/client-details' },
+      { title: 'archive', url: '/client-details' },
+    ] }
   ]
 
   const archived = [
-    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: ['unarchive']},
+    {dateRegistered: 'Jan 12 2024', fullNames: 'John Doe', actions: [
+      { title: 'unarchive', url: '/client-details' },
+    ]},
   ]
 
   const tHeaders = [

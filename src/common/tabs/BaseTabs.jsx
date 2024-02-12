@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import NonRoutineVaccines from '../../components/ClientDetailsView/NonRoutineVaccines';
+import RoutineVaccines from '../../components/ClientDetailsView/RoutineVaccines';
 
 const tabs = [
-  { name: 'Upcoming Vaccines', id: 'upcoming', href: '#', current: false },
-  { name: 'Vaccine History', id: 'history', href: '#', current: false },
-  { name: 'Appointments', id: 'appointments', href: '#', current: true },
+  { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
+  { name: 'Non Routine Vaccines', id: 'nonRoutineVaccines', href: '#', current: false },
 ];
 
 function classNames(...classes) {
@@ -11,7 +12,7 @@ function classNames(...classes) {
 }
 
 export default function BaseTabs() {
-  const [currentTab, setCurrentTab] = useState('appointments');
+  const [currentTab, setCurrentTab] = useState('routineVaccines');
 
   const handleTabChange = (tabId) => {
     setCurrentTab(tabId);
@@ -47,7 +48,7 @@ export default function BaseTabs() {
                 className={classNames(
                   currentTab === tab.id
                     ? 'bg-[#163c94] text-white'
-                    : 'text-gray-500 bg-[#899cc8] hover:border-gray-300 hover:text-gray-700',
+                    : 'text-gray-800 bg-gray-200 hover:border-gray-300 hover:text-gray-700',
                   'w-1/3 border-b py-4 px-1 text-center text-sm font-medium'
                 )}
                 onClick={() => handleTabChange(tab.id)}
@@ -61,42 +62,8 @@ export default function BaseTabs() {
       </div>
 
       {/* Content based on the selected tab */}
-      {currentTab === 'upcoming' && <UpcomingVaccinesComponent />}
-      {currentTab === 'history' && <VaccineHistoryComponent />}
-      {currentTab === 'appointments' && <AppointmentsComponent />}
+      {currentTab === 'routineVaccines' && <RoutineVaccines/>}
+      {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines />}
     </div>
   );
-}
-
-const upcomingVaccines = [
-  { name: 'Oxford', doseNumber: 2, dateScheduled: 'Jan 1 2020', status: 'Upcoming', actions: 'View'}
-]
-
-// Define your UpcomingVaccinesComponent, VaccineHistoryComponent, and AppointmentsComponent here
-function UpcomingVaccinesComponent() {
-  return (
-    <div>
-      <table className="min-w-full divide-y divide-gray-300">
-        <tbody className="divide-y divide-gray-200">
-          {upcomingVaccines.map((item) => (
-            <tr key={item.name}>
-              <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                {item.name}
-              </td>
-              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.doseNumber}</td>
-              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.dateScheduled}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  ) 
-}
-
-function VaccineHistoryComponent() {
-  return <div>Vaccine History Content</div>;
-}
-
-function AppointmentsComponent() {
-  return <div>Appointments Content</div>;
 }
