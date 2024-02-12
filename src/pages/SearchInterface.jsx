@@ -3,11 +3,12 @@ import TextInput from "../common/forms/TextInput"
 import FormState from "../utils/formState"
 import useGet from "../api/useGet"
 import { useEffect, useState } from "react"
+import LoadingArrows from "../common/spinners/LoadingArrows"
 
 export default function SearchInterface(props) {
 
   const [title, setTitle] = useState('Search')
-  const [actions, setActions] = useState(['view'])
+  const [actions, setActions] = useState([{ title: 'view', url: '/' }])
 
   const { data, loading, error } = useGet('Patient')
   const patients = [
@@ -28,19 +29,27 @@ export default function SearchInterface(props) {
   useEffect(() => {
     if (props.searchType === 'searchClient') {
       setTitle('Search')
-      setActions(['view'])
+      setActions([
+        { title: 'view', url: '/client-details' }
+      ])
     }
     if (props.searchType === 'updateClient') {
       setTitle('Update Client History')
-      setActions(['update'])
+      setActions([
+        { title: 'view', btnAction: '' }
+      ])
     }
     if (props.searchType === 'administerVaccine') {
       setTitle('Administer Vaccine')
-      setActions(['view'])
+      setActions([
+        { title: 'view', url: '/client-details' }
+      ])
     }
     if (props.searchType === 'aefi') {
       setTitle('Adverse Event Following Immunisation')
-      setActions(['view'])
+      setActions([
+        { title: 'view', url: '/aefi-report' }
+      ])
     }
   }, [])
 
@@ -69,8 +78,9 @@ export default function SearchInterface(props) {
           </div>
         </div>
 
-        {error && <div>{error}</div>}
-        {loading && <div>loading...</div>}
+        {error && <div className="my-10 text-center">{error}</div> }
+        {loading && <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
+        {!data && !loading && <div className="my-10 text-center">No records to view</div>}
         {data &&
           <SearchTable
             headers={tHeaders}

@@ -2,7 +2,6 @@ import { createBrowserRouter, useParams } from 'react-router-dom'
 import Root from './Root'
 import Login from '../pages/Login'
 import Home from '../pages/Home'
-import SearchClient from '../pages/SearchClient'
 import RegisterClient from '../pages/RegisterClient'
 import StockManagement from '../pages/StockManagement'
 import DefaulterTracing from '../pages/DefaulterTracing'
@@ -17,6 +16,8 @@ import AddUser from '../components/AdminManagement/AddUser'
 import AddFacility from '../components/AdminManagement/AddFacility'
 import VaccinationReports from '../pages/VaccinationReports'
 import SearchInterface from '../pages/SearchInterface'
+import AEFIType from '../components/AEFI/AEFIType'
+import AEFIAction from '../components/AEFI/AEFIAction'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -30,7 +31,6 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       { path: '/', element: <Home /> },
-      { path: '/search-client', element: <SearchClient /> },
       { path: '/search/:searchType', element: <SearchInterfaceWrapper /> },
       { path: '/admin-users', element: <User /> },
       { path: '/admin-facilities', element: <Facility /> },
@@ -41,6 +41,8 @@ const router = createBrowserRouter([
       { path: '/stock-management', element: <StockManagement /> },
       { path: '/reports', element: <VaccinationReports />},
       { path: '/profile', element: <Profile /> },
+      { path: '/aefi-report', element: <AEFIType /> },
+      { path: '/aefi-action', element: <AEFIAction /> },
       { path: '/client-details', element: <ClientDetailsView /> },
       { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
       { path: '/frequently-asked-questions', element: <FAQs /> }
