@@ -3,44 +3,81 @@ import { Dialog, Transition } from '@headlessui/react'
 import {
   Bars3Icon,
   XMarkIcon,
-  CalendarIcon,
-  ChartPieIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
 } from '@heroicons/react/24/outline'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import ProfileDropdown from './ProfileDropdown'
 import { Disclosure } from '@headlessui/react'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import AefiLogo from '../common/icons/aefiLogo'
+import HomeLogo from '../common/icons/homeLogo'
+import AdministerVaccineLogo from '../common/icons/administerVaccineLogo'
+import VaccinationReportLogo from '../common/icons/vaccinationReportLogo'
+import RegisterClientLogo from '../common/icons/registerClientLogo'
+import UpdateClientLogo from '../common/icons/updateClientLogo'
+import DefaulterTracingLogo from '../common/icons/defaulterTracingLogo'
 
-const navigation = [
-  { name: 'Home', href: '/', current: true, icon: HomeIcon },
-  {
-    name: 'Admin Management',
-    icon: UsersIcon,
-    children: [
-      { name: 'User', href: '/admin-users' },
-      { name: 'Facility', href: '/admin-add-facility'}
-    ]},
-  { name: 'Vaccination Reports', current: false, href: '/reports', icon: FolderIcon },
-  { name: 'Register Client', href: '/register-client', icon: CalendarIcon },
-  { name: 'Update Client History', href: '/search/updateClient', icon: DocumentDuplicateIcon },
-  { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: ChartPieIcon },
-  { name: 'AEFI', href: '/search/aefi', icon: ChartPieIcon },
-  { name: 'Defaulter Tracing', href: '/defaulter-tracing', icon: ChartPieIcon },
-  { name: 'Stock Management', href: '/stock-management', icon: ChartPieIcon },
-]
+const iconComponents = {
+  aefiLogo: AefiLogo,
+  homeLogo: HomeLogo,
+  administerVaccineLogo: AdministerVaccineLogo,
+  vaccinationReportLogo: VaccinationReportLogo,
+  registerClientLogo: RegisterClientLogo,
+  updateClientLogo: UpdateClientLogo,
+  defaulterTracingLogo: DefaulterTracingLogo,
+}
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+const SidebarItem = ({ item , onItemClick }) => {
+  const IconComponent = iconComponents[item.icon];
+
+  return (
+    <Link
+      to={item.href}
+      onClick={() => onItemClick(item)}
+      className={classNames(
+        item.current ? 'bg-gray-50 text-[#163C94]' : 'hover:bg-gray-50]',
+        'flex rounded-md py-2 pr-2 pl-5 text-sm leading-6 font-semibold'
+      )}
+    >
+      {IconComponent && <span className='mr-2'><IconComponent width='24' height='24' fillColor={item.current ? '#163C94' : '#000000'} /></span>} {/* Render the icon component */}
+      {item.name}
+    </Link>
+  );
+};
+
 export default function Sidenav() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { pathname } = useLocation()
-  const navigate = useNavigate()
+
+  const [navigation, setNavigation] = useState([
+    { name: 'Home', href: '/', current: true, icon: 'homeLogo' },
+    {
+      name: 'Admin Management',
+      icon: '',
+      children: [
+        { name: 'Add User', href: '/admin-users' },
+        { name: 'Add Facility', href: '/admin-add-facility'}
+      ]},
+    { name: 'Vaccination Reports', current: false, href: '/reports', icon: 'vaccinationReportLogo' },
+    { name: 'Register Client', href: '/register-client', icon: 'registerClientLogo' },
+    { name: 'Update Client History', href: '/search/updateClient', icon: 'updateClientLogo' },
+    { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: 'administerVaccineLogo' },
+    { name: 'AEFI', href: '/search/aefi', icon: 'aefiLogo' },
+    { name: 'Defaulter Tracing', href: '/defaulter-tracing', icon: 'defaulterTracingLogo' },
+    { name: 'Stock Management', href: '/stock-management', icon: '' },
+  ])
+
+  const handleItemClick = (clickedItem) => {
+    const updatedNavigation = navigation.map((item) => ({
+      ...item,
+      current: item.href === clickedItem.href,
+    }));
+
+    setNavigation(updatedNavigation)
+
+  };
 
   return (
     <>
@@ -101,15 +138,7 @@ export default function Sidenav() {
                         {navigation.map((item) => (
                           <li key={item.name}>
                             {!item.children ? (
-                              <Link
-                                to={item.href}
-                                className={classNames(
-                                  item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
-                                  'block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold text-gray-700'
-                                )}
-                              >
-                                {item.name}
-                              </Link>
+                              <SidebarItem onItemClick={handleItemClick} item={item} width='24' height='24' />
                             ) : (
                               <Disclosure as="div">
                                 {({ open }) => (
@@ -132,16 +161,7 @@ export default function Sidenav() {
                                     <Disclosure.Panel as="ul" className="mt-1 px-2">
                                       {item.children.map((subItem) => (
                                         <li key={subItem.name}>
-                                          <Disclosure.Button
-                                            as="a"
-                                            href={subItem.href}
-                                            className={classNames(
-                                              subItem.current ? 'bg-gray-50' : 'hover:bg-gray-50',
-                                              'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700'
-                                            )}
-                                          >
-                                            {subItem.name}
-                                          </Disclosure.Button>
+                                          <SidebarItem onItemClick={handleItemClick} item={subItem} width='24' height='24' />
                                         </li>
                                       ))}
                                     </Disclosure.Panel>
@@ -177,15 +197,7 @@ export default function Sidenav() {
                 {navigation.map((item) => (
                   <li key={item.name}>
                     {!item.children ? (
-                      <a
-                        href={item.href}
-                        className={classNames(
-                          item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
-                          'block rounded-md py-2 pr-2 pl-10 text-sm leading-6 font-semibold text-gray-700'
-                        )}
-                      >
-                        {item.name}
-                      </a>
+                      <SidebarItem onItemClick={handleItemClick} item={item} width='24' height='24' />
                     ) : (
                       <Disclosure as="div">
                         {({ open }) => (
@@ -208,16 +220,7 @@ export default function Sidenav() {
                             <Disclosure.Panel as="ul" className="mt-1 px-2">
                               {item.children.map((subItem) => (
                                 <li key={subItem.name}>
-                                  <Disclosure.Button
-                                    as="a"
-                                    href={subItem.href}
-                                    className={classNames(
-                                      subItem.current ? 'bg-gray-50' : 'hover:bg-gray-50',
-                                      'block rounded-md py-2 pr-2 pl-9 text-sm leading-6 text-gray-700'
-                                    )}
-                                  >
-                                    {subItem.name}
-                                  </Disclosure.Button>
+                                  <SidebarItem onItemClick={handleItemClick} item={subItem} width='24' height='24' />
                                 </li>
                               ))}
                             </Disclosure.Panel>

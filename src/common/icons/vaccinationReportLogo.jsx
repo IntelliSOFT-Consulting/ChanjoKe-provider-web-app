@@ -1,0 +1,16 @@
+export default function VaccinationReportLogo(props) {
+  return (
+    <>
+      <svg id="vuesax_linear_task-square" data-name="vuesax/linear/task-square" xmlns="http://www.w3.org/2000/svg" width={props.width} height={props.height} viewBox="0 0 20.004 20.004">
+        <g id="task-square">
+          <path id="Vector" d="M0,0H4.376" transform="translate(10.311 7.402)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector-2" data-name="Vector" d="M0,1.25l.625.625L2.5,0" transform="translate(5.318 6.151)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector-3" data-name="Vector" d="M0,0H4.376" transform="translate(10.311 13.236)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector-4" data-name="Vector" d="M0,1.25l.625.625L2.5,0" transform="translate(5.318 11.986)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector-5" data-name="Vector" d="M5.835,16.67h5C15,16.67,16.67,15,16.67,10.836v-5C16.67,1.667,15,0,10.836,0h-5C1.667,0,0,1.667,0,5.835v5C0,15,1.667,16.67,5.835,16.67Z" transform="translate(1.667 1.667)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector-6" data-name="Vector" d="M0,0H20V20H0Z" fill="none" opacity="0"/>
+        </g>
+      </svg>
+    </>
+  )
+}

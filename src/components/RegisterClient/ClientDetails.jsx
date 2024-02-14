@@ -14,8 +14,8 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
   ]
 
   const genderOptions = [
-    { id: 1, title: 'Male' },
-    { id: 2, title: 'Female' },
+    { id: 1, title: 'Male', value: 'male' },
+    { id: 2, title: 'Female', value: 'female' },
   ]
 
   const formRules = {
@@ -25,15 +25,9 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
     },
     gender: {
       required: true,
-      enum: ['Male', 'Female']
+      enum: ['male', 'female']
     },
     identificationType: {
-      required: true,
-    },
-    middleName: {
-      required: false,
-    },
-    dateOfBirth: {
       required: true,
     },
     identificationNumber: {
@@ -45,12 +39,6 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
       required: true,
       minLen: 4,
     },
-    age: {
-      required: false,
-    },
-    currentWeight: {
-      required: false,
-    }
   }
 
   const formStructure = {
