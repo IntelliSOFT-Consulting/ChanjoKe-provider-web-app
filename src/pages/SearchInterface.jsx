@@ -4,16 +4,24 @@ import FormState from "../utils/formState"
 import useGet from "../api/useGet"
 import { useEffect, useState } from "react"
 import LoadingArrows from "../common/spinners/LoadingArrows"
+import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
 
 export default function SearchInterface(props) {
 
   const [title, setTitle] = useState('Search')
   const [actions, setActions] = useState([{ title: 'view', url: '/' }])
+  const [results, setResults] = useState([])
 
   const { data, loading, error } = useGet('Patient')
-  const patients = [
-    {clientName: 'John Doe', idNumber: '32009988', phoneNumber: '0700 000000', actions }
-  ]
+
+  useEffect(() => {
+    if (Array.isArray(data)) {
+      const mappedData = data.map(patient => deconstructPatientData(patient, actions));
+      setResults(mappedData);
+
+      console.log({ mappedData })
+    }
+  }, [data])
 
   const tHeaders = [
     {title: 'Client Name', class: '', key: 'clientName'},
@@ -51,7 +59,7 @@ export default function SearchInterface(props) {
         { title: 'view', url: '/aefi-report' }
       ])
     }
-  }, [])
+  }, [props.searchType])
 
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
@@ -84,7 +92,7 @@ export default function SearchInterface(props) {
         {data &&
           <SearchTable
             headers={tHeaders}
-            data={patients} />}
+            data={results} />}
       </div>
     </div>
   );

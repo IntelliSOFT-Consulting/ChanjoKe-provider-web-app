@@ -3,10 +3,13 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useState } from 'react'
+import { createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
+import usePost from '../api/usePost'
 
 export default function RegisterClient() {
 
+  const { data, loading, error, SubmitForm } = usePost()
   const [step, updateStep] = useState(1)
   const [clientDetails, setClientDetails] = useState(null)
   const [clientErrors, setClientFormErrors] = useState({})
@@ -23,7 +26,16 @@ export default function RegisterClient() {
     setDialogOpen(false);
   };
 
+  const SubmitDetails = () => {
+    const postData = createPatientData({ ...clientDetails })
+    SubmitForm('Patient', postData)
+
+    console.log({ postData, data, loading, error })
+  }
+
   const nextForm = () => {
+
+    console.log({ clientDetails })
 
     if (step < 4) {
       updateStep(step + 1)
@@ -84,7 +96,7 @@ export default function RegisterClient() {
           }
           {step === 4 &&
             <button
-              onClick={() => setDialogOpen(true)}
+              onClick={() => SubmitDetails()}
               className="ml-4 flex-shrink-0 rounded-md bg-[#4E8D6E] border border-[#4E8D6E] outline outline-[#4E8D6E] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4E8D6E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4E8D6E]">
               Submit
             </button>
