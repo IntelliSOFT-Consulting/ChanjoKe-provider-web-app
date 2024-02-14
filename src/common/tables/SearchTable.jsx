@@ -1,5 +1,20 @@
 import RenderActionButton from './RenderActionsButton';
 
+function getStatusColorClass(status) {
+  switch (status) {
+    case 'Administered':
+      return 'text-green-300';
+    case 'Due':
+      return 'text-blue-300';
+      case 'Contraindicated':
+      return 'text-yellow-400';
+    case 'Missed':
+      return 'text-red-300';
+    default:
+      return 'text-blue-gray'; // Default class when the status is not recognized
+  }
+}
+
 export default function SearchTable(props) {
 
   return (
@@ -7,11 +22,11 @@ export default function SearchTable(props) {
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
+            <table className="min-w-full border-collapse border border-slate-400">
               <thead>
                 <tr>
                   {props.headers.map((header, index) => (
-                    <th key={index} scope="col" className="py-3.5 pl-4 pr-3 text-center text-sm font-semibold text-gray-900 sm:pl-0">
+                    <th key={index} scope="col" className="border border-slate-300 py-3.5 pl-4 pr-3 text-center bg-slate-200 text-sm font-bold text-gray-900 uppercase sm:pl-0">
                       {header.title}
                     </th>
                   ))}
@@ -21,9 +36,14 @@ export default function SearchTable(props) {
               {props.data.map((item, index) => (
                 <tr key={index}>
                   {props.headers.map((header) => (
-                    <td key={header.key} className={`whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class}`}>
-                      {header.key === 'actions' ? (
-                        RenderActionButton(item)
+                    <td key={header.key} className={`border border-slate-300 whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class} ${header.key === 'status' && getStatusColorClass(item[header.key])}`}>
+                      {header.key === 'checkbox' ? (
+                        <input
+                          type="checkbox"
+                          checked={item.selected}
+                        />
+                      ) : header.key === 'actions' ? (
+                        <RenderActionButton actions={item.actions} />
                       ) : (
                         item[header.key]
                       )}

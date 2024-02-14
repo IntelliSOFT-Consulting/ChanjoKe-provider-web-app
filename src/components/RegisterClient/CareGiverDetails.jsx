@@ -29,10 +29,14 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
     }
   }
 
-  const { formData, formErrors, handleChange } = FormState({
+  const { formData, formErrors, handleChange, resetForm } = FormState({
     caregiverName: '',
     caregiverType: '',
     phoneNumber: '',
+    actions: [
+      { title: 'edit', url: '/' },
+      { title: 'remove', url: '/' }
+    ]
   }, formRules)
   const [caregivers, setCaregivers] = useState([])
 
@@ -43,6 +47,15 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
 
   const handleSubmit = () => {
     setCaregivers([...caregivers, formData])
+    resetForm({
+      caregiverName: '',
+      caregiverType: '',
+      phoneNumber: '',
+      actions: [
+        { title: 'edit', url: '/' },
+        { title: 'remove', url: '/' }
+      ]
+    })
   };
 
   return (
@@ -92,7 +105,7 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
 
           <button
             onClick={handleSubmit}
-            disabled={Object.keys(formErrors).length !== 0}
+            disabled={Object.keys(formErrors).length !== 0 || !formData.caregiverName || !formData.phoneNumber || !formData.caregiverType}
             className="ml-4 justify-self-end flex-shrink-0 rounded-full bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
             Add
           </button>

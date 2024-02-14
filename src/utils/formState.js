@@ -5,6 +5,11 @@ export default function FormState(formStructure, formRules) {
   const [formData, setFormData] = useState(formStructure)
   const [formErrors, setFormErrors] = useState({})
 
+  const resetForm = (form) => {
+    setFormData(form)
+    setFormErrors({})
+  }
+
   const handleChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -36,6 +41,7 @@ export default function FormState(formStructure, formRules) {
   return {
     formData,
     formErrors,
+    resetForm,
     handleChange
   }
 }

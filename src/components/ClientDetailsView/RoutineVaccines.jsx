@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import SearchTable from '../../common/tables/SearchTable'
 
 const atBirthVaccines = [
-  {vaccineName: 'BCG', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Contraindicated', actions: [
+  { vaccineName: 'BCG', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Contraindicated', actions: [
     { title: 'view', url: '/'}
   ]},
   {vaccineName: 'bOPV', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Missed', actions: [
@@ -32,9 +32,10 @@ const tenthWeekVaccines = [
 ]
 
 const tHeaders = [
+  {title: '', class: '', key: 'checkbox' },
   {title: 'Vaccine Name', class: '', key: 'vaccineName'},
   {title: 'Dose Number', class: '', key: 'doseNumber'},
-  {title: 'Due to Administer', class: '', key: 'dueToAdminister'},
+  {title: 'Due Date', class: '', key: 'dueToAdminister'},
   {title: 'Date Administered', class: '', key: 'dateAdministered'},
   {title: 'Status', class: '', key: 'status'},
   {title: 'Actions', class: '', key: 'actions'},
