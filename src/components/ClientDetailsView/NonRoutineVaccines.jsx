@@ -11,6 +11,7 @@ const atBirthVaccines = [
 ]
 
 const tHeaders = [
+  {title: '', class: '', key: 'checkbox' },
   {title: 'Vaccine Name', class: '', key: 'vaccineName'},
   {title: 'Dose Number', class: '', key: 'doseNumber'},
   {title: 'Due to Administer', class: '', key: 'dueToAdminister'},

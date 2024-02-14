@@ -18,8 +18,6 @@ export default function SearchInterface(props) {
     if (Array.isArray(data)) {
       const mappedData = data.map(patient => deconstructPatientData(patient, actions));
       setResults(mappedData);
-
-      console.log({ mappedData })
     }
   }, [data])
 
