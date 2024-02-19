@@ -18,6 +18,7 @@ import VaccinationReports from '../pages/VaccinationReports'
 import SearchInterface from '../pages/SearchInterface'
 import AEFIType from '../components/AEFI/AEFIType'
 import AEFIAction from '../components/AEFI/AEFIAction'
+import Appointments from '../pages/Appointments'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -45,7 +46,8 @@ const router = createBrowserRouter([
       { path: '/aefi-action', element: <AEFIAction /> },
       { path: '/client-details', element: <ClientDetailsView /> },
       { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
-      { path: '/frequently-asked-questions', element: <FAQs /> }
+      { path: '/frequently-asked-questions', element: <FAQs /> },
+      { path: '/appointments', element: <Appointments />}
     ]
   },
   {

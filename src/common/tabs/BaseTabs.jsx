@@ -5,6 +5,7 @@ import RoutineVaccines from '../../components/ClientDetailsView/RoutineVaccines'
 const tabs = [
   { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
   { name: 'Non Routine Vaccines', id: 'nonRoutineVaccines', href: '#', current: false },
+  { name: 'Appointments', id: 'appointments', href: '#', current: false }
 ];
 
 function classNames(...classes) {
@@ -64,6 +65,7 @@ export default function BaseTabs() {
       {/* Content based on the selected tab */}
       {currentTab === 'routineVaccines' && <RoutineVaccines/>}
       {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines />}
+      {currentTab === 'appointments' && <>Appoinements tab</>}
     </div>
   );
 }

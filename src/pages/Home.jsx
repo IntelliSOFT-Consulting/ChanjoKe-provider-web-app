@@ -20,10 +20,6 @@ const statsTwo = [
   { id: 2, name: 'Vaccines Administered Today', stat: '100', icon: AdministerVaccineIcon, change: '', changeType: 'increase' },
 ]
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function Home() {
   return (
     <>

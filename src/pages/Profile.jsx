@@ -22,6 +22,7 @@ export default function Profile() {
               inputType="text"
               inputName="facilityAttached"
               inputId="facilityAttached"
+              disabled={true}
               label="Facility Attached"
               inputPlaceholder="Facility Attached"/>
           </div>
