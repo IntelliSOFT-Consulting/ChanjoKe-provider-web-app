@@ -1,7 +1,7 @@
 import { useState } from "react";
 import validate from "./validate";
 
-export default function FormState(formStructure, formRules) {
+export default function FormState(formStructure, formRules = {}) {
   // const [formValid, setFormValid] = useState(false)
   const [formData, setFormData] = useState(formStructure)
   const [formErrors, setFormErrors] = useState({})

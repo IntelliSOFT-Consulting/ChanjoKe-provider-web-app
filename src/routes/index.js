@@ -44,7 +44,7 @@ const router = createBrowserRouter([
       { path: '/profile', element: <Profile /> },
       { path: '/aefi-report', element: <AEFIType /> },
       { path: '/aefi-action', element: <AEFIAction /> },
-      { path: '/client-details', element: <ClientDetailsView /> },
+      { path: '/client-details/:clientID', element: <ClientDetailsView /> },
       { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
       { path: '/frequently-asked-questions', element: <FAQs /> },
       { path: '/appointments', element: <Appointments />}

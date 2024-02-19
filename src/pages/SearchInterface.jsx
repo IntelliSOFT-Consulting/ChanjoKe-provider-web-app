@@ -5,21 +5,32 @@ import useGet from "../api/useGet"
 import { useEffect, useState } from "react"
 import LoadingArrows from "../common/spinners/LoadingArrows"
 import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
+import SelectDialog from "../common/dialog/SelectDialog"
 
 export default function SearchInterface(props) {
 
   const [title, setTitle] = useState('Search')
-  const [actions, setActions] = useState([{ title: 'view', url: '/' }])
   const [results, setResults] = useState([])
+  const [searchUrl, setSearchUrl] = useState('Patient')
 
-  const { data, loading, error } = useGet('Patient')
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const { data, loading, error } = useGet(searchUrl)
 
   useEffect(() => {
     if (Array.isArray(data)) {
-      const mappedData = data.map(patient => deconstructPatientData(patient, actions));
+      const mappedData = data.map(patient => deconstructPatientData(patient, props.searchType));
       setResults(mappedData);
     }
-  }, [data])
+  }, [data, title])
+
+  const SubmitDetails = () => {
+    setSearchUrl(`Patient?name=${formData.searchInput}`)
+  }
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+  }
 
   const tHeaders = [
     {title: 'Client Name', class: '', key: 'clientName'},
@@ -32,34 +43,34 @@ export default function SearchInterface(props) {
     searchInput: '',
   })
 
+  const handleAction = ({ ...onActionBtn }) => {
+    if (onActionBtn.type === 'modal') {
+      setIsDialogOpen(true)
+    }
+  }
+
   useEffect(() => {
     if (props.searchType === 'searchClient') {
       setTitle('Search')
-      setActions([
-        { title: 'view', url: '/client-details' }
-      ])
     }
     if (props.searchType === 'updateClient') {
       setTitle('Update Client History')
-      setActions([
-        { title: 'view', btnAction: '' }
-      ])
     }
     if (props.searchType === 'administerVaccine') {
       setTitle('Administer Vaccine')
-      setActions([
-        { title: 'view', url: '/client-details' }
-      ])
     }
     if (props.searchType === 'aefi') {
       setTitle('Adverse Event Following Immunisation')
-      setActions([
-        { title: 'view', url: '/aefi-report' }
-      ])
     }
   }, [props.searchType])
 
   return (
+    <>
+
+    <SelectDialog
+      open={isDialogOpen}
+      onClose={handleDialogClose} />
+
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
       <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
         {title}
@@ -78,6 +89,7 @@ export default function SearchInterface(props) {
           </div>
           <div>
             <button
+              onClick={() => SubmitDetails()}
               className="mt-8 flex-shrink-0 rounded-lg w-full bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
               Search
             </button>
@@ -90,8 +102,11 @@ export default function SearchInterface(props) {
         {data &&
           <SearchTable
             headers={tHeaders}
-            data={results} />}
+            data={results}
+            onActionBtn={handleAction}/>
+        }
       </div>
     </div>
+    </>
   );
 }
