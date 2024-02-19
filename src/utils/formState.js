@@ -1,12 +1,14 @@
 import { useState } from "react";
 import validate from "./validate";
 
-export default function FormState(formStructure, formRules) {
+export default function FormState(formStructure, formRules = {}) {
+  // const [formValid, setFormValid] = useState(false)
   const [formData, setFormData] = useState(formStructure)
   const [formErrors, setFormErrors] = useState({})
 
   const resetForm = (form) => {
     setFormData(form)
+    // setFormValid(false)
     setFormErrors({})
   }
 
@@ -27,6 +29,7 @@ export default function FormState(formStructure, formRules) {
           ...errors,
           [name]: `${name} is a required value`
         }))
+        // setFormValid(false)
       } else {
         setFormErrors((errors) => {
           const updatedErrors = { ...errors };

@@ -82,13 +82,34 @@ function createPatientData(data) {
 }
 }
 
-function deconstructPatientData(data, actions) {
+function deconstructPatientData(data, searchType) {
+
+    const idNumber = data?.resource?.identifier.find((item) => item.type.text === 'SYSTEM_GENERATED')
+    let actions = [
+        {
+            title: 'view',
+            url: `/client-details/${data?.resource?.id}`,
+        }
+    ];
+
+    if (searchType === 'updateClient') {
+        actions = [
+            {
+                title: 'update',
+                btnAction: {
+                    type: 'modal',
+                    targetName: 'UpdateRecordsModal'
+                },
+            }
+        ]
+    }
 
     return {
-        clientName: `${data?.resource?.name?.[0]?.family ?? "John"} ${data?.resource?.name?.[0]?.given[0] ?? "Doe"}`,
-        idNumber: '32708833',
-        phoneNumber: '0700 000000',
-        actions: actions
+        id: data?.resource?.id,
+        clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""}`,
+        idNumber: idNumber.value,
+        phoneNumber: data?.resource?.telecom?.[1]?.value,
+        actions,
     }
 }
 

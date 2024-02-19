@@ -3,49 +3,39 @@ import { MinusSmallIcon, PlusSmallIcon } from '@heroicons/react/24/outline'
 
 const faqs = [
   {
-    question: "What are the side effects of vaccination?",
+    question: "Will patients get vaccination certificates instantly or does it take time?",
     answer:
-      "Pain, swelling at site of injection, slight fever, nausea, mild headaches.",
+      "Yes, if the data was entered real-time.",
   },
   {
-    question: "When am I supposed to come for my second dose?",
+    question: "Why am I not able to do vaccinations?",
     answer:
-      "It depends on the type of vaccination given.",
+      "-",
   },
   {
-    question: "Is vaccination painful?",
+    question: "What is required to register a patient?",
     answer:
-      "It is slightly painful.",
+      "ID Number / Passport / Birth Certificate number / Phone number.",
   },
   {
-    question: "Which vaccine am I going to receive?",
+    question: "How do you register a client with two identification documents? (ID and Passport number)",
     answer:
-      "It depends on age, availability of the vaccine and ANC mothers.",
+      "Use the ID number instead of the passport number.",
   },
   {
-    question: "When am I supposed to come back for the second dose?",
+    question: "How do you manage duplicate patient records?",
     answer:
-      "It depends on the type of vaccine.",
+      "Delete duplicated records after identifying them.",
   },
   {
-    question: "Can I be vaccinated when unwell?",
+    question: "How secure is the information shared in the system?",
     answer:
-      "Yes.",
+      "Prevent sharing passwords to protect patient data.",
   },
   {
-    question: "Can I take a second dose / booster of a different vaccine?",
+    question: "How do you query patient records?",
     answer:
-      "Yes.",
-  },
-  {
-    question: "Am I supposed to take any drugs in case of a reaction?",
-    answer:
-      "No, visit the nearest health facility.",
-  },
-  {
-    question: "Can I get vaccinated in another facility?",
-    answer:
-      "Yes.",
+      "Using an ID Number / Passport number / Birth Certificate number or Phone number.",
   },
 ]
 

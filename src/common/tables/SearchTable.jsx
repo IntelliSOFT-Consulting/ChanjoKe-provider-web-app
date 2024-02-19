@@ -15,7 +15,11 @@ function getStatusColorClass(status) {
   }
 }
 
-export default function SearchTable(props) {
+export default function SearchTable({ headers, data, onActionBtn}) {
+
+  const handleActionBtn = ({ ...actionData }) => {
+    onActionBtn && onActionBtn({ ...actionData });
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -25,7 +29,7 @@ export default function SearchTable(props) {
             <table className="min-w-full border-collapse border border-slate-400">
               <thead>
                 <tr>
-                  {props.headers.map((header, index) => (
+                  {headers.map((header, index) => (
                     <th key={index} scope="col" className="border border-slate-300 py-3.5 pl-4 pr-3 text-center bg-slate-200 text-sm font-bold text-gray-900 uppercase sm:pl-0">
                       {header.title}
                     </th>
@@ -33,9 +37,9 @@ export default function SearchTable(props) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 text-center">
-              {props.data.map((item, index) => (
+              {data.map((item, index) => (
                 <tr key={index}>
-                  {props.headers.map((header) => (
+                  {headers.map((header) => (
                     <td key={header.key} className={`border border-slate-300 whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class} ${header.key === 'status' && getStatusColorClass(item[header.key])}`}>
                       {header.key === 'checkbox' ? (
                         <input
@@ -43,7 +47,7 @@ export default function SearchTable(props) {
                           checked={item.selected}
                         />
                       ) : header.key === 'actions' ? (
-                        <RenderActionButton actions={item.actions} />
+                        <RenderActionButton actions={item.actions} onBtnAction={handleActionBtn} />
                       ) : (
                         item[header.key]
                       )}

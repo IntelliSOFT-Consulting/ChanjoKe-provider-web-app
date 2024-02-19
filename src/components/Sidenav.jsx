@@ -15,6 +15,8 @@ import VaccinationReportLogo from '../common/icons/vaccinationReportLogo'
 import RegisterClientLogo from '../common/icons/registerClientLogo'
 import UpdateClientLogo from '../common/icons/updateClientLogo'
 import DefaulterTracingLogo from '../common/icons/defaulterTracingLogo'
+import SearchLogo from '../common/icons/searchLogo'
+import AppointmentLogo from '../common/icons/appointmentLogo'
 
 const iconComponents = {
   aefiLogo: AefiLogo,
@@ -24,6 +26,8 @@ const iconComponents = {
   registerClientLogo: RegisterClientLogo,
   updateClientLogo: UpdateClientLogo,
   defaulterTracingLogo: DefaulterTracingLogo,
+  searchLogo: SearchLogo,
+  appointmentLogo: AppointmentLogo,
 }
 
 function classNames(...classes) {
@@ -39,10 +43,10 @@ const SidebarItem = ({ item , onItemClick }) => {
       onClick={() => onItemClick(item)}
       className={classNames(
         item.current ? 'bg-gray-50 text-[#163C94]' : 'hover:bg-gray-50]',
-        'flex rounded-md py-2 pr-2 pl-5 text-sm leading-6 font-semibold'
+        'flex rounded-md py-2 pr-2 pl-5 text-normal leading-6 font-normal my-5'
       )}
     >
-      {IconComponent && <span className='mr-2'><IconComponent width='24' height='24' fillColor={item.current ? '#163C94' : '#000000'} /></span>} {/* Render the icon component */}
+      {IconComponent && <span className='mr-2'><IconComponent width='24' height='24' fillColor={item.current ? '#163C94' : '#000000'} /></span>}
       {item.name}
     </Link>
   );
@@ -61,12 +65,30 @@ export default function Sidenav() {
         { name: 'Add Facility', href: '/admin-add-facility'}
       ]},
     { name: 'Vaccination Reports', current: false, href: '/reports', icon: 'vaccinationReportLogo' },
+    { name: 'Search Client', href: '/search/searchClient', icon: 'searchLogo' },
     { name: 'Register Client', href: '/register-client', icon: 'registerClientLogo' },
     { name: 'Update Client History', href: '/search/updateClient', icon: 'updateClientLogo' },
     { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: 'administerVaccineLogo' },
+    { name: 'Appointments', href: '/appointments', icon: 'appointmentLogo' },
     { name: 'AEFI', href: '/search/aefi', icon: 'aefiLogo' },
     { name: 'Defaulter Tracing', href: '/defaulter-tracing', icon: 'defaulterTracingLogo' },
-    { name: 'Stock Management', href: '/stock-management', icon: '' },
+    {
+      name: 'Stock Management',
+      href: '/stock-management',
+      icon: '',
+      children: [
+        { name: 'Receive Stock', href: '/admin-users' },
+        { name: 'Issue Stock', href: '/admin-add-facility'},
+        { name: 'Stock Count', href: '/admin-add-facility'},
+        { name: 'Positive Adjustment', href: '/admin-add-facility'},
+        { name: 'Negative Adjustment', href: '/admin-add-facility'},
+        { name: 'VVM Status Change', href: '/admin-add-facility'},
+        { name: 'New Order', href: '/admin-add-facility'},
+        { name: 'Received Orders', href: '/admin-add-facility'},
+        { name: 'Sent Orders', href: '/admin-add-facility'},
+        { name: 'Ledger', href: '/admin-add-facility'},
+      ],
+    },
   ])
 
   const handleItemClick = (clickedItem) => {
@@ -146,7 +168,7 @@ export default function Sidenav() {
                                     <Disclosure.Button
                                       className={classNames(
                                         item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
-                                        'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700'
+                                        'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6  text-gray-700'
                                       )}
                                     >
                                       <ChevronRightIcon
@@ -156,7 +178,7 @@ export default function Sidenav() {
                                         )}
                                         aria-hidden="true"
                                       />
-                                      {item.name}
+                                      <div className='text-xl font-normal'>{item.name}</div>
                                     </Disclosure.Button>
                                     <Disclosure.Panel as="ul" className="mt-1 px-2">
                                       {item.children.map((subItem) => (
@@ -205,17 +227,17 @@ export default function Sidenav() {
                             <Disclosure.Button
                               className={classNames(
                                 item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
-                                'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6 font-semibold text-gray-700'
+                                'flex items-center w-full text-left rounded-md p-2 gap-x-3 leading-6 text-gray-700'
                               )}
                             >
                               <ChevronRightIcon
                                 className={classNames(
                                   open ? 'rotate-90 text-gray-500' : 'text-gray-400',
-                                  'h-5 w-5 shrink-0'
+                                  'h-5 w-5 shrink-0 ml-2'
                                 )}
                                 aria-hidden="true"
                               />
-                              {item.name}
+                              <div className='text-normal font-normal'>{item.name}</div>
                             </Disclosure.Button>
                             <Disclosure.Panel as="ul" className="mt-1 px-2">
                               {item.children.map((subItem) => (

@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom";
 
-export default function RenderActionButton({ actions }) {
+export default function RenderActionButton({ actions, onBtnAction }) {
   const navigate = useNavigate();
 
   const handleActionClick = (action) => {
-    navigate(action.url);
-    // Handle the action click here
-    console.log(`Should navigate to... ${action.url}`);
+    if ('url' in action) {
+      navigate(action.url);
+    }
+
+    if ('btnAction' in action) {
+      onBtnAction && onBtnAction({ ...action.btnAction });
+    }
   };
 
   if (Array.isArray(actions)) {

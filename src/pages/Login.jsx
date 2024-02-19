@@ -24,7 +24,7 @@ export default function Login() {
 
         <h1 className='text-4xl text-[#163C94] text-center'>Login to your account</h1>
 
-        <form className='mt-20 w-full max-w-64 px-32'>
+        <form className='mt-20 w-full max-w-64 px-40'>
           <TextInput
             inputType="email"
             inputName="email"
