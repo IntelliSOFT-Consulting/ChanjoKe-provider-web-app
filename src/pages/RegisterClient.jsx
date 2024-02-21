@@ -27,8 +27,8 @@ export default function RegisterClient() {
   };
 
   const SubmitDetails = () => {
-    const postData = createPatientData({ ...clientDetails })
-    SubmitForm('Patient', postData)
+    const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea })
+    // SubmitForm('Patient', postData)
 
     console.log({ postData, data, loading, error })
   }
@@ -36,6 +36,8 @@ export default function RegisterClient() {
   const nextForm = () => {
 
     console.log({ clientDetails })
+    console.log({ caregiverDetails })
+    console.log({ administrativeArea })
 
     if (step < 4) {
       updateStep(step + 1)
@@ -69,7 +71,10 @@ export default function RegisterClient() {
           {step === 3 && <AdministrativeArea
             setAdministrativeAreaDetails={setAdministrativeAreaDetails}
             setAdminAreaFormErrors={setAdminAreaFormErrors}/>}
-          {step === 4 && <SubmitClientDetails />}
+          {step === 4 && <SubmitClientDetails
+            clientDetails={clientDetails}
+            caregiverDetails={caregiverDetails}
+            administrativeArea={administrativeArea}/>}
         </div>
         <div className="px-4 py-4 sm:px-6 flex justify-end">
           {step !== 1 &&

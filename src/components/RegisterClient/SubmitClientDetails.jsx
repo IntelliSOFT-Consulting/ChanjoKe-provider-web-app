@@ -1,28 +1,13 @@
 import BaseTable from "../../common/tables/BaseTable";
+import ConvertObjectToArray from "./convertObjectToArray";
 
-export default function ClientDetails() {
-  const clientDetails = [
-    { title: 'First Name:', value: 'John' },
-    { title: 'Middle Name:', value: 'Doe' },
-    { title: 'Last name:', value: 'Joseph' },
-    { title: 'Gender:', value: 'Male' },
-    { title: 'Age:', value: '2 years 2 months' },
-    { title: 'ID Number:', value: '1234567' },
-  ]
+export default function ClientDetails({ clientDetails, caregiverDetails, administrativeArea }) {
 
-  const careGiverDetails = [
-    { title: 'Care Giver Name:', value: 'John Doe.' },
-    { title: 'Care Giver Type', value: 'Father' },
-    { title: 'Care Giver contact', value: '0700 000 000' },
-  ]
+  const clientDetailsArray = ConvertObjectToArray(clientDetails)
 
-  const administrativeArea = [
-    { title: 'Residence of child - County', value: 'Kiambu' },
-    { title: 'Subcounty', value: 'Kiambu' },
-    { title: 'Ward', value: 'Juja' },
-    { title: 'Town/Trading centre', value: 'Juja' },
-    { title: 'Estate & House No./village', value: 'Juja town' },
-  ]
+  const careGiverDetailsArray = caregiverDetails.map((item) => ConvertObjectToArray(item))
+
+  const administrativeAreaArray = ConvertObjectToArray(administrativeArea)
 
   return (
     <>
@@ -33,7 +18,7 @@ export default function ClientDetails() {
             Client Details
           </h2>
 
-          <BaseTable data={clientDetails} />
+          <BaseTable data={clientDetailsArray} />
 
         </div>
 
@@ -43,7 +28,7 @@ export default function ClientDetails() {
             Caregiver Details
           </h2>
 
-          <BaseTable data={careGiverDetails} />
+          <BaseTable data={careGiverDetailsArray} />
         </div>
 
         {/* Column 3 */}
@@ -52,7 +37,7 @@ export default function ClientDetails() {
             Administrative Area
           </h2>
 
-          <BaseTable data={administrativeArea} />
+          <BaseTable data={administrativeAreaArray} />
         </div>
 
       </div>

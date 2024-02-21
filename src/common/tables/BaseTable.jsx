@@ -3,7 +3,7 @@ export default function BaseTable(props) {
     <table className="min-w-full divide-y divide-gray-300">
       <tbody className="divide-y divide-gray-200">
         {props.data.map((item) => (
-          <tr key={item.email}>
+          <tr key={item.value}>
             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
               {item.name}
             </td>

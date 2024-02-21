@@ -12,6 +12,8 @@ export default function RadioGroup(props) {
             <div key={item.id} className="flex items-center">
               <input
                 id={item.id}
+                value={props.value}
+                onChange={(e) => props.onInputChange(e.target.value)}
                 name="notification-method"
                 type="radio"
                 className="h-4 w-4 border-gray-300 text-[#163C94] focus:ring-[#163C94]"
