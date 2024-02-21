@@ -22,7 +22,11 @@ export default function FormState(formStructure, formRules = {}) {
 
     if (formRules && toBeValidated) {
 
-      const isInvalid = validate(name, value, formRules).find((value) => (value.valid && value.valid !== true));
+      const isInvalid = validate(name, value, formRules).find((value) => {
+        if (value) {
+          return (value.valid && value.valid !== true)
+        }
+      });
   
       if (isInvalid) {
         setFormErrors((errors) => ({

@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 const RequiredValidator = (formStructure, formRules) => {
   const [isFormValid, setFormValid] = useState(false);
 
-  const keys = Object.keys(formRules)
+  // const keys = Object.keys(formRules)
 
-  console.log({ formRules, keys })
+  // console.log({ formRules, keys })
 
   const checkFormValidity = () => {
     for (const field in formRules) {

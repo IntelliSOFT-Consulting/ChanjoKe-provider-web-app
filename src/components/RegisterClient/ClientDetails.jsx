@@ -6,7 +6,7 @@ import FormState from '../../utils/formState'
 import { useEffect, useState } from 'react'
 import RequiredValidator from '../../utils/requiredValidator'
 
-export default function ClientDetails({ setClientDetails, setClientFormErrors }) {
+export default function ClientDetails({ setClientDetails, setClientFormErrors, setAllFormsValid }) {
   const identificationTypes = [
     { id: 1, name: 'Identification Number' },
     { id: 2, name: 'Birth Certificate Number' },
@@ -28,9 +28,9 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
       required: true,
       enum: ['male', 'female']
     },
-    // identificationType: {
-    //   required: true,
-    // },
+    identificationType: {
+      required: true,
+    },
     identificationNumber: {
       required: true,
       minLen: 5,
@@ -62,6 +62,10 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
   }, [formData])
 
   const isFormValid = RequiredValidator(formData, formRules)
+
+  if (isFormValid) {
+    setAllFormsValid(isFormValid)
+  }
 
   return (
     <>
