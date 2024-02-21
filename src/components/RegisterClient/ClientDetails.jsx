@@ -4,8 +4,9 @@ import RadioGroup from '../../common/forms/RadioGroup'
 import calculateAge from '../../utils/calculateAge'
 import FormState from '../../utils/formState'
 import { useEffect, useState } from 'react'
+import RequiredValidator from '../../utils/requiredValidator'
 
-export default function ClientDetails({ setClientDetails, setClientFormErrors }) {
+export default function ClientDetails({ setClientDetails, setClientFormErrors, setAllFormsValid }) {
   const identificationTypes = [
     { id: 1, name: 'Identification Number' },
     { id: 2, name: 'Birth Certificate Number' },
@@ -33,7 +34,7 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
     identificationNumber: {
       required: true,
       minLen: 5,
-      maxLen: 10,
+      // maxLen: 10,
     },
     lastName: {
       required: true,
@@ -60,11 +61,23 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors })
     setClientFormErrors(formErrors)
   }, [formData])
 
+  const isFormValid = RequiredValidator(formData, formRules)
+
+  if (isFormValid) {
+    setAllFormsValid(isFormValid)
+  }
+
   return (
     <>
       <h3 className="text-xl font-medium">Client Details</h3>
 
       <form>
+
+      {isFormValid ? (
+        <p>Form is valid!</p>
+      ) : (
+        <p>Form is invalid. Please fill in all required fields correctly.</p>
+      )}
       
         <div className="grid mt-5 grid-cols-3 gap-10">
           {/* Column 1 */}
