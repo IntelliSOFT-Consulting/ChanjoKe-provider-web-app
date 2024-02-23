@@ -72,12 +72,6 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
       <h3 className="text-xl font-medium">Client Details</h3>
 
       <form>
-
-      {isFormValid ? (
-        <p>Form is valid!</p>
-      ) : (
-        <p>Form is invalid. Please fill in all required fields correctly.</p>
-      )}
       
         <div className="grid mt-5 grid-cols-3 gap-10">
           {/* Column 1 */}
@@ -108,7 +102,7 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
               data={identificationTypes}
               error={formErrors.identificationType}
               value={formData.identificationType || 'Identification Type'}
-              onInputChange={(value) => handleChange('identificationType', value)}/>
+              onInputChange={(value) => handleChange('identificationType', value.name)}/>
 
           </div>
 

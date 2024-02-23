@@ -120,7 +120,18 @@ function deconstructPatientData(data, searchType) {
     }
 }
 
+function deconstructLocationData(data) {
+    return {
+        id: data?.resource?.id,
+        fullUrl: data?.fullUrl,
+        name: data?.resource?.name,
+        source: data?.resource?.meta?.source,
+        partOf: data?.resource?.partOf
+    }
+}
+
 export {
     createPatientData,
     deconstructPatientData,
+    deconstructLocationData,
 }

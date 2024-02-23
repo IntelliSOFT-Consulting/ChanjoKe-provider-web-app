@@ -19,7 +19,7 @@ const useGet = (url) => {
         return res.json()
       })
       .then((data) => {
-        console.log({ data })
+        // console.log({ data })
         if (data) {
           setData(data.entry)
           setLoader(false)

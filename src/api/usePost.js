@@ -26,7 +26,7 @@ const usePost = () => {
       }
 
       const responseData = await response.json();
-      console.log({ responseData });
+      // console.log({ responseData });
 
       setData(responseData.entry);
       setLoader(false);

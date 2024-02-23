@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import usePost from '../api/usePost'
+import { useNavigate } from 'react-router-dom'
 
 export default function RegisterClient() {
 
@@ -23,6 +24,8 @@ export default function RegisterClient() {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [allFormsValid, setAllFormsValid] = useState(false)
 
+  const navigate = useNavigate()
+
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);
   };
@@ -30,11 +33,13 @@ export default function RegisterClient() {
   const SubmitDetails = () => {
     const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea })
     SubmitForm('Patient', postData)
-
-    console.log({ postData, data, loading, error })
+    console.log({ data })
+    navigate('/client-details/new-patient-id')
   }
 
   const nextForm = () => {
+
+    setAllFormsValid(false)
 
     if (step < 4) {
       updateStep(step + 1)
@@ -68,6 +73,7 @@ export default function RegisterClient() {
             setCaregiverFormErrors={setCaregiverFormErrors} />}
           {step === 3 && <AdministrativeArea
             setAdministrativeAreaDetails={setAdministrativeAreaDetails}
+            setAllFormsValid={setAllFormsValid}
             setAdminAreaFormErrors={setAdminAreaFormErrors}/>}
           {step === 4 && <SubmitClientDetails
             clientDetails={clientDetails}
@@ -85,15 +91,16 @@ export default function RegisterClient() {
           {step === 3 && 
             <button
               onClick={nextForm}
-              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+              disabled={!allFormsValid}
+              className={`${!allFormsValid ? 'bg-[#5370B0] border-[#5370B0] outline-[#5370B0] hover:bg-[#5370B0] focus-visible:outline-[#5370B0]' : 'bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94]' } ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
               Preview
             </button>
           }
           {(step === 1 || step === 2) && 
             <button
               onClick={nextForm}
-              disabled={Object.keys(clientErrors).length !== 0 || Object.keys(adminErrors).length !== 0 || !allFormsValid}
-              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+              disabled={(Object.keys(clientErrors).length !== 0 || Object.keys(adminErrors).length !== 0 || !allFormsValid) && step !== 2}
+              className={`${(Object.keys(clientErrors).length !== 0 || Object.keys(adminErrors).length !== 0 || !allFormsValid) && step !== 2 ? 'bg-[#5370B0] border-[#5370B0] outline-[#5370B0] hover:bg-[#5370B0] focus-visible:outline-[#5370B0]' : 'bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94]' } ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
               Next
             </button>
           }
