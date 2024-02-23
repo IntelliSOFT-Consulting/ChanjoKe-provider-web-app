@@ -12,7 +12,7 @@ const RequiredValidator = (formStructure, formRules) => {
       const rules = formRules[field];
       const value = formStructure[field];
 
-      console.log({ field, rules, value })
+      // console.log({ field, rules, value })
 
       // console.log({ rules, value, field })
 

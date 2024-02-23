@@ -70,7 +70,7 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
             required={true}
             data={caregiverTypes}
             value={formData.caregiverType || 'Care Giver\'s Type'}
-            onInputChange={(value) => handleChange('caregiverType', value)}
+            onInputChange={(value) => handleChange('caregiverType', value.name)}
           />
         </div>
 

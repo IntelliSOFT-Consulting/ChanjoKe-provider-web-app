@@ -22,6 +22,7 @@ export default function TextInput(props) {
           id={props.inputId}
           disabled={props.disabled}
           value={props.value}
+          {...props.inputType === 'date' && { max: new Date().toISOString().split('T')[0] }}
           onChange={(e) => props.onInputChange(e.target.value)}
           className={
             `${props.leadingIcon

@@ -1,17 +1,12 @@
 import TextInput from "../../common/forms/TextInput"
 import SelectMenu from '../../common/forms/SelectMenu'
 import FormState from "../../utils/formState"
-import { useEffect } from "react"
+import RequiredValidator from '../../utils/requiredValidator'
+import { useEffect, useState } from "react"
+import useGet from "../../api/useGet"
+import { deconstructLocationData } from "./DataWrapper"
 
-export default function AdministrativeArea({ setAdministrativeAreaDetails, setAdminAreaFormErrors }) {
-
-  const locations = [
-    { id: 1, name: 'Kiambu' }
-  ]
-
-  const wards = [
-    { id: 1, name: 'Juja' }
-  ]
+export default function AdministrativeArea({ setAdministrativeAreaDetails, setAdminAreaFormErrors, setAllFormsValid }) {
 
   const formRules = {
     residenceCounty: {
@@ -33,10 +28,48 @@ export default function AdministrativeArea({ setAdministrativeAreaDetails, setAd
     ward: ''
   }, formRules)
 
+  const [locationURL, setLocationUrl] = useState({ name: 'Location', level: 1})
+
+  const { data, loading, error } = useGet(locationURL.name)
+  const [counties, setCounties] = useState([])
+  const [subCounties, setSubCounties] = useState([])
+  const [wards, setWards] = useState([])
+
   useEffect(() => {
     setAdministrativeAreaDetails(formData)
     setAdminAreaFormErrors(formErrors)
-  }, [formData])
+
+    if (locationURL.level === 1 && Array.isArray(data)) {
+      const locationArray = data.map((item) => deconstructLocationData(item))
+      setCounties(locationArray)
+      setSubCounties([])
+      setWards([])
+    }
+
+    if (locationURL.level === 2 && Array.isArray(data)) {
+      const locationArray = data.map((item) => deconstructLocationData(item))
+      setSubCounties(locationArray)
+      setWards([])
+    }
+
+    if (locationURL.level === 3 && Array.isArray(data)) {
+      const locationArray = data.map((item) => deconstructLocationData(item))
+      setWards(locationArray)
+    }
+  }, [formData, locationURL, data])
+
+  const isFormValid = RequiredValidator(formData, formRules)
+
+  if (isFormValid) {
+    setAllFormsValid(isFormValid)
+  }
+
+  const switchLocationURL = (level, value) => {
+    if (value) {
+      setLocationUrl({ name: 'Location?partof=Location/' + value.id, level: level + 1 })
+    }
+  }
+
   return (
     <>
       <h3 className="text-xl font-medium">Administrative Area</h3>
@@ -50,8 +83,11 @@ export default function AdministrativeArea({ setAdministrativeAreaDetails, setAd
             label="Residence County"
             value={formData.residenceCounty || 'Residence County'}
             error={formErrors.residenceCounty}
-            onInputChange={(value) => handleChange('residenceCounty', value)}
-            data={locations}/>
+            onInputChange={(value) => {
+              handleChange('residenceCounty', value.name)
+              switchLocationURL(1, value)
+            }}
+            data={counties}/>
 
           <TextInput
             inputType="text"
@@ -71,8 +107,11 @@ export default function AdministrativeArea({ setAdministrativeAreaDetails, setAd
             label="Subcounty"
             value={formData.subCounty || 'Subcounty'}
             error={formErrors.residenceCounty}
-            onInputChange={(value) => handleChange('subCounty', value)}
-            data={locations}/>
+            onInputChange={(value) => {
+              handleChange('subCounty', value.name)
+              switchLocationURL(2, value)
+            }}
+            data={subCounties}/>
 
           <TextInput
             inputType="text"
@@ -92,7 +131,10 @@ export default function AdministrativeArea({ setAdministrativeAreaDetails, setAd
             error={formErrors.ward}
             label="Ward"
             value={formData.ward || 'Ward'}
-            onInputChange={(value) => handleChange('ward', value)}
+            onInputChange={(value) => {
+              handleChange('ward', value.name)
+              switchLocationURL(3)
+            }}
             data={wards}/>
 
         </div>
