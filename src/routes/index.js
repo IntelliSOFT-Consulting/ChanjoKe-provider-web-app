@@ -19,6 +19,14 @@ import SearchInterface from '../pages/SearchInterface'
 import AEFIType from '../components/AEFI/AEFIType'
 import AEFIAction from '../components/AEFI/AEFIAction'
 import Appointments from '../pages/Appointments'
+import ReceiveIssueStock from '../components/StockManagement/ReceiveIssueStock'
+import StockCount from '../components/StockManagement/StockCount'
+import Adjustments from '../components/StockManagement/Adjustments'
+import VVMStatusChange from '../components/StockManagement/VVMStatusChange'
+import NewOrder from '../components/StockManagement/NewOrder'
+import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
+import SentOrders from '../components/StockManagement/SentOrders'
+import Ledger from '../components/StockManagement/Ledger'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -39,7 +47,22 @@ const router = createBrowserRouter([
       { path: '/admin-add-facility', element: <AddFacility /> },
       { path: '/register-client', element: <RegisterClient /> },
       { path: '/defaulter-tracing', element: <DefaulterTracing /> },
-      { path: '/stock-management', element: <StockManagement /> },
+      {
+        path: '/stock-management',
+        children: [
+          { path: '/stock-management', element: <StockManagement /> },
+          { path: '/stock-management/receive-stock', element: <ReceiveIssueStock status={'receive'} /> },
+          { path: '/stock-management/issue-stock', element: <ReceiveIssueStock status={'issue'} /> },
+          { path: '/stock-management/stock-count', element: <StockCount /> },
+          { path: '/stock-management/positive-adjustment', element: <Adjustments polarity={'positive'} /> },
+          { path: '/stock-management/negative-adjustment', element: <Adjustments polarity={'negative'} /> },
+          { path: '/stock-management/vvm-status', element: <VVMStatusChange /> },
+          { path: '/stock-management/new-order', element: <NewOrder /> },
+          { path: '/stock-management/received-orders', element: <ReceivedOrders /> },
+          { path: '/stock-management/sent-orders', element: <SentOrders /> },
+          { path: '/stock-management/ledger', element: <Ledger /> },
+        ]
+      },
       { path: '/reports', element: <VaccinationReports />},
       { path: '/profile', element: <Profile /> },
       { path: '/aefi-report', element: <AEFIType /> },

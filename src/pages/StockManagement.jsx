@@ -85,7 +85,10 @@ export default function StockManagement() {
                 inputName="searchInput"
                 inputId="searchInput"
                 value={formData.searchInput}
-                onInputChange={(value) => handleChange('searchInput', value)}
+                onInputChange={(value) => {
+                  handleChange('searchInput', value)
+                  SubmitDetails()
+                }}
                 inputPlaceholder="Search"/>
             </div>
           </div>
