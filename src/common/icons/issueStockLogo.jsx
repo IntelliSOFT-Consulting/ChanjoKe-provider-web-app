@@ -1,0 +1,13 @@
+export default function IssueStockLogo(props) {
+  return (
+    <svg id="task-square" xmlns="http://www.w3.org/2000/svg" width={props.width} height={props.height} viewBox="0 0 54 54">
+      <path id="Vector" d="M0,0H9.858" transform="translate(29.122 19.98)" fill="none" stroke={props.fillColor} stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-2" data-name="Vector" d="M0,2.816,1.408,4.225,5.633,0" transform="translate(14.694 16.889)" fill="none" stroke={props.fillColor} stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-3" data-name="Vector" d="M0,0H9.858" transform="translate(29.122 35.73)" fill="none" stroke={props.fillColor} stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-4" data-name="Vector" d="M0,2.816,1.408,4.225,5.633,0" transform="translate(14.694 32.909)" fill="none" stroke={props.fillColor} stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-5" data-name="Vector" d="M16.271,46.489H30.218c11.622,0,16.271-4.649,16.271-16.271V16.271C46.489,4.649,41.84,0,30.218,0H16.271C4.649,0,0,4.649,0,16.271V30.218C0,41.84,4.649,46.489,16.271,46.489Z" transform="translate(3.755 3.755)" fill="none" stroke={props.fillColor} stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-6" data-name="Vector" d="M0,0H54V54H0Z" fill="none" opacity="0"/>
+    </svg>
+  )
+
+}
