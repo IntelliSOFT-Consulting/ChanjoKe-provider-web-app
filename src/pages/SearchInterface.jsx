@@ -13,6 +13,7 @@ export default function SearchInterface(props) {
   const [title, setTitle] = useState('Search')
   const [results, setResults] = useState([])
   const [searchUrl, setSearchUrl] = useState('Patient')
+  const [paginationLinks, setPaginationLinks] = useState([])
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -21,12 +22,18 @@ export default function SearchInterface(props) {
   useEffect(() => {
     if (Array.isArray(data?.entry)) {
       const mappedData = data?.entry.map(patient => deconstructPatientData(patient, props.searchType));
+      setPaginationLinks(data?.link)
       setResults(mappedData);
     }
   }, [data, title])
 
   const SubmitDetails = () => {
     setSearchUrl(`Patient?name=${formData.searchInput}`)
+  }
+
+  const onUpdateUrl = (value) => {
+    const URL = value.slice('http://chanjoke.intellisoftkenya.com/hapi/fhir'.length)
+    setSearchUrl(URL)
   }
 
   const handleDialogClose = () => {
@@ -99,15 +106,15 @@ export default function SearchInterface(props) {
 
         {error && <div className="my-10 text-center">{error}</div> }
         {loading && <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
-        {!data && !loading && <div className="my-10 text-center">No records to view</div>}
-        {data &&
+        {!data?.entry && !loading && <div className="my-10 text-center">No records to view</div>}
+        {data?.entry && !loading &&
           <>
             <SearchTable
               headers={tHeaders}
               data={results}
               onActionBtn={handleAction}/>
 
-            <Pagination />
+            <Pagination link={paginationLinks} updateURL={onUpdateUrl} />
           </>
         }
       </div>
