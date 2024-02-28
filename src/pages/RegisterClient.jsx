@@ -25,15 +25,17 @@ export default function RegisterClient() {
   const [allFormsValid, setAllFormsValid] = useState(false)
 
   const navigate = useNavigate()
+  const [response, setResponse] = useState(null)
 
   const handleDialogClose = (confirmed) => {
-    setDialogOpen(false);
+    setDialogOpen(false)
+    navigate(`/client-details/${response?.id}`)
   };
 
   const SubmitDetails = async () => {
+    setDialogOpen(true)
     const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea })
-    const response = await SubmitForm('Patient', postData)
-    navigate(`/client-details/${response?.id}`)
+    setResponse(await SubmitForm('Patient', postData))
   }
 
   const nextForm = () => {

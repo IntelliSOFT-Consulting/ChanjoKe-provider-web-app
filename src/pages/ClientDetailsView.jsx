@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import useGet from "../api/useGet";
 import { useParams } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
+import LoadingArrows from "../common/spinners/LoadingArrows";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -60,15 +61,18 @@ export default function ClientDetailsView() {
       <div className="px-4 py-5 sm:p-6">
         <div className="container grid grid-cols-2 gap-10">
           <div>
-            <p className="text-3xl font-bold ml-8">
-              {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
-              -
-              {calculateAge(patientData?.birthDate)}
-            </p>
+            {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
+            {patientData?.name && <>
+              <p className="text-3xl font-bold ml-8">
+                {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
+                -
+                {calculateAge(patientData?.birthDate)}
+              </p>
 
-            <SearchTable
-              headers={tHeaders}
-              data={stats} />
+              <SearchTable
+                headers={tHeaders}
+                data={stats} />
+            </>}
           </div>
           <div>
           </div>

@@ -33,35 +33,27 @@ export default function ConfirmDialog({ open, onClose, title, description, confi
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="text-1xl bg-green-500 py-3 text-white font-semibold sm:px-6">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-0">
+                <div className="text-1xl bg-[#4D8D6E] py-3 text-white font-semibold sm:px-6">
                   Success
                 </div>
                 <div>
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mt-5">
-                    <CheckIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+                    <CheckIcon className="h-50 w-50 text-green-600" aria-hidden="true" />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                      
+                    <Dialog.Title as="h2" className="text-base font-semibold text-3xl text-gray-900">
+                    { description }
                     </Dialog.Title>
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        { description }
-                      </p>
-                    </div>
                   </div>
                 </div>
-                <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-1 sm:gap-3">
-                  <Link
-                    type="button"
-                    to="/search-client"
+                <div className="sm:grid sm:grid-flow-row-dense sm:grid-cols-1 sm:gap-3 p-6">
+                  <button
                     onClick={() => onClose(false)}
                     ref={cancelButtonRef}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
-                  >
+                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
                     Close
-                  </Link>
+                  </button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
