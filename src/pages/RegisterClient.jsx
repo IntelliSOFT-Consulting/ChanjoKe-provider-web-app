@@ -2,7 +2,7 @@ import ClientDetails from '../components/RegisterClient/ClientDetails'
 import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import usePost from '../api/usePost'
@@ -30,11 +30,10 @@ export default function RegisterClient() {
     setDialogOpen(false);
   };
 
-  const SubmitDetails = () => {
+  const SubmitDetails = async () => {
     const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea })
-    SubmitForm('Patient', postData)
-    console.log({ data })
-    navigate('/client-details/new-patient-id')
+    const response = await SubmitForm('Patient', postData)
+    navigate(`/client-details/${response?.id}`)
   }
 
   const nextForm = () => {

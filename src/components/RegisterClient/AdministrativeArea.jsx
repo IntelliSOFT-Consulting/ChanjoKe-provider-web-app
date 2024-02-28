@@ -39,21 +39,21 @@ export default function AdministrativeArea({ setAdministrativeAreaDetails, setAd
     setAdministrativeAreaDetails(formData)
     setAdminAreaFormErrors(formErrors)
 
-    if (locationURL.level === 1 && Array.isArray(data)) {
-      const locationArray = data.map((item) => deconstructLocationData(item))
+    if (locationURL.level === 1 && Array.isArray(data?.entry)) {
+      const locationArray = data?.entry.map((item) => deconstructLocationData(item))
       setCounties(locationArray)
       setSubCounties([])
       setWards([])
     }
 
-    if (locationURL.level === 2 && Array.isArray(data)) {
-      const locationArray = data.map((item) => deconstructLocationData(item))
+    if (locationURL.level === 2 && Array.isArray(data?.entry)) {
+      const locationArray = data?.entry.map((item) => deconstructLocationData(item))
       setSubCounties(locationArray)
       setWards([])
     }
 
-    if (locationURL.level === 3 && Array.isArray(data)) {
-      const locationArray = data.map((item) => deconstructLocationData(item))
+    if (locationURL.level === 3 && Array.isArray(data?.entry)) {
+      const locationArray = data?.entry.map((item) => deconstructLocationData(item))
       setWards(locationArray)
     }
   }, [formData, locationURL, data])

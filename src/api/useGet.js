@@ -21,7 +21,7 @@ const useGet = (url) => {
       .then((data) => {
         // console.log({ data })
         if (data) {
-          setData(data.entry)
+          setData(data)
           setLoader(false)
           setError(false)
         }

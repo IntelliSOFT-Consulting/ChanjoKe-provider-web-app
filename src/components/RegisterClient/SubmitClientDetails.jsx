@@ -1,20 +1,24 @@
 import BaseTable from "../../common/tables/BaseTable";
+import SearchTable from "../../common/tables/SearchTable";
 import ConvertObjectToArray from "./convertObjectToArray";
 
 export default function ClientDetails({ clientDetails, caregiverDetails, administrativeArea }) {
 
   const clientDetailsArray = ConvertObjectToArray(clientDetails)
-
-  const careGiverDetailsArray = caregiverDetails.map((item) => ConvertObjectToArray(item))
-
   const administrativeAreaArray = ConvertObjectToArray(administrativeArea)
+
+  const tHeaders = [
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
+  ]
 
   return (
     <>
-      <div className="grid mt-5 grid-cols-3 gap-10">
+      <div className="grid grid-cols-2 gap-10 mx-7">
         {/* Column 1 */}
         <div>
-          <h2 className="text-xl font-semibold text-center mb-5">
+          <h2 className="text-xl font-semibold mb-5">
             Client Details
           </h2>
 
@@ -22,18 +26,9 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
 
         </div>
 
-        {/* Column 2 */}
-        <div>
-          <h2 className="text-xl font-semibold text-center mb-5">
-            Caregiver Details
-          </h2>
-
-          <BaseTable data={careGiverDetailsArray} />
-        </div>
-
         {/* Column 3 */}
         <div>
-          <h2 className="text-xl font-semibold text-center mb-5">
+          <h2 className="text-xl font-semibold mb-5">
             Administrative Area
           </h2>
 
@@ -41,6 +36,14 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
         </div>
 
       </div>
+
+      <div>
+          <h2 className="text-xl font-semibold ml-7 mb-5 mt-5">
+            Caregiver Details
+          </h2>
+
+          <SearchTable headers={tHeaders} data={caregiverDetails} />
+        </div>
     </>
   )
 }

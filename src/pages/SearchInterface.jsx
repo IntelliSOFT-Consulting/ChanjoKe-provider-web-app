@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import LoadingArrows from "../common/spinners/LoadingArrows"
 import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
 import SelectDialog from "../common/dialog/SelectDialog"
+import Pagination from "../components/Pagination"
 
 export default function SearchInterface(props) {
 
@@ -18,8 +19,8 @@ export default function SearchInterface(props) {
   const { data, loading, error } = useGet(searchUrl)
 
   useEffect(() => {
-    if (Array.isArray(data)) {
-      const mappedData = data.map(patient => deconstructPatientData(patient, props.searchType));
+    if (Array.isArray(data?.entry)) {
+      const mappedData = data?.entry.map(patient => deconstructPatientData(patient, props.searchType));
       setResults(mappedData);
     }
   }, [data, title])
@@ -100,10 +101,14 @@ export default function SearchInterface(props) {
         {loading && <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
         {!data && !loading && <div className="my-10 text-center">No records to view</div>}
         {data &&
-          <SearchTable
-            headers={tHeaders}
-            data={results}
-            onActionBtn={handleAction}/>
+          <>
+            <SearchTable
+              headers={tHeaders}
+              data={results}
+              onActionBtn={handleAction}/>
+
+            <Pagination />
+          </>
         }
       </div>
     </div>

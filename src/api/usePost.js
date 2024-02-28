@@ -26,11 +26,12 @@ const usePost = () => {
       }
 
       const responseData = await response.json();
-      // console.log({ responseData });
 
-      setData(responseData.entry);
+      setData(responseData);
       setLoader(false);
       setError(null);
+
+      return responseData
     } catch (err) {
       if (err.name === 'AbortError') {
         console.log('Fetch aborted');

@@ -23,7 +23,7 @@ export default function BaseTabs() {
     <div>
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
-          Select a tab
+          
         </label>
         <select
           id="tabs"

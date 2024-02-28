@@ -1,17 +1,29 @@
 import SelectDialog from "../common/dialog/SelectDialog";
 import BaseTabs from "../common/tabs/BaseTabs";
 import SearchTable from "../common/tables/SearchTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useGet from "../api/useGet";
+import { useParams } from "react-router-dom";
+import calculateAge from "../utils/calculateAge";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [patientData, setPatientData] = useState({})
+
+  const { clientID } = useParams()
+  const { data, loading, error } = useGet(`Patient/${clientID}`)
+
+  useEffect(() => {
+    setPatientData(data)
+  }, [data])
+  
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);
   };
 
   const stats = [
-    { dob: 'Jan 1 2002', age: '2 Years', gender: 'Male' }
+    { dob: patientData?.birthDate, age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
   ]
 
   const tHeaders = [
@@ -48,7 +60,11 @@ export default function ClientDetailsView() {
       <div className="px-4 py-5 sm:p-6">
         <div className="container grid grid-cols-2 gap-10">
           <div>
-            <p className="text-3xl font-bold ml-8">JOHN DOE - 20 YRS</p>
+            <p className="text-3xl font-bold ml-8">
+              {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
+              -
+              {calculateAge(patientData?.birthDate)}
+            </p>
 
             <SearchTable
               headers={tHeaders}
