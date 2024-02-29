@@ -1,5 +1,8 @@
 
 export default function calculateAge(dateString) {
+  if (!dateString) {
+    return 'N/A'
+  }
   const today = new Date();
   const birthDate = new Date(dateString);
 

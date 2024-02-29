@@ -3,7 +3,7 @@ import BaseTabs from "../common/tabs/BaseTabs";
 import SearchTable from "../common/tables/SearchTable";
 import { useEffect, useState } from "react";
 import useGet from "../api/useGet";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
 import LoadingArrows from "../common/spinners/LoadingArrows";
 
@@ -12,6 +12,7 @@ export default function ClientDetailsView() {
   const [patientData, setPatientData] = useState({})
 
   const { clientID } = useParams()
+  const navigate = useNavigate()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function ClientDetailsView() {
         </div>
         <div className="right-0">
           <button
+            onClick={() => navigate(`/client-records/${patientData?.id}`)}
             className="ml-4 flex-shrink-0 rounded-md border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
             View Client Details
           </button>
@@ -65,8 +67,6 @@ export default function ClientDetailsView() {
             {patientData?.name && <>
               <p className="text-3xl font-bold ml-8">
                 {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
-                -
-                {calculateAge(patientData?.birthDate)}
               </p>
 
               <SearchTable

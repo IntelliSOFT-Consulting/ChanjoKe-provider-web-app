@@ -17,8 +17,8 @@ function getStatusColorClass(status) {
 
 export default function SearchTable({ headers, data, onActionBtn}) {
 
-  const handleActionBtn = ({ ...actionData }) => {
-    onActionBtn && onActionBtn({ ...actionData });
+  const handleActionBtn = (actionData, data) => {
+    onActionBtn && onActionBtn(actionData, data);
   }
 
   return (
@@ -47,7 +47,7 @@ export default function SearchTable({ headers, data, onActionBtn}) {
                           checked={item.selected}
                         />
                       ) : header.key === 'actions' ? (
-                        <RenderActionButton actions={item.actions} onBtnAction={handleActionBtn} />
+                        <RenderActionButton actions={item.actions} onBtnAction={handleActionBtn} data={item} />
                       ) : (
                         item[header.key]
                       )}

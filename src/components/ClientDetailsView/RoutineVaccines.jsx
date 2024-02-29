@@ -1,35 +1,47 @@
 import { Link } from 'react-router-dom'
+import { v4 as uuidv4 } from 'uuid'
 import SearchTable from '../../common/tables/SearchTable'
+import routineVaccines from './vaccineData'
 
-const atBirthVaccines = [
-  { vaccineName: 'BCG', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Contraindicated', actions: [
+const atBirthVaccines = routineVaccines.filter((vaccine) => vaccine.category === 'at_birth').map((item) => {
+  item.actions = [
     { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'bOPV', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Missed', actions: [
-    { title: 'view', url: '/'}
-  ]},
-]
+  ]
+  item.id = uuidv4()
+  return item
+})
 
-const sixWeekVaccines = [
-  {vaccineName: 'OPV I', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: 'Jan 1 2020', status: 'Administered', actions: [
+const sixWeekVaccines = routineVaccines.filter((vaccine) => vaccine.category === '6_weeks').map((item) => {
+  item.actions = [
     { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'OPV II', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: 'Jan 1 2020', status: 'Administered', actions: [
-    { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'Rotavirus', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: 'Jan 1 2020', status: 'Administered', actions: [
-    { title: 'view', url: '/'}
-  ]},
-]
+  ]
+  item.id = uuidv4()
+  return item
+})
 
-const tenthWeekVaccines = [
-  {vaccineName: 'OPV III', doseNumber: '1', dueToAdminister: 'Jan 1 2024', dateAdministered: '-', status: 'Due', actions: [
+const tenthWeekVaccines = routineVaccines.filter((vaccine) => vaccine.category === '10_weeks').map((item) => {
+  item.actions = [
     { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'Rotavirus II', doseNumber: '1', dueToAdminister: 'Jan 1 2024', dateAdministered: '-', status: 'Due', actions: [
+  ]
+  item.id = uuidv4()
+  return item
+})
+
+const forteenWeeks = routineVaccines.filter((vaccine) => vaccine.category === '14_weeks').map((item) => {
+  item.actions = [
     { title: 'view', url: '/'}
-  ]},
-]
+  ]
+  item.id = uuidv4()
+  return item
+})
+
+const sixMonths = routineVaccines.filter((vaccine) => vaccine.category === '6_months').map((item) => {
+  item.actions = [
+    { title: 'view', url: '/'}
+  ]
+  item.id = uuidv4()
+  return item
+})
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -59,8 +71,13 @@ export default function RoutineVaccines() {
 
       <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
         <div className="flex justify-between px-10">
-          <div>
-            <p>At Birth</p>
+          <div className='flex'>
+            <span className='flex'>At Birth
+
+              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
+                <circle cx={3} cy={3} r={3} />
+              </svg>
+            </span>
           </div>
           <Link to="/aefi-report" className="text-[#163C94]">
             AEFIs
@@ -75,7 +92,13 @@ export default function RoutineVaccines() {
       <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
         <div className="flex justify-between px-10">
           <div>
-            <p>6 Weeks</p>
+            <span className='flex'>
+              6 Weeks
+
+              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
+                <circle cx={3} cy={3} r={3} />
+              </svg>
+            </span>
           </div>
           <Link to="/aefi-report" className="text-[#163C94]">
             AEFIs
@@ -90,7 +113,13 @@ export default function RoutineVaccines() {
       <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
         <div className="flex justify-between px-10">
           <div>
-            <p>10 Weeks</p>
+            <span className='flex'>
+              10 Weeks
+
+              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
+                <circle cx={3} cy={3} r={3} />
+              </svg>
+            </span>
           </div>
           <Link to="/aefi-report" className="text-[#163C94]">
             AEFIs
@@ -100,6 +129,48 @@ export default function RoutineVaccines() {
         <SearchTable
           headers={tHeaders}
           data={tenthWeekVaccines} />
+      </div>
+
+      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+        <div className="flex justify-between px-10">
+          <div>
+            <span className='flex'>
+              14 Weeks
+
+              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
+                <circle cx={3} cy={3} r={3} />
+              </svg>
+            </span>
+          </div>
+          <Link to="/aefi-report" className="text-[#163C94]">
+            AEFIs
+          </Link>
+        </div>
+
+        <SearchTable
+          headers={tHeaders}
+          data={forteenWeeks} />
+      </div>
+
+      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+        <div className="flex justify-between px-10">
+          <div>
+            <span className='flex'>
+              6 months
+
+              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
+                <circle cx={3} cy={3} r={3} />
+              </svg>
+            </span>
+          </div>
+          <Link to="/aefi-report" className="text-[#163C94]">
+            AEFIs
+          </Link>
+        </div>
+
+        <SearchTable
+          headers={tHeaders}
+          data={sixMonths} />
       </div>
     </div>
   ) 

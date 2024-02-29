@@ -7,6 +7,7 @@ import LoadingArrows from "../common/spinners/LoadingArrows"
 import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
 import SelectDialog from "../common/dialog/SelectDialog"
 import Pagination from "../components/Pagination"
+import { useNavigate } from "react-router-dom"
 
 export default function SearchInterface(props) {
 
@@ -18,6 +19,7 @@ export default function SearchInterface(props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const { data, loading, error } = useGet(searchUrl)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (Array.isArray(data?.entry)) {
@@ -106,7 +108,16 @@ export default function SearchInterface(props) {
 
         {error && <div className="my-10 text-center">{error}</div> }
         {loading && <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
-        {!data?.entry && !loading && <div className="my-10 text-center">No records to view</div>}
+        {!data?.entry && !loading && <>
+          <div className="my-10 text-center">No records to view</div>
+          <div className="flex justify-center">
+            <button
+              onClick={() => navigate('/register-client')}
+              className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+              Register new client
+            </button>
+          </div>
+        </>}
         {data?.entry && !loading &&
           <>
             <SearchTable
