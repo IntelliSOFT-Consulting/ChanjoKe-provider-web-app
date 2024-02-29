@@ -4,10 +4,51 @@ import './index.css';
 import routes from './routes/index'
 import { RouterProvider } from 'react-router-dom'
 import reportWebVitals from './reportWebVitals';
+import { ConfigProvider} from "antd";
+
+const defaultData = {
+    borderRadius: 6,
+    colorPrimary: '#163C94',
+    Button: {
+        colorPrimary: '#163C94',
+    },
+};
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+      <ConfigProvider
+          theme={{
+              token: {
+                  colorPrimary: defaultData.colorPrimary,
+                  borderRadius: defaultData.borderRadius,
+              },
+              components: {
+                  Button: {
+                      colorPrimary: defaultData.Button?.colorPrimary,
+                      algorithm: defaultData.Button?.algorithm,
+                  },
+                  Input: {
+                      colorPrimary: defaultData.Input?.colorPrimary,
+                      algorithm: defaultData.Input?.algorithm,
+
+                  },
+                    Select: {
+                        colorPrimary: defaultData.Select?.colorPrimary,
+                        algorithm: defaultData.Select?.algorithm,
+                    },
+                  InputNumber: {
+                        colorPrimary: defaultData.InputNumber?.colorPrimary,
+                        algorithm: defaultData.InputNumber?.algorithm,
+                    },
+                    DatePicker: {
+                            colorPrimary: defaultData.DatePicker?.colorPrimary,
+                            algorithm: defaultData.DatePicker?.algorithm,
+                        },
+              },
+          }}
+      >
     <RouterProvider router={routes} />
+        </ConfigProvider>
   </React.StrictMode>
 );
 
