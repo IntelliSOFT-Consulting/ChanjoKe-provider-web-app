@@ -19,7 +19,8 @@ import SearchInterface from '../pages/SearchInterface'
 import AEFIType from '../components/AEFI/AEFIType'
 import AEFIAction from '../components/AEFI/AEFIAction'
 import Appointments from '../pages/Appointments'
-import ReceiveIssueStock from '../components/StockManagement/ReceiveIssueStock'
+import ReceiveStock from '../components/StockManagement/ReceiveStock'
+import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
 import Adjustments from '../components/StockManagement/Adjustments'
 import VVMStatusChange from '../components/StockManagement/VVMStatusChange'
@@ -51,8 +52,8 @@ const router = createBrowserRouter([
         path: '/stock-management',
         children: [
           { path: '/stock-management', element: <StockManagement /> },
-          { path: '/stock-management/receive-stock', element: <ReceiveIssueStock status={'receive'} /> },
-          { path: '/stock-management/issue-stock', element: <ReceiveIssueStock status={'issue'} /> },
+          { path: '/stock-management/receive-stock', element: <ReceiveStock status={'receive'} /> },
+          { path: '/stock-management/issue-stock', element: <IssueStock status={'issue'} /> },
           { path: '/stock-management/stock-count', element: <StockCount /> },
           { path: '/stock-management/positive-adjustment', element: <Adjustments polarity={'positive'} /> },
           { path: '/stock-management/negative-adjustment', element: <Adjustments polarity={'negative'} /> },

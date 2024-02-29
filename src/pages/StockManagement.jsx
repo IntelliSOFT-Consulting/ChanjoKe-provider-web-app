@@ -29,10 +29,10 @@ export default function StockManagement() {
   };
 
   const stats = [
-    { name: "Receive Stock", icon: "ReceiveStockLogo", href: "search/searchClient" },
-    { name: "Order Stock", icon: "OrderStockLogo", href: "register-client" },
-    { name: "Issue Stock", icon: "IssueStockLogo", href: "search/updateClient" },
-    { name: "Stock Ledger", icon: "StockLedgerLogo", href: "search/administerVaccine" },
+    { name: "Receive Stock", icon: "ReceiveStockLogo", href: "receive-stock" },
+    { name: "Order Stock", icon: "OrderStockLogo", href: "order-stock" },
+    { name: "Issue Stock", icon: "IssueStockLogo", href: "issue-stock" },
+    { name: "Stock Ledger", icon: "StockLedgerLogo", href: "stock-ledger" },
   ];
 
   const tHeaders = [

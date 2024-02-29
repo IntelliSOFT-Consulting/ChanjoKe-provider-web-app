@@ -18,4 +18,17 @@ code {
 
 .ant-input {
   border-radius: 5px !important;
+  padding: 3px 10px !important;
+}
+
+.ant-form-item-label {
+  font-weight: 600 !important;
+  position: relative;
+}
+
+.ant-form-item-label label::before {
+  right: 0;
+  position: absolute;
+  font-weight: 600;
+  font-size: 14px;
 }
