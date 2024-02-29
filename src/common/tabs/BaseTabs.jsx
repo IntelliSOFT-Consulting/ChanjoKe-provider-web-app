@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import NonRoutineVaccines from '../../components/ClientDetailsView/NonRoutineVaccines';
 import RoutineVaccines from '../../components/ClientDetailsView/RoutineVaccines';
+import VaccineAppointments from '../../components/ClientDetailsView/VaccineAppointments';
 
 const tabs = [
   { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
@@ -65,7 +66,7 @@ export default function BaseTabs() {
       {/* Content based on the selected tab */}
       {currentTab === 'routineVaccines' && <RoutineVaccines/>}
       {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines />}
-      {currentTab === 'appointments' && <>Appoinements tab</>}
+      {currentTab === 'appointments' && <VaccineAppointments />}
     </div>
   );
 }

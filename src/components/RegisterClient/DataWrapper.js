@@ -30,7 +30,6 @@ function createPatientData(data) {
 
   return {
     resourceType: "Patient",
-    // id: "32800240-831a-4d5f-81ae-5c24de74d50e", // PS: How is this ID generated?
     identifier: [
         {
             "type": {

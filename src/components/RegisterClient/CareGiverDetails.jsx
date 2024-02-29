@@ -3,6 +3,8 @@ import SelectMenu from '../../common/forms/SelectMenu';
 import { useState, useEffect } from 'react';
 import SearchTable from '../../common/tables/SearchTable';
 import FormState from '../../utils/formState'
+import { v4 as uuidv4 } from 'uuid'
+import ConfirmationDialog from '../../common/dialog/ConfirmationDialog';
 
 export default function CaregiverDetails({ setCaregiverDetails, setCaregiverFormErrors }) {
   const caregiverTypes = [
@@ -30,15 +32,17 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
   }
 
   const { formData, formErrors, handleChange, resetForm } = FormState({
+    id: uuidv4(),
     caregiverName: '',
     caregiverType: '',
     phoneNumber: '',
     actions: [
-      { title: 'edit', url: '/' },
-      { title: 'remove', url: '/' }
+      { title: 'edit', btnAction: 'editCareGiver' },
+      { title: 'remove', btnAction: 'removeCareGiver' }
     ]
   }, formRules)
   const [caregivers, setCaregivers] = useState([])
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     setCaregiverDetails(caregivers)
@@ -46,20 +50,58 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
   }, [caregivers])
 
   const handleSubmit = () => {
-    setCaregivers([...caregivers, formData])
+    setCaregivers([formData, ...caregivers,])
     resetForm({
+      id: uuidv4(),
       caregiverName: '',
       caregiverType: '',
       phoneNumber: '',
       actions: [
-        { title: 'edit', url: '/' },
-        { title: 'remove', url: '/' }
+        { title: 'edit', btnAction: 'editCareGiver' },
+        { title: 'remove', btnAction: 'removeCareGiver' }
       ]
     })
   };
 
+  const handleAction = (onActionBtn, data) => {
+    console.log({ data })
+    if (onActionBtn === 'editCareGiver') {
+      const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== data.id)
+
+      resetForm({
+        id: data.id,
+        caregiverName: data.caregiverName,
+        caregiverType: data.caregiverType,
+        phoneNumber: data.phoneNumber,
+        actions: [
+          { title: 'edit', btnAction: 'editCareGiver' },
+          { title: 'remove', btnAction: 'removeCareGiver' }
+        ]
+      })
+      setCaregivers(arrayWithoutCaregiver)
+    }
+
+    if (onActionBtn === 'removeCareGiver') {
+      const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id === data.id)
+
+      setIsDialogOpen(true)
+      console.log({ arrayWithoutCaregiver })
+    }
+  }
+
+  const handleAcceptRemoveCaregiver = () => {
+
+  }
+
   return (
     <>
+
+      <ConfirmationDialog
+        open={isDialogOpen}
+        description="Are you sure you want to remove Caregiver?"
+        onClose={() => setIsDialogOpen(false)}
+        onAccept={handleAcceptRemoveCaregiver}
+        title="Remove Caregiver" />
       <h3 className="text-xl font-medium">Care Giver's Details</h3>
 
       <div className="grid mt-5 grid-cols-3 gap-10">
@@ -115,8 +157,9 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
       {
         caregivers.length > 0 &&
           <SearchTable
-              headers={tHeaders}
-              data={caregivers} />
+            headers={tHeaders}
+            onActionBtn={handleAction}
+            data={caregivers} />
       }
     </>
   );
