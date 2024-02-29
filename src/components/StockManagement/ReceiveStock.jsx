@@ -61,7 +61,7 @@ const ReceiveStock = () => {
       switch (header.key) {
         case "vaccine":
           return (
-            <Form.Item name={header.key} className="mb-0">
+            <Form.Item className="mb-0">
               <Select
                 options={[
                   { label: "BCG", value: "BCG" },
@@ -75,7 +75,7 @@ const ReceiveStock = () => {
           );
         case "batchNumber":
           return (
-            <Form.Item name={header.key} className="mb-0">
+            <Form.Item className="mb-0">
               <Select
                 options={[
                   { label: "BCG", value: "BCG" },
@@ -89,25 +89,25 @@ const ReceiveStock = () => {
           );
         case "expiryDate":
           return (
-            <Form.Item name={header.key} className="mb-0">
-              <DatePicker disabled onChange={(date) => handleChange({ expiryDate: date }, i)} />
+            <Form.Item className="mb-0">
+              <DatePicker className="w-full" disabled onChange={(date) => handleChange({ expiryDate: date }, i)} />
             </Form.Item>
           );
         case "stockQuantity":
           return (
-            <Form.Item name={header.key} className="mb-0">
+            <Form.Item className="mb-0">
               <InputNumber min={0} disabled onChange={(value) => handleChange({ stockQuantity: value }, i)} />
             </Form.Item>
           );
         case "quantity":
           return (
-            <Form.Item name={header.key} className="mb-0">
+            <Form.Item className="mb-0">
               <InputNumber min={0} onChange={(value) => handleChange({ quantity: value }, i)} />
             </Form.Item>
           );
         case "vvmStatus":
           return (
-            <Form.Item name={header.key} className="mb-0">
+            <Form.Item className="mb-0">
               <Select
                 options={[{ label: "Status", value: "Status" }]}
                 onChange={(value) => handleChange({ vvmStatus: value }, i)}
@@ -116,7 +116,7 @@ const ReceiveStock = () => {
           );
         case "manufacturerDetails":
           return (
-            <Form.Item name={header.key} className="mb-0">
+            <Form.Item className="mb-0">
               <Input disabled onChange={(value) => handleChange({ manufacturerDetails: value }, i)} />
             </Form.Item>
           );
@@ -135,8 +135,6 @@ const ReceiveStock = () => {
   const onSubmit = (values) => {
     console.log(values);
   };
-
-  console.log("Vaccines: ", vaccines);
 
   const addRowToVaccineList = () => setVaccines([...vaccines, {}]);
 
