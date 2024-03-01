@@ -77,11 +77,10 @@ function createPatientData(data) {
     "birthDate": data.dateOfBirth,
     "address": [
         {
-            "estate": "Nai",
-            "steeet": "Nai",
-            "county": "Nairobi",
-            "subCounty": "Kasarani",
-            "ward": "Kahawa West"
+            "city": data.residenceCounty,
+            "district": data.subCounty,
+            "state": data.ward,
+            "line": [data.townCenter, data.estateOrHouseNo],
         }
     ],
     "contact": careGivers,

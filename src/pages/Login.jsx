@@ -76,7 +76,7 @@ export default function Login() {
             <div></div>
             <button
               onClick={() => {
-                if (formData?.username.length > 3 && formData?.password.length > 8) {
+                if (formData?.username.length > 3 && formData?.password.length > 3) {
                   localStorage.setItem('token', 'invalidtokenbutshouldwork')
                   navigate('/')
                 }
