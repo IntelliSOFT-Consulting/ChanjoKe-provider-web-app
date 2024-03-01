@@ -7,7 +7,7 @@ export default function BaseTable(props) {
             {/* <td className="whitespace-nowrap border border-slate-400 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
               {item.name}
             </td> */}
-            <td className="whitespace-nowrap border border-slate-400 px-3 py-4 text-sm text-gray-500">{item.title}</td>
+            <td className="whitespace-nowrap border border-slate-400 px-3 py-4 text-sm text-gray-500 font-bold">{item.title}</td>
             <td className="whitespace-nowrap border border-slate-400 px-3 py-4 text-sm text-gray-500">{item.value}</td>
           </tr>
         ))}

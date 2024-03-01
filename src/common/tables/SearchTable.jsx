@@ -15,10 +15,15 @@ function getStatusColorClass(status) {
   }
 }
 
-export default function SearchTable({ headers, data, onActionBtn}) {
+export default function SearchTable({ headers, data, onActionBtn, onCheckbox }) {
 
   const handleActionBtn = (actionData, data) => {
     onActionBtn && onActionBtn(actionData, data);
+  }
+
+  const handleCheckbox = (value) => {
+    console.log({ value })
+    onCheckbox && onCheckbox(value)
   }
 
   return (
@@ -44,6 +49,7 @@ export default function SearchTable({ headers, data, onActionBtn}) {
                       {header.key === 'checkbox' ? (
                         <input
                           type="checkbox"
+                          onChange={(e) => handleCheckbox(e.target.value)}
                           checked={item.selected}
                         />
                       ) : header.key === 'actions' ? (

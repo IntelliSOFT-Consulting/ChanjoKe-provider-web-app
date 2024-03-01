@@ -6,6 +6,7 @@ import useGet from "../api/useGet";
 import { useParams, useNavigate } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
 import LoadingArrows from "../common/spinners/LoadingArrows";
+import OptionsDialog from "../common/dialog/OptionsDialog";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -39,6 +40,16 @@ export default function ClientDetailsView() {
 
     <SelectDialog
       open={isDialogOpen}
+      title='Info'
+      description='Select Record to update'
+      btnOne={{
+        text: 'Client Record',
+        url: `/update-client-history/${patientData?.id}`
+      }}
+      btnTwo={{
+        text: 'Vaccine Details',
+        url: '/update-vaccine-history'
+      }}
       onClose={handleDialogClose} />
     
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">

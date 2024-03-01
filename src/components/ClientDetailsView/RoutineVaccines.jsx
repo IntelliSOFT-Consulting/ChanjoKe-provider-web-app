@@ -1,47 +1,10 @@
 import { Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import SearchTable from '../../common/tables/SearchTable'
-import routineVaccines from './vaccineData'
-
-const atBirthVaccines = routineVaccines.filter((vaccine) => vaccine.category === 'at_birth').map((item) => {
-  item.actions = [
-    { title: 'view', url: '/'}
-  ]
-  item.id = uuidv4()
-  return item
-})
-
-const sixWeekVaccines = routineVaccines.filter((vaccine) => vaccine.category === '6_weeks').map((item) => {
-  item.actions = [
-    { title: 'view', url: '/'}
-  ]
-  item.id = uuidv4()
-  return item
-})
-
-const tenthWeekVaccines = routineVaccines.filter((vaccine) => vaccine.category === '10_weeks').map((item) => {
-  item.actions = [
-    { title: 'view', url: '/'}
-  ]
-  item.id = uuidv4()
-  return item
-})
-
-const forteenWeeks = routineVaccines.filter((vaccine) => vaccine.category === '14_weeks').map((item) => {
-  item.actions = [
-    { title: 'view', url: '/'}
-  ]
-  item.id = uuidv4()
-  return item
-})
-
-const sixMonths = routineVaccines.filter((vaccine) => vaccine.category === '6_months').map((item) => {
-  item.actions = [
-    { title: 'view', url: '/'}
-  ]
-  item.id = uuidv4()
-  return item
-})
+import { routineVaccines } from './vaccineData'
+import { Disclosure } from '@headlessui/react'
+import { PlusSmallIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react'
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -54,6 +17,46 @@ const tHeaders = [
 ]
 
 export default function RoutineVaccines() {
+
+  function formatCardTitle(input) {
+    return input
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+  
+  function mapVaccinesByCategory(vaccines) {
+    const categoriesMap = {};
+
+    routineVaccines.forEach(vaccine => {
+      const { category, ...rest } = vaccine;
+
+      if (!categoriesMap[category]) {
+        categoriesMap[category] = [];
+      }
+
+      rest.actions = [
+        { title: 'view', url: '/' }
+      ]
+
+      categoriesMap[category].push(rest);
+    });
+
+    const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
+      category,
+      vaccines,
+    }));
+
+    return categoriesArray;
+  }
+
+  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(routineVaccines));
+  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
   return (
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
       <div className="flex justify-between">
@@ -64,114 +67,52 @@ export default function RoutineVaccines() {
         <div>
           <button
             className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-            Administer Vaccine (3)
+            Administer Vaccine ( {vaccinesToAdminister.length} )
           </button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div className='flex'>
-            <span className='flex'>At Birth
+      {mappedVaccines.map((category => (
+        <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
+          <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+            <Disclosure as="div" key='key' className="pt-6">
+              {({ open }) => (
+                <>
+                  <dt>
+                    <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                      <div className="flex w-full justify-between px-10">
+                        <span>
+                          <span className='flex'>{formatCardTitle(category.category)}
 
-              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx={3} cy={3} r={3} />
-              </svg>
-            </span>
+                            <svg className="h-3 w-3 fill-yellow-500 ml-3 mt-1" viewBox="0 0 6 6" aria-hidden="true">
+                              <circle cx={3} cy={3} r={3} />
+                            </svg>
+                          </span>
+                        </span>
+                        <span>
+                        {open ? (
+                          <Link to="/aefi-report" className="text-[#163C94]">
+                              AEFIs
+                          </Link>
+                        ) : (
+                          <PlusSmallIcon className="h-6 w-6" aria-hidden="true" />
+                        )}
+                        </span>
+                      </div>
+                    </Disclosure.Button>
+                  </dt>
+                  <Disclosure.Panel as="dd" className="mt-2 pr-12">
+                    <SearchTable
+                      headers={tHeaders}
+                      data={category.vaccines} />
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
           </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
+        </dl>
+      )))}
 
-        <SearchTable
-          headers={tHeaders}
-          data={atBirthVaccines} />
-      </div>
-
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div>
-            <span className='flex'>
-              6 Weeks
-
-              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx={3} cy={3} r={3} />
-              </svg>
-            </span>
-          </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
-
-        <SearchTable
-          headers={tHeaders}
-          data={sixWeekVaccines} />
-      </div>
-
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div>
-            <span className='flex'>
-              10 Weeks
-
-              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx={3} cy={3} r={3} />
-              </svg>
-            </span>
-          </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
-
-        <SearchTable
-          headers={tHeaders}
-          data={tenthWeekVaccines} />
-      </div>
-
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div>
-            <span className='flex'>
-              14 Weeks
-
-              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx={3} cy={3} r={3} />
-              </svg>
-            </span>
-          </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
-
-        <SearchTable
-          headers={tHeaders}
-          data={forteenWeeks} />
-      </div>
-
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div>
-            <span className='flex'>
-              6 months
-
-              <svg className="h-1.5 w-1.5 fill-yellow-500" viewBox="0 0 6 6" aria-hidden="true">
-                <circle cx={3} cy={3} r={3} />
-              </svg>
-            </span>
-          </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
-
-        <SearchTable
-          headers={tHeaders}
-          data={sixMonths} />
-      </div>
     </div>
   ) 
 }

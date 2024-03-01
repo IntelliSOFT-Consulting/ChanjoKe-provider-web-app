@@ -57,12 +57,13 @@ function createPatientData(data) {
                 "text": "SYSTEM_GENERATED"
             },
             "system": "identification",
-            "value": "EB047L8H"
+            "value": data.idNumber,
         }
     ],
     name: [
         {
             family: data.firstName,
+            middle: data.middleName,
             given: [data.lastName]
         }
     ],
@@ -76,8 +77,11 @@ function createPatientData(data) {
     "birthDate": data.dateOfBirth,
     "address": [
         {
-            "city": "Nai",
-            "country": "Nai"
+            "estate": "Nai",
+            "steeet": "Nai",
+            "county": "Nairobi",
+            "subCounty": "Kasarani",
+            "ward": "Kahawa West"
         }
     ],
     "contact": careGivers,
@@ -110,11 +114,13 @@ function deconstructPatientData(data, searchType) {
         ]
     }
 
+    console.log({ constan: data?.resource })
+
     return {
         id: data?.resource?.id,
         clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""}`,
         idNumber: idNumber,
-        phoneNumber: data?.resource?.telecom?.[1]?.value,
+        phoneNumber: data?.resource?.contact?.[0]?.telecom?.[0]?.value,
         actions,
     }
 }

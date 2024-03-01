@@ -1,10 +1,12 @@
 import { Outlet } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Sidenav from '../components/Sidenav'
+import { AuthProvider } from '../AuthContext'
 
 export default function Root() {
+
   return (
-    <>
+    <AuthProvider>
       <div>
         <Sidenav />
 
@@ -17,6 +19,6 @@ export default function Root() {
           </div>
         </main>
       </div>
-    </>
+    </AuthProvider>
   )
 }

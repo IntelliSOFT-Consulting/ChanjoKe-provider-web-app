@@ -12,7 +12,7 @@ export default function SelectMenu(props) {
     <Listbox value={props.value} onChange={(value) => props.onInputChange(value)}>
       {({ open }) => (
         <>
-          <Listbox.Label className="block text-sm text-[#707070]">
+          <Listbox.Label className="block text-sm text-[#707070] font-bold">
             { props.label }
             { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
           </Listbox.Label>
