@@ -1,14 +1,9 @@
 import { Link } from 'react-router-dom'
 import SearchTable from '../../common/tables/SearchTable'
-
-const atBirthVaccines = [
-  {vaccineName: 'Tetanus', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Contraindicated', actions: [
-    { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'Covid19', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Missed', actions: [
-    { title: 'view', url: '/'}
-  ]},
-]
+import { nonRoutineVaccines } from './vaccineData'
+import { useState } from 'react'
+import { Disclosure } from '@headlessui/react'
+import { PlusSmallIcon } from '@heroicons/react/24/outline'
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -21,6 +16,40 @@ const tHeaders = [
 ]
 
 export default function NonRoutineVaccines() {
+
+  function formatCardTitle(input) {
+    return input
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  function mapVaccinesByCategory(vaccines) {
+    const categoriesMap = {};
+
+    nonRoutineVaccines.forEach(vaccine => {
+      const { category, ...rest } = vaccine;
+
+      if (!categoriesMap[category]) {
+        categoriesMap[category] = [];
+      }
+
+      rest.actions = [
+        { title: 'view', url: '/' }
+      ]
+
+      categoriesMap[category].push(rest);
+    });
+
+    const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
+      category,
+      vaccines,
+    }));
+
+    return categoriesArray;
+  }
+  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(nonRoutineVaccines));
+
   return (
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
       <div className="flex justify-between">
@@ -36,20 +65,46 @@ export default function NonRoutineVaccines() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div>
-            <p>Pregnancy Vaccines</p>
-          </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
+      {mappedVaccines.map((category => (
+        <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
+          <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+            <Disclosure as="div" key='key' className="pt-6">
+              {({ open }) => (
+                <>
+                  <dt>
+                    <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                      <div className="flex w-full justify-between px-10">
+                        <span>
+                          <span className='flex'>{formatCardTitle(category.category)}
 
-        <SearchTable
-          headers={tHeaders}
-          data={atBirthVaccines} />
-      </div>
+                            <svg className="h-3 w-3 fill-yellow-500 ml-3 mt-1" viewBox="0 0 6 6" aria-hidden="true">
+                              <circle cx={3} cy={3} r={3} />
+                            </svg>
+                          </span>
+                        </span>
+                        <span>
+                        {open ? (
+                          <Link to="/aefi-report" className="text-[#163C94]">
+                              AEFIs
+                          </Link>
+                        ) : (
+                          <PlusSmallIcon className="h-6 w-6" aria-hidden="true" />
+                        )}
+                        </span>
+                      </div>
+                    </Disclosure.Button>
+                  </dt>
+                  <Disclosure.Panel as="dd" className="mt-2 pr-12">
+                    <SearchTable
+                      headers={tHeaders}
+                      data={category.vaccines} />
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
+          </div>
+        </dl>
+      )))}
 
     </div>
   ) 

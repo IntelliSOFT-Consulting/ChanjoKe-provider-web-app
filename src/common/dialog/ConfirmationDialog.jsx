@@ -1,7 +1,6 @@
 import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
-// import { Link } from 'react-router-dom'
 
 export default function ConfirmationDialog({ open, onClose, title, description, onAccept, confirmText, cancelText }) {
   

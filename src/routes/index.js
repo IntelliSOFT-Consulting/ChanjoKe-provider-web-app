@@ -20,6 +20,7 @@ import AEFIType from '../components/AEFI/AEFIType'
 import AEFIAction from '../components/AEFI/AEFIAction'
 import Appointments from '../pages/Appointments'
 import ClientRecords from '../pages/ClientRecords'
+import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       { path: '/client-details/:clientID', element: <ClientDetailsView /> },
       { path: '/client-records/:clientID', element: <ClientRecords />},
       { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
+      { path: '/update-client-history/:clientID', element: <UpdateClientHistory />},
       { path: '/frequently-asked-questions', element: <FAQs /> },
       { path: '/appointments', element: <Appointments />}
     ]

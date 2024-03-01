@@ -39,6 +39,17 @@ export default function ClientDetailsView() {
 
     <SelectDialog
       open={isDialogOpen}
+      title='Info'
+      description='Select Record to update'
+      btnTextTwo='Vaccine Details'
+      btnOne={{
+        text: 'Client Record',
+        url: `/update-client-history/${patientData?.id}`
+      }}
+      btnTwo={{
+        text: 'Vaccine Details',
+        url: '/update-vaccine-history'
+      }}
       onClose={handleDialogClose} />
     
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
