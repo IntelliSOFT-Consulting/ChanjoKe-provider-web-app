@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { Button, Input, InputNumber, Select, DatePicker } from "antd";
 import DataTable from "../components/DataTable";
 import { createUseStyles } from "react-jss";
+import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import weekday from "dayjs/plugin/weekday";
+
+dayjs.extend(weekday);
+dayjs.extend(localeData);
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -33,47 +39,43 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
   };
 
   const renderInput = (column, index) => {
-    switch (column.inputType) {
+    switch (column.type) {
       case "text":
         return (
           <Input
-            size="small"
             placeholder={column.inputPlaceholder}
-            value={values[index][column.inputName]}
-            onChange={(e) => handleChange({ [column.inputName]: e.target.value }, index)}
+            value={values[index][column.dataIndex]}
+            onChange={(e) => handleChange({ [column.dataIndex]: e.target.value }, index)}
+            {...column}
           />
         );
       case "select":
         return (
           <Select
-            size="small"
+            className="w-full"
             placeholder={column.inputPlaceholder}
-            value={values[index][column.inputName]}
-            onChange={(value) => handleChange({ [column.inputName]: value }, index)}
-          >
-            {column.options.map((option) => (
-              <Select.Option key={option.value} value={option.value}>
-                {option.label}
-              </Select.Option>
-            ))}
-          </Select>
+            value={values[index][column.dataIndex]}
+            onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+            {...column}
+          />
         );
       case "date":
         return (
           <DatePicker
             style={{ width: "100%" }}
             placeholder={column.inputPlaceholder}
-            value={values[index][column.inputName]}
-            onChange={(date, dateString) => handleChange({ [column.inputName]: dateString }, index)}
+            value={dayjs(values[index][column.dataIndex])}
+            onChange={(date, dateString) => handleChange({ [column.dataIndex]: dateString }, index)}
+            {...column}
           />
         );
       case "number":
         return (
           <InputNumber
-            size="small"
             placeholder={column.inputPlaceholder}
-            value={values[index][column.inputName]}
-            onChange={(value) => handleChange({ [column.inputName]: value }, index)}
+            value={values[index][column.dataIndex]}
+            onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+            {...column}
           />
         );
       case "remove":
