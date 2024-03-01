@@ -80,7 +80,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
         );
       case "remove":
         return (
-          <Button type="link" onClick={() => removeRowFromList(index)}>
+          <Button type="link" onClick={() => removeRowFromList(index)} danger>
             Remove
           </Button>
         );
@@ -95,9 +95,11 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
         title: column.title,
         dataIndex: column.key,
         key: index,
+        ...column,
         render: (_, _row, i) => {
           return <div className="mb-0 w-full">{renderInput(column, i)}</div>;
         },
+        
       };
     });
   };
