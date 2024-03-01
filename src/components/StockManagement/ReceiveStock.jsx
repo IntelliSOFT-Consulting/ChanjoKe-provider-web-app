@@ -55,7 +55,7 @@ const ReceiveStock = () => {
       title={<div className="text-xl font-semibold">Receive Stock</div>}
       actions={[
         <div className="flex w-full justify-end px-6">
-          <Button className="mr-4" onClick={() => form.resetFields()}>
+          <Button type="primary" className="mr-4" onClick={() => form.resetFields()} ghost>
             Cancel
           </Button>
           <Button className={classes.btnPrimary} onClick={() => form.submit()}>
