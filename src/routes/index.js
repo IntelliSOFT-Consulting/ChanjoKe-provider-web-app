@@ -21,6 +21,8 @@ import AEFIAction from '../components/AEFI/AEFIAction'
 import Appointments from '../pages/Appointments'
 import ClientRecords from '../pages/ClientRecords'
 import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
+import { useAuth } from '../AuthContext'
+import { Navigate} from 'react-router-dom'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -28,30 +30,36 @@ function SearchInterfaceWrapper() {
   return <SearchInterface searchType={searchType} />
 }
 
+const ProtectedRoute = ({ element }) => {
+  const { token } = useAuth();
+
+  return token ? element : <Navigate to="/auth" />;
+};
+
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Root />,
     children: [
-      { path: '/', element: <Home /> },
-      { path: '/search/:searchType', element: <SearchInterfaceWrapper /> },
-      { path: '/admin-users', element: <User /> },
-      { path: '/admin-facilities', element: <Facility /> },
-      { path: '/admin-add-user', element: <AddUser /> },
-      { path: '/admin-add-facility', element: <AddFacility /> },
-      { path: '/register-client', element: <RegisterClient /> },
-      { path: '/defaulter-tracing', element: <DefaulterTracing /> },
-      { path: '/stock-management', element: <StockManagement /> },
-      { path: '/reports', element: <VaccinationReports />},
-      { path: '/profile', element: <Profile /> },
-      { path: '/aefi-report', element: <AEFIType /> },
-      { path: '/aefi-action', element: <AEFIAction /> },
-      { path: '/client-details/:clientID', element: <ClientDetailsView /> },
-      { path: '/client-records/:clientID', element: <ClientRecords />},
-      { path: '/update-vaccine-history', element: <UpdateVaccineHistory /> },
-      { path: '/update-client-history/:clientID', element: <UpdateClientHistory />},
-      { path: '/frequently-asked-questions', element: <FAQs /> },
-      { path: '/appointments', element: <Appointments />}
+      { path: '/', element: <ProtectedRoute element={<Home />} /> },
+      { path: '/search/:searchType', element: <ProtectedRoute element={<SearchInterfaceWrapper /> } /> },
+      { path: '/admin-users', element: <ProtectedRoute element={<User />} /> },
+      { path: '/admin-facilities', element: <ProtectedRoute element={<Facility />} /> },
+      { path: '/admin-add-user', element: <ProtectedRoute element={<AddUser />} /> },
+      { path: '/admin-add-facility', element: <ProtectedRoute element={<AddFacility />} /> },
+      { path: '/register-client', element: <ProtectedRoute element={<RegisterClient />} /> },
+      { path: '/defaulter-tracing', element: <ProtectedRoute element={<DefaulterTracing />} /> },
+      { path: '/stock-management', element: <ProtectedRoute element={<StockManagement />} /> },
+      { path: '/reports', element: <ProtectedRoute element={<VaccinationReports />} />},
+      { path: '/profile', element: <ProtectedRoute element={<Profile />} /> },
+      { path: '/aefi-report', element: <ProtectedRoute element={<AEFIType />} /> },
+      { path: '/aefi-action', element: <ProtectedRoute element={<AEFIAction /> } />},
+      { path: '/client-details/:clientID', element: <ProtectedRoute element={<ClientDetailsView />} /> },
+      { path: '/client-records/:clientID', element: <ProtectedRoute element={<ClientRecords />} />},
+      { path: '/update-vaccine-history', element: <ProtectedRoute element={<UpdateVaccineHistory /> } />},
+      { path: '/update-client-history/:clientID', element: <ProtectedRoute element={<UpdateClientHistory />} />},
+      { path: '/frequently-asked-questions', element: <ProtectedRoute element={<FAQs /> } />},
+      { path: '/appointments', element: <ProtectedRoute element={<Appointments />} />}
     ]
   },
   {

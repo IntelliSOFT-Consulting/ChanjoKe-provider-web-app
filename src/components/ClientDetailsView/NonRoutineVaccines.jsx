@@ -4,6 +4,7 @@ import { nonRoutineVaccines } from './vaccineData'
 import { useState } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
+import OptionsDialog from '../../common/dialog/OptionsDialog'
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -48,9 +49,31 @@ export default function NonRoutineVaccines() {
 
     return categoriesArray;
   }
+
+  function handleCheckBox(onActionBtn) {
+    console.log({ onActionBtn })
+  }
   const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(nonRoutineVaccines));
+  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
+  const administerVaccineBtns = [
+    { btnText: 'Administer Vaccine', url: '/', bgClass: 'bg-[#4E8D6E] text-white', textClass: 'text-center' },
+    { btnText: 'Contraindications', url: '/', bgClass: 'bg-[#5370B0] text-white', textClass: 'text-center' },
+    { btnText: 'Not Administered', url: '/', bgClass: 'outline outline-[#5370B0] text-[#5370B0]', textClass: 'text-center' }
+  ]
 
   return (
+    <>
+    <OptionsDialog
+      open={isDialogOpen}
+      buttons={administerVaccineBtns}
+      onClose={handleDialogClose}
+      />
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
       <div className="flex justify-between">
         <div>
@@ -59,8 +82,9 @@ export default function NonRoutineVaccines() {
         </div>
         <div>
           <button
+            onClick={() => setDialogOpen(true)}
             className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-            Administer Vaccine (1)
+            Administer Vaccine ( {vaccinesToAdminister.length} )
           </button>
         </div>
       </div>
@@ -97,7 +121,8 @@ export default function NonRoutineVaccines() {
                   <Disclosure.Panel as="dd" className="mt-2 pr-12">
                     <SearchTable
                       headers={tHeaders}
-                      data={category.vaccines} />
+                      data={category.vaccines}
+                      onCheckbox={() => handleCheckBox()}/>
                   </Disclosure.Panel>
                 </>
               )}
@@ -107,5 +132,6 @@ export default function NonRoutineVaccines() {
       )))}
 
     </div>
+    </>
   ) 
 }

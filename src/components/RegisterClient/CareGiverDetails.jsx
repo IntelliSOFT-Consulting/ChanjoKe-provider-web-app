@@ -64,7 +64,6 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
   };
 
   const handleAction = (onActionBtn, data) => {
-    console.log({ data })
     if (onActionBtn === 'editCareGiver') {
       const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== data.id)
 

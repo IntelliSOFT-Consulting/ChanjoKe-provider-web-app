@@ -1,21 +1,12 @@
 import { Outlet } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Sidenav from '../components/Sidenav'
-import { useEffect } from 'react'
-import { useNavigate  } from 'react-router-dom'
+import { AuthProvider } from '../AuthContext'
 
 export default function Root() {
-  const navigate = useNavigate()
 
-  useEffect(() => {
-    const isAuthenticated = true;
-
-    if (!isAuthenticated) {
-      navigate('/auth')
-    }
-  }, [navigate])
   return (
-    <>
+    <AuthProvider>
       <div>
         <Sidenav />
 
@@ -28,6 +19,6 @@ export default function Root() {
           </div>
         </main>
       </div>
-    </>
+    </AuthProvider>
   )
 }

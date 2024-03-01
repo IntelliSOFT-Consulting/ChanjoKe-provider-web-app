@@ -51,6 +51,12 @@ export default function RoutineVaccines() {
   }
 
   const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(routineVaccines));
+  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
   return (
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
       <div className="flex justify-between">
@@ -61,7 +67,7 @@ export default function RoutineVaccines() {
         <div>
           <button
             className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-            Administer Vaccine (3)
+            Administer Vaccine ( {vaccinesToAdminister.length} )
           </button>
         </div>
       </div>

@@ -15,6 +15,7 @@ export default function SearchInterface(props) {
   const [results, setResults] = useState([])
   const [searchUrl, setSearchUrl] = useState('Patient')
   const [paginationLinks, setPaginationLinks] = useState([])
+  const [selectedItem, setSelectedItem] = useState({})
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -53,9 +54,10 @@ export default function SearchInterface(props) {
     searchInput: '',
   })
 
-  const handleAction = ({ ...onActionBtn }) => {
+  const handleAction = (onActionBtn, data) => {
     if (onActionBtn.type === 'modal') {
       setIsDialogOpen(true)
+      setSelectedItem(data)
     }
   }
 
@@ -79,6 +81,16 @@ export default function SearchInterface(props) {
 
     <SelectDialog
       open={isDialogOpen}
+      title='Info'
+      description='Select Record to update'
+      btnOne={{
+        text: 'Client Record',
+        url: `/update-client-history/${selectedItem.id}`
+      }}
+      btnTwo={{
+        text: 'Vaccine Details',
+        url: '/update-vaccine-history'
+      }}
       onClose={handleDialogClose} />
 
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
