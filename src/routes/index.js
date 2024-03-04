@@ -21,6 +21,9 @@ import AEFIAction from '../components/AEFI/AEFIAction'
 import Appointments from '../pages/Appointments'
 import ClientRecords from '../pages/ClientRecords'
 import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
+import BatchNumbers from '../components/AdministerVaccines/BatchNumbers'
+import Contraindications from '../components/AdministerVaccines/Contraindications'
+import NotAdministered from '../components/AdministerVaccines/NotAdministered'
 import { useAuth } from '../AuthContext'
 import { Navigate} from 'react-router-dom'
 
@@ -58,6 +61,9 @@ const router = createBrowserRouter([
       { path: '/client-records/:clientID', element: <ProtectedRoute element={<ClientRecords />} />},
       { path: '/update-vaccine-history', element: <ProtectedRoute element={<UpdateVaccineHistory /> } />},
       { path: '/update-client-history/:clientID', element: <ProtectedRoute element={<UpdateClientHistory />} />},
+      { path: '/administer-vaccine', element: <ProtectedRoute element={<BatchNumbers />} />},
+      { path: '/add-contraindication', element: <ProtectedRoute element={<Contraindications />} />},
+      { path: '/not-administered', element: <ProtectedRoute element={<NotAdministered />} />},
       { path: '/frequently-asked-questions', element: <ProtectedRoute element={<FAQs /> } />},
       { path: '/appointments', element: <ProtectedRoute element={<Appointments />} />}
     ]

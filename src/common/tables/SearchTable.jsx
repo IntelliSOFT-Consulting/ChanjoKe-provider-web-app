@@ -21,9 +21,8 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox }) 
     onActionBtn && onActionBtn(actionData, data);
   }
 
-  const handleCheckbox = (value) => {
-    console.log({ value })
-    onCheckbox && onCheckbox(value)
+  const handleCheckbox = (value, item) => {
+    onCheckbox && onCheckbox(value, item)
   }
 
   return (
@@ -49,7 +48,7 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox }) 
                       {header.key === 'checkbox' ? (
                         <input
                           type="checkbox"
-                          onChange={(e) => handleCheckbox(e.target.value)}
+                          onChange={(e) => handleCheckbox(e.target.value, item)}
                           checked={item.selected}
                         />
                       ) : header.key === 'actions' ? (

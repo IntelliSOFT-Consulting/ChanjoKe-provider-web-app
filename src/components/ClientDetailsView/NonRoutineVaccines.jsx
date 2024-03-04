@@ -62,9 +62,9 @@ export default function NonRoutineVaccines() {
   };
 
   const administerVaccineBtns = [
-    { btnText: 'Administer Vaccine', url: '/', bgClass: 'bg-[#4E8D6E] text-white', textClass: 'text-center' },
-    { btnText: 'Contraindications', url: '/', bgClass: 'bg-[#5370B0] text-white', textClass: 'text-center' },
-    { btnText: 'Not Administered', url: '/', bgClass: 'outline outline-[#5370B0] text-[#5370B0]', textClass: 'text-center' }
+    { btnText: 'Administer Vaccine', url: '/administer-vaccine', bgClass: 'bg-[#4E8D6E] text-white', textClass: 'text-center' },
+    { btnText: 'Contraindications', url: '/add-contraindication', bgClass: 'bg-[#5370B0] text-white', textClass: 'text-center' },
+    { btnText: 'Not Administered', url: '/not-administered', bgClass: 'outline outline-[#5370B0] text-[#5370B0]', textClass: 'text-center' }
   ]
 
   return (

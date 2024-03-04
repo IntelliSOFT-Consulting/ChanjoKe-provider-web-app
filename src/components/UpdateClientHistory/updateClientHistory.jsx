@@ -9,7 +9,6 @@ export default function UpdateClientHistory() {
   const { formData, formErrors, handleChange } = FormState({
     birthWeight: '',
     multipleBirths: '',
-    typeOfMultipleBirths: '',
     clientHIVStatus: '',
     receivingHaart: '',
     maternalHivStatus: '',
@@ -23,16 +22,6 @@ export default function UpdateClientHistory() {
   const polarityOptions = [
     {name: 'Positive', value: true },
     {name: 'Negative', value: false },
-  ]
-
-  const multipleBirthOptions = [
-    { id: 1, name: 'Twins', value: 'twins' },
-    { id: 2, name: 'Triplets', value: 'triplets' },
-    { id: 3, name: 'Quadruplets', value: 'quadruplets' },
-    { id: 4, name: 'Quintuplets', value: 'quintluplets' },
-    { id: 5, name: 'Sextuplets', value: 'sextuplets' },
-    { id: 6, name: 'Septuplets', value: 'septuplets' },
-    { id: 6, name: 'Octuplets', value: 'octuplets' },
   ]
 
   return (
@@ -80,11 +69,6 @@ export default function UpdateClientHistory() {
 
           {/* Column 3 */}
           <div>
-            <SelectMenu
-              label="Type of multiple births"
-              data={multipleBirthOptions}
-              value={formData.multipleBirths || 'Type of multiple births'}
-              onInputChange={(value) => handleChange('multipleBirths', value.name)}/>
 
             <SelectMenu
               label="Maternal HIV Status"
