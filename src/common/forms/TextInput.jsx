@@ -6,7 +6,7 @@ export default function TextInput(props) {
         { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
       </label>
 
-      <div className="relative mt-2 rounded-md shadow-sm mb-3">
+      <div className={`relative rounded-md shadow-sm mb-3 ${props.label ? 'mt-2' : 'mt-9'}`}>
         {
           props.leadingIcon ? (
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

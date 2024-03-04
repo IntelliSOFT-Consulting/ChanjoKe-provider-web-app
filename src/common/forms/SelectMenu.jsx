@@ -16,7 +16,7 @@ export default function SelectMenu(props) {
             { props.label }
             { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
           </Listbox.Label>
-          <div className="relative mt-2">
+          <div className={`relative ${props.label ? 'mt-2' : 'mt-9'}`}>
             <Listbox.Button className="relative w-full mb-4 cursor-default rounded-md bg-white py-2.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-[#4E4E4E] focus:outline-none focus:ring-2 focus:ring-[#163C94] sm:text-sm sm:leading-6">
               <span className="block truncate">{props.value}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
