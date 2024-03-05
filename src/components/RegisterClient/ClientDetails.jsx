@@ -15,9 +15,9 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
     { id: 4, name: 'Passport Number' },
   ]
   const [actualDate, setActualDate] = useState('actual')
-  const [weeks, setWeeks] = useState(0)
-  const [months, setMonths] = useState(0)
-  const [years, setYears] = useState(0)
+  const [weeks, setWeeks] = useState(null)
+  const [months, setMonths] = useState(null)
+  const [years, setYears] = useState(null)
 
   const monthsData = [
     { name: '1 Month', value: 1 },
@@ -200,33 +200,40 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
               <>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                  <SelectMenu
-                    data={[{name: 'Week 1', value: 1},{name: 'Week 2', value: 2},{name: 'Week 3', value: 3},]}
-                    value={weeks || 'Weeks'}
-                    label="Estimated Birth Date"
-                    onInputChange={(value) => {
-                      const dob = calculateEstimatedBirthDate(value.value, months, years)
-                      setWeeks(value.value)
-                      handleChange('dateOfBirth', dob)
-                    }}/>
+                    <TextInput
+                      inputType="number"
+                      inputName="weeks"
+                      inputId="weeks"
+                      max={3}
+                      min={1}
+                      value={weeks}
+                      onInputChange={(value) => {
+                        const dob = calculateEstimatedBirthDate(value, months, years)
+                        setWeeks(value.value)
+                        handleChange('dateOfBirth', dob)
+                      }}
+                      inputPlaceholder="Weeks"/>
                   </div>
                   <div>
-                  <SelectMenu
-                    data={monthsData}
-                    label="."
-                    value={months || 'Months'}
-                    onInputChange={(value) => {
-                      const dob = calculateEstimatedBirthDate(weeks, value.value, years)
-                      setMonths(value.value)
-                      handleChange('dateOfBirth', dob)
-                    }}/>
+                    <TextInput
+                      inputType="number"
+                      inputName="months"
+                      inputId="months"
+                      max={11}
+                      min={1}
+                      value={months}
+                      onInputChange={(value) => {
+                        const dob = calculateEstimatedBirthDate(weeks, value, years)
+                        setMonths(value.value)
+                        handleChange('dateOfBirth', dob)
+                      }}
+                      inputPlaceholder="Months"/>
                   </div>
                   <div>
                     <TextInput
                     inputType="number"
                     inputName="years"
                     inputId="years"
-                    label='.'
                     value={years}
                     onInputChange={(value) => {
                       const dob = calculateEstimatedBirthDate(weeks, months, value)

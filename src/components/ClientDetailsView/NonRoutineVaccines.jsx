@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
+import { useSharedState } from '../../shared/sharedState'
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -16,7 +17,7 @@ const tHeaders = [
   {title: 'Actions', class: '', key: 'actions'},
 ]
 
-export default function NonRoutineVaccines() {
+export default function NonRoutineVaccines({ userCategory }) {
 
   function formatCardTitle(input) {
     return input
@@ -36,7 +37,7 @@ export default function NonRoutineVaccines() {
       }
 
       rest.actions = [
-        { title: 'view', url: '/' }
+        { title: 'view', url: '#' }
       ]
 
       categoriesMap[category].push(rest);
@@ -50,12 +51,21 @@ export default function NonRoutineVaccines() {
     return categoriesArray;
   }
 
-  function handleCheckBox(onActionBtn) {
-    console.log({ onActionBtn })
+  function handleCheckBox(onActionBtn, item) {
+    const vaccineExists = vaccinesToAdminister.find((vaccine) => vaccine.vaccineName === item.vaccineName)
+    if (vaccineExists === undefined) {
+      setVaccinesToAdminister([...vaccinesToAdminister, item])
+    }
+    if (vaccineExists) {
+      const withoutDeletedVaccine = vaccinesToAdminister.filter((vaccine) => vaccine.vaccineName !== item.vaccineName)
+      setVaccinesToAdminister(withoutDeletedVaccine)
+    }
   }
+
   const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(nonRoutineVaccines));
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const { setSharedData } = useSharedState()
 
   const handleDialogClose = () => {
     setDialogOpen(false);
@@ -82,7 +92,11 @@ export default function NonRoutineVaccines() {
         </div>
         <div>
           <button
-            onClick={() => setDialogOpen(true)}
+            onClick={() => {
+              setDialogOpen(true)
+              setSharedData(vaccinesToAdminister)
+            }}
+            disabled={vaccinesToAdminister.length > 0 ? false : true}
             className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
             Administer Vaccine ( {vaccinesToAdminister.length} )
           </button>
@@ -122,7 +136,7 @@ export default function NonRoutineVaccines() {
                     <SearchTable
                       headers={tHeaders}
                       data={category.vaccines}
-                      onCheckbox={() => handleCheckBox()}/>
+                      onCheckbox={(value, item) => handleCheckBox(value, item)}/>
                   </Disclosure.Panel>
                 </>
               )}

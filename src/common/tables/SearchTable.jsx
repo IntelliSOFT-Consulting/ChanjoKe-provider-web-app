@@ -15,7 +15,7 @@ function getStatusColorClass(status) {
   }
 }
 
-export default function SearchTable({ headers, data, onActionBtn, onCheckbox }) {
+export default function SearchTable({ headers, data, onActionBtn, onCheckbox, disabledChechboxes }) {
 
   const handleActionBtn = (actionData, data) => {
     onActionBtn && onActionBtn(actionData, data);
@@ -48,6 +48,8 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox }) 
                       {header.key === 'checkbox' ? (
                         <input
                           type="checkbox"
+                          disabled={disabledChechboxes}
+                          className={disabledChechboxes ? 'bg-slate-300' : ''}
                           onChange={(e) => handleCheckbox(e.target.value, item)}
                           checked={item.selected}
                         />

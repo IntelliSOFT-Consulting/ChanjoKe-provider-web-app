@@ -51,6 +51,8 @@ const nonRoutineVaccines = [
   {vaccineName: 'Tetanus 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'tetanus'},
   {vaccineName: 'Tetanus 4', doseNumber: '4', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'tetanus'},
   {vaccineName: 'Tetanus 5', doseNumber: '5', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'tetanus'},
+
+  {vaccineName: 'Yellow Fever', doseNumber: '5', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'yellow_fever'},
 ]
 
 export { routineVaccines, nonRoutineVaccines }

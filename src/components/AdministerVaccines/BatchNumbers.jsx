@@ -2,6 +2,7 @@ import FormState from "../../utils/formState"
 import TextInput from "../../common/forms/TextInput"
 import SelectMenu from "../../common/forms/SelectMenu"
 import ConfirmDialog from "../../common/dialog/ConfirmDialog"
+import { useSharedState } from "../../shared/sharedState"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -12,6 +13,7 @@ export default function BatchNumbers() {
     { vaccinaName: 'bOPV', batches: ['OPVJJD788778', 'OPV667HHD889'], diseaseTarget: ''}
   ])
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const { sharedData } = useSharedState()
 
   const { formData, formErrors, handleChange } = FormState({
     currentWeight: '',
@@ -59,28 +61,31 @@ export default function BatchNumbers() {
 
           <div className="px-4 py-5 sm:p-6">
             <p>Batch Numbers</p>
-            <div className="grid grid-cols-3 gap-10">
+            {sharedData.map((vaccine) => 
+              (
+                <div className="grid grid-cols-3 gap-10">
 
-              <div>
-                <SelectMenu
-                  data={[{ name: '778377443'}, { name: '78788888'}]}
-                  error={formErrors.identificationType}
-                  value={formData.identificationType || 'BCG Batch numbers'}
-                  onInputChange={(value) => handleChange('identificationType', value.name)}/>
-              </div>
+                  <div>
+                    <SelectMenu
+                      data={[{ name: '778377443'}, { name: '78788888'}]}
+                      error={formErrors.identificationType}
+                      value={formData.identificationType || `${vaccine.vaccineName} Batch numbers`}
+                      onInputChange={(value) => handleChange('non', value.name)}/>
+                  </div>
 
-              <div>
-                <TextInput
-                  inputType="text"
-                  inputName="diseaseTarget"
-                  inputId="diseaseTarget"
-                  disabled={true}
-                  value={formData.currentWeight}
-                  onInputChange={(value) => handleChange('currentWeight', value)}
-                  inputPlaceholder="Disease Targeted"/>
-              </div>
-              <div></div>
-            </div>
+                  <div>
+                    <TextInput
+                      inputType="text"
+                      inputName="diseaseTarget"
+                      inputId="diseaseTarget"
+                      disabled={true}
+                      value={formData.currentWeight}
+                      onInputChange={(value) => handleChange('currentWeight', value)}
+                      inputPlaceholder="Disease Targeted"/>
+                  </div>
+                  <div></div>
+                </div>))
+              }
           </div>
         </div>
         <div className="px-4 py-4 sm:px-6 flex justify-end">
