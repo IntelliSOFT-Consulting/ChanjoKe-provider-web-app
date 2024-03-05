@@ -6,11 +6,12 @@ import useGet from "../api/useGet";
 import { useParams, useNavigate } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
 import LoadingArrows from "../common/spinners/LoadingArrows";
-import OptionsDialog from "../common/dialog/OptionsDialog";
+import classifyUserByAge from "../components/ClientDetailsView/classifyUserByAge";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [patientData, setPatientData] = useState({})
+  const [clientCategory, setClientCategory] = useState('')
 
   const { clientID } = useParams()
   const navigate = useNavigate()
@@ -18,7 +19,13 @@ export default function ClientDetailsView() {
 
   useEffect(() => {
     setPatientData(data)
-  }, [data])
+
+    if (patientData?.birthDate) {
+      const category = classifyUserByAge(patientData?.birthDate)
+      setClientCategory(category)
+    }
+
+  }, [data, patientData])
   
 
   const handleDialogClose = (confirmed) => {
@@ -93,7 +100,7 @@ export default function ClientDetailsView() {
     </div>
 
     <div className="mt-10">
-      <BaseTabs />
+      <BaseTabs userCategory={clientCategory} />
     </div>
 
     </>

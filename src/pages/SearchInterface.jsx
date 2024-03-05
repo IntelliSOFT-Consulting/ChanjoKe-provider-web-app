@@ -13,7 +13,7 @@ export default function SearchInterface(props) {
 
   const [title, setTitle] = useState('Search')
   const [results, setResults] = useState([])
-  const [searchUrl, setSearchUrl] = useState('Patient')
+  const [searchUrl, setSearchUrl] = useState('Patient?_sort=-_lastUpdated')
   const [paginationLinks, setPaginationLinks] = useState([])
   const [selectedItem, setSelectedItem] = useState({})
 
@@ -31,7 +31,7 @@ export default function SearchInterface(props) {
   }, [data, title])
 
   const SubmitDetails = () => {
-    setSearchUrl(`Patient?name=${formData.searchInput}`)
+    setSearchUrl(`Patient?name=${formData.searchInput}&_sort=-_lastUpdated`)
   }
 
   const onUpdateUrl = (value) => {

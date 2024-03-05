@@ -12,25 +12,33 @@ export default function ClientRecords() {
   const { clientID } = useParams()
   const navigate = useNavigate()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
-  const administrativeAreaArray = [] //ConvertObjectToArray(administrativeArea)
 
   const [clientDetailsArray, setClientDetails] = useState([])
   const [caregiverDetails, setCaregiverDetails] = useState([])
+  const [administrativeAreaArray, setAreaDetails] = useState([])
 
   useEffect(() => {
     setPatientData(data)
 
     const clientDetails = {
-      firstName: data?.name?.[0]?.family,
-      lastName: data?.name?.[0]?.given[0],
-      gender: data?.gender,
-      dateOfBirth: data?.birthDate,
+      'First Name': data?.name?.[0]?.family,
+      'Last Name': data?.name?.[0]?.given[0],
+      'Gender': data?.gender,
+      'Date of Birth': data?.birthDate,
+    }
+
+    const addressDetails = {
+      'County': data?.address?.[0]?.city,
+      'Sub County': data?.address?.[0].district,
+      'State': data?.address?.[0].state,
+      'Town Center': data?.address?.[0].line?.[0],
+      'House': data?.address?.[0].line?.[1]
     }
 
     if (Array.isArray(data?.contact)) {
       const caregiverArray = data?.contact.map((caregiver) => {
         return {
-          caregiverName: caregiver?.name?.given,
+          caregiverName: caregiver?.name?.given || caregiver?.name?.family,
           caregiverType: caregiver?.relationship?.[0]?.text,
           phoneNumber: caregiver?.telecom?.[0]?.value,
         }
@@ -39,8 +47,7 @@ export default function ClientRecords() {
     }
 
     setClientDetails(ConvertObjectToArray(clientDetails))
-
-    console.log({ data, clientDetails })
+    setAreaDetails(ConvertObjectToArray(addressDetails))
   }, [data])
 
   const tHeaders = [
@@ -48,6 +55,7 @@ export default function ClientRecords() {
     {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
     {title: 'Phone Number', class: '', key: 'phoneNumber'},
   ]
+
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">

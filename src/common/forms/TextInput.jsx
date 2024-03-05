@@ -21,8 +21,10 @@ export default function TextInput(props) {
           name={props.inputName}
           id={props.inputId}
           disabled={props.disabled}
+          min={props.min}
+          max={props.max}
           value={props.value}
-          {...props.inputType === 'date' && { max: new Date().toISOString().split('T')[0] }}
+          {...props.inputType === 'date' && props.max && { max: new Date().toISOString().split('T')[0] }}
           onChange={(e) => props.onInputChange(e.target.value)}
           className={
             `${props.leadingIcon
