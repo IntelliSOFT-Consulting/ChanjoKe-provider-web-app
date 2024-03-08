@@ -66,6 +66,7 @@ function createPatientData(data) {
 
   return {
     resourceType: "Patient",
+    id: data.id,
     identifier: [
         {
             "type": {
@@ -73,13 +74,13 @@ function createPatientData(data) {
                     {
                         "system": "http://hl7.org/fhir/administrative-identifier",
                         "code": "nemis",
-                        "display": "NEMIS No"
+                        "display": data.identificationType
                     }
                 ],
-                "text": "NEMIS No"
+                "text": data.identificationNumber,
             },
             "system": "identification",
-            "value": "43545"
+            "value": data.identificationNumber,
         },
         {
             "type": {
@@ -99,8 +100,7 @@ function createPatientData(data) {
     name: [
         {
             family: data.firstName,
-            middle: data.middleName,
-            given: [data.lastName]
+            given: [data.lastName, data.middleName]
         }
     ],
     "telecom": [
@@ -110,7 +110,7 @@ function createPatientData(data) {
         }
     ],
     "gender": data.gender,
-    "birthDate": data.dateOfBirth,
+    "birthDate": data.birthDate,
     "address": [
         {
             "city": data.residenceCounty,
@@ -151,7 +151,7 @@ function deconstructPatientData(data, searchType) {
 
     return {
         id: data?.resource?.id,
-        clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""}`,
+        clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""} ${data?.resource?.name?.[0]?.given[1] ?? ""}`,
         idNumber: organizeData(data?.resource?.identifier).NATIONAL_ID || organizeData(data?.resource?.identifier).BIRTH_CERTIFICATE || organizeData(data?.resource?.identifier).NEMIS_NUMBER || organizeData(data?.resource?.identifier).PASSPORT,
         phoneNumber: `${data?.resource?.contact?.[0]?.telecom?.[0]?.value} (${data?.resource?.contact?.[0]?.relationship?.[0]?.text})`,
         actions,

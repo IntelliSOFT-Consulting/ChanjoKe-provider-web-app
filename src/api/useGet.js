@@ -1,45 +1,44 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 const useGet = (url) => {
-  const [data, setData] = useState(null)
-  const [loading, setLoader] = useState(false)
-  const [error, setError ] = useState(null)
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchData = async () => {
+      const abortController = new AbortController();
 
-    const abortController = new AbortController()
+      try {
+        setLoading(true);
+        const response = await fetch(`https://chanjoke.intellisoftkenya.com/hapi/fhir/${url}`, {
+          signal: abortController.signal,
+        });
 
-    setLoader(true)
-
-    fetch(`https://chanjoke.intellisoftkenya.com/hapi/fhir/${url}`, { signal: abortController.signal })
-      .then((res) => {
-        if (!res.ok) {
-          throw Error('could not fetch data for that resource')
+        if (!response.ok) {
+          throw new Error('Could not fetch data for that resource');
         }
-        return res.json()
-      })
-      .then((data) => {
-        // console.log({ data })
-        if (data) {
-          setData(data)
-          setLoader(false)
-          setError(false)
-        }
-      })
-      .catch((err) => {
+
+        const result = await response.json();
+        setData(result);
+        setError(null);
+      } catch (err) {
         if (err.name === 'AbortError') {
-          console.log('fetch aborted')
+          console.log('Fetch aborted');
         } else {
-          setLoader(false)
-          setError(err.message)
+          setError(err.message);
         }
-      })
+      } finally {
+        setLoading(false);
+      }
 
-    return () => abortController.abort()
+      return () => abortController.abort();
+    };
 
-  }, [url])
+    fetchData();
+  }, [url]);
 
-  return { data, loading, error }
-}
+  return { data, loading, error };
+};
 
-export default useGet
+export default useGet;

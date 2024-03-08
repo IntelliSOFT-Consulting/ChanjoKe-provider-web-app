@@ -15,7 +15,6 @@ export default function UpdateClientHistory() {
   }
   const { formData, formErrors, handleChange } = FormState({
     currentWeight: '',
-    multipleBirths: '',
     clientHIVStatus: '',
     receivingHaart: '',
     maternalHivStatus: '',
@@ -54,6 +53,7 @@ export default function UpdateClientHistory() {
                 label="Current Weight (KGs)"
                 value={formData.currentWeight}
                 onInputChange={(value) => handleChange('currentWeight', value)}
+                addOn={true}
                 addOnTitle="Kgs"
                 inputPlaceholder="Current Weight (KGs)"/>
 
@@ -66,12 +66,6 @@ export default function UpdateClientHistory() {
 
             {/* Column 2 */}
             <div>
-              <RadioGroup
-                label="Multiple Births"
-                value={formData.multipleBirths}
-                error={formErrors.multipleBirths}
-                onInputChange={(value) => handleChange('multipleBirths', value)}
-                data={affirmOptions} />
 
               <SelectMenu
                 label="Client is currently receiving HAART"

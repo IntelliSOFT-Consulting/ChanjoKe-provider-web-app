@@ -66,7 +66,7 @@ export default function Sidenav() {
       ]},
     { name: 'Vaccination Reports', current: false, href: '/reports', icon: 'vaccinationReportLogo' },
     { name: 'Search Client', href: '/search/searchClient', icon: 'searchLogo' },
-    { name: 'Register Client', href: '/register-client', icon: 'registerClientLogo' },
+    { name: 'Register Client', href: '/register-client/_', icon: 'registerClientLogo' },
     { name: 'Update Client History', href: '/search/updateClient', icon: 'updateClientLogo' },
     { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: 'administerVaccineLogo' },
     { name: 'Appointments', href: '/appointments', icon: 'appointmentLogo' },

@@ -46,6 +46,7 @@ export default function RoutineVaccines({ userCategory }) {
 
     const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
       category,
+      status: 'administered',
       vaccines,
     }));
 
@@ -103,18 +104,24 @@ export default function RoutineVaccines({ userCategory }) {
           </div>
         </div>
 
-        {mappedVaccines.map((category => (
+        {console.log({ userCategory })}
+
+        {userCategory && mappedVaccines.map((category => (
           <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
             <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-              <Disclosure as="div" key='key' className="pt-6">
+              <Disclosure 
+                as="div" 
+                key={category.category}
+                defaultOpen={category.category === userCategory ? true : false}
+                className="pt-6">
                 {({ open }) => (
                   <>
                     <dt>
-                      <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                      <Disclosure.Button
+                        className="flex w-full items-start justify-between text-left text-gray-900">
                         <div className="flex w-full justify-between px-10">
                           <span>
                             <span className='flex'>{formatCardTitle(category.category)}
-
                               <svg className="h-3 w-3 fill-yellow-500 ml-3 mt-1" viewBox="0 0 6 6" aria-hidden="true">
                                 <circle cx={3} cy={3} r={3} />
                               </svg>
@@ -132,7 +139,7 @@ export default function RoutineVaccines({ userCategory }) {
                         </div>
                       </Disclosure.Button>
                     </dt>
-                    <Disclosure.Panel as="dd" className="mt-2 pr-12">
+                    <Disclosure.Panel as="dd" className="mt-2 pr-12" de={category.category === userCategory}>
                       <SearchTable
                         headers={tHeaders}
                         data={category.vaccines}

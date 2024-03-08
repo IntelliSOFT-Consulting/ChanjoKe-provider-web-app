@@ -4,19 +4,19 @@ const routineVaccines = [
 
   {vaccineName: 'OPV 1', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_weeks'},
   {vaccineName: 'DPT 1', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_weeks'},
-  {vaccineName: 'PCV 1', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_weeks'},
-  {vaccineName: 'Rota 1', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_weeks'},
+  {vaccineName: 'PCV10 1', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_weeks'},
+  {vaccineName: 'Rotavirus 1', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_weeks'},
 
   {vaccineName: 'OPV 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '10_weeks'},
   {vaccineName: 'DPT 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '10_weeks'},
-  {vaccineName: 'PCV 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '10_weeks'},
-  {vaccineName: 'Rota 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '10_weeks'},
+  {vaccineName: 'PCV10 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '10_weeks'},
+  {vaccineName: 'Rotavirus 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '10_weeks'},
 
   {vaccineName: 'OPV 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
   {vaccineName: 'DPT 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
-  {vaccineName: 'PCV 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
+  {vaccineName: 'PCV10 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
   {vaccineName: 'IPV', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
-  {vaccineName: 'Rota 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
+  {vaccineName: 'Rotavirus 3', doseNumber: '3', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '14_weeks'},
 
   {vaccineName: 'Vitamin A', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_months'},
   {vaccineName: 'Measles', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: '6_months'},
@@ -52,7 +52,16 @@ const nonRoutineVaccines = [
   {vaccineName: 'Tetanus 4', doseNumber: '4', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'tetanus'},
   {vaccineName: 'Tetanus 5', doseNumber: '5', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'tetanus'},
 
-  {vaccineName: 'Yellow Fever', doseNumber: '5', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'yellow_fever'},
+  {vaccineName: 'Yellow Fever', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'yellow_fever'},
+
+  {vaccineName: 'Rabies 1', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'rabies'},
+  {vaccineName: 'Rabies 2', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'rabies'},
+  {vaccineName: 'Rabies 3', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'rabies'},
+  {vaccineName: 'Rabies 4', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'rabies'},
+  {vaccineName: 'Rabies 5', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'rabies'},
+
+  {vaccineName: 'Influenza 1', doseNumber: '1', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'influenza'},
+  {vaccineName: 'Influenza 2', doseNumber: '2', dueDate: 'Jan 1 2020', dateAdministered: '', status: 'upcoming', category: 'influenza'},
 ]
 
 export { routineVaccines, nonRoutineVaccines }

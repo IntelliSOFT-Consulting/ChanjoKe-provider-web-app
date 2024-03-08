@@ -7,6 +7,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
 import LoadingArrows from "../common/spinners/LoadingArrows";
 import classifyUserByAge from "../components/ClientDetailsView/classifyUserByAge";
+import moment from "moment";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -20,6 +21,8 @@ export default function ClientDetailsView() {
   useEffect(() => {
     setPatientData(data)
 
+    console.log({ birthDate: patientData?.birthDate })
+
     if (patientData?.birthDate) {
       const category = classifyUserByAge(patientData?.birthDate)
       setClientCategory(category)
@@ -27,13 +30,12 @@ export default function ClientDetailsView() {
 
   }, [data, patientData])
   
-
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);
   };
 
   const stats = [
-    { dob: patientData?.birthDate, age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
+    { dob: moment(patientData?.birthDate).format('Do MMM YYYY'), age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
   ]
 
   const tHeaders = [
@@ -84,7 +86,7 @@ export default function ClientDetailsView() {
             {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
             {patientData?.name && <>
               <p className="text-3xl font-bold ml-8">
-                {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
+                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''}`}
               </p>
 
               <SearchTable
