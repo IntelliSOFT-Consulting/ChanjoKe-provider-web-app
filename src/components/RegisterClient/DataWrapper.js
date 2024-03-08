@@ -1,3 +1,39 @@
+function organizeData(items) {
+    if (Array.isArray(items)) {
+        const filteredItems = items.filter(item => (item?.type?.text !== 'SYSTEM_GENERATED' || item.system !== 'system-creation'));
+
+        const hierarchy = {
+        'BIRTH_CERTIFICATE': null,
+        'PASSPORT': null,
+        'NATIONAL_ID': null,
+        'NEMIS_NUMBER': null,
+        };
+    
+        filteredItems.forEach(item => {
+        if (item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No') {
+            hierarchy['NEMIS_NUMBER'] = item.value;
+        } else if (item.system === 'Passport') {
+            hierarchy['PASSPORT'] = item.value;
+        } else if (item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate') {
+            hierarchy['BIRTH_CERTIFICATE'] = item.value;
+        } else if (item.system === 'National ID' || item.system === 'ID Number') {
+            hierarchy['NATIONAL_ID'] = item.value;
+        } else {
+            hierarchy['DEFAULT'] = item.value;
+        }
+        });
+    
+        return hierarchy;
+    }
+
+    return {
+        'BIRTH_CERTIFICATE': 'N/A',
+        'PASSPORT': 'N/A',
+        'NATIONAL_ID': 'N/A',
+        'NEMIS_NUMBER': 'N/A',
+        };
+  }
+
 function createPatientData(data) {
 
   const careGivers = data.caregivers.map((item) => {
@@ -30,7 +66,6 @@ function createPatientData(data) {
 
   return {
     resourceType: "Patient",
-    id: "32800240-831a-4d5f-81ae-5c24de74d50e", // PS: How is this ID generated?
     identifier: [
         {
             "type": {
@@ -58,12 +93,13 @@ function createPatientData(data) {
                 "text": "SYSTEM_GENERATED"
             },
             "system": "identification",
-            "value": "EB047L8H"
+            "value": data.idNumber,
         }
     ],
     name: [
         {
             family: data.firstName,
+            middle: data.middleName,
             given: [data.lastName]
         }
     ],
@@ -77,8 +113,10 @@ function createPatientData(data) {
     "birthDate": data.dateOfBirth,
     "address": [
         {
-            "city": "Nai",
-            "country": "Nai"
+            "city": data.residenceCounty,
+            "district": data.subCounty,
+            "state": data.ward,
+            "line": [data.townCenter, data.estateOrHouseNo],
         }
     ],
     "contact": careGivers,
@@ -114,8 +152,8 @@ function deconstructPatientData(data, searchType) {
     return {
         id: data?.resource?.id,
         clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""}`,
-        idNumber: idNumber,
-        phoneNumber: data?.resource?.telecom?.[1]?.value,
+        idNumber: organizeData(data?.resource?.identifier).NATIONAL_ID || organizeData(data?.resource?.identifier).BIRTH_CERTIFICATE || organizeData(data?.resource?.identifier).NEMIS_NUMBER || organizeData(data?.resource?.identifier).PASSPORT,
+        phoneNumber: `${data?.resource?.contact?.[0]?.telecom?.[0]?.value} (${data?.resource?.contact?.[0]?.relationship?.[0]?.text})`,
         actions,
     }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import NonRoutineVaccines from '../../components/ClientDetailsView/NonRoutineVaccines';
 import RoutineVaccines from '../../components/ClientDetailsView/RoutineVaccines';
+import VaccineAppointments from '../../components/ClientDetailsView/VaccineAppointments';
 
 const tabs = [
   { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
@@ -12,7 +13,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-export default function BaseTabs() {
+export default function BaseTabs(props) {
   const [currentTab, setCurrentTab] = useState('routineVaccines');
 
   const handleTabChange = (tabId) => {
@@ -23,15 +24,14 @@ export default function BaseTabs() {
     <div>
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
-          Select a tab
+          
         </label>
         <select
           id="tabs"
           name="tabs"
           className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
           value={currentTab}
-          onChange={(e) => handleTabChange(e.target.value)}
-        >
+          onChange={(e) => handleTabChange(e.target.value)}>
           {tabs.map((tab) => (
             <option key={tab.id} value={tab.id}>
               {tab.name}
@@ -63,9 +63,9 @@ export default function BaseTabs() {
       </div>
 
       {/* Content based on the selected tab */}
-      {currentTab === 'routineVaccines' && <RoutineVaccines/>}
-      {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines />}
-      {currentTab === 'appointments' && <>Appoinements tab</>}
+      {currentTab === 'routineVaccines' && <RoutineVaccines userCategory={props.userCategory} />}
+      {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines userCategory={props.userCategory} />}
+      {currentTab === 'appointments' && <VaccineAppointments userCategory={props.userCategory} />}
     </div>
   );
 }

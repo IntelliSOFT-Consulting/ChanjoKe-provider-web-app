@@ -5,6 +5,7 @@ import calculateAge from '../../utils/calculateAge'
 import FormState from '../../utils/formState'
 import { useEffect, useState } from 'react'
 import RequiredValidator from '../../utils/requiredValidator'
+import calculateEstimatedBirthDate from '../../utils/calculateDate'
 
 export default function ClientDetails({ setClientDetails, setClientFormErrors, setAllFormsValid }) {
   const identificationTypes = [
@@ -12,6 +13,24 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
     { id: 2, name: 'Birth Certificate Number' },
     { id: 3, name: 'NEMIS Number' },
     { id: 4, name: 'Passport Number' },
+  ]
+  const [actualDate, setActualDate] = useState('actual')
+  const [weeks, setWeeks] = useState(null)
+  const [months, setMonths] = useState(null)
+  const [years, setYears] = useState(null)
+
+  const monthsData = [
+    { name: '1 Month', value: 1 },
+    { name: '2 Months', value: 2 },
+    { name: '3 Months', value: 3 },
+    { name: '4 Months', value: 4 },
+    { name: '5 Months', value: 5 },
+    { name: '6 Months', value: 6 },
+    { name: '7 Months', value: 7 },
+    { name: '8 Months', value: 8 },
+    { name: '9 Months', value: 9 },
+    { name: '10 Months', value: 10 },
+    { name: '11 Months', value: 11 },
   ]
 
   const genderOptions = [
@@ -116,17 +135,14 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
               label="Middle Name"
               value={formData.middleName}
               onInputChange={(value) => handleChange('middleName', value)}
-              inputPlaceholder="Middle Name"/>
+              inputPlaceholder="Middle Name"/>   
 
-            <TextInput
-              inputType="date"
-              inputName="middleName"
-              inputId="middleName"
+            <RadioGroup
               label="Date of Birth"
               required={true}
-              value={formData.dateOfBirth}
-              onInputChange={(value) => (handleChange('dateOfBirth', value), handleChange('age', calculateAge(value)))}
-              inputPlaceholder="Date of Birth"/>
+              value={actualDate}
+              onInputChange={(value) => setActualDate(value)}
+              data={[{title: 'Actual', value: 'actual'}, {title: 'Estimated', value: 'estimated'}]} />
 
             <TextInput
               inputType="text"
@@ -138,6 +154,8 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
               onInputChange={(value) => handleChange('identificationNumber', value)}
               required={true}
               inputPlaceholder="Identification Number"/>
+
+            
 
           </div>
 
@@ -155,14 +173,88 @@ export default function ClientDetails({ setClientDetails, setClientFormErrors, s
               onInputChange={(value) => handleChange('lastName', value)}
               inputPlaceholder="Last Name"/>
 
-            <TextInput
-              inputType="text"
-              inputName="lastName"
-              inputId="lastName"
-              label="Age"
-              value={formData.age}
-              disabled={true}
-              inputPlaceholder="Age"/>
+              {actualDate === 'actual' &&
+              <>
+                <TextInput
+                  inputType="date"
+                  inputName="middleName"
+                  inputId="middleName"
+                  label="Date of Birth"
+                  required={true}
+                  value={formData.dateOfBirth}
+                  onInputChange={(value) => (handleChange('dateOfBirth', value), handleChange('age', calculateAge(value)))}
+                  inputPlaceholder="Date of Birth"/>
+
+                <TextInput
+                  inputType="text"
+                  inputName="lastName"
+                  inputId="lastName"
+                  label="Age"
+                  value={formData.age}
+                  disabled={true}
+                  inputPlaceholder="Age"/>
+              </>
+              }
+
+              {actualDate === 'estimated' &&
+              <>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <TextInput
+                      inputType="number"
+                      inputName="weeks"
+                      inputId="weeks"
+                      max={3}
+                      min={1}
+                      value={weeks}
+                      onInputChange={(value) => {
+                        const dob = calculateEstimatedBirthDate(value, months, years)
+                        setWeeks(value.value)
+                        handleChange('dateOfBirth', dob)
+                      }}
+                      inputPlaceholder="Weeks"/>
+                  </div>
+                  <div>
+                    <TextInput
+                      inputType="number"
+                      inputName="months"
+                      inputId="months"
+                      max={11}
+                      min={1}
+                      value={months}
+                      onInputChange={(value) => {
+                        const dob = calculateEstimatedBirthDate(weeks, value, years)
+                        setMonths(value.value)
+                        handleChange('dateOfBirth', dob)
+                      }}
+                      inputPlaceholder="Months"/>
+                  </div>
+                  <div>
+                    <TextInput
+                    inputType="number"
+                    inputName="years"
+                    inputId="years"
+                    value={years}
+                    onInputChange={(value) => {
+                      const dob = calculateEstimatedBirthDate(weeks, months, value)
+                      setYears(value.value)
+                      handleChange('dateOfBirth', dob)
+                    }}
+                    inputPlaceholder="Years"/>
+                  </div>
+                </div>
+
+                <TextInput
+                  inputType="date"
+                  inputName="middleName"
+                  inputId="middleName"
+                  label="Date of Birth"
+                  required={true}
+                  disabled={true}
+                  value={formData.dateOfBirth}
+                  inputPlaceholder="Date of Birth"/>
+              </>
+              }
           </div>
         </div>
 

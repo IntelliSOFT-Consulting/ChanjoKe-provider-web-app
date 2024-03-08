@@ -1,17 +1,39 @@
 import SelectDialog from "../common/dialog/SelectDialog";
 import BaseTabs from "../common/tabs/BaseTabs";
 import SearchTable from "../common/tables/SearchTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useGet from "../api/useGet";
+import { useParams, useNavigate } from "react-router-dom";
+import calculateAge from "../utils/calculateAge";
+import LoadingArrows from "../common/spinners/LoadingArrows";
+import classifyUserByAge from "../components/ClientDetailsView/classifyUserByAge";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [patientData, setPatientData] = useState({})
+  const [clientCategory, setClientCategory] = useState('')
+
+  const { clientID } = useParams()
+  const navigate = useNavigate()
+  const { data, loading, error } = useGet(`Patient/${clientID}`)
+
+  useEffect(() => {
+    setPatientData(data)
+
+    if (patientData?.birthDate) {
+      const category = classifyUserByAge(patientData?.birthDate)
+      setClientCategory(category)
+    }
+
+  }, [data, patientData])
+  
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);
   };
 
   const stats = [
-    { dob: 'Jan 1 2002', age: '2 Years', gender: 'Male' }
+    { dob: patientData?.birthDate, age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
   ]
 
   const tHeaders = [
@@ -25,6 +47,16 @@ export default function ClientDetailsView() {
 
     <SelectDialog
       open={isDialogOpen}
+      title='Info'
+      description='Select Record to update'
+      btnOne={{
+        text: 'Client Record',
+        url: `/update-client-history/${patientData?.id}`
+      }}
+      btnTwo={{
+        text: 'Vaccine Details',
+        url: '/update-vaccine-history'
+      }}
       onClose={handleDialogClose} />
     
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
@@ -34,6 +66,7 @@ export default function ClientDetailsView() {
         </div>
         <div className="right-0">
           <button
+            onClick={() => navigate(`/client-records/${patientData?.id}`)}
             className="ml-4 flex-shrink-0 rounded-md border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
             View Client Details
           </button>
@@ -48,11 +81,16 @@ export default function ClientDetailsView() {
       <div className="px-4 py-5 sm:p-6">
         <div className="container grid grid-cols-2 gap-10">
           <div>
-            <p className="text-3xl font-bold ml-8">JOHN DOE - 20 YRS</p>
+            {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
+            {patientData?.name && <>
+              <p className="text-3xl font-bold ml-8">
+                {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
+              </p>
 
-            <SearchTable
-              headers={tHeaders}
-              data={stats} />
+              <SearchTable
+                headers={tHeaders}
+                data={stats} />
+            </>}
           </div>
           <div>
           </div>
@@ -62,7 +100,7 @@ export default function ClientDetailsView() {
     </div>
 
     <div className="mt-10">
-      <BaseTabs />
+      <BaseTabs userCategory={clientCategory} />
     </div>
 
     </>

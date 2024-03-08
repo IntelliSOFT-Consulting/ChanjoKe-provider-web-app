@@ -1,43 +1,35 @@
 import TextInput from "../../common/forms/TextInput"
+import RadioGroup from "../../common/forms/RadioGroup"
 import SelectMenu from "../../common/forms/SelectMenu"
-import { useNavigate } from "react-router-dom"
 import FormState from "../../utils/formState"
+import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import ConfirmDialog from "../../common/dialog/ConfirmDialog"
 
-export default function UpdateVaccineHistory() {
-  
+export default function UpdateClientHistory() {
   const navigate = useNavigate()
   const [isDialogOpen, setDialogOpen] = useState(false)
-
-  const vaccines = [
-    { name: 'bOPV', value: 'bOPV'}
-  ]
-
   function handleDialogClose() {
     navigate(-1)
     setDialogOpen(false)
   }
-
   const { formData, formErrors, handleChange } = FormState({
-    vaccineType: '',
-    doseNumber: '',
-    vaccinationFacility: '',
-    dateOfLastDose: '',
-  }, {
-    vaccineType: {
-      required: true,
-    },
-    doseNumber: {
-      required: true,
-    },
-    vaccinationFacility: {
-      required: true,
-    },
-    dateOfLastDose: {
-      required: true,
-    },
-  })
+    currentWeight: '',
+    multipleBirths: '',
+    clientHIVStatus: '',
+    receivingHaart: '',
+    maternalHivStatus: '',
+  }, {})
+
+  const affirmOptions = [
+    { id: 1, title: 'Yes', name: 'Yes', value: true },
+    { id: 2, title: 'No', name: 'No', value: false },
+  ]
+
+  const polarityOptions = [
+    {name: 'Positive', value: true },
+    {name: 'Negative', value: false },
+  ]
 
   return (
     <>
@@ -45,56 +37,57 @@ export default function UpdateVaccineHistory() {
         open={isDialogOpen}
         description={`Vaccine history updated successfully`}
         onClose={handleDialogClose} />
-      
+
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-          Update Vaccine History
+          Update Client History
         </div>
         <div className="px-4 py-5 sm:p-6">
           <div className="grid grid-cols-3 gap-10 mt-10">
             {/* Column 1 */}
             <div>
 
-              <SelectMenu
-                label="Vaccine Type"
-                required={true}
-                data={vaccines}
-                value={formData.vaccineType || 'Vaccine Type'}
-                onInputChange={(value) => handleChange('vaccineType', value.name)}
-              />
-
               <TextInput
-                inputType="date"
-                inputName="lastDose"
-                inputId="lastDose"
-                label="Date of last dose"
-                required={true}
-                value={formData.lastDose}
-                error={formErrors.lastDose}
-                onInputChange={(value) => handleChange('lastDose', value)}/>
+                inputType="text"
+                inputName="currentWeight"
+                inputId="currentWeight"
+                label="Current Weight (KGs)"
+                value={formData.currentWeight}
+                onInputChange={(value) => handleChange('currentWeight', value)}
+                addOnTitle="Kgs"
+                inputPlaceholder="Current Weight (KGs)"/>
 
+              <SelectMenu
+                label="Client HIV Status"
+                data={polarityOptions}
+                value={formData.clientHIVStatus || 'Client HIV Status'}
+                onInputChange={(value) => handleChange('clientHIVStatus', value.name)}/>
             </div>
 
             {/* Column 2 */}
             <div>
-            <SelectMenu
-                label="Dose"
-                required={true}
-                data={[{ name: 'Dose 1', value: '1'}]}
-                value={formData.doseNumber || 'Dose Number'}
-                onInputChange={(value) => handleChange('doseNumber', value.name)}
-              />
+              <RadioGroup
+                label="Multiple Births"
+                value={formData.multipleBirths}
+                error={formErrors.multipleBirths}
+                onInputChange={(value) => handleChange('multipleBirths', value)}
+                data={affirmOptions} />
+
+              <SelectMenu
+                label="Client is currently receiving HAART"
+                data={affirmOptions}
+                value={formData.receivingHaart || 'Client is currently receiving HAART'}
+                onInputChange={(value) => handleChange('receivingHaart', value.name)}/>
             </div>
 
             {/* Column 3 */}
             <div>
+
               <SelectMenu
-                label="Place of Vaccination"
-                required={true}
-                data={[{ name: 'Facility', value: 'facility' }, { name: 'Outreach', value: 'outreach' }]}
-                value={formData.placeOfVaccination || 'Place of Vaccination'}
-                onInputChange={(value) => handleChange('placeOfVaccination', value.name)}
-              />
+                label="Maternal HIV Status"
+                data={polarityOptions}
+                value={formData.maternalHivStatus || 'Maternal HIV Status'}
+                onInputChange={(value) => handleChange('maternalHivStatus', value.name)}/>
 
             </div>
           </div>
@@ -113,6 +106,6 @@ export default function UpdateVaccineHistory() {
           
         </div>
       </div>
-    </>
+  </>
   )
 }

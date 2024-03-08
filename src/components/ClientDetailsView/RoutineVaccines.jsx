@@ -1,35 +1,12 @@
 import { Link } from 'react-router-dom'
+import { v4 as uuidv4 } from 'uuid'
 import SearchTable from '../../common/tables/SearchTable'
-
-const atBirthVaccines = [
-  { vaccineName: 'BCG', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Contraindicated', actions: [
-    { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'bOPV', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: '-', status: 'Missed', actions: [
-    { title: 'view', url: '/'}
-  ]},
-]
-
-const sixWeekVaccines = [
-  {vaccineName: 'OPV I', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: 'Jan 1 2020', status: 'Administered', actions: [
-    { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'OPV II', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: 'Jan 1 2020', status: 'Administered', actions: [
-    { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'Rotavirus', doseNumber: '1', dueToAdminister: 'Jan 1 2020', dateAdministered: 'Jan 1 2020', status: 'Administered', actions: [
-    { title: 'view', url: '/'}
-  ]},
-]
-
-const tenthWeekVaccines = [
-  {vaccineName: 'OPV III', doseNumber: '1', dueToAdminister: 'Jan 1 2024', dateAdministered: '-', status: 'Due', actions: [
-    { title: 'view', url: '/'}
-  ]},
-  {vaccineName: 'Rotavirus II', doseNumber: '1', dueToAdminister: 'Jan 1 2024', dateAdministered: '-', status: 'Due', actions: [
-    { title: 'view', url: '/'}
-  ]},
-]
+import { routineVaccines } from './vaccineData'
+import { Disclosure } from '@headlessui/react'
+import { PlusSmallIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react'
+import OptionsDialog from '../../common/dialog/OptionsDialog'
+import { useSharedState } from '../../shared/sharedState'
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -41,66 +18,135 @@ const tHeaders = [
   {title: 'Actions', class: '', key: 'actions'},
 ]
 
-export default function RoutineVaccines() {
+export default function RoutineVaccines({ userCategory }) {
+
+  function formatCardTitle(input) {
+    return input
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+  
+  function mapVaccinesByCategory(vaccines) {
+    const categoriesMap = {};
+
+    routineVaccines.forEach(vaccine => {
+      const { category, ...rest } = vaccine;
+
+      if (!categoriesMap[category]) {
+        categoriesMap[category] = [];
+      }
+
+      rest.actions = [
+        { title: 'view', url: '#' }
+      ]
+
+      categoriesMap[category].push(rest);
+    });
+
+    const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
+      category,
+      vaccines,
+    }));
+
+    return categoriesArray;
+  }
+
+  function handleCheckBox(onActionBtn, item) {
+    const vaccineExists = vaccinesToAdminister.find((vaccine) => vaccine.vaccineName === item.vaccineName)
+    if (vaccineExists === undefined) {
+      setVaccinesToAdminister([...vaccinesToAdminister, item])
+    }
+    if (vaccineExists) {
+      const withoutDeletedVaccine = vaccinesToAdminister.filter((vaccine) => vaccine.vaccineName !== item.vaccineName)
+      setVaccinesToAdminister(withoutDeletedVaccine)
+    }
+  }
+
+  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(routineVaccines));
+  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const { setSharedData } = useSharedState()
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
+  const administerVaccineBtns = [
+    { btnText: 'Administer Vaccine', url: '/administer-vaccine', bgClass: 'bg-[#4E8D6E] text-white', textClass: 'text-center' },
+    { btnText: 'Contraindications', url: '/add-contraindication', bgClass: 'bg-[#5370B0] text-white', textClass: 'text-center' },
+    { btnText: 'Not Administered', url: '/not-administered', bgClass: 'outline outline-[#5370B0] text-[#5370B0]', textClass: 'text-center' }
+  ]
   return (
-    <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
-      <div className="flex justify-between">
-        <div>
-          <p>Vaccination Schedule</p>
-          <small>Please click on the checkbox to select which vaccine to administer</small>
-        </div>
-        <div>
-          <button
-            className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-            Administer Vaccine (3)
-          </button>
-        </div>
-      </div>
-
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
+    <>
+      <OptionsDialog
+        open={isDialogOpen}
+        buttons={administerVaccineBtns}
+        onClose={handleDialogClose}
+        />
+      <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
+        <div className="flex justify-between">
           <div>
-            <p>At Birth</p>
+            <p>Vaccination Schedule</p>
+            <small>Please click on the checkbox to select which vaccine to administer</small>
           </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
-
-        <SearchTable
-          headers={tHeaders}
-          data={atBirthVaccines} />
-      </div>
-
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
           <div>
-            <p>6 Weeks</p>
+            <button
+              onClick={() => {
+                setDialogOpen(true)
+                setSharedData(vaccinesToAdminister)
+              }}
+              disabled={vaccinesToAdminister.length > 0 ? false : true}
+              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+              Administer Vaccine ( {vaccinesToAdminister.length} )
+            </button>
           </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
         </div>
 
-        <SearchTable
-          headers={tHeaders}
-          data={sixWeekVaccines} />
-      </div>
+        {mappedVaccines.map((category => (
+          <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
+            <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+              <Disclosure as="div" key='key' className="pt-6">
+                {({ open }) => (
+                  <>
+                    <dt>
+                      <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                        <div className="flex w-full justify-between px-10">
+                          <span>
+                            <span className='flex'>{formatCardTitle(category.category)}
 
-      <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between px-10">
-          <div>
-            <p>10 Weeks</p>
-          </div>
-          <Link to="/aefi-report" className="text-[#163C94]">
-            AEFIs
-          </Link>
-        </div>
+                              <svg className="h-3 w-3 fill-yellow-500 ml-3 mt-1" viewBox="0 0 6 6" aria-hidden="true">
+                                <circle cx={3} cy={3} r={3} />
+                              </svg>
+                            </span>
+                          </span>
+                          <span>
+                          {open ? (
+                            <Link to="/aefi-report" className="text-[#163C94]">
+                                AEFIs
+                            </Link>
+                          ) : (
+                            <PlusSmallIcon className="h-6 w-6" aria-hidden="true" />
+                          )}
+                          </span>
+                        </div>
+                      </Disclosure.Button>
+                    </dt>
+                    <Disclosure.Panel as="dd" className="mt-2 pr-12">
+                      <SearchTable
+                        headers={tHeaders}
+                        data={category.vaccines}
+                        disabledChechboxes={category.category === userCategory ? false : true }
+                        onCheckbox={(value, item) => handleCheckBox(value, item)} />
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
+            </div>
+          </dl>
+        )))}
 
-        <SearchTable
-          headers={tHeaders}
-          data={tenthWeekVaccines} />
       </div>
-    </div>
+    </>
   ) 
 }

@@ -1,9 +1,8 @@
 import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
-import { Link } from 'react-router-dom'
 
-export default function ConfirmDialog({ open, onClose, title, description, confirmText, cancelText }) {
+export default function ConfirmationDialog({ open, onClose, title, description, onAccept, confirmText, cancelText }) {
   
   const cancelButtonRef = useRef(null)
 
@@ -34,8 +33,8 @@ export default function ConfirmDialog({ open, onClose, title, description, confi
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-0">
-                <div className="text-1xl bg-[#4D8D6E] py-3 text-white font-semibold sm:px-6">
-                  Success
+                <div className="text-1xl bg-[#FF0000] py-3 text-white font-semibold sm:px-6">
+                  {title}
                 </div>
                 <div>
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mt-5">
@@ -47,12 +46,21 @@ export default function ConfirmDialog({ open, onClose, title, description, confi
                     </Dialog.Title>
                   </div>
                 </div>
-                <div className="sm:grid sm:grid-flow-row-dense sm:grid-cols-1 sm:gap-3 p-6">
+                <div className="sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3 p-6">
                   <button
                     onClick={() => onClose(false)}
                     ref={cancelButtonRef}
                     className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-                    Close
+                    No
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      onClose(false)
+                      onAccept(true)
+                    }}
+                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+                    Yes
                   </button>
                 </div>
               </Dialog.Panel>

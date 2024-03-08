@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function RenderActionButton({ actions, onBtnAction }) {
+export default function RenderActionButton({ actions, onBtnAction, data }) {
   const navigate = useNavigate();
 
   const handleActionClick = (action) => {
@@ -9,7 +9,7 @@ export default function RenderActionButton({ actions, onBtnAction }) {
     }
 
     if ('btnAction' in action) {
-      onBtnAction && onBtnAction({ ...action.btnAction });
+      onBtnAction && onBtnAction(action.btnAction, data);
     }
   };
 

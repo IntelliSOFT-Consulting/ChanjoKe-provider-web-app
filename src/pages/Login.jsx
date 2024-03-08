@@ -2,8 +2,25 @@ import { Link } from 'react-router-dom'
 import ChanjoKE from '../assets/chanjoke-img.png'
 import MOHLogo from '../assets/moh-logo.png'
 import TextInput from '../common/forms/TextInput'
+import FormState from '../utils/formState'
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
+
+  const navigate = useNavigate()
+  const { formData, formErrors, handleChange } = FormState({
+    username: '',
+    password: '',
+  }, {
+    username: {
+      required: true,
+    },
+    password: {
+      required: true,
+      minLen: 4,
+    }
+  })
+
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
       <nav className="hidden md:block">
@@ -25,13 +42,18 @@ export default function Login() {
         <h1 className='text-4xl text-[#163C94] text-center'>Login to your account</h1>
 
         <form className='mt-20 w-full max-w-64 px-40'>
+
           <TextInput
-            inputType="email"
-            inputName="email"
-            inputId="email"
+            inputType="text"
+            inputName="username"
+            inputId="username"
+            value={formData.username}
+            error={formErrors.username}
             leadingIcon="true"
             leadingIconName="mail"
-            inputPlaceholder="Username"/>
+            onInputChange={(value) => handleChange('username', value)}
+            inputPlaceholder="Username"
+          />
 
           <br />
 
@@ -39,6 +61,9 @@ export default function Login() {
             inputType="password"
             inputName="password"
             inputId="password"
+            value={formData.password}
+            error={formErrors.password}
+            onInputChange={(value) => handleChange('password', value)}
             leadingIcon="true"
             leadingIconName="lock"
             inputPlaceholder="Password"/>
@@ -49,13 +74,18 @@ export default function Login() {
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div></div>
-            <a
-            href='/'
+            <button
+              onClick={() => {
+                if (formData?.username.length > 3 && formData?.password.length > 3) {
+                  localStorage.setItem('token', 'invalidtokenbutshouldwork')
+                  navigate('/')
+                }
+              }}
               className="flex w-full items-center justify-center gap-3 rounded-md bg-[#163C94] px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]">
               <span className="text-sm font-semibold leading-6">
                 Login
               </span>
-            </a>
+            </button>
           </div>
         </form>
       </div>

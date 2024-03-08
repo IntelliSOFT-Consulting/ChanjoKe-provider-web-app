@@ -1,9 +1,10 @@
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
 import { Link } from 'react-router-dom'
+import updateSVG from '../../assets/update-record.svg'
 
-export default function ConfirmDialog({ open, onClose, title, description, confirmText, cancelText }) {
+export default function OptionsDialog({ open, onClose, buttons }) {
   
   const cancelButtonRef = useRef(null)
 
@@ -34,26 +35,20 @@ export default function ConfirmDialog({ open, onClose, title, description, confi
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-0">
-                <div className="text-1xl bg-[#4D8D6E] py-3 text-white font-semibold sm:px-6">
-                  Success
+                <div className="text-1xl bg-[#5370B0] py-3 text-white font-semibold sm:px-6">
+                  Select
                 </div>
-                <div>
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mt-5">
-                    <CheckIcon className="h-50 w-50 text-green-600" aria-hidden="true" />
-                  </div>
-                  <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title as="h2" className="text-base font-semibold text-3xl text-gray-900">
-                    { description }
-                    </Dialog.Title>
-                  </div>
-                </div>
-                <div className="sm:grid sm:grid-flow-row-dense sm:grid-cols-1 sm:gap-3 p-6">
-                  <button
-                    onClick={() => onClose(false)}
-                    ref={cancelButtonRef}
-                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-                    Close
-                  </button>
+                <div className="mt-5 mb-5 mx-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-1 sm:gap-3 px-10">
+                  {buttons.map((btn) => (
+                    <Link
+                      type="button"
+                      to={btn.url}
+                      onClick={() => onClose(false)}
+                      className={`${btn.bgClass} ${btn.textClass} inline-flex w-full justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm  focus-visible:outline`}
+                    >
+                      {btn.btnText}
+                    </Link>
+                  ))}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

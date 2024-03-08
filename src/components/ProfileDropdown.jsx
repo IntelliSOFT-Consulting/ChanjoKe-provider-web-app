@@ -1,10 +1,12 @@
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ')
 
 export default function ProfileDropdown() {
+  const navigate = useNavigate()
+
   return (
     <Menu as="div" className="relative">
       <div>
@@ -48,11 +50,14 @@ export default function ProfileDropdown() {
           </Menu.Item>
           <Menu.Item>
             {({ active }) => (
-              <Link
-                to="/auth"
-                className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
+              <button
+                onClick={() => {
+                  localStorage.clear()
+                  navigate('/auth')
+                }}
+                className={classNames(active ? 'bg-gray-100 w-full' : '', 'block px-4 w-full py-2 text-left text-sm text-gray-700')}>
                 Log Out
-              </Link>
+              </button>
             )}
           </Menu.Item>
         </Menu.Items>
