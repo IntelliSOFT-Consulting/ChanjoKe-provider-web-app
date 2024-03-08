@@ -1,81 +1,60 @@
-import { createBrowserRouter, useParams } from 'react-router-dom'
-import Root from './Root'
-import Login from '../pages/Login'
-import Home from '../pages/Home'
-import RegisterClient from '../pages/RegisterClient'
-import StockManagement from '../pages/StockManagement'
-import DefaulterTracing from '../pages/DefaulterTracing'
-import Profile from '../pages/Profile'
-import ForgotPassword from '../pages/ForgotPassword'
-import ClientDetailsView from '../pages/ClientDetailsView'
-import UpdateVaccineHistory from '../components/UpdateClientHistory/UpdateVaccineHistory'
-import FAQs from '../pages/FAQs'
-import User from '../components/AdminManagement/User'
-import Facility from '../components/AdminManagement/Facility'
-import AddUser from '../components/AdminManagement/AddUser'
-import AddFacility from '../components/AdminManagement/AddFacility'
-import VaccinationReports from '../pages/VaccinationReports'
-import SearchInterface from '../pages/SearchInterface'
-import AEFIType from '../components/AEFI/AEFIType'
-import AEFIAction from '../components/AEFI/AEFIAction'
-import Appointments from '../pages/Appointments'
-import ClientRecords from '../pages/ClientRecords'
-import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
-import BatchNumbers from '../components/AdministerVaccines/BatchNumbers'
-import Contraindications from '../components/AdministerVaccines/Contraindications'
-import NotAdministered from '../components/AdministerVaccines/NotAdministered'
-import { useAuth } from '../AuthContext'
-import { Navigate} from 'react-router-dom'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import routes from './routes/index'
+import {RouterProvider} from 'react-router-dom'
+import reportWebVitals from './reportWebVitals';
+import {ConfigProvider} from "antd";
 
-function SearchInterfaceWrapper() {
-  const { searchType } = useParams()
-
-  return <SearchInterface searchType={searchType} />
-}
-
-const ProtectedRoute = ({ element }) => {
-  const { token } = useAuth();
-
-  return token ? element : <Navigate to="/auth" />;
+const defaultData = {
+    borderRadius: 6,
+    colorPrimary: '#163C94',
+    Button: {
+        colorPrimary: '#163C94',
+    },
+    Input: {
+        colorPrimary: '#163C94',
+    },
 };
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Root />,
-    children: [
-      { path: '/', element: <ProtectedRoute element={<Home />} /> },
-      { path: '/search/:searchType', element: <ProtectedRoute element={<SearchInterfaceWrapper /> } /> },
-      { path: '/admin-users', element: <ProtectedRoute element={<User />} /> },
-      { path: '/admin-facilities', element: <ProtectedRoute element={<Facility />} /> },
-      { path: '/admin-add-user', element: <ProtectedRoute element={<AddUser />} /> },
-      { path: '/admin-add-facility', element: <ProtectedRoute element={<AddFacility />} /> },
-      { path: '/register-client', element: <ProtectedRoute element={<RegisterClient />} /> },
-      { path: '/defaulter-tracing', element: <ProtectedRoute element={<DefaulterTracing />} /> },
-      { path: '/stock-management', element: <ProtectedRoute element={<StockManagement />} /> },
-      { path: '/reports', element: <ProtectedRoute element={<VaccinationReports />} />},
-      { path: '/profile', element: <ProtectedRoute element={<Profile />} /> },
-      { path: '/aefi-report', element: <ProtectedRoute element={<AEFIType />} /> },
-      { path: '/aefi-action', element: <ProtectedRoute element={<AEFIAction /> } />},
-      { path: '/client-details/:clientID', element: <ProtectedRoute element={<ClientDetailsView />} /> },
-      { path: '/client-records/:clientID', element: <ProtectedRoute element={<ClientRecords />} />},
-      { path: '/update-vaccine-history', element: <ProtectedRoute element={<UpdateVaccineHistory /> } />},
-      { path: '/update-client-history/:clientID', element: <ProtectedRoute element={<UpdateClientHistory />} />},
-      { path: '/administer-vaccine', element: <ProtectedRoute element={<BatchNumbers />} />},
-      { path: '/add-contraindication', element: <ProtectedRoute element={<Contraindications />} />},
-      { path: '/not-administered', element: <ProtectedRoute element={<NotAdministered />} />},
-      { path: '/frequently-asked-questions', element: <ProtectedRoute element={<FAQs /> } />},
-      { path: '/appointments', element: <ProtectedRoute element={<Appointments />} />}
-    ]
-  },
-  {
-    path: '/auth',
-    element: <Login />
-  },
-  {
-    path: '/forgot-password',
-    element: <ForgotPassword />
-  }
-])
+ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+        <ConfigProvider
+            theme={{
+                token: {
+                    colorPrimary: defaultData.colorPrimary,
+                    borderRadius: defaultData.borderRadius,
+                },
+                components: {
+                    Button: {
+                        colorPrimary: defaultData.Button?.colorPrimary,
+                        algorithm: defaultData.Button?.algorithm,
+                    },
+                    Input: {
+                        colorPrimary: defaultData.Input?.colorPrimary,
+                        algorithm: defaultData.Input?.algorithm,
+                    },
+                    Select: {
+                        colorPrimary: defaultData.Select?.colorPrimary,
+                        algorithm: defaultData.Select?.algorithm,
+                    },
+                    InputNumber: {
+                        colorPrimary: defaultData.InputNumber?.colorPrimary,
+                        algorithm: defaultData.InputNumber?.algorithm,
+                    },
+                    DatePicker: {
+                        colorPrimary: defaultData.DatePicker?.colorPrimary,
+                        algorithm: defaultData.DatePicker?.algorithm,
+                    },
+                },
+            }}
+        >
+            <RouterProvider router={routes}/>
+        </ConfigProvider>
+    </React.StrictMode>
+);
 
-export default router
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

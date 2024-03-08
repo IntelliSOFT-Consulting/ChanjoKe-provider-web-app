@@ -1,12 +1,11 @@
 import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Dialog, Transition, Disclosure } from '@headlessui/react'
 import {
   Bars3Icon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ProfileDropdown from './ProfileDropdown'
-import { Disclosure } from '@headlessui/react'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import AefiLogo from '../common/icons/aefiLogo'
 import HomeLogo from '../common/icons/homeLogo'
@@ -54,6 +53,7 @@ const SidebarItem = ({ item , onItemClick }) => {
 
 export default function Sidenav() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const navigate = useNavigate()
 
   const [navigation, setNavigation] = useState([
     { name: 'Home', href: '/', current: true, icon: 'homeLogo' },
@@ -77,16 +77,16 @@ export default function Sidenav() {
       href: '/stock-management',
       icon: '',
       children: [
-        { name: 'Receive Stock', href: '/admin-users' },
-        { name: 'Issue Stock', href: '/admin-add-facility'},
-        { name: 'Stock Count', href: '/admin-add-facility'},
-        { name: 'Positive Adjustment', href: '/admin-add-facility'},
-        { name: 'Negative Adjustment', href: '/admin-add-facility'},
-        { name: 'VVM Status Change', href: '/admin-add-facility'},
-        { name: 'New Order', href: '/admin-add-facility'},
-        { name: 'Received Orders', href: '/admin-add-facility'},
-        { name: 'Sent Orders', href: '/admin-add-facility'},
-        { name: 'Ledger', href: '/admin-add-facility'},
+        { name: 'Receive Stock', href: '/stock-management/receive-stock' },
+        { name: 'Issue Stock', href: '/stock-management/issue-stock'},
+        { name: 'Stock Count', href: '/stock-management/stock-count'},
+        { name: 'Positive Adjustment', href: '/stock-management/positive-adjustment'},
+        { name: 'Negative Adjustment', href: '/stock-management/negative-adjustment'},
+        { name: 'VVM Status Change', href: '/stock-management/vvm-status'},
+        { name: 'New Order', href: '/stock-management/new-order'},
+        { name: 'Received Orders', href: '/stock-management/received-orders'},
+        { name: 'Sent Orders', href: '/stock-management/sent-orders'},
+        { name: 'Ledger', href: '/stock-management/ledger'},
       ],
     },
   ])
@@ -166,6 +166,7 @@ export default function Sidenav() {
                                 {({ open }) => (
                                   <>
                                     <Disclosure.Button
+                                      onClick={() => { navigate(item?.href)}}
                                       className={classNames(
                                         item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
                                         'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6  text-gray-700'
@@ -225,6 +226,7 @@ export default function Sidenav() {
                         {({ open }) => (
                           <>
                             <Disclosure.Button
+                              onClick={() => { navigate(item?.href)}}
                               className={classNames(
                                 item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
                                 'flex items-center w-full text-left rounded-md p-2 gap-x-3 leading-6 text-gray-700'
