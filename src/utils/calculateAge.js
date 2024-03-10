@@ -15,9 +15,9 @@ export default function calculateAge(dateString) {
   const ageInMonths = today.getMonth() - birthDate.getMonth() + (12 * (today.getFullYear() - birthDate.getFullYear()));
   const ageInYears = today.getFullYear() - birthDate.getFullYear();
 
-  if (ageInDays <= 1) {
-    return `New born`;
-  }
+  // if (ageInDays <= 1) {
+  //   return `0 days`;
+  // }
   if (ageInDays <= 7) {
     return `${Math.floor(ageInDays)} day old`;
   } else if (ageInMonths < 2) {

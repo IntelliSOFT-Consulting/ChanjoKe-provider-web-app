@@ -1,3 +1,14 @@
+import dayjs from 'dayjs'
+import weekdays from 'dayjs/plugin/weekday'
+import localeDate from 'dayjs/plugin/localeData'
+
+dayjs.extend(weekdays)
+dayjs.extend(localeDate) 
+
+function convertCamelCaseString(inputString) {
+  return inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
 const ConvertObjectToArray = (inputObject) => {
   const clientDetails = [];
 
@@ -7,8 +18,8 @@ const ConvertObjectToArray = (inputObject) => {
   for (const key in inputObject) {
     if (inputObject[key] !== "") {
       const item = {
-        title: `${capitalizeFirstLetter(key)}:`,
-        value: inputObject[key],
+        title: `${convertCamelCaseString(capitalizeFirstLetter(key))}`,
+        value: typeof inputObject[key] === 'object' ? dayjs(inputObject[key]).format('YYYY-MM-DD') :  inputObject[key],
       };
 
       clientDetails.push(item);

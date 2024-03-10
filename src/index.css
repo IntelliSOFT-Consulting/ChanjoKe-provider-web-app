@@ -32,3 +32,18 @@ code {
   font-weight: 600;
   font-size: 14px;
 }
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-form-item .ant-form-item-label >label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+  display: none;
+}
+
+.ant-radio-wrapper input[type="radio"]:checked + .ant-radio-inner {
+  background-color: #163C94;
+  border-color: #163C94;
+}
+
+.ant-radio-wrapper:hover .ant-radio-inner,
+.ant-radio:hover .ant-radio-inner,
+.ant-radio-input:focus + .ant-radio-inner {
+  border-color: #163C94;
+}

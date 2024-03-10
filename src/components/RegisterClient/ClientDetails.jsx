@@ -1,291 +1,303 @@
-import SelectMenu from '../../common/forms/SelectMenu'
-import TextInput from '../../common/forms/TextInput'
-import RadioGroup from '../../common/forms/RadioGroup'
 import calculateAge from '../../utils/calculateAge'
-import FormState from '../../utils/formState'
+import LoadingArrows from '../../common/spinners/LoadingArrows'
 import { useEffect, useState } from 'react'
-import RequiredValidator from '../../utils/requiredValidator'
-import calculateEstimatedBirthDate from '../../utils/calculateDate'
+import moment from 'moment'
+import dayjs from 'dayjs'
+import weekdays from 'dayjs/plugin/weekday'
+import localeDate from 'dayjs/plugin/localeData'
+import { Col, Row, Radio, DatePicker, Form, Input, Select } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
-export default function ClientDetails({ setClientDetails, setClientFormErrors, setAllFormsValid }) {
-  const identificationTypes = [
-    { id: 1, name: 'Identification Number' },
-    { id: 2, name: 'Birth Certificate Number' },
-    { id: 3, name: 'NEMIS Number' },
-    { id: 4, name: 'Passport Number' },
-  ]
-  const [actualDate, setActualDate] = useState('actual')
-  const [weeks, setWeeks] = useState(null)
-  const [months, setMonths] = useState(null)
-  const [years, setYears] = useState(null)
+const Option = Select.Option;
+dayjs.extend(weekdays)
+dayjs.extend(localeDate)
 
-  const monthsData = [
-    { name: '1 Month', value: 1 },
-    { name: '2 Months', value: 2 },
-    { name: '3 Months', value: 3 },
-    { name: '4 Months', value: 4 },
-    { name: '5 Months', value: 5 },
-    { name: '6 Months', value: 6 },
-    { name: '7 Months', value: 7 },
-    { name: '8 Months', value: 8 },
-    { name: '9 Months', value: 9 },
-    { name: '10 Months', value: 10 },
-    { name: '11 Months', value: 11 },
-  ]
+export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
-  const genderOptions = [
-    { id: 1, title: 'Male', value: 'male' },
-    { id: 2, title: 'Female', value: 'female' },
-  ]
+  // const [actualDate, setActualDate] = useState('actual')
+  // const [weeks, setWeeks] = useState(null)
+  // const [months, setMonths] = useState(null)
+  // const [years, setYears] = useState(null)
+  // const [formValues, setFormValues] = useState(editClientDetails)
+  const [loading, setLoading] = useState(false)
+  const [userAge, setUserAge] = useState(null)
 
-  const formRules = {
-    firstName: {
-      required: true,
-      minLen: 4
-    },
-    gender: {
-      required: true,
-      enum: ['male', 'female']
-    },
-    identificationType: {
-      required: true,
-    },
-    identificationNumber: {
-      required: true,
-      minLen: 5,
-      // maxLen: 10,
-    },
-    lastName: {
-      required: true,
-      minLen: 4,
-    },
-  }
+  const [form] = Form.useForm();
+  const navigate = useNavigate()
 
-  const formStructure = {
-    firstName: '',
-    gender: '',
-    identificationType: '',
-    middleName: '',
-    dateOfBirth: '',
-    identificationNumber: '',
-    lastName: '',
-    age: '',
-    currentWeight: '',
-  }
-
-  const { formData, formErrors, handleChange } = FormState(formStructure, formRules)
+  form.setFieldsValue({ weightMetric: 'Kgs' });
 
   useEffect(() => {
-    setClientDetails(formData)
-    setClientFormErrors(formErrors)
-  }, [formData])
+    form.setFieldsValue(editClientDetails)
+    setUserAge(editClientDetails?.age || 'Age')
+    setLoading(true)
+  }, [editClientDetails])
 
-  const isFormValid = RequiredValidator(formData, formRules)
+  const onFinish = (values) => {
+    values.currentWeight = `${values.currentWeight || 0} ${values.weightMetric}`
+    delete values.weightMetric
+    setClientDetails(values)
+    // console.log('Success:', values);
+  };
 
-  if (isFormValid) {
-    setAllFormsValid(isFormValid)
-  }
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
 
   return (
     <>
       <h3 className="text-xl font-medium">Client Details</h3>
 
-      <form>
-      
-        <div className="grid mt-5 grid-cols-3 gap-10">
-          {/* Column 1 */}
-          <div>
-
-            <TextInput
-              inputType="text"
-              inputName="firstName"
-              inputId="firstName"
-              label="First Name"
-              required={true}
-              value={formData.firstName}
-              error={formErrors.firstName}
-              onInputChange={(value) => handleChange('firstName', value)}
-              inputPlaceholder="First Name"/>
-
-            <RadioGroup
-              label="Gender"
-              required={true}
-              value={formData.gender}
-              error={formErrors.gender}
-              onInputChange={(value) => handleChange('gender', value)}
-              data={genderOptions} />
-
-            <SelectMenu
-              label="Identification Type"
-              required={true}
-              data={identificationTypes}
-              error={formErrors.identificationType}
-              value={formData.identificationType || 'Identification Type'}
-              onInputChange={(value) => handleChange('identificationType', value.name)}/>
-
-          </div>
-
-          {/* Column 2 */}
-          <div>
-
-            <TextInput
-              inputType="text"
-              inputName="middleName"
-              inputId="middleName"
-              label="Middle Name"
-              value={formData.middleName}
-              onInputChange={(value) => handleChange('middleName', value)}
-              inputPlaceholder="Middle Name"/>   
-
-            <RadioGroup
-              label="Date of Birth"
-              required={true}
-              value={actualDate}
-              onInputChange={(value) => setActualDate(value)}
-              data={[{title: 'Actual', value: 'actual'}, {title: 'Estimated', value: 'estimated'}]} />
-
-            <TextInput
-              inputType="text"
-              inputName="middleName"
-              inputId="middleName"
-              label="Identification Number"
-              value={formData.identificationNumber}
-              error={formErrors.identificationNumber}
-              onInputChange={(value) => handleChange('identificationNumber', value)}
-              required={true}
-              inputPlaceholder="Identification Number"/>
-
+      {loading && 
+        <Form
+          name="clientDetails"
+          onFinish={onFinish}
+          layout="vertical"
+          colon={true}
+          autoComplete="on"
+          form={form}
+          initialValues={editClientDetails}
+          onFinishFailed={onFinishFailed}>
             
+            <Row className='mt-5' gutter={16}>
 
-          </div>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="firstName"
+                  label={
+                    <div>
+                      <span className="font-bold">First Name</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input your first name!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="First Name"
+                      autoComplete="off"
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
 
-          {/* Column 3 */}
-          <div>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="middleName"
+                  label={
+                    <div>
+                      <span className="font-bold">Middle Name</span>
+                    </div>
+                  }
+                  rules={[]}>
+                    <Input
+                      placeholder="Middle Name"
+                      autoComplete="off"
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
 
-            <TextInput
-              inputType="text"
-              inputName="lastName"
-              inputId="lastName"
-              label="Last Name"
-              required={true}
-              value={formData.lastName}
-              error={formErrors.lastName}
-              onInputChange={(value) => handleChange('lastName', value)}
-              inputPlaceholder="Last Name"/>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="lastName"
+                  label={
+                    <div>
+                      <span className="font-bold">Last Name</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input your last name!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Last Name"
+                      autoComplete="off"
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
 
-              {actualDate === 'actual' &&
-              <>
-                <TextInput
-                  inputType="date"
-                  inputName="middleName"
-                  inputId="middleName"
-                  label="Date of Birth"
-                  required={true}
-                  value={formData.dateOfBirth}
-                  onInputChange={(value) => (handleChange('dateOfBirth', value), handleChange('age', calculateAge(value)))}
-                  inputPlaceholder="Date of Birth"/>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="gender"
+                  label={
+                    <div>
+                      <span className="font-bold">Gender</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please select gender',
+                    },
+                  ]}>
+                  
+                  <Radio.Group>
+                    <Radio value="male">Male</Radio>
+                    <Radio value="female">Female</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
 
-                <TextInput
-                  inputType="text"
-                  inputName="lastName"
-                  inputId="lastName"
-                  label="Age"
-                  value={formData.age}
-                  disabled={true}
-                  inputPlaceholder="Age"/>
-              </>
-              }
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  label={
+                    <div>
+                      <span className="font-bold">Age Type</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }>
+                  <Radio.Group>
+                    <Radio value="male">Actual</Radio>
+                    <Radio value="female">Estimated</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
 
-              {actualDate === 'estimated' &&
-              <>
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <TextInput
-                      inputType="number"
-                      inputName="weeks"
-                      inputId="weeks"
-                      max={3}
-                      min={1}
-                      value={weeks}
-                      onInputChange={(value) => {
-                        const dob = calculateEstimatedBirthDate(value, months, years)
-                        setWeeks(value.value)
-                        handleChange('dateOfBirth', dob)
-                      }}
-                      inputPlaceholder="Weeks"/>
-                  </div>
-                  <div>
-                    <TextInput
-                      inputType="number"
-                      inputName="months"
-                      inputId="months"
-                      max={11}
-                      min={1}
-                      value={months}
-                      onInputChange={(value) => {
-                        const dob = calculateEstimatedBirthDate(weeks, value, years)
-                        setMonths(value.value)
-                        handleChange('dateOfBirth', dob)
-                      }}
-                      inputPlaceholder="Months"/>
-                  </div>
-                  <div>
-                    <TextInput
-                    inputType="number"
-                    inputName="years"
-                    inputId="years"
-                    value={years}
-                    onInputChange={(value) => {
-                      const dob = calculateEstimatedBirthDate(weeks, months, value)
-                      setYears(value.value)
-                      handleChange('dateOfBirth', dob)
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="birthDate"
+                  label={
+                    <div>
+                      <span className="font-bold">Birth Date</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input birth date!',
+                    },
+                  ]}>
+                  
+                  <DatePicker
+                    disabledDate={(current) => current && current > moment().endOf('day')}
+                    onChange={(e) => {
+                      const date = moment(e.$d).format('YYYY-MM-DD')
+                      setUserAge(calculateAge(date))
                     }}
-                    inputPlaceholder="Years"/>
-                  </div>
-                </div>
+                    className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
 
-                <TextInput
-                  inputType="date"
-                  inputName="middleName"
-                  inputId="middleName"
-                  label="Date of Birth"
-                  required={true}
-                  disabled={true}
-                  value={formData.dateOfBirth}
-                  inputPlaceholder="Date of Birth"/>
-              </>
-              }
-          </div>
-        </div>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="identificationType"
+                  label={
+                    <div>
+                      <span className="font-bold">Identification Type</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }>
+                  <Select>
+                    <Select.Option value="id_number">Identification Number</Select.Option>
+                    <Select.Option value="birth_certificate">Birth Certificate Number</Select.Option>
+                    <Select.Option value="nemis_number">NEMIS Number</Select.Option>
+                    <Select.Option value="passport_number">Passport Number</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-        <div className="grid grid-cols-3 gap-10 mt-10">
-          {/* Column 1 */}
-          <div>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="identificationNumber"
+                  label={
+                    <div>
+                      <span className="font-bold">Identification Number</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input identifier!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Identification Number"
+                      autoComplete="off"
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
 
-            <TextInput
-              inputType="text"
-              inputName="firstName"
-              inputId="firstName"
-              label="Current Weight"
-              value={formData.currentWeight}
-              onInputChange={(value) => handleChange('currentWeight', value)}
-              addOn={true}
-              addOnTitle="Kgs"
-              inputPlaceholder="Current Weight"/>
-          </div>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  label={
+                    <div>
+                      <span className="font-bold">Age</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input age!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Age"
+                      value={userAge}
+                      disabled={true}
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
 
-          {/* Column 2 */}
-          <div>
-          </div>
+            </Row>
 
-          {/* Column 3 */}
-          <div>
-          </div>
-        </div>
+            <Row className='mt-5' gutter={16}>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="currentWeight"
+                  label={
+                    <div>
+                      <span className="font-bold">Current Weight</span>
+                    </div>
+                  }
+                  rules={[]}>
+                      <Input
+                        placeholder="Current Weight"
+                        autoComplete="off"
+                        addonAfter={
+                          <Form.Item name='weightMetric' className='mb-0 block rounded-md'>
+                        <Select
+                          style={{ width: 100 }}
+                          defaultValue={'Kgs'}
+                          onChange={(value) => {
+                            form.setFieldsValue({ weightMetric: value });
+                          }}>
+                          <Select.Option value="Kgs">KGs</Select.Option>
+                          <Select.Option value="Grams">Grams</Select.Option>
+                        </Select>
+                        </Form.Item>
+                        } 
+                        className='rounded' />
+                </Form.Item>
+              </Col>
+            </Row>
 
-      </form>
+            <div className="px-4 py-4 sm:px-6 flex justify-end">
+              <button
+                onClick={() => navigate(-1)}
+                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-3 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                Back
+              </button>
+              <button
+                htmlType="submit"
+                className='bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'>
+                Next
+              </button>
+            </div>
 
-      
+        </Form>
+      }
+
+      {!loading && <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
+
     </>
   )
 }
