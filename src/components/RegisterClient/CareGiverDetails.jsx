@@ -44,6 +44,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
   }, formRules)
   const [caregivers, setCaregivers] = useState(editCaregivers)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [caregiverToRemove, setCaregiverToRemove] = useState('')
 
   useEffect(() => {
     updateCaregiverDetails(caregivers)
@@ -81,13 +82,16 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
     }
 
     if (onActionBtn === 'removeCareGiver') {
-      const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== data.id)
-      setCaregivers(arrayWithoutCaregiver)
+      setIsDialogOpen(true)
+      setCaregiverToRemove(data.id)
     }
   }
 
   const handleAcceptRemoveCaregiver = () => {
-
+    if (caregiverToRemove) {
+      const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== caregiverToRemove)
+      setCaregivers(arrayWithoutCaregiver)
+    }
   }
 
   return (
@@ -96,6 +100,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
       <ConfirmationDialog
         open={isDialogOpen}
         description="Are you sure you want to remove Caregiver?"
+        confirmationData={caregiverToRemove}
         onClose={() => setIsDialogOpen(false)}
         onAccept={handleAcceptRemoveCaregiver}
         title="Remove Caregiver" />
@@ -172,6 +177,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
             updateCaregiverDetails(caregivers)
             nextPage()
           }}
+          disabled={caregivers && caregivers.length > 0 ? false : true}
           className="bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
           Next
         </button>      

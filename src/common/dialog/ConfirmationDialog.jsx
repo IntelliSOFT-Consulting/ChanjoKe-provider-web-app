@@ -2,7 +2,7 @@ import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
 
-export default function ConfirmationDialog({ open, onClose, title, description, onAccept, confirmText, cancelText }) {
+export default function ConfirmationDialog({ open, onClose, title, description, onAccept }) {
   
   const cancelButtonRef = useRef(null)
 

@@ -5,6 +5,7 @@ import RequiredValidator from '../../utils/requiredValidator'
 import { useEffect, useState } from "react"
 import useGet from "../../api/useGet"
 import { deconstructLocationData } from "./DataWrapper"
+import { AutoComplete, Input, Form } from 'antd'
 
 export default function AdministrativeArea({ adminArea, setAdministrativeAreaDetails, handleBack, handleNext }) {
 
@@ -29,11 +30,25 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
   }, formRules)
 
   const [locationURL, setLocationUrl] = useState({ name: 'Location?_count=50', level: 1})
+  const [form] = Form.useForm();
 
   const { data, loading, error } = useGet(locationURL.name)
   const [counties, setCounties] = useState([])
   const [subCounties, setSubCounties] = useState([])
   const [wards, setWards] = useState([])
+  const [autoCompleteResult, setAutoCompleteResult] = useState([]);
+
+  const onWebsiteChange = (value) => {
+    console.log({ value })
+    if (!value) {
+      setAutoCompleteResult(counties);
+    } else {
+      const newCounties = counties.filter(location =>
+        location.label.toLowerCase().includes(value)
+      );
+      setCounties(newCounties)
+    }
+  };
 
   useEffect(() => {
     setAdministrativeAreaDetails(formData)
@@ -46,6 +61,11 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
     if (locationURL.level === 1 && Array.isArray(data?.entry)) {
       const locationArray = data?.entry.map((item) => deconstructLocationData(item))
+      // console.log({ locationArray })
+      // const options = locationArray.map((location) => ({
+      //   label: location?.name,
+      //   value: location?.partOf?.reference || ''
+      // }))
       setCounties(locationArray)
       setSubCounties([])
       setWards([])
@@ -78,6 +98,19 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
       <div className="grid mt-5 grid-cols-3 gap-10">
         {/* Column   */}
         <div>
+          {/* <Form
+            form={form}>
+
+          <Form.Item
+            name="residenceCounty"
+            label="County of Residence"
+            rules={[{ required: true, message: 'Please input county!' }]}>
+
+            <AutoComplete options={counties} onChange={onWebsiteChange} placeholder="County of Residence">
+              <Input />
+            </AutoComplete>
+          </Form.Item>
+          </Form> */}
 
           <SelectMenu
             required={true}
