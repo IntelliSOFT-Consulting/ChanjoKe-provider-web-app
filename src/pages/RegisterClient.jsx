@@ -17,7 +17,6 @@ export default function RegisterClient({ editClientID }) {
   const [clientDetails, setClientDetails] = useState(null)
   const [caregiverDetails, setCaregiverDetails] = useState([])
   const [administrativeArea, setAdministrativeAreaDetails] = useState(null)
-  const [clientObservations, setClientObservations] = useState([])
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState('')
@@ -35,20 +34,33 @@ export default function RegisterClient({ editClientID }) {
 
   useEffect(() => {
     let currentweight = ''
+    let identificationType = ''
+    let identificationNumber = ''
     if (observationData?.entry && Array.isArray(observationData?.entry) && observationData?.entry.length) {
       const weight = observationData?.entry.map((observation) => {
         return observation?.resource?.code?.coding?.[0]?.code === 'CURRENT_WEIGHT' ? observation?.resource?.code?.text : ''
       })
-      currentweight = weight
+      const finalWeight = weight.reverse()
+      console.log({ weight, finalWeight })
+      currentweight = finalWeight[0]
     }
+
+    if (data?.identifier && Array.isArray(data?.identifier)) {
+      const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
+      identificationType = userID?.[0]?.type?.coding?.[0]?.code
+      identificationNumber = userID?.[0]?.value
+    }
+
     setClientDetails({
       firstName: data?.name?.[0]?.family || '',
       middleName: data?.name?.[0]?.given[1] || '',
       lastName: data?.name?.[0]?.given[0] || '',
-      birthDate: data?.birthDate ? dayjs(data?.birthDate) : '',
+      dateOfBirth: data?.birthDate ? dayjs(data?.birthDate) : '',
       age: calculateAge(data?.birthDate),
       gender: data?.gender,
       currentWeight: currentweight,
+      identificationNumber: identificationNumber,
+      identificationType: identificationType,
     })
 
     const caregivers = data?.contact.map((caregiver) => {
@@ -81,8 +93,6 @@ export default function RegisterClient({ editClientID }) {
 
   const SubmitDetails = async () => {
     const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea, id: editClientID || '' })
-
-    console.log({ postData })
 
     if (editClientID === '_') {
       setDialogText('Client added successfully!')

@@ -22,14 +22,14 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
   }
 
   const { formData, formErrors, handleChange } = FormState({
-    residenceCounty: '',
-    townCenter: '',
+    residenceCounty: '',  
     subCounty: '',
+    ward: '',
+    townCenter: '',
     estateOrHouseNo: '',
-    ward: ''
   }, formRules)
 
-  const [locationURL, setLocationUrl] = useState({ name: 'Location?_count=50', level: 1})
+  const [locationURL, setLocationUrl] = useState({ name: 'Location?_count=50&_partof=0', level: 1})
   const [form] = Form.useForm();
 
   const { data, loading, error } = useGet(locationURL.name)
@@ -39,7 +39,6 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
   const [autoCompleteResult, setAutoCompleteResult] = useState([]);
 
   const onWebsiteChange = (value) => {
-    console.log({ value })
     if (!value) {
       setAutoCompleteResult(counties);
     } else {
@@ -54,10 +53,11 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
     setAdministrativeAreaDetails(formData)
 
     handleChange('residenceCounty', adminArea?.residenceCounty || '')
-    handleChange('townCenter', adminArea?.townCenter || '')
     handleChange('subCounty', adminArea?.subCounty || '')
-    handleChange('estateOrHouseNo', adminArea?.estateOrHouseNo || '')
     handleChange('ward', adminArea?.ward || '')
+    handleChange('townCenter', adminArea?.townCenter || '')
+    handleChange('estateOrHouseNo', adminArea?.estateOrHouseNo || '')
+    
 
     if (locationURL.level === 1 && Array.isArray(data?.entry)) {
       const locationArray = data?.entry.map((item) => deconstructLocationData(item))
