@@ -13,6 +13,7 @@ export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [patientData, setPatientData] = useState({})
   const [clientCategory, setClientCategory] = useState('')
+  const [systemGenID, setSystemGenID] = useState('')
 
   const { clientID } = useParams()
   const navigate = useNavigate()
@@ -22,12 +23,17 @@ export default function ClientDetailsView() {
   useEffect(() => {
     setPatientData(data)
 
+    console.log({ data })
+
+    if (data?.identifier && Array.isArray(data?.identifier)) {
+      const systemGenerated = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED' ? id?.value : ''))
+      setSystemGenID(systemGenerated?.[0]?.value)
+    }
+
     if (patientData?.birthDate) {
       const category = classifyUserByAge(patientData?.birthDate)
       setClientCategory(category)
     }
-
-    console.log({ immunizationData })
 
   }, [data, patientData, immunizationData])
   
@@ -87,7 +93,7 @@ export default function ClientDetailsView() {
             {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
             {patientData?.name && <>
               <p className="text-3xl font-bold ml-8">
-                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''}`}
+                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''} - (System ID:  ${systemGenID || ''})`}
               </p>
 
               <SearchTable

@@ -12,6 +12,23 @@ const Option = Select.Option;
 dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
+const identificationOptions = [
+  { name: 'Birth Notification Number', value: 'birth_notification_number', minAge: 0, maxAge: 1095 },
+  { name: 'Birth Certificate', value: 'birth_certificate', minAge: 0, maxAge: 36525 },
+  { name: 'ID Number', value: 'id_number', minAge: 6575, maxAge: 36525 },
+  { name: 'Nemis', value: 'NEMIS No', minAge: 1095, maxAge: 6575 },
+  { name: 'Passport', value: 'Passport', minAge: 0, maxAge: 36525 }, 
+]
+
+function daysBetweenTodayAndDate(inputDate) {
+  const currentDate = new Date();
+  const targetDate = new Date(inputDate);
+  const timeDifference = targetDate - currentDate;
+  const daysDifference = Math.ceil(Math.abs(timeDifference) / (1000 * 60 * 60 * 24));
+
+  return daysDifference;
+}
+
 export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
   // const [actualDate, setActualDate] = useState('actual')
@@ -21,6 +38,8 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   // const [formValues, setFormValues] = useState(editClientDetails)
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
+  const [actualAge, setActualAge] = useState(true)
+  const [idOptions, setIdOptions] = useState([])
 
   const [form] = Form.useForm();
   const navigate = useNavigate()
@@ -31,13 +50,18 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
     form.setFieldsValue(editClientDetails)
     setUserAge(editClientDetails?.age || 'Age')
     setLoading(true)
+
+    const days = daysBetweenTodayAndDate(moment(editClientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD'))
+    const mappedIDs = identificationOptions.filter(option =>
+      days >= option.minAge && days <= option.maxAge
+    );
+    setIdOptions(mappedIDs)
   }, [editClientDetails])
 
   const onFinish = (values) => {
     values.currentWeight = `${values.currentWeight || 0} ${values.weightMetric}`
     delete values.weightMetric
     setClientDetails(values)
-    // console.log('Success:', values);
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -144,67 +168,107 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   </div>
                   <div>
                     <Form.Item
-                    label={
-                      <div>
-                        <span className="font-bold">Age Type</span>
-                      </div>
-                    }>
-                    <Radio.Group>
-                      <Radio value="male">Actual</Radio>
-                      <Radio value="female">Estimated</Radio>
+                      label={
+                        <div>
+                          <span className="font-bold">Age Type</span>
+                        </div>
+                      }>
+                    <Radio.Group onChange={(value) => {
+                      setActualAge(value.target.value)
+                      }}>
+                      <Radio value={true} checked={true} defaultChecked={true}>Actual</Radio>
+                      <Radio value={false}>Estimated</Radio>
                     </Radio.Group>
                   </Form.Item>
                   </div>
                 </div>
               
               </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="dateOfBirth"
-                  label={
-                    <div>
-                      <span className="font-bold">Date of birth</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input date of birth!',
-                    },
-                  ]}>
-                  
-                  <DatePicker
-                    disabledDate={(current) => current && current > moment().endOf('day')}
-                    format="DD-MM-YYYY"
-                    onChange={(e) => {
-                      const date = moment(e.$d).format('DD-MM-YYYY')
-                      setUserAge(calculateAge(date))
-                    }}
-                    className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  label={
-                    <div>
-                      <span className="font-bold">Age</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input age!',
-                    },
-                  ]}>
-                    <Input
-                      placeholder="Age"
-                      value={userAge}
-                      disabled={true}
+              { actualAge && <>
+                <Col className="gutter-row" span={8}>
+                  <Form.Item
+                    name="dateOfBirth"
+                    label={
+                      <div>
+                        <span className="font-bold">Date of birth</span>
+                      </div>
+                    }
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input date of birth!',
+                      },
+                    ]}>
+                    
+                    <DatePicker
+                      disabledDate={(current) => current && current >= moment().endOf('day')}
+                      format="DD-MM-YYYY"
+                      onChange={(e) => {
+                        const date = moment(e.$d).format('YYYY-MM-DD')
+                        setUserAge(calculateAge(date))
+                        const days = daysBetweenTodayAndDate(date)
+                        const mappedIDs = identificationOptions.filter(option =>
+                          days >= option.minAge && days <= option.maxAge
+                        );
+                        setIdOptions(mappedIDs)
+                      }}
                       className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                </Form.Item>
-              </Col>
+                  </Form.Item>
+                </Col>
+
+                <Col className="gutter-row" span={8}>
+                  <Form.Item
+                    label={
+                      <div>
+                        <span className="font-bold">Age</span>
+                      </div>
+                    }
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input age!',
+                      },
+                    ]}>
+                      <Input
+                        placeholder="Age"
+                        value={userAge}
+                        disabled={true}
+                        className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                  </Form.Item>
+                </Col>
+              </>
+              }
+
+              {!actualAge && <>
+                <Col className="gutter-row grid grid-cols-3 gap-4 flex mt-7" span={8}>
+                  <Form.Item>     
+                    <Input placeholder="Years" />
+                  </Form.Item>
+                  <Form.Item>
+                    <Input placeholder="Months" />
+                  </Form.Item>
+                  <Form.Item>
+                    <Input placeholder="Weeks" />
+                  </Form.Item>
+                </Col>
+
+                <Col className="gutter-row" span={8}>
+                  <Form.Item
+                    name="dateOfBirth"
+                    label={
+                      <div>
+                        <span className="font-bold">Estimated date of birth</span>
+                      </div>
+                    }>
+                    
+                    <DatePicker
+                      disabled={true}
+                      format="DD-MM-YYYY"
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                  </Form.Item>
+                </Col>
+              </>
+              }
 
               <Col className="gutter-row" span={8}>
                 <Form.Item
@@ -215,11 +279,12 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                       <span className="text-red-400 mx-2">*</span>
                     </div>
                   }>
-                  <Select size='large'>
-                    <Select.Option value="id_number">Identification Number</Select.Option>
-                    <Select.Option value="birth_certificate">Birth Certificate Number</Select.Option>
-                    <Select.Option value="nemis_number">NEMIS Number</Select.Option>
-                    <Select.Option value="passport_number">Passport Number</Select.Option>
+                  <Select size='large' disabled={form.getFieldValue('dateOfBirth') ? false : true}>
+                    {idOptions.map((option) => (
+                      <Select.Option value={option.value}>
+                        {option.name}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>

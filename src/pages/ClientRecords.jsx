@@ -20,6 +20,13 @@ export default function ClientRecords() {
 
   useEffect(() => {
     setPatientData(data)
+    let identificationType = ''
+    let identificationNumber = ''
+    if (data?.identifier && Array.isArray(data?.identifier)) {
+      const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
+      identificationType = userID?.[0]?.type?.coding?.[0]?.code
+      identificationNumber = userID?.[0]?.value
+    }
 
     const clientDetails = {
       'First Name': data?.name?.[0]?.family,
@@ -27,12 +34,13 @@ export default function ClientRecords() {
       'Middle Name': data?.name?.[0]?.given[1],
       'Gender': data?.gender,
       'Date of Birth': moment(data?.birthDate).format('Do MMM YYYY'),
+      'Identification Number': identificationNumber,
     }
 
     const addressDetails = {
-      'County': data?.address?.[0]?.city,
+      'County of Residence': data?.address?.[0]?.city,
       'Sub County': data?.address?.[0].district,
-      'State': data?.address?.[0].state,
+      'Ward': data?.address?.[0].state,
       'Town Center': data?.address?.[0].line?.[0],
       'House': data?.address?.[0].line?.[1]
     }
@@ -67,7 +75,7 @@ export default function ClientRecords() {
         <div className="px-4 py-5 sm:p-6">
         <div className="grid grid-cols-2 gap-10 mx-7">
           {/* Column 1 */}
-          <div>
+          <div style={{ textTransform: 'capitalize' }}>
             <h2 className="text-xl font-semibold mb-5">
               Client Details
             </h2>

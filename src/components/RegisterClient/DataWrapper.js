@@ -1,3 +1,15 @@
+function generateUniqueCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+  
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters.charAt(randomIndex);
+    }
+  
+    return code;
+}
+
 function organizeData(items) {
     if (Array.isArray(items)) {
         const filteredItems = items.filter(item => (item?.type?.text !== 'SYSTEM_GENERATED' || item.system !== 'system-creation'));
@@ -73,7 +85,7 @@ function createPatientData(data) {
                 "coding": [
                     {
                         "system": "http://hl7.org/fhir/administrative-identifier",
-                        "code": "nemis",
+                        "code": data.identificationType,
                         "display": data.identificationType
                     }
                 ],
@@ -94,7 +106,7 @@ function createPatientData(data) {
                 "text": "SYSTEM_GENERATED"
             },
             "system": "identification",
-            "value": data.idNumber,
+            "value": generateUniqueCode(8),
         }
     ],
     name: [
