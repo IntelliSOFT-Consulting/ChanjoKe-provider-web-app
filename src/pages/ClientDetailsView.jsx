@@ -17,18 +17,19 @@ export default function ClientDetailsView() {
   const { clientID } = useParams()
   const navigate = useNavigate()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
+  const { data: immunizationData, loading: immunizationLoading, error: immunizationE } = useGet(`Immunization?patient=Patient/${clientID}`)
 
   useEffect(() => {
     setPatientData(data)
-
-    console.log({ birthDate: patientData?.birthDate })
 
     if (patientData?.birthDate) {
       const category = classifyUserByAge(patientData?.birthDate)
       setClientCategory(category)
     }
 
-  }, [data, patientData])
+    console.log({ immunizationData })
+
+  }, [data, patientData, immunizationData])
   
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);
@@ -102,7 +103,7 @@ export default function ClientDetailsView() {
     </div>
 
     <div className="mt-10">
-      <BaseTabs userCategory={clientCategory} />
+      <BaseTabs userCategory={clientCategory}  />
     </div>
 
     </>

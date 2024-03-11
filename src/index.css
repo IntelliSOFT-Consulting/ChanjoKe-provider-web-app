@@ -17,8 +17,9 @@ code {
 }
 
 .ant-input {
-  border-radius: 5px !important;
-  padding: 3px 10px !important;
+  border-radius: 10px !important;
+  padding: 10px 10px !important;
+  border-width: 1px;
 }
 
 .ant-form-item-label {
@@ -35,6 +36,12 @@ code {
 
 :where(.css-dev-only-do-not-override-1drr2mu).ant-form-item .ant-form-item-label >label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
   display: none;
+}
+
+:where(.css-dev-only-do-not-override-arsac9).ant-input-group >.ant-input:first-child, :where(.css-dev-only-do-not-override-arsac9).ant-input-group .ant-input-group-addon:first-child {
+  border-start-end-radius: 0 !important;
+  border-end-end-radius: 0 !important;
+  border-width: 1px;
 }
 
 .ant-radio-wrapper input[type="radio"]:checked + .ant-radio-inner {

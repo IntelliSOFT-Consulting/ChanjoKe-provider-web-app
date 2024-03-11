@@ -16,14 +16,12 @@ const ConvertObjectToArray = (inputObject) => {
     string.charAt(0).toUpperCase() + string.slice(1);
 
   for (const key in inputObject) {
-    if (inputObject[key] !== "") {
-      const item = {
-        title: `${convertCamelCaseString(capitalizeFirstLetter(key))}`,
-        value: typeof inputObject[key] === 'object' ? dayjs(inputObject[key]).format('YYYY-MM-DD') :  inputObject[key],
-      };
+    const item = {
+      title: `${convertCamelCaseString(capitalizeFirstLetter(key))}`,
+      value: typeof inputObject[key] === 'object' ? dayjs(inputObject[key]).format('YYYY-MM-DD') :  inputObject[key],
+    };
 
-      clientDetails.push(item);
-    }
+    clientDetails.push(item);
   }
 
   return clientDetails;

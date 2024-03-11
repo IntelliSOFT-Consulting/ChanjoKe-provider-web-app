@@ -110,7 +110,7 @@ function createPatientData(data) {
         }
     ],
     "gender": data.gender,
-    "birthDate": data.birthDate,
+    "birthDate": data.dateOfBirth,
     "address": [
         {
             "city": data.residenceCounty,
@@ -121,6 +121,43 @@ function createPatientData(data) {
     ],
     "contact": careGivers,
 }
+}
+
+function extractNumberFromWeight(value) {
+    const numericValue = parseFloat(value.replace(/[^\d.]/g, ''));
+    return isNaN(numericValue) ? null : numericValue;
+  }
+
+function createObservationData(value, patient, encounter) {
+    return {
+        "resourceType": "Observation",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "CURRENT_WEIGHT",
+              "display": "Current Weight"
+            }
+          ],
+          "text": extractNumberFromWeight(value)
+        },
+        "subject": {
+          "reference": `Patient/${patient}`
+        },
+        "encounter": {
+          "reference": "Encounter/220e5514-b005-4462-a047-9e9114228e46"
+        },
+        "valueQuantity": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "KGs",
+              "value": extractNumberFromWeight(value)
+            }
+          ]
+        }
+      }
+      
 }
 
 function deconstructPatientData(data, searchType) {
@@ -172,4 +209,5 @@ export {
     createPatientData,
     deconstructPatientData,
     deconstructLocationData,
+    createObservationData,
 }

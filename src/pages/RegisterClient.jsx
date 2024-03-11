@@ -3,7 +3,7 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useEffect, useState } from 'react'
-import { createPatientData } from '../components/RegisterClient/DataWrapper'
+import { createObservationData, createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import calculateAge from '../utils/calculateAge'
 import usePost from '../api/usePost'
@@ -17,6 +17,7 @@ export default function RegisterClient({ editClientID }) {
   const [clientDetails, setClientDetails] = useState(null)
   const [caregiverDetails, setCaregiverDetails] = useState([])
   const [administrativeArea, setAdministrativeAreaDetails] = useState(null)
+  const [clientObservations, setClientObservations] = useState([])
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState('')
@@ -26,11 +27,20 @@ export default function RegisterClient({ editClientID }) {
 
   const navigate = useNavigate()
   const { SubmitForm } = usePost()
+  const { SubmitForm: SubmitObservationForm } = usePost()
   const { SubmitUpdateForm } = usePut()
   
   const { data, loading, error } = useGet(`Patient/${editClientID}`)
+  const { data: observationData } = useGet(`Observation?patient=Patient/${editClientID}`)
 
   useEffect(() => {
+    let currentweight = ''
+    if (observationData?.entry && Array.isArray(observationData?.entry) && observationData?.entry.length) {
+      const weight = observationData?.entry.map((observation) => {
+        return observation?.resource?.code?.coding?.[0]?.code === 'CURRENT_WEIGHT' ? observation?.resource?.code?.text : ''
+      })
+      currentweight = weight
+    }
     setClientDetails({
       firstName: data?.name?.[0]?.family || '',
       middleName: data?.name?.[0]?.given[1] || '',
@@ -38,6 +48,7 @@ export default function RegisterClient({ editClientID }) {
       birthDate: data?.birthDate ? dayjs(data?.birthDate) : '',
       age: calculateAge(data?.birthDate),
       gender: data?.gender,
+      currentWeight: currentweight,
     })
 
     const caregivers = data?.contact.map((caregiver) => {
@@ -61,7 +72,7 @@ export default function RegisterClient({ editClientID }) {
       ward: data?.address?.[0]?.state
     })
 
-  }, [editClientID, data])
+  }, [editClientID, data, observationData])
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false)
@@ -76,13 +87,24 @@ export default function RegisterClient({ editClientID }) {
     if (editClientID === '_') {
       setDialogText('Client added successfully!')
       setDialogOpen(true)
-      setResponse(await SubmitForm('Patient', postData))
+      const newClientResponse = await SubmitForm('Patient', postData)
+      const currentWeight = clientDetails.hasOwnProperty('currentWeight')
+
+      if (currentWeight) {
+        SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, newClientResponse?.id))
+      }
+      setResponse(newClientResponse)
     } else {
       setDialogText('Client details updated successfully!')
       setDialogOpen(true)
       setResponse(await SubmitUpdateForm(`Patient/${editClientID}`, postData))
+
+      const currentWeight = clientDetails.hasOwnProperty('currentWeight')
+
+      if (currentWeight) {
+        SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, editClientID))
+      }
     }
-    // 
   }
 
   return (

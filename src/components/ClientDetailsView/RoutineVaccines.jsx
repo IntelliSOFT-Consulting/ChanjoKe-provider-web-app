@@ -104,8 +104,6 @@ export default function RoutineVaccines({ userCategory }) {
           </div>
         </div>
 
-        {console.log({ userCategory })}
-
         {userCategory && mappedVaccines.map((category => (
           <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
             <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">

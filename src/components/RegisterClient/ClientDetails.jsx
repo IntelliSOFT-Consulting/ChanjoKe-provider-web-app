@@ -59,7 +59,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           initialValues={editClientDetails}
           onFinishFailed={onFinishFailed}>
             
-            <Row className='mt-5' gutter={16}>
+            <Row className='mt-5 px-6' gutter={16}>
 
               <Col className="gutter-row" span={8}>
                 <Form.Item
@@ -67,19 +67,18 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   label={
                     <div>
                       <span className="font-bold">First Name</span>
-                      <span className="text-red-400 mx-2">*</span>
                     </div>
                   }
                   rules={[
                     {
                       required: true,
-                      message: 'Please input your first name!',
+                      message: 'Please input first name!',
                     },
                   ]}>
                     <Input
                       placeholder="First Name"
                       autoComplete="off"
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className='block w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
                 </Form.Item>
               </Col>
 
@@ -105,13 +104,12 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   label={
                     <div>
                       <span className="font-bold">Last Name</span>
-                      <span className="text-red-400 mx-2">*</span>
                     </div>
                   }
                   rules={[
                     {
                       required: true,
-                      message: 'Please input your last name!',
+                      message: 'Please input last name!',
                     },
                   ]}>
                     <Input
@@ -122,63 +120,65 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
               </Col>
 
               <Col className="gutter-row" span={8}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Form.Item
+                      name="gender"
+                      label={
+                        <div>
+                          <span className="font-bold">Gender</span>
+                        </div>
+                      }
+                      rules={[
+                        {
+                          required: true,
+                          message: 'Please select gender',
+                        },
+                      ]}>
+                      
+                      <Radio.Group>
+                        <Radio value="male">Male</Radio>
+                        <Radio value="female">Female</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </div>
+                  <div>
+                    <Form.Item
+                    label={
+                      <div>
+                        <span className="font-bold">Age Type</span>
+                      </div>
+                    }>
+                    <Radio.Group>
+                      <Radio value="male">Actual</Radio>
+                      <Radio value="female">Estimated</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  </div>
+                </div>
+              
+              </Col>
+
+              <Col className="gutter-row" span={8}>
                 <Form.Item
-                  name="gender"
+                  name="dateOfBirth"
                   label={
                     <div>
-                      <span className="font-bold">Gender</span>
-                      <span className="text-red-400 mx-2">*</span>
+                      <span className="font-bold">Date of birth</span>
                     </div>
                   }
                   rules={[
                     {
                       required: true,
-                      message: 'Please select gender',
-                    },
-                  ]}>
-                  
-                  <Radio.Group>
-                    <Radio value="male">Male</Radio>
-                    <Radio value="female">Female</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  label={
-                    <div>
-                      <span className="font-bold">Age Type</span>
-                      <span className="text-red-400 mx-2">*</span>
-                    </div>
-                  }>
-                  <Radio.Group>
-                    <Radio value="male">Actual</Radio>
-                    <Radio value="female">Estimated</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="birthDate"
-                  label={
-                    <div>
-                      <span className="font-bold">Birth Date</span>
-                      <span className="text-red-400 mx-2">*</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input birth date!',
+                      message: 'Please input date of birth!',
                     },
                   ]}>
                   
                   <DatePicker
                     disabledDate={(current) => current && current > moment().endOf('day')}
+                    format="DD-MM-YYYY"
                     onChange={(e) => {
-                      const date = moment(e.$d).format('YYYY-MM-DD')
+                      const date = moment(e.$d).format('DD-MM-YYYY')
                       setUserAge(calculateAge(date))
                     }}
                     className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
@@ -187,50 +187,9 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
               <Col className="gutter-row" span={8}>
                 <Form.Item
-                  name="identificationType"
-                  label={
-                    <div>
-                      <span className="font-bold">Identification Type</span>
-                      <span className="text-red-400 mx-2">*</span>
-                    </div>
-                  }>
-                  <Select>
-                    <Select.Option value="id_number">Identification Number</Select.Option>
-                    <Select.Option value="birth_certificate">Birth Certificate Number</Select.Option>
-                    <Select.Option value="nemis_number">NEMIS Number</Select.Option>
-                    <Select.Option value="passport_number">Passport Number</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="identificationNumber"
-                  label={
-                    <div>
-                      <span className="font-bold">Identification Number</span>
-                      <span className="text-red-400 mx-2">*</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input identifier!',
-                    },
-                  ]}>
-                    <Input
-                      placeholder="Identification Number"
-                      autoComplete="off"
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
                   label={
                     <div>
                       <span className="font-bold">Age</span>
-                      <span className="text-red-400 mx-2">*</span>
                     </div>
                   }
                   rules={[
@@ -247,9 +206,45 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 </Form.Item>
               </Col>
 
-            </Row>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="identificationType"
+                  label={
+                    <div>
+                      <span className="font-bold">Identification Type</span>
+                      <span className="text-red-400 mx-2">*</span>
+                    </div>
+                  }>
+                  <Select size='large'>
+                    <Select.Option value="id_number">Identification Number</Select.Option>
+                    <Select.Option value="birth_certificate">Birth Certificate Number</Select.Option>
+                    <Select.Option value="nemis_number">NEMIS Number</Select.Option>
+                    <Select.Option value="passport_number">Passport Number</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-            <Row className='mt-5' gutter={16}>
+              <Col className="gutter-row" span={8}>
+                <Form.Item
+                  name="identificationNumber"
+                  label={
+                    <div>
+                      <span className="font-bold">Identification Number</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input identifier!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Identification Number"
+                      autoComplete="off"
+                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              </Col>
+
               <Col className="gutter-row" span={8}>
                 <Form.Item
                   name="currentWeight"
@@ -278,6 +273,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         className='rounded' />
                 </Form.Item>
               </Col>
+
             </Row>
 
             <div className="px-4 py-4 sm:px-6 flex justify-end">
