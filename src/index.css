@@ -85,3 +85,7 @@ code {
 .ant-radio-input:focus + .ant-radio-inner {
   border-color: #163C94;
 }
+
+.vaccination-status > span {
+  padding: 6px !important;
+}

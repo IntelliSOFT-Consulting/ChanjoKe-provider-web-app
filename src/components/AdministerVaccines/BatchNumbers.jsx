@@ -7,6 +7,8 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
 import usePost from "../../api/usePost"
+import { useParams } from 'react-router-dom'
+import {useSelector} from 'react-redux'
 
 export default function BatchNumbers() {
 
@@ -18,11 +20,17 @@ export default function BatchNumbers() {
   const { sharedData } = useSharedState()
   const { SubmitForm } = usePost()
 
+  const currentPatient = useSelector(state=> state.currentPatient);
+
+
   const { formData, formErrors, handleChange } = FormState({
     currentWeight: '',
     batchNumbers: [],
   }, {})
   const navigate = useNavigate()
+
+
+
 
   function handleDialogClose() {
     navigate(-1)
@@ -30,7 +38,7 @@ export default function BatchNumbers() {
 
     if (Array.isArray(sharedData) && sharedData.length > 0) {
       const data = sharedData.map((immunization) => {
-        return createVaccineImmunization(immunization, '', 'completed')
+        return createVaccineImmunization(immunization, currentPatient.id, 'completed')
       })
 
       const responses = data?.map((administerVaccine) => {

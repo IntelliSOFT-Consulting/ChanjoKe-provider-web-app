@@ -5,6 +5,8 @@ import routes from './routes/index'
 import { RouterProvider } from 'react-router-dom'
 import reportWebVitals from './reportWebVitals'
 import { ConfigProvider } from 'antd'
+import { Provider } from 'react-redux'
+import store from './redux/store'
 
 const defaultData = {
   borderRadius: 6,
@@ -19,38 +21,40 @@ const defaultData = {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ConfigProvider
-      theme={{
-        token: {
-          colorPrimary: defaultData.colorPrimary,
-          borderRadius: defaultData.borderRadius,
-        },
-        components: {
-          Button: {
-            colorPrimary: defaultData.Button?.colorPrimary,
-            algorithm: defaultData.Button?.algorithm,
+    <Provider store={store}>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: defaultData.colorPrimary,
+            borderRadius: defaultData.borderRadius,
           },
-          Input: {
-            colorPrimary: defaultData.Input?.colorPrimary,
-            algorithm: defaultData.Input?.algorithm,
+          components: {
+            Button: {
+              colorPrimary: defaultData.Button?.colorPrimary,
+              algorithm: defaultData.Button?.algorithm,
+            },
+            Input: {
+              colorPrimary: defaultData.Input?.colorPrimary,
+              algorithm: defaultData.Input?.algorithm,
+            },
+            Select: {
+              colorPrimary: defaultData.Select?.colorPrimary,
+              algorithm: defaultData.Select?.algorithm,
+            },
+            InputNumber: {
+              colorPrimary: defaultData.InputNumber?.colorPrimary,
+              algorithm: defaultData.InputNumber?.algorithm,
+            },
+            DatePicker: {
+              colorPrimary: defaultData.DatePicker?.colorPrimary,
+              algorithm: defaultData.DatePicker?.algorithm,
+            },
           },
-          Select: {
-            colorPrimary: defaultData.Select?.colorPrimary,
-            algorithm: defaultData.Select?.algorithm,
-          },
-          InputNumber: {
-            colorPrimary: defaultData.InputNumber?.colorPrimary,
-            algorithm: defaultData.InputNumber?.algorithm,
-          },
-          DatePicker: {
-            colorPrimary: defaultData.DatePicker?.colorPrimary,
-            algorithm: defaultData.DatePicker?.algorithm,
-          },
-        },
-      }}
-    >
-      <RouterProvider router={routes} />
-    </ConfigProvider>
+        }}
+      >
+        <RouterProvider router={routes} />
+      </ConfigProvider>
+    </Provider>
   </React.StrictMode>
 )
 

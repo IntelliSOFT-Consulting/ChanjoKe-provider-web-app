@@ -3,6 +3,10 @@ import { message } from 'antd'
 
 const server = axios.create({
   baseURL: 'https://chanjoke.intellisoftkenya.com/hapi/fhir',
+  headers: {
+    'Cache-Control': 'no-cache',
+    'Content-Type': 'application/json',
+  }
 })
 
 server.interceptors.response.use(
