@@ -2,13 +2,13 @@ import RenderActionButton from './RenderActionsButton';
 
 function getStatusColorClass(status) {
   switch (status) {
-    case 'Administered':
+    case 'completed':
       return 'text-green-300';
-    case 'Due':
-      return 'text-blue-300';
-      case 'Contraindicated':
+    case 'upcoming':
+      return 'text-amber-300';
+    case 'contraindicated':
       return 'text-yellow-400';
-    case 'Missed':
+    case 'missed':
       return 'text-red-300';
     default:
       return 'text-blue-gray'; // Default class when the status is not recognized
@@ -34,13 +34,13 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox, di
               <thead>
                 <tr>
                   {headers.map((header, index) => (
-                    <th key={index} scope="col" className="border border-slate-300 py-3.5 pl-4 pr-3 text-center bg-slate-200 text-sm font-bold text-gray-900 uppercase sm:pl-0">
+                    <th key={index} scope="col" className="border border-slate-300 py-3.5 pl-4 pr-3 bg-slate-200 text-sm font-bold text-gray-900 uppercase sm:pl-0">
                       {header.title}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 text-center">
+              <tbody className="divide-y divide-gray-200">
               {data.map((item, index) => (
                 <tr key={index}>
                   {headers.map((header) => (
@@ -48,10 +48,10 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox, di
                       {header.key === 'checkbox' ? (
                         <input
                           type="checkbox"
-                          disabled={disabledChechboxes}
-                          className={disabledChechboxes ? 'bg-slate-300' : ''}
+                          disabled={item.status !== 'upcoming'}
+                          checked={item.status === 'completed'}
+                          className={item.status === 'completed' ? 'bg-slate-300' : ''}
                           onChange={(e) => handleCheckbox(e.target.value, item)}
-                          checked={item.selected}
                         />
                       ) : header.key === 'actions' ? (
                         <RenderActionButton actions={item.actions} onBtnAction={handleActionBtn} data={item} />

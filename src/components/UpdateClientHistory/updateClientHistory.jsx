@@ -56,7 +56,10 @@ export default function UpdateClientHistory() {
                 addOn={true}
                 addOnTitle="Kgs"
                 inputPlaceholder="Current Weight (KGs)"/>
+            </div>
 
+            {/* Column 2 */}
+            <div>
               <SelectMenu
                 label="Client HIV Status"
                 data={polarityOptions}
@@ -64,25 +67,8 @@ export default function UpdateClientHistory() {
                 onInputChange={(value) => handleChange('clientHIVStatus', value.name)}/>
             </div>
 
-            {/* Column 2 */}
-            <div>
-
-              <SelectMenu
-                label="Client is currently receiving HAART"
-                data={affirmOptions}
-                value={formData.receivingHaart || 'Client is currently receiving HAART'}
-                onInputChange={(value) => handleChange('receivingHaart', value.name)}/>
-            </div>
-
             {/* Column 3 */}
             <div>
-
-              <SelectMenu
-                label="Maternal HIV Status"
-                data={polarityOptions}
-                value={formData.maternalHivStatus || 'Maternal HIV Status'}
-                onInputChange={(value) => handleChange('maternalHivStatus', value.name)}/>
-
             </div>
           </div>
         </div>

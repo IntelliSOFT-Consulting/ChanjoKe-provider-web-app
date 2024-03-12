@@ -23,8 +23,6 @@ export default function ClientDetailsView() {
   useEffect(() => {
     setPatientData(data)
 
-    console.log({ data })
-
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const systemGenerated = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED' ? id?.value : ''))
       setSystemGenID(systemGenerated?.[0]?.value)
@@ -109,7 +107,7 @@ export default function ClientDetailsView() {
     </div>
 
     <div className="mt-10">
-      <BaseTabs userCategory={clientCategory}  />
+      <BaseTabs userCategory={clientCategory} userID={patientData?.id}  />
     </div>
 
     </>

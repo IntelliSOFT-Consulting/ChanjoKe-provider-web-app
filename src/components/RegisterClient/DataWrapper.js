@@ -12,30 +12,29 @@ function generateUniqueCode(length) {
 
 function organizeData(items) {
     if (Array.isArray(items)) {
-        const filteredItems = items.filter(item => (item?.type?.text !== 'SYSTEM_GENERATED' || item.system !== 'system-creation'));
-
-        const hierarchy = {
-        'BIRTH_CERTIFICATE': null,
-        'PASSPORT': null,
-        'NATIONAL_ID': null,
-        'NEMIS_NUMBER': null,
-        };
-    
-        filteredItems.forEach(item => {
-        if (item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No') {
-            hierarchy['NEMIS_NUMBER'] = item.value;
-        } else if (item.system === 'Passport') {
-            hierarchy['PASSPORT'] = item.value;
-        } else if (item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate') {
-            hierarchy['BIRTH_CERTIFICATE'] = item.value;
-        } else if (item.system === 'National ID' || item.system === 'ID Number') {
-            hierarchy['NATIONAL_ID'] = item.value;
-        } else {
-            hierarchy['DEFAULT'] = item.value;
-        }
-        });
-    
-        return hierarchy;
+      const filteredItems = items.filter(item => (item?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' || item.system !== 'system-creation'));
+      const hierarchy = {
+      'BIRTH_CERTIFICATE': null,
+      'PASSPORT': null,
+      'NATIONAL_ID': null,
+      'NEMIS_NUMBER': null,
+      };
+  
+      filteredItems.forEach(item => {
+      if (item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No' || item.system === 'Nemis' || item?.type?.coding?.[0]?.display === 'NEMIS No' || item?.type?.coding?.[0]?.code === 'nemis') {
+          hierarchy['NEMIS_NUMBER'] = item.value;
+      } else if (item?.system === 'Passport' || item?.type?.coding?.[0]?.display === 'Passport') {
+          hierarchy['PASSPORT'] = item.value;
+      } else if (item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate' || item?.type?.coding?.[0]?.display === 'birth_notification_number' || item?.type?.coding?.[0]?.display === 'birth_certificate') {
+          hierarchy['BIRTH_CERTIFICATE'] = item.value;
+      } else if (item?.system === 'National ID' || item.system === 'ID Number') {
+          hierarchy['NATIONAL_ID'] = item.value;
+      } else {
+          hierarchy['DEFAULT'] = item.value;
+      }
+      });
+  
+      return hierarchy;
     }
 
     return {

@@ -124,7 +124,7 @@ export default function SearchInterface(props) {
           <div className="my-10 text-center">No records to view</div>
           <div className="flex justify-center">
             <button
-              onClick={() => navigate('/register-client')}
+              onClick={() => navigate('/register-client/_')}
               className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
               Register new client
             </button>

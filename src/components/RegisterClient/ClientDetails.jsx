@@ -16,7 +16,7 @@ const identificationOptions = [
   { name: 'Birth Notification Number', value: 'birth_notification_number', minAge: 0, maxAge: 1095 },
   { name: 'Birth Certificate', value: 'birth_certificate', minAge: 0, maxAge: 36525 },
   { name: 'ID Number', value: 'id_number', minAge: 6575, maxAge: 36525 },
-  { name: 'Nemis', value: 'NEMIS No', minAge: 1095, maxAge: 6575 },
+  { name: 'NEMIS', value: 'NEMIS No', minAge: 1095, maxAge: 6575 },
   { name: 'Passport', value: 'Passport', minAge: 0, maxAge: 36525 }, 
 ]
 

@@ -63,9 +63,9 @@ export default function BaseTabs(props) {
       </div>
 
       {/* Content based on the selected tab */}
-      {currentTab === 'routineVaccines' && <RoutineVaccines userCategory={props.userCategory} />}
-      {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines userCategory={props.userCategory} />}
-      {currentTab === 'appointments' && <VaccineAppointments userCategory={props.userCategory} />}
+      {currentTab === 'routineVaccines' && <RoutineVaccines userCategory={props.userCategory} userID={props.userID} />}
+      {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines userCategory={props.userCategory} userID={props.userID} />}
+      {currentTab === 'appointments' && <VaccineAppointments userCategory={props.userCategory} userID={props.userID} />}
     </div>
   );
 }
