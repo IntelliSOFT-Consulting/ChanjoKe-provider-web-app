@@ -3,29 +3,87 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useEffect, useState } from 'react'
-import { createPatientData } from '../components/RegisterClient/DataWrapper'
+import { createObservationData, createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
+import calculateAge from '../utils/calculateAge'
 import usePost from '../api/usePost'
 import { useNavigate } from 'react-router-dom'
+import useGet from '../api/useGet'
+import usePut from '../api/usePut'
+import dayjs from 'dayjs'
 
-export default function RegisterClient() {
+export default function RegisterClient({ editClientID }) {
 
-  const { data, loading, error, SubmitForm } = usePost()
-  const [step, updateStep] = useState(1)
   const [clientDetails, setClientDetails] = useState(null)
-  const [clientErrors, setClientFormErrors] = useState({})
-
   const [caregiverDetails, setCaregiverDetails] = useState([])
-  const [caregiverErrors, setCaregiverFormErrors] = useState({})
-
   const [administrativeArea, setAdministrativeAreaDetails] = useState(null)
-  const [adminErrors, setAdminAreaFormErrors] = useState({})
 
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [dialogText, setDialogText] = useState('')
   const [allFormsValid, setAllFormsValid] = useState(false)
+  const [step, updateStep] = useState(1)
+  const [response, setResponse] = useState(null)
 
   const navigate = useNavigate()
-  const [response, setResponse] = useState(null)
+  const { SubmitForm } = usePost()
+  const { SubmitForm: SubmitObservationForm } = usePost()
+  const { SubmitUpdateForm } = usePut()
+  
+  const { data, loading, error } = useGet(`Patient/${editClientID}`)
+  const { data: observationData } = useGet(`Observation?patient=Patient/${editClientID}`)
+
+  useEffect(() => {
+    let currentweight = ''
+    let identificationType = ''
+    let identificationNumber = ''
+    if (observationData?.entry && Array.isArray(observationData?.entry) && observationData?.entry.length) {
+      const weight = observationData?.entry.map((observation) => {
+        return observation?.resource?.code?.coding?.[0]?.code === 'CURRENT_WEIGHT' ? observation?.resource?.code?.text : ''
+      })
+      const finalWeight = weight.reverse()
+      currentweight = finalWeight[0]
+    }
+
+    if (data?.identifier && Array.isArray(data?.identifier)) {
+      const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
+      identificationType = userID?.[0]?.type?.coding?.[0]?.code
+      identificationNumber = userID?.[0]?.value
+    }
+
+    setClientDetails({
+      firstName: data?.name?.[0]?.family || '',
+      middleName: data?.name?.[0]?.given[1] || '',
+      lastName: data?.name?.[0]?.given[0] || '',
+      dateOfBirth: data?.birthDate ? dayjs(data?.birthDate) : '',
+      age: calculateAge(data?.birthDate),
+      gender: data?.gender,
+      currentWeight: currentweight,
+      identificationNumber: identificationNumber,
+      identificationType: identificationType,
+    })
+
+    const caregivers = data?.contact.map((caregiver) => {
+      return {
+        caregiverName: caregiver?.name?.family || caregiver?.name?.given[0],
+        caregiverType: caregiver?.relationship?.[0]?.text,
+        phoneNumber: caregiver?.telecom?.[0]?.value,
+        actions: [
+          { title: 'edit', btnAction: 'editCareGiver' },
+          { title: 'remove', btnAction: 'removeCareGiver' }
+        ]
+      }
+    })
+    setCaregiverDetails(caregivers)
+    
+    setAdministrativeAreaDetails({
+      residenceCounty: data?.address?.[0]?.city,
+      townCenter: data?.address?.[0]?.line?.[0],
+      subCounty: data?.address?.[0]?.district,
+      estateOrHouseNo: data?.address?.[0]?.line?.[1],
+      ward: data?.address?.[0]?.state
+    })
+
+  }, [editClientID, data, observationData])
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false)
@@ -33,23 +91,28 @@ export default function RegisterClient() {
   };
 
   const SubmitDetails = async () => {
-    setDialogOpen(true)
-    const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea })
-    setResponse(await SubmitForm('Patient', postData))
-  }
+    const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea, id: editClientID || '' })
 
-  const nextForm = () => {
+    if (editClientID === '_') {
+      setDialogText('Client added successfully!')
+      setDialogOpen(true)
+      const newClientResponse = await SubmitForm('Patient', postData)
+      const currentWeight = clientDetails.hasOwnProperty('currentWeight')
 
-    setAllFormsValid(false)
+      if (currentWeight) {
+        SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, newClientResponse?.id))
+      }
+      setResponse(newClientResponse)
+    } else {
+      setDialogText('Client details updated successfully!')
+      setDialogOpen(true)
+      setResponse(await SubmitUpdateForm(`Patient/${editClientID}`, postData))
 
-    if (step < 4) {
-      updateStep(step + 1)
-    }
-  }
+      const currentWeight = clientDetails.hasOwnProperty('currentWeight')
 
-  const handleCancel = () => {
-    if (step > 1) {
-      updateStep(step - 1)
+      if (currentWeight) {
+        SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, editClientID))
+      }
     }
   }
 
@@ -57,63 +120,46 @@ export default function RegisterClient() {
     <>
       <ConfirmDialog
         open={isDialogOpen}
-        description={`Client added successfully!`}
+        description={dialogText}
         onClose={handleDialogClose} />
 
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-          Register Client
+          {editClientID === '_' ? 'Register Client' : 'Edit Client'}
         </div>
         <div className="px-4 py-5 sm:p-6">
-          {step === 1 && <ClientDetails
-            setClientDetails={setClientDetails}
-            setClientFormErrors={setClientFormErrors}
-            setAllFormsValid={setAllFormsValid} />}
-          {step === 2 && <CareGiverDetails
-            setCaregiverDetails={setCaregiverDetails}
-            setCaregiverFormErrors={setCaregiverFormErrors} />}
-          {step === 3 && <AdministrativeArea
-            setAdministrativeAreaDetails={setAdministrativeAreaDetails}
-            setAllFormsValid={setAllFormsValid}
-            setAdminAreaFormErrors={setAdminAreaFormErrors}/>}
-          {step === 4 && <SubmitClientDetails
-            clientDetails={clientDetails}
-            caregiverDetails={caregiverDetails}
-            administrativeArea={administrativeArea}/>}
-        </div>
-        <div className="px-4 py-4 sm:px-6 flex justify-end">
-          {step !== 1 &&
-            <button
-            onClick={handleCancel}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-3 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-            Back
-          </button>
+          {step === 1 &&
+          <ClientDetails
+            editClientDetails={clientDetails}
+            setClientDetails={(value) => {
+              setClientDetails(value)
+              updateStep(step + 1)
+            }} />
+          }
+          {step === 2 &&
+          <CareGiverDetails
+            editCaregivers={caregiverDetails}
+            nextPage={() => updateStep(step + 1)}
+            updateCaregiverDetails={setCaregiverDetails}
+            handleBack={() => updateStep(step - 1)} />
           }
           {step === 3 && 
-            <button
-              onClick={nextForm}
-              disabled={!allFormsValid}
-              className={`${!allFormsValid ? 'bg-[#5370B0] border-[#5370B0] outline-[#5370B0] hover:bg-[#5370B0] focus-visible:outline-[#5370B0]' : 'bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94]' } ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
-              Preview
-            </button>
-          }
-          {(step === 1 || step === 2) && 
-            <button
-              onClick={nextForm}
-              disabled={(Object.keys(clientErrors).length !== 0 || Object.keys(adminErrors).length !== 0 || !allFormsValid) && step !== 2}
-              className={`${(Object.keys(clientErrors).length !== 0 || Object.keys(adminErrors).length !== 0 || !allFormsValid) && step !== 2 ? 'bg-[#5370B0] border-[#5370B0] outline-[#5370B0] hover:bg-[#5370B0] focus-visible:outline-[#5370B0]' : 'bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94]' } ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
-              Next
-            </button>
+          <AdministrativeArea
+            adminArea={administrativeArea}
+            setAdministrativeAreaDetails={setAdministrativeAreaDetails}
+            handleNext={() => updateStep(step + 1)}
+            handleBack={() => updateStep(step - 1)}/>
           }
           {step === 4 &&
-            <button
-              onClick={() => SubmitDetails()}
-              className="ml-4 flex-shrink-0 rounded-md bg-[#4E8D6E] border border-[#4E8D6E] outline outline-[#4E8D6E] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4E8D6E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4E8D6E]">
-              Submit
-            </button>
+          <SubmitClientDetails
+            clientDetails={clientDetails}
+            caregiverDetails={caregiverDetails}
+            administrativeArea={administrativeArea}
+            handleBack={() => updateStep(step - 1)}
+            submitPatientDetails={SubmitDetails}/>
           }
-          
         </div>
+
       </div>
     </>
   );

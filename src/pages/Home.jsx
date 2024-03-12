@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 
 const stats = [
   { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient' },
-  { name: 'Register Client', icon: RegisterClientIcon, href: 'register-client' },
+  { name: 'Register Client', icon: RegisterClientIcon, href: 'register-client/_' },
   { name: 'Update Client History', icon: UpdateClientHistoryIcon, href: 'search/updateClient' },
   { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'search/administerVaccine' },
   { name: 'AEFI', icon: AefiIcon, href: 'search/aefi' },

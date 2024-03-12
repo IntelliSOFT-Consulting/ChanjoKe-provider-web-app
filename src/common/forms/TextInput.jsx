@@ -23,6 +23,7 @@ export default function TextInput(props) {
           disabled={props.disabled}
           min={props.min}
           max={props.max}
+          autoComplete="off"
           value={props.value}
           {...props.inputType === 'date' && props.max && { max: new Date().toISOString().split('T')[0] }}
           onChange={(e) => props.onInputChange(e.target.value)}

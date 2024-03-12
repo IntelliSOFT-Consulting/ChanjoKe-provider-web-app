@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import SearchTable from '../../common/tables/SearchTable';
 import FormState from '../../utils/formState'
 import { v4 as uuidv4 } from 'uuid'
-import ConfirmationDialog from '../../common/dialog/ConfirmationDialog';
+import ConfirmationDialog from '../../common/dialog/ConfirmationDialog'
+import { Col, Row, Radio, DatePicker, Form, Input, Select } from 'antd'
 
-export default function CaregiverDetails({ setCaregiverDetails, setCaregiverFormErrors }) {
+export default function CaregiverDetails({ editCaregivers = [], updateCaregiverDetails, handleBack, nextPage }) {
   const caregiverTypes = [
     { id: 1, name: 'Father' },
     { id: 2, name: 'Mother' },
@@ -14,9 +15,9 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
   ];
 
   const tHeaders = [
-    {title: 'Relationship', class: '', key: 'caregiverType'},
-    {title: 'Care Giver\'s name', class: '', key: 'caregiverName'},
-    {title: 'Contact phone number', class: '', key: 'phoneNumber'},
+    {title: 'Caregiver\s Type', class: '', key: 'caregiverType'},
+    {title: 'CareGiver\'s Name', class: '', key: 'caregiverName'},
+    {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
     {title: 'Actions', class: '', key: 'actions'},
   ]
 
@@ -41,16 +42,16 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
       { title: 'remove', btnAction: 'removeCareGiver' }
     ]
   }, formRules)
-  const [caregivers, setCaregivers] = useState([])
+  const [caregivers, setCaregivers] = useState(editCaregivers)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [caregiverToRemove, setCaregiverToRemove] = useState('')
 
   useEffect(() => {
-    setCaregiverDetails(caregivers)
-    setCaregiverFormErrors(formErrors)
+    updateCaregiverDetails(caregivers)
   }, [caregivers])
 
   const handleSubmit = () => {
-    setCaregivers([formData, ...caregivers,])
+    setCaregivers([...caregivers, formData])
     resetForm({
       id: uuidv4(),
       caregiverName: '',
@@ -68,7 +69,7 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
       const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== data.id)
 
       resetForm({
-        id: data.id,
+        id: data.id || uuidv4(),
         caregiverName: data.caregiverName,
         caregiverType: data.caregiverType,
         phoneNumber: data.phoneNumber,
@@ -81,15 +82,16 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
     }
 
     if (onActionBtn === 'removeCareGiver') {
-      const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id === data.id)
-
       setIsDialogOpen(true)
-      console.log({ arrayWithoutCaregiver })
+      setCaregiverToRemove(data.id)
     }
   }
 
   const handleAcceptRemoveCaregiver = () => {
-
+    if (caregiverToRemove) {
+      const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== caregiverToRemove)
+      setCaregivers(arrayWithoutCaregiver)
+    }
   }
 
   return (
@@ -98,12 +100,13 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
       <ConfirmationDialog
         open={isDialogOpen}
         description="Are you sure you want to remove Caregiver?"
+        confirmationData={caregiverToRemove}
         onClose={() => setIsDialogOpen(false)}
         onAccept={handleAcceptRemoveCaregiver}
         title="Remove Caregiver" />
       <h3 className="text-xl font-medium">Care Giver's Details</h3>
 
-      <div className="grid mt-5 grid-cols-3 gap-10">
+      <div className="grid mt-5 grid-cols-3 gap-10 mx-9">
         {/* Column 1 */}
         <div>
           <SelectMenu
@@ -121,12 +124,12 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
             inputType="text"
             inputName="caregiverName"
             inputId="caregiverName"
-            label="Care Giver's name"
+            label="Care Giver's Name"
             required={true}
             value={formData.caregiverName}
             error={formErrors.caregiverName}
             onInputChange={(value) => handleChange('caregiverName', value)}
-            inputPlaceholder="Care Giver's name"
+            inputPlaceholder="eg John Doe"
           />
         </div>
 
@@ -136,18 +139,18 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
             inputType="text"
             inputName="phoneNumber"
             inputId="phoneNumber"
-            label="Contact phone number"
+            label="Contact Phone Number"
             required={true}
             value={formData.phoneNumber}
             error={formErrors.phoneNumber}
             onInputChange={(value) => handleChange('phoneNumber', value)}
-            inputPlaceholder="Contact phone number"
+            inputPlaceholder="eg 0700777888"
           />
 
           <button
             onClick={handleSubmit}
             disabled={Object.keys(formErrors).length !== 0 || !formData.caregiverName || !formData.phoneNumber || !formData.caregiverType}
-            className="ml-4 justify-self-end flex-shrink-0 rounded-full bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+            className="ml-4 justify-self-end flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
             Add
           </button>
         </div>
@@ -160,6 +163,25 @@ export default function CaregiverDetails({ setCaregiverDetails, setCaregiverForm
             onActionBtn={handleAction}
             data={caregivers} />
       }
+
+      <hr className='mt-5 mb-5 mx-10' />
+
+      <div className="px-4 mx-3 py-4 sm:px-6 flex justify-end">
+        <button
+          onClick={handleBack}
+          className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-3 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          Back
+        </button>
+        <button
+          onClick={() => {
+            updateCaregiverDetails(caregivers)
+            nextPage()
+          }}
+          disabled={caregivers && caregivers.length > 0 ? false : true}
+          className="bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+          Next
+        </button>      
+      </div> 
     </>
   );
 }

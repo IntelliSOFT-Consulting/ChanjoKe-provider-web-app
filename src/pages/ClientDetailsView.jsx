@@ -7,33 +7,40 @@ import { useParams, useNavigate } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
 import LoadingArrows from "../common/spinners/LoadingArrows";
 import classifyUserByAge from "../components/ClientDetailsView/classifyUserByAge";
+import moment from "moment";
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [patientData, setPatientData] = useState({})
   const [clientCategory, setClientCategory] = useState('')
+  const [systemGenID, setSystemGenID] = useState('')
 
   const { clientID } = useParams()
   const navigate = useNavigate()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
+  const { data: immunizationData, loading: immunizationLoading, error: immunizationE } = useGet(`Immunization?patient=Patient/${clientID}`)
 
   useEffect(() => {
     setPatientData(data)
+
+    if (data?.identifier && Array.isArray(data?.identifier)) {
+      const systemGenerated = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED' ? id?.value : ''))
+      setSystemGenID(systemGenerated?.[0]?.value)
+    }
 
     if (patientData?.birthDate) {
       const category = classifyUserByAge(patientData?.birthDate)
       setClientCategory(category)
     }
 
-  }, [data, patientData])
+  }, [data, patientData, immunizationData])
   
-
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);
   };
 
   const stats = [
-    { dob: patientData?.birthDate, age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
+    { dob: moment(patientData?.birthDate).format('Do MMM YYYY'), age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
   ]
 
   const tHeaders = [
@@ -84,7 +91,7 @@ export default function ClientDetailsView() {
             {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
             {patientData?.name && <>
               <p className="text-3xl font-bold ml-8">
-                {`${patientData?.name?.[0]?.family || ''}  ${patientData?.name?.[0]?.given[0] || ''}  `}
+                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''} - (System ID:  ${systemGenID || ''})`}
               </p>
 
               <SearchTable
@@ -100,7 +107,7 @@ export default function ClientDetailsView() {
     </div>
 
     <div className="mt-10">
-      <BaseTabs userCategory={clientCategory} />
+      <BaseTabs userCategory={clientCategory} userID={patientData?.id}  />
     </div>
 
     </>

@@ -1,29 +1,40 @@
+function generateUniqueCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+  
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      code += characters.charAt(randomIndex);
+    }
+  
+    return code;
+}
+
 function organizeData(items) {
     if (Array.isArray(items)) {
-        const filteredItems = items.filter(item => (item?.type?.text !== 'SYSTEM_GENERATED' || item.system !== 'system-creation'));
-
-        const hierarchy = {
-        'BIRTH_CERTIFICATE': null,
-        'PASSPORT': null,
-        'NATIONAL_ID': null,
-        'NEMIS_NUMBER': null,
-        };
-    
-        filteredItems.forEach(item => {
-        if (item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No') {
-            hierarchy['NEMIS_NUMBER'] = item.value;
-        } else if (item.system === 'Passport') {
-            hierarchy['PASSPORT'] = item.value;
-        } else if (item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate') {
-            hierarchy['BIRTH_CERTIFICATE'] = item.value;
-        } else if (item.system === 'National ID' || item.system === 'ID Number') {
-            hierarchy['NATIONAL_ID'] = item.value;
-        } else {
-            hierarchy['DEFAULT'] = item.value;
-        }
-        });
-    
-        return hierarchy;
+      const filteredItems = items.filter(item => (item?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' || item.system !== 'system-creation'));
+      const hierarchy = {
+      'BIRTH_CERTIFICATE': null,
+      'PASSPORT': null,
+      'NATIONAL_ID': null,
+      'NEMIS_NUMBER': null,
+      };
+  
+      filteredItems.forEach(item => {
+      if (item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No' || item.system === 'Nemis' || item?.type?.coding?.[0]?.display === 'NEMIS No' || item?.type?.coding?.[0]?.code === 'nemis') {
+          hierarchy['NEMIS_NUMBER'] = item.value;
+      } else if (item?.system === 'Passport' || item?.type?.coding?.[0]?.display === 'Passport') {
+          hierarchy['PASSPORT'] = item.value;
+      } else if (item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate' || item?.type?.coding?.[0]?.display === 'birth_notification_number' || item?.type?.coding?.[0]?.display === 'birth_certificate') {
+          hierarchy['BIRTH_CERTIFICATE'] = item.value;
+      } else if (item?.system === 'National ID' || item.system === 'ID Number') {
+          hierarchy['NATIONAL_ID'] = item.value;
+      } else {
+          hierarchy['DEFAULT'] = item.value;
+      }
+      });
+  
+      return hierarchy;
     }
 
     return {
@@ -66,20 +77,21 @@ function createPatientData(data) {
 
   return {
     resourceType: "Patient",
+    id: data.id,
     identifier: [
         {
             "type": {
                 "coding": [
                     {
                         "system": "http://hl7.org/fhir/administrative-identifier",
-                        "code": "nemis",
-                        "display": "NEMIS No"
+                        "code": data.identificationType,
+                        "display": data.identificationType
                     }
                 ],
-                "text": "NEMIS No"
+                "text": data.identificationNumber,
             },
             "system": "identification",
-            "value": "43545"
+            "value": data.identificationNumber,
         },
         {
             "type": {
@@ -93,14 +105,13 @@ function createPatientData(data) {
                 "text": "SYSTEM_GENERATED"
             },
             "system": "identification",
-            "value": data.idNumber,
+            "value": generateUniqueCode(8),
         }
     ],
     name: [
         {
             family: data.firstName,
-            middle: data.middleName,
-            given: [data.lastName]
+            given: [data.lastName, data.middleName]
         }
     ],
     "telecom": [
@@ -121,6 +132,43 @@ function createPatientData(data) {
     ],
     "contact": careGivers,
 }
+}
+
+function extractNumberFromWeight(value) {
+    const numericValue = parseFloat(value.replace(/[^\d.]/g, ''));
+    return isNaN(numericValue) ? null : numericValue;
+  }
+
+function createObservationData(value, patient, encounter) {
+    return {
+        "resourceType": "Observation",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "CURRENT_WEIGHT",
+              "display": "Current Weight"
+            }
+          ],
+          "text": extractNumberFromWeight(value)
+        },
+        "subject": {
+          "reference": `Patient/${patient}`
+        },
+        "encounter": {
+          "reference": "Encounter/220e5514-b005-4462-a047-9e9114228e46"
+        },
+        "valueQuantity": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "KGs",
+              "value": extractNumberFromWeight(value)
+            }
+          ]
+        }
+      }
+      
 }
 
 function deconstructPatientData(data, searchType) {
@@ -151,7 +199,7 @@ function deconstructPatientData(data, searchType) {
 
     return {
         id: data?.resource?.id,
-        clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""}`,
+        clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""} ${data?.resource?.name?.[0]?.given[1] ?? ""}`,
         idNumber: organizeData(data?.resource?.identifier).NATIONAL_ID || organizeData(data?.resource?.identifier).BIRTH_CERTIFICATE || organizeData(data?.resource?.identifier).NEMIS_NUMBER || organizeData(data?.resource?.identifier).PASSPORT,
         phoneNumber: `${data?.resource?.contact?.[0]?.telecom?.[0]?.value} (${data?.resource?.contact?.[0]?.relationship?.[0]?.text})`,
         actions,
@@ -172,4 +220,5 @@ export {
     createPatientData,
     deconstructPatientData,
     deconstructLocationData,
+    createObservationData,
 }
