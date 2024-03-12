@@ -5,6 +5,8 @@ import ConfirmDialog from "../../common/dialog/ConfirmDialog"
 import { useSharedState } from "../../shared/sharedState"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
+import usePost from "../../api/usePost"
 
 export default function BatchNumbers() {
 
@@ -14,6 +16,7 @@ export default function BatchNumbers() {
   ])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const { sharedData } = useSharedState()
+  const { SubmitForm } = usePost()
 
   const { formData, formErrors, handleChange } = FormState({
     currentWeight: '',
@@ -24,6 +27,17 @@ export default function BatchNumbers() {
   function handleDialogClose() {
     navigate(-1)
     setDialogOpen(false)
+
+    if (Array.isArray(sharedData) && sharedData.length > 0) {
+      const data = sharedData.map((immunization) => {
+        return createVaccineImmunization(immunization, '', 'completed')
+      })
+
+      const responses = data?.map((administerVaccine) => {
+        return SubmitForm('Immunization', administerVaccine)
+      })
+      console.log({ data, responses })
+    }
   }
 
   return (

@@ -41,7 +41,6 @@ export default function RegisterClient({ editClientID }) {
         return observation?.resource?.code?.coding?.[0]?.code === 'CURRENT_WEIGHT' ? observation?.resource?.code?.text : ''
       })
       const finalWeight = weight.reverse()
-      console.log({ weight, finalWeight })
       currentweight = finalWeight[0]
     }
 

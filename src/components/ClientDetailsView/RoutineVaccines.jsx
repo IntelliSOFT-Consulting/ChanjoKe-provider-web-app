@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
-import { v4 as uuidv4 } from 'uuid'
 import SearchTable from '../../common/tables/SearchTable'
 import { routineVaccines } from './vaccineData'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import { useSharedState } from '../../shared/sharedState'
+import moment from 'moment'
+import useGet from '../../api/useGet'
+import usePost from '../../api/usePost'
 
 const tHeaders = [
   {title: '', class: '', key: 'checkbox' },
@@ -18,7 +20,28 @@ const tHeaders = [
   {title: 'Actions', class: '', key: 'actions'},
 ]
 
-export default function RoutineVaccines({ userCategory }) {
+export default function RoutineVaccines({ userCategory, userID }) {
+  // const [rVaccines, setrVaccines] = useState([])
+  const [mappedVaccines, setMappedVaccines] = useState([]);
+  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const { setSharedData, sharedData } = useSharedState()
+
+  function mergeVaccines(localVaccines, apiVaccines) {
+    console.log({ apiVaccines })
+    if (Array.isArray(apiVaccines) && apiVaccines.length) {
+      const updatedVaccines = localVaccines.map(localVaccine => {
+        const matchingApiVaccine = apiVaccines.find(apiVaccine => 
+          apiVaccine?.resource?.vaccineCode?.text === localVaccine?.vaccineName);
+    
+        return matchingApiVaccine ? { ...localVaccine, ...matchingApiVaccine.resource } : localVaccine;
+      });
+    
+      return updatedVaccines;
+    } else {
+      return localVaccines
+    }
+  }
 
   function formatCardTitle(input) {
     return input
@@ -26,31 +49,57 @@ export default function RoutineVaccines({ userCategory }) {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
+
+  const { data, loading, error } = useGet(`Immunization?patient=Patient/${userID}`)
+  const { SubmitForm } = usePost('Immunization')
+
+  useEffect(() => {
+    const vaccData = data?.entry?.map((vaccine) => {
+      return {
+        vaccineName: vaccine?.resource?.vaccineCode?.text,
+        vaccineCode: vaccine?.resource?.vaccineCode?.coding?.[0]?.code,
+        diseaseTarget: vaccine?.resource?.protocolApplied?.[0]?.targetDisease?.[0]?.text,
+        status: vaccine?.resource?.status === 'completed' ? 'Administered' : 'Not Administered',
+        dateAdministered: moment(vaccine?.resource?.occurenceDateTime).format('DD-MM-YYYY'),
+        dueDate: '-',
+        doseNumber: vaccine?.resource?.doseQuantity?.value,
+      }
+    })
+
+    if (Array.isArray(vaccData) && vaccData) {
+      console.log('should only run once...')
+      const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
+
+      setMappedVaccines(mapVaccinesByCategory(mergedVax))
+    }
+  }, [data?.entry, userID])
   
   function mapVaccinesByCategory(vaccines) {
     const categoriesMap = {};
 
-    routineVaccines.forEach(vaccine => {
-      const { category, ...rest } = vaccine;
+    if (Array.isArray(vaccines) && vaccines.length > 0) {
+      vaccines.forEach(vaccine => {
+        const { category, ...rest } = vaccine;
 
-      if (!categoriesMap[category]) {
-        categoriesMap[category] = [];
-      }
+        if (!categoriesMap[category]) {
+          categoriesMap[category] = [];
+        }
 
-      rest.actions = [
-        { title: 'view', url: '#' }
-      ]
+        rest.actions = [
+          { title: 'view', url: '#' }
+        ]
 
-      categoriesMap[category].push(rest);
-    });
+        categoriesMap[category].push(rest);
+      });
 
-    const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
-      category,
-      status: 'administered',
-      vaccines,
-    }));
+      const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
+        category,
+        status: 'pending',
+        vaccines,
+      }));
 
-    return categoriesArray;
+      return categoriesArray;
+    }
   }
 
   function handleCheckBox(onActionBtn, item) {
@@ -63,11 +112,6 @@ export default function RoutineVaccines({ userCategory }) {
       setVaccinesToAdminister(withoutDeletedVaccine)
     }
   }
-
-  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(routineVaccines));
-  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
-  const [isDialogOpen, setDialogOpen] = useState(false)
-  const { setSharedData } = useSharedState()
 
   const handleDialogClose = () => {
     setDialogOpen(false);
@@ -104,7 +148,7 @@ export default function RoutineVaccines({ userCategory }) {
           </div>
         </div>
 
-        {userCategory && mappedVaccines.map((category => (
+        {userCategory && !loading && mappedVaccines.map((category => (
           <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
             <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
               <Disclosure 
@@ -137,7 +181,7 @@ export default function RoutineVaccines({ userCategory }) {
                         </div>
                       </Disclosure.Button>
                     </dt>
-                    <Disclosure.Panel as="dd" className="mt-2 pr-12" de={category.category === userCategory}>
+                    <Disclosure.Panel as="dd" className="mt-2 pr-12" open={category.category === userCategory}>
                       <SearchTable
                         headers={tHeaders}
                         data={category.vaccines}
