@@ -84,7 +84,7 @@ export default function NonRoutineVaccines({ userCategory }) {
       buttons={administerVaccineBtns}
       onClose={handleDialogClose}
       />
-    <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
+    <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
       <div className="flex justify-between">
         <div>
           <p>Vaccination Schedule</p>
@@ -104,14 +104,14 @@ export default function NonRoutineVaccines({ userCategory }) {
       </div>
 
       {mappedVaccines.map((category => (
-        <dl key={category.category} className="mt-10 space-y-6 divide-y divide-gray-900/10">
-          <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-            <Disclosure as="div" key='key' className="pt-6">
+        <dl key={category.category} className="mt-5 space-y-6 divide-y divide-gray-900/10">
+          <div className="overflow-hidden rounded-lg bg-gray-100 pb-6 pt-5 mt-5 shadow sm:px-6">
+            <Disclosure as="div" key='key' className="pt-2">
               {({ open }) => (
                 <>
                   <dt>
                     <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
-                      <div className="flex w-full justify-between px-10">
+                      <div className="flex w-full justify-between">
                         <span>
                           <span className='flex'>{formatCardTitle(category.category)}
 
@@ -132,7 +132,7 @@ export default function NonRoutineVaccines({ userCategory }) {
                       </div>
                     </Disclosure.Button>
                   </dt>
-                  <Disclosure.Panel as="dd" className="mt-2 pr-12">
+                  <Disclosure.Panel as="dd" className="pr-12" open={category.category === userCategory}>
                     <SearchTable
                       headers={tHeaders}
                       data={category.vaccines}

@@ -32,11 +32,9 @@ function daysBetweenTodayAndDate(inputDate) {
 
 export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
-  // const [actualDate, setActualDate] = useState('actual')
   const [weeks, setWeeks] = useState(null)
   const [months, setMonths] = useState(null)
   const [years, setYears] = useState(null)
-  // const [formValues, setFormValues] = useState(editClientDetails)
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
   const [actualAge, setActualAge] = useState(true)
@@ -192,7 +190,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     name="dateOfBirth"
                     label={
                       <div>
-                        <span className="font-bold">Date of birth</span>
+                        <span className="font-bold">Date of Birth</span>
                       </div>
                     }
                     rules={[
@@ -254,6 +252,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         setYears(e)
                         const est = calculateEstimatedBirthDate(weeks, months, e)
                         form.setFieldValue('dateOfBirth', dayjs(est))
+                        const date = moment(est).format('YYYY-MM-DD')
+                        setUserAge(calculateAge(date))
+                        const days = daysBetweenTodayAndDate(date)
+                        const mappedIDs = identificationOptions.filter(option =>
+                          days >= option.minAge && days <= option.maxAge
+                        );
+                        setIdOptions(mappedIDs)
                       }}
                       className='w-full' />
                   </Form.Item>
@@ -267,6 +272,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         setMonths(e)
                         const est = calculateEstimatedBirthDate(weeks, e, years)
                         form.setFieldValue('dateOfBirth', dayjs(est))
+                        const date = moment(est).format('YYYY-MM-DD')
+                        setUserAge(calculateAge(date))
+                        const days = daysBetweenTodayAndDate(date)
+                        const mappedIDs = identificationOptions.filter(option =>
+                          days >= option.minAge && days <= option.maxAge
+                        );
+                        setIdOptions(mappedIDs)
                       }}
                       className='w-full'/>
                   </Form.Item>
@@ -281,6 +293,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         setWeeks(e)
                         const est = calculateEstimatedBirthDate(e, months, years)
                         form.setFieldValue('dateOfBirth', dayjs(est))
+                        const date = moment(est).format('YYYY-MM-DD')
+                        setUserAge(calculateAge(date))
+                        const days = daysBetweenTodayAndDate(date)
+                        const mappedIDs = identificationOptions.filter(option =>
+                          days >= option.minAge && days <= option.maxAge
+                        );
+                        setIdOptions(mappedIDs)
                       }}/>
                   </Form.Item>
                 </Col>

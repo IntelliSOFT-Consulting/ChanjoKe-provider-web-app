@@ -39,8 +39,6 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
   useEffect(() => {
     setAdministrativeAreaDetails(formData)
 
-    console.log({ adminArea, formData })
-
     handleChange('residenceCounty', adminArea?.residenceCounty || '')
     handleChange('subCounty', adminArea?.subCounty || '')
     handleChange('ward', adminArea?.ward || '')
@@ -100,14 +98,14 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             inputId="firstName"
             value={formData.townCenter}
             onInputChange={(value) => handleChange('townCenter', value)}
-            label="Town/Trading center"
+            label="Town/Trading Center"
             inputPlaceholder="eg Elgeyo Marakwet Market"/>
         </div>
     
         <div>
 
           <ComboInput
-            label="Subcounty"
+            label="Sub County"
             setSelected={(value) => {
               handleChange('subCounty', value.name)
               handleChange('ward', '')
@@ -122,14 +120,14 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             inputId="firstName"
             value={formData.estateOrHouseNo}
             onInputChange={(value) => handleChange('estateOrHouseNo', value)}
-            label="Estate & House No./village"
+            label="Estate & House No./ Village"
             inputPlaceholder="eg Jamii House, House Number 14"/>
         </div>
 
         <div>
 
           <ComboInput
-            label="Subcounty"
+            label="Ward"
             setSelected={(value) => {
               handleChange('ward', value.name)
               switchLocationURL(3, null)

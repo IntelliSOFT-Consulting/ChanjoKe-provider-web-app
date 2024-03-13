@@ -16,7 +16,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
 
   const tHeaders = [
     {title: 'Caregiver\'s Type', class: '', key: 'caregiverType'},
-    {title: 'CareGiver\'s Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver\'s Name', class: '', key: 'caregiverName'},
     {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
     {title: 'Actions', class: '', key: 'actions'},
   ]
@@ -104,13 +104,13 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
         onClose={() => setIsDialogOpen(false)}
         onAccept={handleAcceptRemoveCaregiver}
         title="Remove Caregiver" />
-      <h3 className="text-xl font-medium">Care Giver's Details</h3>
+      <h3 className="text-xl font-medium">Caregiver's Details</h3>
 
       <div className="grid mt-5 grid-cols-3 gap-10 mx-9">
         {/* Column 1 */}
         <div>
           <SelectMenu
-            label="Care Giver's Type"
+            label="Caregiver's Type"
             required={true}
             data={caregiverTypes}
             value={formData.caregiverType || 'Care Giver\'s Type'}
@@ -124,7 +124,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
             inputType="text"
             inputName="caregiverName"
             inputId="caregiverName"
-            label="Care Giver's Name"
+            label="Caregiver's Name"
             required={true}
             value={formData.caregiverName}
             error={formErrors.caregiverName}

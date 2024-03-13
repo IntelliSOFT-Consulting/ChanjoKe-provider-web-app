@@ -127,7 +127,7 @@ export default function RegisterClient({ editClientID }) {
 
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-          {editClientID === '_' ? 'Register Client' : 'Edit Client'}
+          {editClientID === '_' ? 'Register Client' : 'Edit Client Details'}
         </div>
         <div className="px-4 py-5 sm:p-6">
           {step === 1 &&
