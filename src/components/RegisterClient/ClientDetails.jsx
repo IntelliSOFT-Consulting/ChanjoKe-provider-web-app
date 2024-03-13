@@ -5,7 +5,8 @@ import moment from 'moment'
 import dayjs from 'dayjs'
 import weekdays from 'dayjs/plugin/weekday'
 import localeDate from 'dayjs/plugin/localeData'
-import { Col, Row, Radio, DatePicker, Form, Input, Select } from 'antd'
+import calculateEstimatedBirthDate from '../../utils/calculateDate'
+import { Col, Row, Radio, DatePicker, Form, Input, Select, InputNumber } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
 const Option = Select.Option;
@@ -15,9 +16,9 @@ dayjs.extend(localeDate)
 const identificationOptions = [
   { name: 'Birth Notification Number', value: 'birth_notification_number', minAge: 0, maxAge: 1095 },
   { name: 'Birth Certificate', value: 'birth_certificate', minAge: 0, maxAge: 36525 },
-  { name: 'ID Number', value: 'id_number', minAge: 6575, maxAge: 36525 },
-  { name: 'NEMIS', value: 'NEMIS No', minAge: 1095, maxAge: 6575 },
-  { name: 'Passport', value: 'Passport', minAge: 0, maxAge: 36525 }, 
+  { name: 'ID Number', value: 'ID_number', minAge: 6575, maxAge: 36525 },
+  { name: 'NEMIS', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
+  { name: 'Passport', value: 'passport', minAge: 0, maxAge: 36525 }, 
 ]
 
 function daysBetweenTodayAndDate(inputDate) {
@@ -32,9 +33,9 @@ function daysBetweenTodayAndDate(inputDate) {
 export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
   // const [actualDate, setActualDate] = useState('actual')
-  // const [weeks, setWeeks] = useState(null)
-  // const [months, setMonths] = useState(null)
-  // const [years, setYears] = useState(null)
+  const [weeks, setWeeks] = useState(null)
+  const [months, setMonths] = useState(null)
+  const [years, setYears] = useState(null)
   // const [formValues, setFormValues] = useState(editClientDetails)
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
@@ -79,6 +80,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           layout="vertical"
           colon={true}
           autoComplete="on"
+          validateTrigger="onBlur"
           form={form}
           initialValues={editClientDetails}
           onFinishFailed={onFinishFailed}>
@@ -170,13 +172,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Form.Item
                       label={
                         <div>
-                          <span className="font-bold">Age Type</span>
+                          <span className="font-bold">Age Input Method</span>
                         </div>
                       }>
                     <Radio.Group onChange={(value) => {
                       setActualAge(value.target.value)
-                      }}>
-                      <Radio value={true} checked={true} defaultChecked={true}>Actual</Radio>
+                      }} value={actualAge}>
+                      <Radio value={true}>Actual</Radio>
                       <Radio value={false}>Estimated</Radio>
                     </Radio.Group>
                   </Form.Item>
@@ -242,13 +244,44 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
               {!actualAge && <>
                 <Col className="gutter-row grid grid-cols-3 gap-4 flex mt-7" span={8}>
                   <Form.Item>     
-                    <Input placeholder="Years" />
+                    <InputNumber
+                      size='large'
+                      placeholder="Years"
+                      max={99}
+                      min={1}
+                      value={years}
+                      onChange={(e) => {
+                        setYears(e)
+                        const est = calculateEstimatedBirthDate(weeks, months, e)
+                        form.setFieldValue('dateOfBirth', dayjs(est))
+                      }}
+                      className='w-full' />
                   </Form.Item>
                   <Form.Item>
-                    <Input placeholder="Months" />
+                    <InputNumber
+                      size='large'
+                      placeholder="Months"
+                      max={11}
+                      min={1}
+                      onChange={(e) => {
+                        setMonths(e)
+                        const est = calculateEstimatedBirthDate(weeks, e, years)
+                        form.setFieldValue('dateOfBirth', dayjs(est))
+                      }}
+                      className='w-full'/>
                   </Form.Item>
                   <Form.Item>
-                    <Input placeholder="Weeks" />
+                    <InputNumber
+                      size='large'
+                      placeholder="Weeks"
+                      max={3}
+                      min={1}
+                      className='w-full'
+                      onChange={(e) => {
+                        setWeeks(e)
+                        const est = calculateEstimatedBirthDate(e, months, years)
+                        form.setFieldValue('dateOfBirth', dayjs(est))
+                      }}/>
                   </Form.Item>
                 </Col>
 
@@ -294,7 +327,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   name="identificationNumber"
                   label={
                     <div>
-                      <span className="font-bold">Identification Number</span>
+                      <span className="font-bold">Document Identification Number</span>
                     </div>
                   }
                   rules={[
@@ -304,7 +337,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     },
                   ]}>
                     <Input
-                      placeholder="Identification Number"
+                      placeholder="Document Identification Number"
                       autoComplete="off"
                       className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>

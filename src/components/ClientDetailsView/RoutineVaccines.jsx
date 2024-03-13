@@ -28,7 +28,6 @@ export default function RoutineVaccines({ userCategory, userID }) {
   const { setSharedData, sharedData } = useSharedState()
 
   function mergeVaccines(localVaccines, apiVaccines) {
-    console.log({ apiVaccines })
     if (Array.isArray(apiVaccines) && apiVaccines.length) {
       const updatedVaccines = localVaccines.map(localVaccine => {
         const matchingApiVaccine = apiVaccines.find(apiVaccine => 
@@ -67,7 +66,6 @@ export default function RoutineVaccines({ userCategory, userID }) {
     })
 
     if (Array.isArray(vaccData) && vaccData) {
-      console.log('should only run once...')
       const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
 
       setMappedVaccines(mapVaccinesByCategory(mergedVax))

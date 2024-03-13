@@ -221,4 +221,5 @@ export {
     deconstructPatientData,
     deconstructLocationData,
     createObservationData,
+    organizeData
 }
