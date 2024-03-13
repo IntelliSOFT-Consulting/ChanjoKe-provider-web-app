@@ -87,11 +87,13 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
         doseNumber: vaccine?.resource?.doseQuantity?.value,
       }
     })
-
+              console.log('vaccData', vaccData)
     if (Array.isArray(vaccData) && vaccData) {
       const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
 
       setMappedVaccines(mapVaccinesByCategory(mergedVax))
+    }  else {
+      setMappedVaccines(mapVaccinesByCategory(routineVaccines))
     }
   }, [data?.entry, userID])
 
