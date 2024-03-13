@@ -40,6 +40,14 @@ const DataTable = (props) => {
   return (
     <Table
       className={classes.root}
+      locale={{
+        emptyText: (
+          <div className="flex flex-col items-center justify-center">
+            <img src={empty} alt="empty" className="w-20 h-20 opacity-50" />
+            <p className="text-gray-400 text-sm mt-2">No data available</p>
+          </div>
+        ),
+      }}
       {...props}
       loading={
         props.loading
@@ -52,14 +60,7 @@ const DataTable = (props) => {
             }
           : false
       }
-      locale={{
-        emptyText: (
-          <div className="flex flex-col items-center justify-center">
-            <img src={empty} alt="empty" className="w-20 h-20 opacity-50" />
-            <p className="text-gray-400 text-sm mt-2">No data available</p>
-          </div>
-        ),
-      }}
+
       bordered
     />
   )
