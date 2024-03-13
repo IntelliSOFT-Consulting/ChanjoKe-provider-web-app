@@ -1,0 +1,1 @@
+export const SET_AEFI_VACCINES = 'SET_AEFI_VACCINES'

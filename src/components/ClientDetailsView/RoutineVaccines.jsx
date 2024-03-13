@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom'
-import SearchTable from '../../common/tables/SearchTable'
+import { useNavigate } from 'react-router-dom'
 import { routineVaccines } from './vaccineData'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
@@ -11,10 +10,10 @@ import { useApiRequest } from '../../api/useApiRequest'
 import Loader from '../../common/spinners/LoadingArrows'
 import usePost from '../../api/usePost'
 import Table from '../DataTable'
-import { Checkbox, Button, Tag, Badge } from 'antd'
+import { Badge, Button, Checkbox, Tag } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
-
-
+import { setAEFIVaccines } from '../../redux/actions/vaccineActions'
+import { useDispatch } from 'react-redux'
 
 export default function RoutineVaccines({ userCategory, userID, patientData }) {
   // const [rVaccines, setrVaccines] = useState([])
@@ -26,6 +25,9 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
 
   const { setSharedData, sharedData } = useSharedState()
   const { get } = useApiRequest()
+  const navigate = useNavigate()
+
+  const dispatch = useDispatch()
 
   function mergeVaccines(localVaccines, apiVaccines) {
     if (Array.isArray(apiVaccines) && apiVaccines.length) {
@@ -161,7 +163,9 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
     },
   ]
 
-
+  const allVaccines = mappedVaccines
+    ?.map((category) => category.vaccines)
+    ?.flat(Infinity)
   const columns = [
     {
       title: '',
@@ -185,7 +189,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
       width: '5%',
     },
     {
-      title: 'Vaccine Name',
+      title: 'Vaccine',
       dataIndex: 'vaccineName',
       key: 'vaccineName',
     },
@@ -196,8 +200,16 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
     },
     {
       title: 'Due Date',
-      dataIndex: 'dueToAdminister',
-      key: 'dueToAdminister',
+      dataIndex: 'dueDate',
+      key: 'dueDate',
+      render: (text, _record) => {
+        const dependentVaccine = allVaccines?.find(
+          (vaccine) =>
+            _record?.dependentVaccine ===
+            vaccine?.vaccineCode?.coding?.[0]?.code
+        )
+        return text(patientData?.birthDate, dependentVaccine)
+      },
     },
     {
       title: 'Date Administered',
@@ -219,7 +231,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
         )
         return (
           <Tag color={text === 'completed' ? 'green' : missed ? 'red' : 'gray'}>
-            {missed ? 'Missed' : text || '-'}
+            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text}
           </Tag>
         )
       },
@@ -271,8 +283,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
           </div>
         </div>
 
-        {userCategory &&
-          !loading ?
+        {userCategory && !loading ? (
           mappedVaccines.map((category) => (
             <dl
               key={category.category}
@@ -301,7 +312,12 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
                       )?.length === category.vaccines.length
                     const allNotAdministered =
                       category.vaccines.filter(
-                        (vaccine) => vaccine.status === 'not-done'
+                        (vaccine) =>
+                          vaccine.status !== 'completed' &&
+                          !lockVaccine(
+                            vaccine?.adminRange?.start,
+                            patientData.birthDate
+                          )
                       )?.length === category.vaccines.length
 
                     return (
@@ -330,12 +346,18 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
                               </span>
                               <span>
                                 {open ? (
-                                  <Link
+                                  <Button
                                     to="/aefi-report"
                                     className="text-[#163C94]"
+                                    disabled={allNotAdministered}
+                                    onClick={() => {
+                                      dispatch(setAEFIVaccines(administered))
+                                      navigate('/aefi-report')
+                                    }}
+                                    type="link"
                                   >
                                     AEFIs
-                                  </Link>
+                                  </Button>
                                 ) : (
                                   <PlusSmallIcon
                                     className="h-6 w-6"
@@ -366,8 +388,11 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
               </div>
             </dl>
           ))
-          : <div className="my-10 mx-auto flex justify-center"><Loader /></div>
-        }
+        ) : (
+          <div className="my-10 mx-auto flex justify-center">
+            <Loader />
+          </div>
+        )}
       </div>
     </>
   )
