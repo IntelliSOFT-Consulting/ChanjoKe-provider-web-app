@@ -7,6 +7,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import calculateAge from "../utils/calculateAge";
 import LoadingArrows from "../common/spinners/LoadingArrows";
 import classifyUserByAge from "../components/ClientDetailsView/classifyUserByAge";
+import { useDispatch} from 'react-redux'
+import { setCurrentPatient} from '../redux/actions/patientActions'
 import moment from "moment";
 
 export default function ClientDetailsView() {
@@ -19,10 +21,11 @@ export default function ClientDetailsView() {
   const navigate = useNavigate()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
   const { data: immunizationData, loading: immunizationLoading, error: immunizationE } = useGet(`Immunization?patient=Patient/${clientID}`)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     setPatientData(data)
-
+     dispatch(setCurrentPatient(data))
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const systemGenerated = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED' ? id?.value : ''))
       setSystemGenID(systemGenerated?.[0]?.value)
@@ -107,7 +110,7 @@ export default function ClientDetailsView() {
     </div>
 
     <div className="mt-10">
-      <BaseTabs userCategory={clientCategory} userID={patientData?.id}  />
+      <BaseTabs userCategory={clientCategory} userID={patientData?.id} patientData={patientData}  />
     </div>
 
     </>
