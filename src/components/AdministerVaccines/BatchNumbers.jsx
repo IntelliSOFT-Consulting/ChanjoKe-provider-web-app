@@ -36,7 +36,6 @@ export default function BatchNumbers() {
       const responses = data?.map((administerVaccine) => {
         return SubmitForm('Immunization', administerVaccine)
       })
-      console.log({ data, responses })
     }
   }
 

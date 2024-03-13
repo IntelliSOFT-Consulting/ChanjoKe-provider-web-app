@@ -6,6 +6,18 @@ import { useState, useEffect } from "react"
 import ConvertObjectToArray from "../components/RegisterClient/convertObjectToArray"
 import moment from "moment"
 
+function convertUnderscoresAndCapitalize(inputString) {
+  if (inputString !== undefined) {
+    const stringWithSpaces = inputString.replace(/_/g, ' ');
+    const capitalizedString =
+      stringWithSpaces.charAt(0).toUpperCase() + stringWithSpaces.slice(1);
+
+    return capitalizedString;
+  } else {
+    return ''
+  }
+}
+
 export default function ClientRecords() {
 
   const [patientData, setPatientData] = useState({})
@@ -24,7 +36,7 @@ export default function ClientRecords() {
     let identificationNumber = ''
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
-      identificationType = userID?.[0]?.type?.coding?.[0]?.code
+      identificationType = userID?.[0]?.type?.coding?.[0]?.code || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
 
@@ -35,14 +47,15 @@ export default function ClientRecords() {
       'Gender': data?.gender,
       'Date of Birth': moment(data?.birthDate).format('Do MMM YYYY'),
       'Identification Number': identificationNumber,
+      'Identification Type': convertUnderscoresAndCapitalize(identificationType),
     }
 
     const addressDetails = {
       'County of Residence': data?.address?.[0]?.city,
       'Sub County': data?.address?.[0].district,
       'Ward': data?.address?.[0].state,
-      'Town Center': data?.address?.[0].line?.[0],
-      'House': data?.address?.[0].line?.[1]
+      'Town/Trading Center': data?.address?.[0].line?.[0],
+      'Estate & House No / Village': data?.address?.[0].line?.[1]
     }
 
     if (Array.isArray(data?.contact)) {

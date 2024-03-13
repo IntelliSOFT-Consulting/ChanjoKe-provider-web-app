@@ -15,7 +15,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
   ];
 
   const tHeaders = [
-    {title: 'Caregiver\s Type', class: '', key: 'caregiverType'},
+    {title: 'Caregiver\'s Type', class: '', key: 'caregiverType'},
     {title: 'CareGiver\'s Name', class: '', key: 'caregiverName'},
     {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
     {title: 'Actions', class: '', key: 'actions'},

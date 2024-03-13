@@ -15,22 +15,19 @@ export default function calculateAge(dateString) {
   const ageInMonths = today.getMonth() - birthDate.getMonth() + (12 * (today.getFullYear() - birthDate.getFullYear()));
   const ageInYears = today.getFullYear() - birthDate.getFullYear();
 
-  // if (ageInDays <= 1) {
-  //   return `0 days`;
-  // }
   if (ageInDays <= 7) {
-    return `${Math.floor(ageInDays)} day old`;
+    return Math.floor(ageInDays) > 1 ? `${Math.floor(ageInDays)} days` : `${Math.floor(ageInDays)} day`;
   } else if (ageInMonths < 2) {
     const weeks = Math.floor(ageInWeeks);
     const days = Math.floor(ageInDays % 7);
-    return days > 0 ? `${weeks} week${weeks > 1 ? 's' : ''}, ${days} days old` : `${weeks} week${weeks > 1 ? 's' : ''} old`;
+    return days > 0 ? `${weeks} week${weeks > 1 ? 's' : ''}, ${days} days` : `${weeks} week${weeks > 1 ? 's' : ''}`;
   } else if (ageInMonths < 12) {
     const months = Math.floor(ageInMonths);
     const weeks = Math.floor(ageInWeeks % 4);
-    return weeks > 0 ? `${months} month${months > 1 ? 's' : ''}, ${weeks} week${weeks > 1 ? 's' : ''} old` : `${months} month${months > 1 ? 's' : ''}`;
+    return weeks > 0 ? `${months} month${months > 1 ? 's' : ''}, ${weeks} week${weeks > 1 ? 's' : ''}` : `${months} month${months > 1 ? 's' : ''}`;
   } else {
     const years = Math.floor(ageInYears);
     const months = Math.floor(ageInMonths % 12);
-    return months > 0 ? `${years} year${years > 1 ? 's' : ''}, ${months} month${months > 1 ? 's' : ''} old` : `${years} year${years > 1 ? 's' : ''} old`;
+    return months > 0 ? `${years} year${years > 1 ? 's' : ''}, ${months} month${months > 1 ? 's' : ''}` : `${years} year${years > 1 ? 's' : ''}`;
   }
 }
