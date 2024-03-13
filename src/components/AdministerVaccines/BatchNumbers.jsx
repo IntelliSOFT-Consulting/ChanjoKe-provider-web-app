@@ -181,7 +181,7 @@ export default function BatchNumbers() {
             onClick={() => form.submit()}
             className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Submit
+            Administer
           </button>
         </div>
       </div>

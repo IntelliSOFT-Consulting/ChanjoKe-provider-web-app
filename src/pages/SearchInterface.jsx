@@ -7,7 +7,8 @@ import LoadingArrows from "../common/spinners/LoadingArrows"
 import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
 import SelectDialog from "../common/dialog/SelectDialog"
 import Pagination from "../components/Pagination"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
+import Table from '../components/DataTable'
 
 export default function SearchInterface(props) {
 
@@ -43,11 +44,28 @@ export default function SearchInterface(props) {
     setIsDialogOpen(false)
   }
 
-  const tHeaders = [
-    {title: 'Client Name', class: '', key: 'clientName'},
-    {title: 'ID Number', class: '', key: 'idNumber'},
-    {title: 'Phone Number', class: '', key: 'phoneNumber'},
-    {title: 'Actions', class: '', key: 'actions'},
+  const columns = [
+    {
+      title: 'Client Name',
+      dataIndex: 'clientName',
+      key: 'clientName',
+    },
+    {
+      title: 'ID Number',
+      dataIndex: 'idNumber',
+      key: 'idNumber',
+    },
+    {
+      title: 'Phone Number',
+      dataIndex: 'phoneNumber',
+      key: 'phoneNumber',
+    },
+    {
+      title: 'Actions',
+      dataIndex: '',
+      key: 'x',
+      render: (_,record) => <Link to={`/client-details/${record.id}`} className='text-[#163C94] font-semibold'>View</Link>
+    }
   ]
 
   const { formData, formErrors, handleChange} = FormState({
@@ -130,15 +148,23 @@ export default function SearchInterface(props) {
             </button>
           </div>
         </>}
-        {data?.entry && !loading &&
-          <>
-            <SearchTable
-              headers={tHeaders}
-              data={results}
-              onActionBtn={handleAction}/>
+        {data?.entry &&
+          <div className='px-10 my-6'>
+            <Table
+              columns={columns}
+              dataSource={results}
+              size="small"
+              loading={loading}
+              pagination={results?.length > 12 ? {
+                pageSize: 12,
+                showSizeChanger: false,
+                showQuickJumper: true,
+                showTotal: (total) => `Total ${total} items`
+              }: false}
+            />
 
             <Pagination link={paginationLinks} updateURL={onUpdateUrl} />
-          </>
+          </div>
         }
       </div>
     </div>
