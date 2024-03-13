@@ -44,7 +44,7 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox, di
               {data.map((item, index) => (
                 <tr key={index}>
                   {headers.map((header) => (
-                    <td key={header.key} className={`border border-slate-300 whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 ${header.class} ${header.key === 'status' && getStatusColorClass(item[header.key])}`}>
+                    <td key={header.key} className={`border border-slate-300 whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-900 ${header.class} ${header.key === 'status' && getStatusColorClass(item[header.key])}`}>
                       {header.key === 'checkbox' ? (
                         <input
                           type="checkbox"

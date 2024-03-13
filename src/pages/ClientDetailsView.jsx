@@ -19,9 +19,9 @@ export default function ClientDetailsView() {
 
   const { clientID } = useParams()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
   const { data: immunizationData, loading: immunizationLoading, error: immunizationE } = useGet(`Immunization?patient=Patient/${clientID}`)
-  const dispatch = useDispatch()
 
   useEffect(() => {
     setPatientData(data)
@@ -89,18 +89,21 @@ export default function ClientDetailsView() {
       </div>
       
       <div className="px-4 py-5 sm:p-6">
+      {patientData?.name &&
+            <>
+              <p className="text-2xl font-bold ml-8">
+                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''}`}
+                {systemGenID && `- (System ID:  ${systemGenID || ''})`}
+              </p>
+            </>
+          }
         <div className="container grid grid-cols-2 gap-10">
           <div>
             {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
-            {patientData?.name && <>
-              <p className="text-3xl font-bold ml-8">
-                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''} - (System ID:  ${systemGenID || ''})`}
-              </p>
-
+            {patientData?.name &&
               <SearchTable
                 headers={tHeaders}
-                data={stats} />
-            </>}
+                data={stats} />}
           </div>
           <div>
           </div>

@@ -32,11 +32,9 @@ function daysBetweenTodayAndDate(inputDate) {
 
 export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
-  // const [actualDate, setActualDate] = useState('actual')
   const [weeks, setWeeks] = useState(null)
   const [months, setMonths] = useState(null)
   const [years, setYears] = useState(null)
-  // const [formValues, setFormValues] = useState(editClientDetails)
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
   const [actualAge, setActualAge] = useState(true)
@@ -192,7 +190,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     name="dateOfBirth"
                     label={
                       <div>
-                        <span className="font-bold">Date of birth</span>
+                        <span className="font-bold">Date of Birth</span>
                       </div>
                     }
                     rules={[

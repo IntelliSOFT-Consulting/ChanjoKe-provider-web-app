@@ -112,10 +112,10 @@ export default function SearchInterface(props) {
       onClose={handleDialogClose} />
 
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
-      <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
+      <div className="px-4 text-2xl font-semibold py-3 sm:px-6">
         {title}
       </div>
-      <div className="px-4 py-5 sm:p-6">
+      <div className="px-4">
         <div className="grid grid-cols-5 gap-4 mx-10">
           <div className="col-span-4">
             <TextInput
@@ -124,8 +124,7 @@ export default function SearchInterface(props) {
               inputId="searchInput"
               value={formData.searchInput}
               onInputChange={(value) => handleChange('searchInput', value)}
-              label="Enter Client Name/ID"
-              inputPlaceholder="Enter Client Name/ID"/>
+              inputPlaceholder="Search Client"/>
           </div>
           <div>
             <button
