@@ -34,7 +34,7 @@ const usePost = () => {
       return responseData
     } catch (err) {
       if (err.name === 'AbortError') {
-        console.log('Fetch aborted');
+        // console.log('Fetch aborted');
       } else {
         setLoader(false);
         setError(err.message);

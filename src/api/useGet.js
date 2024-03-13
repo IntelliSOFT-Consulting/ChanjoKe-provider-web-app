@@ -24,7 +24,7 @@ const useGet = (url) => {
         setError(null);
       } catch (err) {
         if (err.name === 'AbortError') {
-          console.log('Fetch aborted');
+          // console.log('Fetch aborted');
         } else {
           setError(err.message);
         }

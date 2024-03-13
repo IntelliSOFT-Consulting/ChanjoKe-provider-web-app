@@ -5,7 +5,7 @@ import RequiredValidator from '../../utils/requiredValidator'
 import { useEffect, useState } from "react"
 import useGet from "../../api/useGet"
 import { deconstructLocationData } from "./DataWrapper"
-import { AutoComplete, Input, Form } from 'antd'
+import ComboInput from "../../common/forms/ComboInput"
 
 export default function AdministrativeArea({ adminArea, setAdministrativeAreaDetails, handleBack, handleNext }) {
 
@@ -29,28 +29,17 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
     estateOrHouseNo: '',
   }, formRules)
 
-  const [locationURL, setLocationUrl] = useState({ name: 'Location?_count=50&_partof=0', level: 1})
-  const [form] = Form.useForm();
+  const [locationURL, setLocationUrl] = useState({ name: 'Location?partof=0&_sort=name&_count=50', level: 1})
 
   const { data, loading, error } = useGet(locationURL.name)
   const [counties, setCounties] = useState([])
   const [subCounties, setSubCounties] = useState([])
   const [wards, setWards] = useState([])
-  const [autoCompleteResult, setAutoCompleteResult] = useState([]);
-
-  const onWebsiteChange = (value) => {
-    if (!value) {
-      setAutoCompleteResult(counties);
-    } else {
-      const newCounties = counties.filter(location =>
-        location.label.toLowerCase().includes(value)
-      );
-      setCounties(newCounties)
-    }
-  };
 
   useEffect(() => {
     setAdministrativeAreaDetails(formData)
+
+    console.log({ adminArea, formData })
 
     handleChange('residenceCounty', adminArea?.residenceCounty || '')
     handleChange('subCounty', adminArea?.subCounty || '')
@@ -61,11 +50,6 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
     if (locationURL.level === 1 && Array.isArray(data?.entry)) {
       const locationArray = data?.entry.map((item) => deconstructLocationData(item))
-      // console.log({ locationArray })
-      // const options = locationArray.map((location) => ({
-      //   label: location?.name,
-      //   value: location?.partOf?.reference || ''
-      // }))
       setCounties(locationArray)
       setSubCounties([])
       setWards([])
@@ -81,13 +65,13 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
       const locationArray = data?.entry.map((item) => deconstructLocationData(item))
       setWards(locationArray)
     }
-  }, [locationURL, data])
 
-  const isFormValid = RequiredValidator(formData, formRules)
+    console.log({ g: adminArea, form: formData })
+  }, [locationURL, data])
 
   const switchLocationURL = (level, value) => {
     if (value) {
-      setLocationUrl({ name: `Location?partof=Location/${value.id}&_count=50`, level: level + 1 })
+      setLocationUrl({ name: `Location?partof=Location/${value.id}&_count=50&_sort=name`, level: level + 1 })
     }
   }
 
@@ -96,34 +80,19 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
       <h3 className="text-xl font-medium">Administrative Area</h3>
 
       <div className="grid mt-5 grid-cols-3 gap-10">
-        {/* Column   */}
+
         <div>
-          {/* <Form
-            form={form}>
 
-          <Form.Item
-            name="residenceCounty"
+          <ComboInput
             label="County of Residence"
-            rules={[{ required: true, message: 'Please input county!' }]}>
-
-            <AutoComplete options={counties} onChange={onWebsiteChange} placeholder="County of Residence">
-              <Input />
-            </AutoComplete>
-          </Form.Item>
-          </Form> */}
-
-          <SelectMenu
-            required={true}
-            label="County of Residence"
-            value={formData.residenceCounty || 'County of Residence'}
-            error={formErrors.residenceCounty}
-            onInputChange={(value) => {
+            setSelected={(value) => {
               handleChange('residenceCounty', value.name)
               handleChange('subCounty', '')
               handleChange('ward', '')
               switchLocationURL(1, value)
             }}
-            data={counties}/>
+            val={formData?.residenceCounty}
+            people={counties}/>
 
           <TextInput
             inputType="text"
@@ -134,21 +103,18 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             label="Town/Trading center"
             inputPlaceholder="eg Elgeyo Marakwet Market"/>
         </div>
-
-        {/* Column   */}
+    
         <div>
 
-          <SelectMenu
-            required={true}
+          <ComboInput
             label="Subcounty"
-            value={formData.subCounty || 'Subcounty'}
-            error={formErrors.residenceCounty}
-            onInputChange={(value) => {
+            setSelected={(value) => {
               handleChange('subCounty', value.name)
               handleChange('ward', '')
               switchLocationURL(2, value)
             }}
-            data={subCounties}/>
+            val={formData?.subCounty}
+            people={subCounties}/>
 
           <TextInput
             inputType="text"
@@ -160,19 +126,16 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             inputPlaceholder="eg Jamii House, House Number 14"/>
         </div>
 
-        {/* Column   */}
         <div>
 
-          <SelectMenu
-            required={true}
-            error={formErrors.ward}
-            label="Ward"
-            value={formData.ward || 'Ward'}
-            onInputChange={(value) => {
+          <ComboInput
+            label="Subcounty"
+            setSelected={(value) => {
               handleChange('ward', value.name)
-              switchLocationURL(3)
+              switchLocationURL(3, null)
             }}
-            data={wards}/>
+            val={formData?.ward}
+            people={wards}/>
 
         </div>
       </div>

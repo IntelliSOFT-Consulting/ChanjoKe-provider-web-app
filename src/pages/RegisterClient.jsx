@@ -3,7 +3,7 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useEffect, useState } from 'react'
-import { createObservationData, createPatientData } from '../components/RegisterClient/DataWrapper'
+import { createObservationData, createPatientData, organizeData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import calculateAge from '../utils/calculateAge'
 import usePost from '../api/usePost'
@@ -46,9 +46,11 @@ export default function RegisterClient({ editClientID }) {
 
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
-      identificationType = userID?.[0]?.type?.coding?.[0]?.code
+      identificationType = userID?.[0]?.type?.coding?.[0]?.code || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
+
+    const ID = organizeData(data?.identifier).BIRTH_CERTIFICATE || organizeData(data?.identifier).NATIONAL_ID || organizeData(data?.identifier).NEMIS_NUMBER || organizeData(data?.identifier).PASSPORT
 
     setClientDetails({
       firstName: data?.name?.[0]?.family || '',
@@ -58,8 +60,8 @@ export default function RegisterClient({ editClientID }) {
       age: calculateAge(data?.birthDate),
       gender: data?.gender,
       currentWeight: currentweight,
-      identificationNumber: identificationNumber,
-      identificationType: identificationType,
+      identificationNumber,
+      identificationType,
     })
 
     const caregivers = data?.contact.map((caregiver) => {
