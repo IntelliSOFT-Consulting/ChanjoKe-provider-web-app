@@ -1,17 +1,19 @@
 import { Link } from 'react-router-dom'
 import ChanjoKE from '../assets/chanjoke-img.png'
 import MOHLogo from '../assets/moh-logo.png'
-// import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Form, Input } from 'antd'
 import usePost from '../api/usePost'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 export default function Login() {
 
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const onFinish = (values) => {
     console.log('Success:', values);
+    localStorage.setItem('token', JSON.stringify(values))
+    navigate('/')
   }
 
   const onFinishFailed = (errorInfo) => {
