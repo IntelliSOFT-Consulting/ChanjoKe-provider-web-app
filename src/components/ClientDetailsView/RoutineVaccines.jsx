@@ -16,7 +16,6 @@ import { setAEFIVaccines } from '../../redux/actions/vaccineActions'
 import { useDispatch } from 'react-redux'
 
 export default function RoutineVaccines({ userCategory, userID, patientData }) {
-  // const [rVaccines, setrVaccines] = useState([])
   const [mappedVaccines, setMappedVaccines] = useState([])
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -87,7 +86,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
         doseNumber: vaccine?.resource?.doseQuantity?.value,
       }
     })
-              console.log('vaccData', vaccData)
+
     if (Array.isArray(vaccData) && vaccData) {
       const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
 
@@ -108,7 +107,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
           categoriesMap[category] = []
         }
 
-        rest.actions = [{ title: 'view', url: '#' }]
+        rest.actions = [{ title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }]
 
         categoriesMap[category].push(rest)
       })
@@ -245,8 +244,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
       render: (text, record) => (
         <Button
           onClick={() => {
-            setDialogOpen(true)
-            setSharedData(record)
+            navigate('/view-vaccination/fdkljadlfjkfdl')
           }}
           type="link"
           className="font-bold text=[#173C94]"
@@ -291,14 +289,14 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
               key={category.category}
               className="mt-10 space-y-6 divide-y divide-gray-900/10"
             >
-              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-12 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-6 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
                 <Disclosure
                   as="div"
                   key={category.category}
                   defaultOpen={
                     category.category === userCategory ? true : false
                   }
-                  className="pt-6"
+                  className="pt-2"
                 >
                   {({ open }) => {
                     const administered = category.vaccines.filter(

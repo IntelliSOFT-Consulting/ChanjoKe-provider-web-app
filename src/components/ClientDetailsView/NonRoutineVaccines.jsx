@@ -1,21 +1,12 @@
-import { Link } from 'react-router-dom'
-import SearchTable from '../../common/tables/SearchTable'
 import { nonRoutineVaccines } from './vaccineData'
 import { useState } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
+import Table from '../DataTable'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import { useSharedState } from '../../shared/sharedState'
-
-const tHeaders = [
-  {title: '', class: '', key: 'checkbox' },
-  {title: 'Vaccine Name', class: '', key: 'vaccineName'},
-  {title: 'Dose Number', class: '', key: 'doseNumber'},
-  {title: 'Due to Administer', class: '', key: 'dueToAdminister'},
-  {title: 'Date Administered', class: '', key: 'dateAdministered'},
-  {title: 'Status', class: '', key: 'status'},
-  {title: 'Actions', class: '', key: 'actions'},
-]
+import { Badge, Button, Checkbox, Tag } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
 export default function NonRoutineVaccines({ userCategory }) {
 
@@ -37,7 +28,7 @@ export default function NonRoutineVaccines({ userCategory }) {
       }
 
       rest.actions = [
-        { title: 'view', url: '#' }
+        { title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }
       ]
 
       categoriesMap[category].push(rest);
@@ -67,6 +58,8 @@ export default function NonRoutineVaccines({ userCategory }) {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const { setSharedData } = useSharedState()
 
+  const navigate = useNavigate()
+
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
@@ -75,6 +68,94 @@ export default function NonRoutineVaccines({ userCategory }) {
     { btnText: 'Administer Vaccine', url: '/administer-vaccine', bgClass: 'bg-[#4E8D6E] text-white', textClass: 'text-center' },
     { btnText: 'Contraindications', url: '/add-contraindication', bgClass: 'bg-[#5370B0] text-white', textClass: 'text-center' },
     { btnText: 'Not Administered', url: '/not-administered', bgClass: 'outline outline-[#5370B0] text-[#5370B0]', textClass: 'text-center' }
+  ]
+
+  const columns = [
+    {
+      title: '',
+      dataIndex: 'vaccineName',
+      key: 'vaccineName',
+      render: (text, record) => {
+        const completed = record.status === 'completed'
+        return (
+          <Checkbox
+            name={record.vaccineName}
+            value={record.vaccineName}
+            defaultChecked={completed}
+            disabled={
+              completed || ''
+              // lockVaccine(record?.adminRange?.start, patientData.birthDate)
+            }
+            onChange={() => handleCheckBox('administer', record)}
+          />
+        )
+      },
+      width: '5%',
+    },
+    {
+      title: 'Vaccine',
+      dataIndex: 'vaccineName',
+      key: 'vaccineName',
+    },
+    {
+      title: 'Dose Number',
+      dataIndex: 'doseNumber',
+      key: 'doseNumber',
+    },
+    {
+      title: 'Due Date',
+      dataIndex: 'dueDate',
+      key: 'dueDate',
+      // render: (text, _record) => {
+      //   const dependentVaccine = allVaccines?.find(
+      //     (vaccine) =>
+      //       _record?.dependentVaccine ===
+      //       vaccine?.vaccineCode?.coding?.[0]?.code
+      //   )
+      //   return text(patientData?.birthDate, dependentVaccine)
+      // },
+    },
+    {
+      title: 'Date Administered',
+      dataIndex: 'occurrenceDateTime',
+      key: 'occurrenceDateTime',
+      // render: (text) => {
+      //   return text ? moment(text).format('DD-MM-YYYY') : '-'
+      // },
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      // render: (text, record) => {
+      //   const missed = datePassed(
+      //     text,
+      //     patientData?.birthDate,
+      //     record?.adminRange?.end
+      //   )
+      //   return (
+      //     <Tag color={text === 'completed' ? 'green' : missed ? 'red' : 'gray'}>
+      //       {missed ? 'Missed' : text === 'completed' ? 'Administered' : text}
+      //     </Tag>
+      //   )
+      // },
+    },
+    {
+      title: 'Actions',
+      dataIndex: 'actions',
+      key: 'actions',
+      render: (text, record) => (
+        <Button
+          onClick={() => {
+            navigate('/view-vaccination/fdkljadlfjkfdl')
+          }}
+          type="link"
+          className="font-bold text=[#173C94]"
+        >
+          View
+        </Button>
+      ),
+    },
   ]
 
   return (
@@ -106,41 +187,101 @@ export default function NonRoutineVaccines({ userCategory }) {
       {mappedVaccines.map((category => (
         <dl key={category.category} className="mt-5 space-y-6 divide-y divide-gray-900/10">
           <div className="overflow-hidden rounded-lg bg-gray-100 pb-6 pt-5 mt-5 shadow sm:px-6">
-            <Disclosure as="div" key='key' className="pt-2">
-              {({ open }) => (
-                <>
-                  <dt>
-                    <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
-                      <div className="flex w-full justify-between">
-                        <span>
-                          <span className='flex'>{formatCardTitle(category.category)}
+          <Disclosure
+                  as="div"
+                  key={category.category}
+                  defaultOpen={
+                    category.category === userCategory ? true : false
+                  }
+                  className="pt-2"
+                >
+                  {({ open }) => {
+                    const administered = category.vaccines.filter(
+                      (vaccine) => vaccine.status === 'completed'
+                    )
+                    const someAdministered =
+                      category.vaccines.filter(
+                        (vaccine) => vaccine.status !== 'complete'
+                      )?.length > 0 && administered.length > 0
+                    const allAdministered =
+                      category.vaccines.filter(
+                        (vaccine) => vaccine.status === 'completed'
+                      )?.length === category.vaccines.length
+                    const allNotAdministered =
+                      category.vaccines.filter(
+                        (vaccine) =>
+                          vaccine.status !== 'completed' && ''
+                          // !lockVaccine(
+                          //   vaccine?.adminRange?.start,
+                          //   patientData.birthDate
+                          // )
+                      )?.length === category.vaccines.length
 
-                            <svg className="h-3 w-3 fill-yellow-500 ml-3 mt-1" viewBox="0 0 6 6" aria-hidden="true">
-                              <circle cx={3} cy={3} r={3} />
-                            </svg>
-                          </span>
-                        </span>
-                        <span>
-                        {open ? (
-                          <Link to="/aefi-report" className="text-[#163C94]">
-                              AEFIs
-                          </Link>
-                        ) : (
-                          <PlusSmallIcon className="h-6 w-6" aria-hidden="true" />
-                        )}
-                        </span>
-                      </div>
-                    </Disclosure.Button>
-                  </dt>
-                  <Disclosure.Panel as="dd" className="pr-12" open={category.category === userCategory}>
-                    <SearchTable
-                      headers={tHeaders}
-                      data={category.vaccines}
-                      onCheckbox={(value, item) => handleCheckBox(value, item)}/>
-                  </Disclosure.Panel>
-                </>
-              )}
-            </Disclosure>
+                    return (
+                      <>
+                        <dt>
+                          <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                            <div className="flex w-full justify-between px-10">
+                              <span>
+                                <span className="flex items-center">
+                                  {formatCardTitle(category.category)}
+                                  {/*Colour coding - dark grey (not administered), Green (administered), amber (some vaccines not administered), red (missed)*/}
+                                  <Badge
+                                    className="ml-2 vaccination-status"
+                                    size="large"
+                                    color={
+                                      allAdministered
+                                        ? 'green'
+                                        : someAdministered
+                                          ? '#faad14'
+                                          : allNotAdministered
+                                            ? 'red'
+                                            : 'gray'
+                                    }
+                                  />
+                                </span>
+                              </span>
+                              <span>
+                                {open ? (
+                                  <Button
+                                    to="/aefi-report"
+                                    className="text-[#163C94]"
+                                    disabled={allNotAdministered}
+                                    onClick={() => {
+                                      // dispatch(setAEFIVaccines(administered))
+                                      // navigate('/aefi-report')
+                                    }}
+                                    type="link"
+                                  >
+                                    AEFIs
+                                  </Button>
+                                ) : (
+                                  <PlusSmallIcon
+                                    className="h-6 w-6"
+                                    aria-hidden="true"
+                                  />
+                                )}
+                              </span>
+                            </div>
+                          </Disclosure.Button>
+                        </dt>
+                        <Disclosure.Panel
+                          as="dd"
+                          className="mt-2 pr-12 overflow-x-auto"
+                          open={category.category === userCategory}
+                        >
+                          <Table
+                            columns={columns}
+                            dataSource={category.vaccines}
+                            // data={category.vaccines}
+                            pagination={false}
+                            size="small"
+                          />
+                        </Disclosure.Panel>
+                      </>
+                    )
+                  }}
+                </Disclosure>
           </div>
         </dl>
       )))}

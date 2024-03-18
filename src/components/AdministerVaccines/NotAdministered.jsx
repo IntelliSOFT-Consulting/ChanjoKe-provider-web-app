@@ -2,13 +2,28 @@ import TextInput from "../../common/forms/TextInput"
 import SelectMenu from "../../common/forms/SelectMenu"
 import ConfirmDialog from "../../common/dialog/ConfirmDialog"
 import FormState from "../../utils/formState"
-import { useState } from "react"
+import { useSharedState } from "../../shared/sharedState"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 export default function NotAdministered() {
   const navigate = useNavigate()
+  const { sharedData } = useSharedState()
 
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [vaccines, setVaccines] = useState([])
+  const [selectedVaccine, setSelectedVaccine] = useState(null)
+  const [vaccinesToNotAdminister, setVaccinesToNotAdminister] = useState([])
+
+  useEffect(() => {
+    const vaccinesToSelect = sharedData.map((item) => ({
+      name: item.vaccineName,
+      value: item.vaccineCode,
+    }))
+
+    setVaccines(vaccinesToSelect)
+    console.log({ sharedData })
+  }, [sharedData])
 
   const { formData, formErrors, handleChange } = FormState({
     vaccinesToContraindicate: '',
@@ -16,6 +31,27 @@ export default function NotAdministered() {
     contraindicationDetails: '',
     nextVaccinationDate: '',
   }, {})
+
+  // const reasons = {
+  //   name: 'Product out of stock', value: '',
+  //   name: 'Contraindication', value: '',
+  //   name: 'Cold chain break', value: '',
+  //   name: 'Client objection', value: '',
+  //   name: 'Caregiver refusal', value: '',
+  //   name: 'Expired product', value: '',
+  //   name: 'Client acquired the disease', value: '',
+  // }
+
+  const fhirReasons = [
+    { name: 'Immunity', value: 'IMMUNE' },
+    { name: 'Medical precaution', value: 'MEDPREC' },
+    { name: 'Product out of stock', value: 'OSTOCK' },
+    { name: 'Patient objection', value: 'PATOBJ' },
+    { name: 'Philosophical objection', value: 'PHILISOP' },
+    { name: 'Religious objection', value: 'RELIG' },
+    { name: 'Vaccine efficacy concerns', value: 'VACEFF' },
+    { name: 'Vaccine safety concerns', value: 'VACSAF' },
+  ]
 
   function handleDialogClose() {
     navigate(-1)
@@ -39,12 +75,14 @@ export default function NotAdministered() {
             <div>
 
               <SelectMenu
-                data={[{ name: '778377443'}, { name: '78788888'}]}
+                data={vaccines}
                 error={formErrors.identificationType}
                 required={true}
                 label="Vaccines not administered"
-                value={formData.vaccinesToContraindicate || 'Vaccines not administered'}
-                onInputChange={(value) => handleChange('vaccinesToContraindicate', value.name)}/>
+                value={selectedVaccine || 'Vaccines not administered'}
+                onInputChange={(value) => {
+                  setSelectedVaccine(value.name)
+                }}/>
 
               <div className="py-4 flex justify-end">
                 <button
@@ -58,7 +96,7 @@ export default function NotAdministered() {
 
             <div>
               <SelectMenu
-                data={[{ name: 'Reason 1'}, { name: 'Reason 2'}]}
+                data={fhirReasons}
                 error={formErrors.identificationType}
                 required={true}
                 label="Reasons for not vaccinated"
