@@ -1,14 +1,50 @@
 import { nonRoutineVaccines } from './vaccineData'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import Table from '../DataTable'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import { useSharedState } from '../../shared/sharedState'
 import { Badge, Button, Checkbox, Tag } from 'antd'
+import moment from 'moment'
+import { useApiRequest } from '../../api/useApiRequest'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { datePassed, lockVaccine } from '../../utils/validate'
 
-export default function NonRoutineVaccines({ userCategory }) {
+export default function NonRoutineVaccines({ userCategory, userID, patientData}) {
+
+  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(nonRoutineVaccines));
+  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const { setSharedData } = useSharedState()
+  const { get } = useApiRequest()
+  const navigate = useNavigate()
+
+  const dispatch = useDispatch()
+
+  function mergeVaccines(localVaccines, apiVaccines) {
+    if (Array.isArray(apiVaccines) && apiVaccines.length) {
+      const updatedVaccines = localVaccines.map((localVaccine) => {
+        const matchingApiVaccine = apiVaccines.find(
+          (apiVaccine) =>
+            apiVaccine?.resource?.vaccineCode?.text ===
+            localVaccine?.vaccineName
+        )
+
+        return matchingApiVaccine
+          ? { ...localVaccine, ...matchingApiVaccine.resource }
+          : localVaccine
+      })
+
+      return updatedVaccines
+    } else {
+      return localVaccines
+    }
+  }
 
   function formatCardTitle(input) {
     return input
@@ -17,58 +53,118 @@ export default function NonRoutineVaccines({ userCategory }) {
       .join(' ');
   }
 
-  function mapVaccinesByCategory(vaccines) {
-    const categoriesMap = {};
+  useEffect(() => {
+    const fetchPatientImmunization = async () => {
+      const response = await get(`Immunization?patient=Patient/${patientData?.id}`);
+      setData(response);
+      setLoading(false)
+    }
+  
+    if (patientData?.id) {
+      fetchPatientImmunization();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientData]);
 
-    nonRoutineVaccines.forEach(vaccine => {
-      const { category, ...rest } = vaccine;
-
-      if (!categoriesMap[category]) {
-        categoriesMap[category] = [];
+  useEffect(() => {
+    const vaccData = data?.entry?.map((vaccine) => {
+      return {
+        vaccineName: vaccine?.resource?.vaccineCode?.text,
+        vaccineCode: vaccine?.resource?.vaccineCode?.coding?.[0]?.code,
+        diseaseTarget:
+          vaccine?.resource?.protocolApplied?.[0]?.targetDisease?.[0]?.text,
+        status:
+          vaccine?.resource?.status === 'completed'
+            ? 'Administered'
+            : 'Not Administered',
+        dateAdministered: moment(vaccine?.resource?.occurenceDateTime).format(
+          'DD-MM-YYYY'
+        ),
+        dueDate: '-',
+        doseNumber: vaccine?.resource?.doseQuantity?.value,
       }
+    })
 
-      rest.actions = [
-        { title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }
-      ]
+    if (Array.isArray(vaccData) && vaccData) {
+      const mergedVax = mergeVaccines(nonRoutineVaccines, data?.entry || [])
 
-      categoriesMap[category].push(rest);
-    });
+      setMappedVaccines(mapVaccinesByCategory(mergedVax))
+    }  else {
+      setMappedVaccines(mapVaccinesByCategory(nonRoutineVaccines))
+    }
+  }, [data?.entry])
 
-    const categoriesArray = Object.entries(categoriesMap).map(([category, vaccines]) => ({
-      category,
-      vaccines,
-    }));
+  function mapVaccinesByCategory(vaccines) {
+    const categoriesMap = {}
 
-    return categoriesArray;
+    if (Array.isArray(vaccines) && vaccines.length > 0) {
+      vaccines.forEach((vaccine) => {
+        const { category, ...rest } = vaccine
+
+        if (!categoriesMap[category]) {
+          categoriesMap[category] = []
+        }
+
+        rest.actions = [{ title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }]
+
+        categoriesMap[category].push(rest)
+      })
+
+      const categoriesArray = Object.entries(categoriesMap).map(
+        ([category, vaccines]) => ({
+          category,
+          status: 'pending',
+          vaccines,
+        })
+      )
+
+      return categoriesArray
+    }
   }
 
   function handleCheckBox(onActionBtn, item) {
-    const vaccineExists = vaccinesToAdminister.find((vaccine) => vaccine.vaccineName === item.vaccineName)
+    const vaccineExists = vaccinesToAdminister.find(
+      (vaccine) => vaccine.vaccineName === item.vaccineName
+    )
     if (vaccineExists === undefined) {
       setVaccinesToAdminister([...vaccinesToAdminister, item])
     }
     if (vaccineExists) {
-      const withoutDeletedVaccine = vaccinesToAdminister.filter((vaccine) => vaccine.vaccineName !== item.vaccineName)
+      const withoutDeletedVaccine = vaccinesToAdminister.filter(
+        (vaccine) => vaccine.vaccineName !== item.vaccineName
+      )
       setVaccinesToAdminister(withoutDeletedVaccine)
     }
   }
-
-  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(nonRoutineVaccines));
-  const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
-  const [isDialogOpen, setDialogOpen] = useState(false)
-  const { setSharedData } = useSharedState()
-
-  const navigate = useNavigate()
 
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
 
   const administerVaccineBtns = [
-    { btnText: 'Administer Vaccine', url: '/administer-vaccine', bgClass: 'bg-[#4E8D6E] text-white', textClass: 'text-center' },
-    { btnText: 'Contraindications', url: '/add-contraindication', bgClass: 'bg-[#5370B0] text-white', textClass: 'text-center' },
-    { btnText: 'Not Administered', url: '/not-administered', bgClass: 'outline outline-[#5370B0] text-[#5370B0]', textClass: 'text-center' }
+    {
+      btnText: 'Administer Vaccine',
+      url: '/administer-vaccine',
+      bgClass: 'bg-[#4E8D6E] text-white',
+      textClass: 'text-center',
+    },
+    {
+      btnText: 'Contraindications',
+      url: '/add-contraindication',
+      bgClass: 'bg-[#5370B0] text-white',
+      textClass: 'text-center',
+    },
+    {
+      btnText: 'Not Administered',
+      url: '/not-administered',
+      bgClass: 'outline outline-[#5370B0] text-[#5370B0]',
+      textClass: 'text-center',
+    },
   ]
+
+  const allVaccines = mappedVaccines
+    ?.map((category) => category.vaccines)
+    ?.flat(Infinity)
 
   const columns = [
     {
@@ -77,14 +173,15 @@ export default function NonRoutineVaccines({ userCategory }) {
       key: 'vaccineName',
       render: (text, record) => {
         const completed = record.status === 'completed'
+        const notDone = record.status === 'not-done'
         return (
           <Checkbox
             name={record.vaccineName}
             value={record.vaccineName}
             defaultChecked={completed}
             disabled={
-              completed || ''
-              // lockVaccine(record?.adminRange?.start, patientData.birthDate)
+              completed || notDone ||
+              lockVaccine(6574.5, patientData.birthDate)
             }
             onChange={() => handleCheckBox('administer', record)}
           />
@@ -106,39 +203,39 @@ export default function NonRoutineVaccines({ userCategory }) {
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      // render: (text, _record) => {
-      //   const dependentVaccine = allVaccines?.find(
-      //     (vaccine) =>
-      //       _record?.dependentVaccine ===
-      //       vaccine?.vaccineCode?.coding?.[0]?.code
-      //   )
-      //   return text(patientData?.birthDate, dependentVaccine)
-      // },
+      render: (text, _record) => {
+        const dependentVaccine = allVaccines?.find(
+          (vaccine) =>
+            _record?.dependentVaccine ===
+            vaccine?.vaccineCode?.coding?.[0]?.code
+        )
+        return `${moment(patientData?.birthDate).format('Do MMM YYYY')}`
+      },
     },
     {
       title: 'Date Administered',
       dataIndex: 'occurrenceDateTime',
       key: 'occurrenceDateTime',
-      // render: (text) => {
-      //   return text ? moment(text).format('DD-MM-YYYY') : '-'
-      // },
+      render: (text) => {
+        return text ? moment(text).format('Do MMM YYYY') : '-'
+      },
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      // render: (text, record) => {
-      //   const missed = datePassed(
-      //     text,
-      //     patientData?.birthDate,
-      //     record?.adminRange?.end
-      //   )
-      //   return (
-      //     <Tag color={text === 'completed' ? 'green' : missed ? 'red' : 'gray'}>
-      //       {missed ? 'Missed' : text === 'completed' ? 'Administered' : text}
-      //     </Tag>
-      //   )
-      // },
+      render: (text, record) => {
+        const missed = datePassed(
+          text,
+          patientData?.birthDate,
+          record?.adminRange?.end
+        )
+        return (
+          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : 'gray'}>
+            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text }
+          </Tag>
+        )
+      },
     },
     {
       title: 'Actions',
@@ -201,7 +298,7 @@ export default function NonRoutineVaccines({ userCategory }) {
                     )
                     const someAdministered =
                       category.vaccines.filter(
-                        (vaccine) => vaccine.status !== 'complete'
+                        (vaccine) => vaccine.status !== 'complete' || vaccine.status === 'not-done'
                       )?.length > 0 && administered.length > 0
                     const allAdministered =
                       category.vaccines.filter(
@@ -273,7 +370,6 @@ export default function NonRoutineVaccines({ userCategory }) {
                           <Table
                             columns={columns}
                             dataSource={category.vaccines}
-                            // data={category.vaccines}
                             pagination={false}
                             size="small"
                           />

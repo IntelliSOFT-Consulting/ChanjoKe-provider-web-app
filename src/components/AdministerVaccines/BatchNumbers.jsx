@@ -38,7 +38,7 @@ export default function BatchNumbers() {
     }
   }, [sharedData])
 
-  const handleFormSubmit = async (values) => {
+  const handleFormSubmit = async () => {
     if (Array.isArray(sharedData) && sharedData.length > 0) {
       const data = sharedData.map((immunization) => {
         return createVaccineImmunization(

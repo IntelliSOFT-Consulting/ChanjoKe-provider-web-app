@@ -8,21 +8,20 @@ import { useSharedState } from '../../shared/sharedState'
 import moment from 'moment'
 import { useApiRequest } from '../../api/useApiRequest'
 import Loader from '../../common/spinners/LoadingArrows'
-import usePost from '../../api/usePost'
 import Table from '../DataTable'
 import { Badge, Button, Checkbox, Tag } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import { setAEFIVaccines } from '../../redux/actions/vaccineActions'
 import { useDispatch } from 'react-redux'
 
-export default function RoutineVaccines({ userCategory, userID, patientData }) {
+export default function RoutineVaccines({ userCategory, patientData }) {
   const [mappedVaccines, setMappedVaccines] = useState([])
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const { setSharedData, sharedData } = useSharedState()
+  const { setSharedData } = useSharedState()
   const { get } = useApiRequest()
   const navigate = useNavigate()
 
@@ -54,19 +53,19 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
   }
-
-  const fetchPatientImmunization = async () => {
-    setLoading(true)
-    const response = await get(`Immunization?patient=Patient/${userID}`)
-    setData(response)
-    setLoading(false)
-  }
-
+ 
   useEffect(() => {
-    fetchPatientImmunization()
-  }, [userID])
-
-  const { SubmitForm } = usePost('Immunization')
+    const fetchPatientImmunization = async () => {
+      const response = await get(`Immunization?patient=Patient/${patientData?.id}`);
+      setData(response);
+      setLoading(false)
+    }
+  
+    if (patientData?.id) {
+      fetchPatientImmunization();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientData]); 
 
   useEffect(() => {
     const vaccData = data?.entry?.map((vaccine) => {
@@ -94,7 +93,7 @@ export default function RoutineVaccines({ userCategory, userID, patientData }) {
     }  else {
       setMappedVaccines(mapVaccinesByCategory(routineVaccines))
     }
-  }, [data?.entry, userID])
+  }, [data?.entry])
 
   function mapVaccinesByCategory(vaccines) {
     const categoriesMap = {}

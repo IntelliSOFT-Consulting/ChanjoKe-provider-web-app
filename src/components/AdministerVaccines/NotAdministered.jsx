@@ -4,7 +4,10 @@ import ConfirmDialog from "../../common/dialog/ConfirmDialog"
 import FormState from "../../utils/formState"
 import { useSharedState } from "../../shared/sharedState"
 import { useEffect, useState } from "react"
+import { useSelector } from 'react-redux'
+import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
 import { useNavigate } from "react-router-dom"
+import { useApiRequest } from "../../api/useApiRequest"
 
 export default function NotAdministered() {
   const navigate = useNavigate()
@@ -25,22 +28,15 @@ export default function NotAdministered() {
     console.log({ sharedData })
   }, [sharedData])
 
+  const currentPatient = useSelector((state) => state.currentPatient)
+  const { post } = useApiRequest()
+
   const { formData, formErrors, handleChange } = FormState({
     vaccinesToContraindicate: '',
     batchNumbers: [],
     contraindicationDetails: '',
     nextVaccinationDate: '',
   }, {})
-
-  // const reasons = {
-  //   name: 'Product out of stock', value: '',
-  //   name: 'Contraindication', value: '',
-  //   name: 'Cold chain break', value: '',
-  //   name: 'Client objection', value: '',
-  //   name: 'Caregiver refusal', value: '',
-  //   name: 'Expired product', value: '',
-  //   name: 'Client acquired the disease', value: '',
-  // }
 
   const fhirReasons = [
     { name: 'Immunity', value: 'IMMUNE' },
@@ -56,6 +52,33 @@ export default function NotAdministered() {
   function handleDialogClose() {
     navigate(-1)
     setDialogOpen(false)
+  }
+
+  const handleFormSubmit = async () => {
+    if (Array.isArray(sharedData) && sharedData.length > 0) {
+      const data = sharedData.map((immunization) => {
+        return createVaccineImmunization(
+          immunization,
+          currentPatient.id,
+          'not-done'
+        )
+      })
+
+      const responses = await Promise.all(
+        data?.map(async (administerVaccine) => {
+          return await post('Immunization', administerVaccine)
+        })
+      )
+
+      if (responses) {
+        setDialogOpen(true)
+        const time = setTimeout(() => {
+          setDialogOpen(false)
+          navigate(-1)
+        }, 2000)
+        return () => clearTimeout(time)
+      }
+    }
   }
 
   return (
@@ -121,7 +144,10 @@ export default function NotAdministered() {
             Cancel
           </button>
           <button
-            onClick={() => setDialogOpen(true)}
+            onClick={() => {
+              setDialogOpen(true)
+              handleFormSubmit()
+            }}
             className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Submit
           </button>
