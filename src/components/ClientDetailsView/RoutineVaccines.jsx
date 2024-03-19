@@ -173,13 +173,14 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       key: 'vaccineName',
       render: (text, record) => {
         const completed = record.status === 'completed'
+        const notDone = record.status === 'not-done'
         return (
           <Checkbox
             name={record.vaccineName}
             value={record.vaccineName}
             defaultChecked={completed}
             disabled={
-              completed ||
+              completed || notDone ||
               lockVaccine(record?.adminRange?.start, patientData.birthDate)
             }
             onChange={() => handleCheckBox('administer', record)}
@@ -230,8 +231,8 @@ export default function RoutineVaccines({ userCategory, patientData }) {
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : missed ? 'red' : 'gray'}>
-            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text}
+          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : 'gray'}>
+            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text }
           </Tag>
         )
       },
@@ -303,7 +304,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                     )
                     const someAdministered =
                       category.vaccines.filter(
-                        (vaccine) => vaccine.status !== 'complete'
+                        (vaccine) => vaccine.status !== 'complete' || vaccine.status === 'not-done'
                       )?.length > 0 && administered.length > 0
                     const allAdministered =
                       category.vaccines.filter(
