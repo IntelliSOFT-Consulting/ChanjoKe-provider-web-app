@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import routes from './routes/index'
+import IsMobileView from './components/isMobileView'
 import { RouterProvider } from 'react-router-dom'
 import reportWebVitals from './reportWebVitals'
 import { ConfigProvider } from 'antd'
@@ -19,44 +20,68 @@ const defaultData = {
   },
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <ConfigProvider
-        theme={{
-          token: {
-            colorPrimary: defaultData.colorPrimary,
-            borderRadius: defaultData.borderRadius,
-          },
-          components: {
-            Button: {
-              colorPrimary: defaultData.Button?.colorPrimary,
-              algorithm: defaultData.Button?.algorithm,
+const App = () => {
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1012px)');
+    const handleWidthChange = (e) => {
+      setIsMobileOrTablet(e.matches);
+    };
+
+    handleWidthChange(mediaQuery);
+
+    mediaQuery.addListener(handleWidthChange);
+
+    return () => {
+      mediaQuery.removeListener(handleWidthChange);
+    };
+  }, []);
+
+  return (
+    <React.StrictMode>
+      <Provider store={store}>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: defaultData.colorPrimary,
+              borderRadius: defaultData.borderRadius,
             },
-            Input: {
-              colorPrimary: defaultData.Input?.colorPrimary,
-              algorithm: defaultData.Input?.algorithm,
+            components: {
+              Button: {
+                colorPrimary: defaultData.Button?.colorPrimary,
+                algorithm: defaultData.Button?.algorithm,
+              },
+              Input: {
+                colorPrimary: defaultData.Input?.colorPrimary,
+                algorithm: defaultData.Input?.algorithm,
+              },
+              Select: {
+                colorPrimary: defaultData.Select?.colorPrimary,
+                algorithm: defaultData.Select?.algorithm,
+              },
+              InputNumber: {
+                colorPrimary: defaultData.InputNumber?.colorPrimary,
+                algorithm: defaultData.InputNumber?.algorithm,
+              },
+              DatePicker: {
+                colorPrimary: defaultData.DatePicker?.colorPrimary,
+                algorithm: defaultData.DatePicker?.algorithm,
+              },
             },
-            Select: {
-              colorPrimary: defaultData.Select?.colorPrimary,
-              algorithm: defaultData.Select?.algorithm,
-            },
-            InputNumber: {
-              colorPrimary: defaultData.InputNumber?.colorPrimary,
-              algorithm: defaultData.InputNumber?.algorithm,
-            },
-            DatePicker: {
-              colorPrimary: defaultData.DatePicker?.colorPrimary,
-              algorithm: defaultData.DatePicker?.algorithm,
-            },
-          },
-        }}
-      >
-        <RouterProvider router={routes} />
-      </ConfigProvider>
-    </Provider>
-  </React.StrictMode>
-)
+          }}
+        >
+          {isMobileOrTablet &&
+            <IsMobileView />}
+          {!isMobileOrTablet &&
+            <RouterProvider router={routes} />}
+        </ConfigProvider>
+      </Provider>
+    </React.StrictMode>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
