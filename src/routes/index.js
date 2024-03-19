@@ -34,6 +34,8 @@ import UpdateClientHistory from '../components/UpdateClientHistory/updateClientH
 import BatchNumbers from '../components/AdministerVaccines/BatchNumbers'
 import Contraindications from '../components/AdministerVaccines/Contraindications'
 import NotAdministered from '../components/AdministerVaccines/NotAdministered'
+import VaccinationDetails from '../pages/VaccinationDetails'
+import ContraindicationDetails from '../pages/ContraindicationDetails'
 
 function SearchInterfaceWrapper() {
     const { searchType } = useParams()
@@ -93,6 +95,8 @@ const router = createBrowserRouter([
           { path: '/administer-vaccine', element: <ProtectedRoute element={<BatchNumbers />} />},
           { path: '/add-contraindication', element: <ProtectedRoute element={<Contraindications />} />},
           { path: '/not-administered', element: <ProtectedRoute element={<NotAdministered />} />},
+          { path: '/view-vaccination/:vaccinationID', element: <ProtectedRoute element={<VaccinationDetails />} /> },
+          { path: '/view-contraindication/:contraindicationID', element: <ProtectedRoute element={<ContraindicationDetails />} /> },
           { path: '/frequently-asked-questions', element: <ProtectedRoute element={<FAQs /> } />},
           { path: '/appointments', element: <ProtectedRoute element={<Appointments />} />}
         ]
