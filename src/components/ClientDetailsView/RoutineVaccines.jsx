@@ -174,6 +174,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       render: (text, record) => {
         const completed = record.status === 'completed'
         const notDone = record.status === 'not-done'
+        console.log({ record })
         return (
           <Checkbox
             name={record.vaccineName}
@@ -232,7 +233,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
         )
         return (
           <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : 'gray'}>
-            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text }
+            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': '' }
           </Tag>
         )
       },
@@ -243,8 +244,9 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       key: 'actions',
       render: (text, record) => (
         <Button
+          disabled={record?.id ? false : true}
           onClick={() => {
-            navigate('/view-vaccination/fdkljadlfjkfdl')
+            navigate(`/view-vaccination/${record?.id}`)
           }}
           type="link"
           className="font-bold text=[#173C94]"

@@ -231,8 +231,8 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : 'gray'}>
-            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text }
+          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
+            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': '' }
           </Tag>
         )
       },

@@ -1,5 +1,4 @@
 function convertUnderscoresAndCapitalize(inputString) {
-  console.log({ inputString })
   if (inputString) {
     const stringWithSpaces = inputString.replace(/_/g, ' ');
     const capitalizedString =

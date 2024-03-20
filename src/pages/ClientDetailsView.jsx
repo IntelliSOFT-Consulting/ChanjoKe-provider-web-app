@@ -22,10 +22,11 @@ export default function ClientDetailsView() {
   const dispatch = useDispatch()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
   const { data: immunizationData, loading: immunizationLoading, error: immunizationE } = useGet(`Immunization?patient=Patient/${clientID}`)
+  const { data: immunizationRecommendation } = useGet(`ImmunizationRecommendation?patient=Patient/${clientID}`)
 
   useEffect(() => {
     setPatientData(data)
-     dispatch(setCurrentPatient(data))
+    dispatch(setCurrentPatient(data))
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const systemGenerated = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED' ? id?.value : ''))
       setSystemGenID(systemGenerated?.[0]?.value)
@@ -36,7 +37,7 @@ export default function ClientDetailsView() {
       setClientCategory(category)
     }
 
-  }, [data, patientData, immunizationData])
+  }, [data, patientData, immunizationData, immunizationRecommendation])
   
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false);

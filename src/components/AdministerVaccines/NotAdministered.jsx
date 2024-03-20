@@ -41,12 +41,12 @@ export default function NotAdministered() {
   const fhirReasons = [
     { name: 'Immunity', value: 'IMMUNE' },
     { name: 'Medical precaution', value: 'MEDPREC' },
-    { name: 'Product out of stock', value: 'OSTOCK' },
-    { name: 'Patient objection', value: 'PATOBJ' },
-    { name: 'Philosophical objection', value: 'PHILISOP' },
+    //{ name: 'Product out of stock', value: 'OSTOCK' },
+    // { name: 'Patient objection', value: 'PATOBJ' },
+    { name: 'Caregiver refusal', value: 'PHILISOP' },
     { name: 'Religious objection', value: 'RELIG' },
-    { name: 'Vaccine efficacy concerns', value: 'VACEFF' },
-    { name: 'Vaccine safety concerns', value: 'VACSAF' },
+    { name: 'Cold Chain Break', value: 'VACEFF' },
+    { name: 'Expired Product', value: 'VACSAF' },
   ]
 
   function handleDialogClose() {

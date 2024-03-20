@@ -2,13 +2,21 @@ import TextInput from "../../common/forms/TextInput"
 import SelectMenu from "../../common/forms/SelectMenu"
 import TextArea from "../../common/forms/TextArea"
 import FormState from "../../utils/formState"
+import { useSharedState } from "../../shared/sharedState"
+import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
+import { useApiRequest } from "../../api/useApiRequest"
+import { useSelector } from 'react-redux'
 import ConfirmDialog from "../../common/dialog/ConfirmDialog"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Contraindications() {
   const navigate = useNavigate()
+  const [vaccines, setVaccines] = useState([])
+  const { sharedData } = useSharedState()
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const currentPatient = useSelector((state) => state.currentPatient)
+  const { post } = useApiRequest()
 
   const { formData, formErrors, handleChange } = FormState({
     vaccinesToContraindicate: '',
@@ -17,9 +25,45 @@ export default function Contraindications() {
     nextVaccinationDate: '',
   }, {})
 
+  useEffect(() => {
+    const vaccinesToSelect = sharedData.map((item) => ({
+      name: item.vaccineName,
+      value: item.vaccineCode,
+    }))
+
+    setVaccines(vaccinesToSelect)
+  }, [sharedData])
+
   function handleDialogClose() {
     navigate(-1)
     setDialogOpen(false)
+  }
+
+  const handleFormSubmit = async () => {
+    if (Array.isArray(sharedData) && sharedData.length > 0) {
+      const data = sharedData.map((immunization) => {
+        return createVaccineImmunization(
+          immunization,
+          currentPatient.id,
+          'entered-in-error'
+        )
+      })
+
+      const responses = await Promise.all(
+        data?.map(async (administerVaccine) => {
+          return await post('Immunization', administerVaccine)
+        })
+      )
+
+      if (responses) {
+        setDialogOpen(true)
+        const time = setTimeout(() => {
+          setDialogOpen(false)
+          navigate(-1)
+        }, 2000)
+        return () => clearTimeout(time)
+      }
+    }
   }
 
   return (
@@ -38,7 +82,7 @@ export default function Contraindications() {
             <div>
 
               <SelectMenu
-                data={[{ name: '778377443'}, { name: '78788888'}]}
+                data={vaccines}
                 error={formErrors.identificationType}
                 required={true}
                 label="Vaccines to Contraindicate"
@@ -85,7 +129,10 @@ export default function Contraindications() {
             Cancel
           </button>
           <button
-            onClick={() => setDialogOpen(true)}
+            onClick={() => {
+              setDialogOpen(true)
+              handleFormSubmit()
+            }}
             className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Next
           </button>

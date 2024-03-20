@@ -1,16 +1,20 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import BaseTable from '../common/tables/BaseTable'
 import Table from '../components/DataTable'
 import { Button } from 'antd'
 import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
 import { useEffect, useState } from 'react'
+import { useApiRequest } from '../api/useApiRequest'
 
 export default function VaccinationDetails() {
 
   const [doseInfo, setDoseInfo] = useState([])
   const [clientInfo, setClientInfo] = useState([])
+  const [vaccinationDetails, setVaccinationDetails] = useState(null)
+  const { get } = useApiRequest()
 
   const navigate = useNavigate()
+  const { vaccinationID } = useParams()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const doseInformation = {
@@ -63,10 +67,22 @@ export default function VaccinationDetails() {
     { symptomName: 'Migranes', occurenceDate: 'Jan 1 2020', actions: [{ title: 'view', url: '#'}]}
   ]
 
+  const fetchVaccinationDetails = async () => {
+    const response = await get(`Immunization/${vaccinationID}`)
+    setVaccinationDetails(response)
+    console.log({ response })
+  }
+
   useEffect(() => {
+  
+
     setDoseInfo(ConvertObjectToArray(doseInformation))
     setClientInfo(ConvertObjectToArray(clientInformation))
-  }, [clientInformation, doseInformation])
+    fetchVaccinationDetails()
+    
+  }, [])
+
+
 
   return (
     <>
