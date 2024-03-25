@@ -14,11 +14,11 @@ dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
 const identificationOptions = [
-  { name: 'Birth Notification Number', value: 'birth_notification_number', minAge: 0, maxAge: 1095 },
-  { name: 'Birth Certificate', value: 'birth_certificate', minAge: 0, maxAge: 36525 },
-  { name: 'ID Number', value: 'ID_number', minAge: 6575, maxAge: 36525 },
-  { name: 'NEMIS', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
-  { name: 'Passport', value: 'passport', minAge: 0, maxAge: 36525 }, 
+  { name: 'BIRTH NOTIFICATION NUMBER', value: 'birth_notification_number', minAge: 0, maxAge: 1095 },
+  { name: 'BIRTH CERTIFICATE', value: 'birth_certificate', minAge: 0, maxAge: 36525 },
+  { name: 'ID NUMBER', value: 'ID_number', minAge: 6575, maxAge: 36525 },
+  { name: 'NEMIS NUMBER', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
+  { name: 'PASSPORT', value: 'passport', minAge: 0, maxAge: 36525 }, 
 ]
 
 function daysBetweenTodayAndDate(inputDate) {
