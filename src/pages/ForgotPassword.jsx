@@ -1,9 +1,35 @@
-import { Link } from 'react-router-dom'
-import ChanjoKE from '../assets/chanjoke-img.png'
+import ChanjoKE from '../assets/login bg.png'
 import MOHLogo from '../assets/moh-logo.png'
-import TextInput from '../common/forms/TextInput'
+import { useNavigate } from 'react-router-dom'
+import { Form, Input } from 'antd'
+import { useState } from 'react'
+import { useApiRequest } from '../api/useApiRequest'
+import { UserOutlined, MailOutlined } from '@ant-design/icons';
+import LoadingIcon from '../common/icons/loadingIcon'
 
 export default function ForgotPassword() {
+
+  const [loading, setLoading] = useState(false)
+  const { get } = useApiRequest()
+  const navigate = useNavigate()
+
+  const onFinish = async (values) => {
+
+    setLoading(true)
+    const response = await get(`/auth/provider/reset-password?idNumber=${values?.idNumber}&email=${values?.email}`)
+
+    if (response) {
+      setLoading(false)
+      console.log({ response })
+      // On success, how to reset password...
+      // localStorage.setItem('authorization', JSON.stringify(response))
+      // navigate('/')
+    }
+
+    else {
+      setLoading(false)
+    }
+  }
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
       <nav className="hidden md:block">
@@ -23,27 +49,65 @@ export default function ForgotPassword() {
           alt="Ministry of Health"/>
 
         <h1 className='text-4xl text-[#163C94] text-center'>Enter your email address</h1>
+        
+        <Form
+          onFinish={onFinish}
+          autoComplete="off"
+          layout='vertical'
+          className='mt-20 w-full max-w-64 px-40'>
+          <Form.Item
+            name="idNumber"
+            className='w-full'
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: 'Please enter ID number',
+              },
+              {
+                min: 5,
+                message: 'ID Number is too short',
+              },
+            ]}>
+            <Input
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder='ID Number' />
+          </Form.Item>
 
-        <form className='mt-20 w-full max-w-64 px-40'>
-          <TextInput
-            inputType="email"
-            inputName="email"
-            inputId="email"
-            leadingIcon="true"
-            leadingIconName="mail"
-            inputPlaceholder="Email Address"/>
+          <Form.Item
+            name="email"
+            className='w-full'
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: 'Please enter email',
+              },
+              {
+                type: 'email',
+                message: 'Please enter valid email address',
+              },
+            ]}>
+            <Input
+              prefix={<MailOutlined className="site-form-item-icon" />}
+              placeholder='Email' />
+          </Form.Item>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div></div>
-            <a
-              href='/'
+            <button
+              type="primary"
+              htmlType="submit"
               className="flex w-full items-center justify-center gap-3 rounded-md bg-[#163C94] px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]">
+              {loading && <span>
+                <LoadingIcon className="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
+              </span>}
               <span className="text-sm font-semibold leading-6">
                 Reset Password
               </span>
-            </a>
+            </button>
           </div>
-        </form>
+        </Form>
       </div>
     </div>
       </div>

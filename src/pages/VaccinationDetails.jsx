@@ -1,31 +1,42 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import BaseTable from '../common/tables/BaseTable'
 import Table from '../components/DataTable'
 import { Button } from 'antd'
 import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
 import { useEffect, useState } from 'react'
+import { useApiRequest } from '../api/useApiRequest'
+import dayjs from 'dayjs'
+import moment from 'moment'
 
 export default function VaccinationDetails() {
 
   const [doseInfo, setDoseInfo] = useState([])
   const [clientInfo, setClientInfo] = useState([])
+  const [vaccinationDetails, setVaccinationDetails] = useState(null)
+  const { get } = useApiRequest()
+
+  const today = dayjs()
 
   const navigate = useNavigate()
+  const { vaccinationID } = useParams()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const doseInformation = {
-    'Dose administered': '1',
-    'Date of last dose': 'Jan 1 2020',
-    'Days since last dose': '23',
-    'Months since last dose': '44',
-  }
+  useEffect(() => {
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const clientInformation = {
-    'Years since last dose': '23',
-    'Age at last dose': '22',
-    'Client has completed vaccine primary series': 'YES',
-  }
+    if (vaccinationDetails !== null) {
+      console.log({ vaccinationDetails: today.diff(dayjs(vaccinationDetails?.occurrenceDateTime).format('YYYY-MM-DD'), 'days') })
+      setDoseInfo(ConvertObjectToArray({
+        'Dose administered': vaccinationDetails?.doseQuantity?.value.toString(),
+        'Date of last dose': dayjs(vaccinationDetails?.occurrenceDateTime).format('Do MMM YYYY'),
+        'Days since last dose': today.diff(dayjs(vaccinationDetails?.occurrenceDateTime).format('YYYY-MM-DD'), 'days').toString(),
+        'Months since last dose': today.diff(dayjs(vaccinationDetails?.occurrenceDateTime).format('YYYY-MM-DD'), 'months').toString(),
+      }))
+      setClientInfo(ConvertObjectToArray({
+        'Years since last dose': today.diff(dayjs(vaccinationDetails?.occurrenceDateTime).format('YYYY-MM-DD'), 'years').toString(),
+        'Age at last dose': 'N/A', 
+        'Client has completed vaccine primary series': vaccinationDetails?.status === 'completed' ? 'YES' : 'NO',
+      }))
+    }
+  }, [vaccinationDetails])
 
   const columns = [
     {
@@ -44,10 +55,8 @@ export default function VaccinationDetails() {
       key: 'actions',
       render: (text, record) => (
         <Button
-          onClick={() => {
-            // setDialogOpen(true)
-            // setSharedData(record)
-          }}
+          disabled={true}
+          onClick={() => {}}
           type="link"
           className="font-bold text=[#173C94]"
         >
@@ -63,17 +72,27 @@ export default function VaccinationDetails() {
     { symptomName: 'Migranes', occurenceDate: 'Jan 1 2020', actions: [{ title: 'view', url: '#'}]}
   ]
 
+  const fetchVaccinationDetails = async () => {
+    const response = await get(`/hapi/fhir/Immunization/${vaccinationID}`)
+    setVaccinationDetails(response)
+
+    console.log({ response })
+  }
+
   useEffect(() => {
-    setDoseInfo(ConvertObjectToArray(doseInformation))
-    setClientInfo(ConvertObjectToArray(clientInformation))
-  }, [clientInformation, doseInformation])
+    fetchVaccinationDetails()
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
 
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
         <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 rounded-lg px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
           <div className="text-2xl font-semibold py-5">
-            Polio
+            { vaccinationDetails?.vaccineCode?.text }
           </div>
           <Link
             to="/view-contraindication/fh8hoi3h8348jj"
@@ -83,7 +102,7 @@ export default function VaccinationDetails() {
         </div>
 
         <div className="px-10 text-2xl font-semibold bg-gray-200 py-5 sm:px-10">
-          Biovalent Oral Polio (bOPV)
+        { vaccinationDetails?.vaccineCode?.text } ({ vaccinationDetails?.vaccineCode?.coding?.[0]?.code })
         </div>
 
         <div className="grid grid-cols-2 gap-10 mx-7 px-10 py-10">

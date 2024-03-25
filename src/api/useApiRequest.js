@@ -1,8 +1,9 @@
 import axios from 'axios'
 import { message } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
 const server = axios.create({
-  baseURL: 'https://chanjoke.intellisoftkenya.com/hapi/fhir',
+  baseURL: 'https://chanjoke.intellisoftkenya.com',
   headers: {
     'Cache-Control': 'no-cache',
     'Content-Type': 'application/json',
@@ -26,13 +27,17 @@ server.interceptors.response.use(
 export const useApiRequest = () => {
   // abort controller
   const abortController = new AbortController()
+  const navigate = useNavigate()
 
   const get = async (url) => {
     try {
       const response = await server.get(url, { signal: abortController.signal })
       return response.data
     } catch (error) {
-      console.log('Error', error)
+      if (error?.response?.status === 401) {
+        localStorage.clear()
+        navigate('/auth')
+      }
     }
   }
 
@@ -43,7 +48,10 @@ export const useApiRequest = () => {
       })
       return response.data
     } catch (error) {
-      console.log('Error', error)
+      if (error?.response?.status === 401) {
+        localStorage.clear()
+        navigate('/auth')
+      }
     }
   }
 
@@ -54,7 +62,10 @@ export const useApiRequest = () => {
       })
       return response.data
     } catch (error) {
-      console.log('Error', error)
+      if (error?.response?.status === 401) {
+        localStorage.clear()
+        navigate('/auth')
+      }
     }
   }
 
@@ -65,7 +76,10 @@ export const useApiRequest = () => {
       })
       return response.data
     } catch (error) {
-      console.log('Error', error)
+      if (error?.response?.status === 401) {
+        localStorage.clear()
+        navigate('/auth')
+      }
     }
   }
 

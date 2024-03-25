@@ -55,7 +55,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
 
   useEffect(() => {
     const fetchPatientImmunization = async () => {
-      const response = await get(`Immunization?patient=Patient/${patientData?.id}`);
+      const response = await get(`/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`);
       setData(response);
       setLoading(false)
     }
@@ -231,8 +231,8 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : 'gray'}>
-            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text }
+          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
+            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': '' }
           </Tag>
         )
       },
@@ -243,8 +243,9 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
       key: 'actions',
       render: (text, record) => (
         <Button
+          disabled={record?.id ? false : true}
           onClick={() => {
-            navigate('/view-vaccination/fdkljadlfjkfdl')
+            navigate(`/view-vaccination/${record?.id}`)
           }}
           type="link"
           className="font-bold text=[#173C94]"
