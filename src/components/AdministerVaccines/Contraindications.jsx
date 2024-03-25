@@ -51,7 +51,7 @@ export default function Contraindications() {
 
       const responses = await Promise.all(
         data?.map(async (administerVaccine) => {
-          return await post('Immunization', administerVaccine)
+          return await post('/hapi/fhir/Immunization', administerVaccine)
         })
       )
 

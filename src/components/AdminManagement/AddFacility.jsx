@@ -89,7 +89,7 @@ export default function AddFacility() {
     const query = name ? `&name=${name}` : ''
     const archivedQuery = archived ? `&status=inactive` : '&status:not=inactive'
     const response = await get(
-      `Location?type:code=FACILITY&_count=12&_total=accurate&_getpagesoffset=${currentPage}${query}${archivedQuery}`
+      `/hapi/fhir/Location?type:code=FACILITY&_count=12&_total=accurate&_getpagesoffset=${currentPage}${query}${archivedQuery}`
     )
     if (response) {
       if (archived) {
@@ -108,7 +108,7 @@ export default function AddFacility() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchLocations('Location?partof=0&_count=50')
+      await fetchLocations('/hapi/fhir/Location?partof=0&_count=50')
       await Promise.all([fetchSubCounties(), fetchWards()])
       await fetchFacilities()
       await fetchFacilities(null, true)

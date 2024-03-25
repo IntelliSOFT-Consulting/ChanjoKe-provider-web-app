@@ -56,7 +56,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
  
   useEffect(() => {
     const fetchPatientImmunization = async () => {
-      const response = await get(`Immunization?patient=Patient/${patientData?.id}`);
+      const response = await get(`/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`);
       setData(response);
       setLoading(false)
     }

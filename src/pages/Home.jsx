@@ -25,7 +25,7 @@ export default function Home() {
     <>
       <div>
 
-        <dl className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <dl className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 mx-auto max-w-7xl">
           {statsTwo.map((item) => (
             <div
               key={item.id}

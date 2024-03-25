@@ -1,23 +1,33 @@
-import { Link } from 'react-router-dom'
-import ChanjoKE from '../assets/chanjoke-img.png'
+import ChanjoKE from '../assets/login bg.png'
 import MOHLogo from '../assets/moh-logo.png'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Form, Input } from 'antd'
-import usePost from '../api/usePost'
+import { useState } from 'react'
+import { useApiRequest } from '../api/useApiRequest'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import LoadingIcon from '../common/icons/loadingIcon'
 
 export default function Login() {
 
   const navigate = useNavigate()
+  const { post } = useApiRequest()
 
-  const onFinish = (values) => {
-    console.log('Success:', values);
-    localStorage.setItem('token', JSON.stringify(values))
-    navigate('/')
-  }
+  const [loading, setLoading] = useState(false)
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+  const onFinish = async (values) => {
+
+    setLoading(true)
+    const response = await post('/auth/provider/login', values)
+
+    if (response) {
+      setLoading(false)
+      localStorage.setItem('authorization', JSON.stringify(response))
+      navigate('/')
+    }
+
+    else {
+      setLoading(false)
+    }
   }
 
   return (
@@ -42,7 +52,6 @@ export default function Login() {
 
         <Form
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
           autoComplete="off"
           layout='vertical'
           className='mt-20 w-full max-w-64 px-40'>
@@ -54,7 +63,7 @@ export default function Login() {
             rules={[
               {
                 required: true,
-                message: 'Field cannot be empty',
+                message: 'Please enter ID number',
               },
               {
                 min: 5,
@@ -72,7 +81,7 @@ export default function Login() {
             rules={[
               {
                 required: true,
-                message: 'Field cannot be empty',
+                message: 'Please enter password',
               },
               {
                 min: 8,
@@ -96,7 +105,10 @@ export default function Login() {
               type="primary"
               htmlType="submit"
               className="flex w-full items-center justify-center gap-3 rounded-md bg-[#163C94] px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]">
-              <span className="text-sm font-semibold leading-6">
+              {loading && <span>
+                <LoadingIcon className="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
+              </span>}
+              <span className="text-sm font-semibold leading-6">  
                 Login
               </span>
             </button>
