@@ -9,9 +9,9 @@ import { Col, Row, Radio, DatePicker, Form, Input, Select } from 'antd'
 
 export default function CaregiverDetails({ editCaregivers = [], updateCaregiverDetails, handleBack, nextPage }) {
   const caregiverTypes = [
-    { id: 1, name: 'Father' },
-    { id: 2, name: 'Mother' },
-    { id: 3, name: 'Guardian' },
+    { id: 1, name: 'Father', value: 'Father' },
+    { id: 2, name: 'Mother', value: 'Mother' },
+    { id: 3, name: 'Guardian', value: 'Guardian' },
   ];
 
   const tHeaders = [
@@ -21,54 +21,21 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
     {title: 'Actions', class: '', key: 'actions'},
   ]
 
-  const formRules = {
-    caregiverName: {
-      required: true,
-      minLen: 4,
-    },
-    phoneNumber: {
-      required: true,
-      minLen: 8,
-    }
-  }
-
-  const { formData, formErrors, handleChange, resetForm } = FormState({
-    id: uuidv4(),
-    caregiverName: '',
-    caregiverType: '',
-    phoneNumber: '',
-    actions: [
-      { title: 'edit', btnAction: 'editCareGiver' },
-      { title: 'remove', btnAction: 'removeCareGiver' }
-    ]
-  }, formRules)
   const [caregivers, setCaregivers] = useState(editCaregivers)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [caregiverToRemove, setCaregiverToRemove] = useState('')
+
+  const [form] = Form.useForm()
 
   useEffect(() => {
     updateCaregiverDetails(caregivers)
   }, [caregivers])
 
-  const handleSubmit = () => {
-    setCaregivers([...caregivers, formData])
-    resetForm({
-      id: uuidv4(),
-      caregiverName: '',
-      caregiverType: '',
-      phoneNumber: '',
-      actions: [
-        { title: 'edit', btnAction: 'editCareGiver' },
-        { title: 'remove', btnAction: 'removeCareGiver' }
-      ]
-    })
-  };
-
   const handleAction = (onActionBtn, data) => {
     if (onActionBtn === 'editCareGiver') {
       const arrayWithoutCaregiver = caregivers.filter((caregiver) => caregiver.id !== data.id)
 
-      resetForm({
+      form.setFieldsValue({
         id: data.id || uuidv4(),
         caregiverName: data.caregiverName,
         caregiverType: data.caregiverType,
@@ -78,6 +45,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
           { title: 'remove', btnAction: 'removeCareGiver' }
         ]
       })
+      
       setCaregivers(arrayWithoutCaregiver)
     }
 
@@ -94,6 +62,20 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
     }
   }
 
+  const onFinish = (values) => {
+
+    values.id = uuidv4()
+    values.actions = [
+      { title: 'edit', btnAction: 'editCareGiver' },
+      { title: 'remove', btnAction: 'removeCareGiver' }
+    ]
+
+    console.log({ values })
+
+    setCaregivers([...caregivers, values])
+    form.resetFields()
+  };
+
   return (
     <>
 
@@ -106,55 +88,96 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
         title="Remove Caregiver" />
       <h3 className="text-xl font-medium">Caregiver's Details</h3>
 
-      <div className="grid mt-5 grid-cols-3 gap-10 mx-9">
-        {/* Column 1 */}
-        <div>
-          <SelectMenu
-            label="Caregiver's Type"
-            required={true}
-            data={caregiverTypes}
-            value={formData.caregiverType || 'Care Giver\'s Type'}
-            onInputChange={(value) => handleChange('caregiverType', value.name)}
-          />
-        </div>
+      <Form
+        onFinish={onFinish}
+        layout="vertical"
+        form={form}
+        autoComplete="off">
+        <Row className='mt-5 px-6' gutter={16}>
 
-        {/* Column 2 */}
-        <div>
-          <TextInput
-            inputType="text"
-            inputName="caregiverName"
-            inputId="caregiverName"
-            label="Caregiver's Name"
-            required={true}
-            value={formData.caregiverName}
-            error={formErrors.caregiverName}
-            onInputChange={(value) => handleChange('caregiverName', value)}
-            inputPlaceholder="eg John Doe"
-          />
-        </div>
+          <Col className="gutter-row" span={8}>
+            <Form.Item
+              name="caregiverType"
+              label={
+                <div>
+                  <span className="font-bold">Caregiver's Type</span>
+                </div>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input the caregiver\'s type!',
+                },
+              ]}>
+              <Select size='large'>
+                {caregiverTypes.map((option) => (
+                  <Select.Option value={option.value}>
+                    {option.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
 
-        {/* Column 3 */}
-        <div className="justify-items-stretch grid">
-          <TextInput
-            inputType="text"
-            inputName="phoneNumber"
-            inputId="phoneNumber"
-            label="Contact Phone Number"
-            required={true}
-            value={formData.phoneNumber}
-            error={formErrors.phoneNumber}
-            onInputChange={(value) => handleChange('phoneNumber', value)}
-            inputPlaceholder="eg 0700777888"
-          />
+          <Col className="gutter-row" span={8}>
+            <Form.Item
+              name="caregiverName"
+              label={
+                <div>
+                  <span className="font-bold">Caregiver's Name</span>
+                </div>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input the caregiver\'s name!',
+                },
+              ]}>
+                <Input
+                  placeholder="eg John Doe"
+                  autoComplete="off"
+                  className='block w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
+            </Form.Item>
+          </Col>
 
-          <button
-            onClick={handleSubmit}
-            disabled={Object.keys(formErrors).length !== 0 || !formData.caregiverName || !formData.phoneNumber || !formData.caregiverType}
-            className="ml-4 justify-self-end flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-            Add
-          </button>
-        </div>
-      </div>
+          <Col className="gutter-row" span={8}>
+            <Form.Item
+              name="phoneNumber"
+              label={
+                <div>
+                  <span className="font-bold">Contact Phone Number</span>
+                </div>
+              }
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input the phone number!',
+                },
+                {
+                  pattern: /^(\+?)([0-9]{7,15})$/,
+                  message: 'Please enter a valid phone number!',
+                },
+              ]}>
+                <Input
+                  placeholder="eg 0700232003"
+                  autoComplete="off"
+                  className='block w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
+            </Form.Item>
+
+            <div className="w-full grid justify-items-end">
+            <button
+              htmlType="submit"
+              className="ml-4 justify-self-end flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+              Add
+            </button>
+            </div>
+
+            
+          </Col>
+        </Row>
+
+      </Form>
+      
 
       {
         caregivers.length > 0 &&
