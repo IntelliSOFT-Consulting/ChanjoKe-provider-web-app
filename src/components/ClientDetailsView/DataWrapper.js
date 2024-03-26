@@ -28,9 +28,13 @@ const createVaccineImmunization = (data, patientID, status) => {
     },
     "note": [
         {
-            "text": "Facility"
+            "text": "Facility",
+        },
+        {
+            "authorString": data?.contraindicationDetails
         }
     ],
+    "education": data?.education,
     "protocolApplied": [
         {
             "series": "3",

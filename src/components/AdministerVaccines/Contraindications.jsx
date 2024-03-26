@@ -13,6 +13,7 @@ import { useState, useEffect } from "react"
 export default function Contraindications() {
   const navigate = useNavigate()
   const [vaccines, setVaccines] = useState([])
+  const [vaccinesToSelect, setVaccinesToSelect] = useState([])
   const { sharedData } = useSharedState()
   const [isDialogOpen, setDialogOpen] = useState(false)
   const currentPatient = useSelector((state) => state.currentPatient)
@@ -26,12 +27,7 @@ export default function Contraindications() {
   }, {})
 
   useEffect(() => {
-    const vaccinesToSelect = sharedData.map((item) => ({
-      name: item.vaccineName,
-      value: item.vaccineCode,
-    }))
-
-    setVaccines(vaccinesToSelect)
+    setVaccines(sharedData)
   }, [sharedData])
 
   function handleDialogClose() {
@@ -42,6 +38,12 @@ export default function Contraindications() {
   const handleFormSubmit = async () => {
     if (Array.isArray(sharedData) && sharedData.length > 0) {
       const data = sharedData.map((immunization) => {
+        immunization.contraindicationDetails = formData.contraindicationDetails
+        immunization.education = [
+          { presentationDate: formData.nextVaccinationDate }
+        ]
+
+        console.log({ immunization })
         return createVaccineImmunization(
           immunization,
           currentPatient.id,
@@ -82,18 +84,28 @@ export default function Contraindications() {
             <div>
 
               <SelectMenu
-                data={vaccines}
-                error={formErrors.identificationType}
+                data={vaccines.map((vaccine) => ({ name: vaccine.vaccineName, value: vaccine.vaccineCode }))}
                 required={true}
                 label="Vaccines to Contraindicate"
                 value={formData.vaccinesToContraindicate || 'Vaccines to Contraindicate'}
                 onInputChange={(value) => handleChange('vaccinesToContraindicate', value.name)}/>
 
-              <div className="py-4 flex justify-end">
-                <button
-                  className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                  Add
-                </button>
+              <div className="py-4 flex">
+                {vaccines.map((vaccine) => (
+                  <span class="inline-flex items-center gap-x-3 py-2 ps-5 pe-2 rounded-full text-xs font-medium bg-blue-100 mx-2">
+                    {vaccine.vaccineName}
+                    <button
+                      onClick={() => {
+                        const vaccinesLeft = vaccines.filter((vacc) => vacc.vaccineName !== vaccine.vaccineName)
+                        setVaccines([...vaccines, vaccinesLeft])
+                      }}
+                      type="button"
+                      class="flex-shrink-0 size-4 inline-flex items-center justify-center rounded-full hover:bg-blue-200 focus:outline-none focus:bg-blue-200">
+                      <span class="sr-only">Remove badge</span>
+                      <svg class="flex-shrink-0 size-3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                  </span>
+                ))}
                 
               </div>
 
@@ -109,7 +121,7 @@ export default function Contraindications() {
                   required={true}
                   rows="4"
                   cols="50"
-                  inputPlaceholder="Enter Contraindications"/>
+                  inputPlaceholder="  Enter Contraindications"/>
 
                 <TextInput
                   inputType="date"

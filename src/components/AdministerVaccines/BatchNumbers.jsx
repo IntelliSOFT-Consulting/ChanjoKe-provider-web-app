@@ -9,18 +9,6 @@ import { useSelector } from 'react-redux'
 import { Form, Input, Select } from 'antd'
 
 export default function BatchNumbers() {
-  const [batchNumbers, setBatchNumbers] = useState([
-    {
-      vaccinaName: 'BCG',
-      batches: ['HHFK88399434', 'HDKKD8777847'],
-      diseaseTarget: '',
-    },
-    {
-      vaccinaName: 'bOPV',
-      batches: ['OPVJJD788778', 'OPV667HHD889'],
-      diseaseTarget: '',
-    },
-  ])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const { sharedData } = useSharedState()
   const { SubmitForm } = usePost()
@@ -36,6 +24,7 @@ export default function BatchNumbers() {
     if (!sharedData || sharedData?.length === 0) {
       navigate(-1)
     }
+    console.log({ sharedData })
   }, [sharedData])
 
   const handleFormSubmit = async () => {
@@ -132,15 +121,11 @@ export default function BatchNumbers() {
                         name={[field.name, 'batchNumber']}
                         label="Batch Number"
                       >
-                        {console.log('field', field)}
+                        {console.log('field', sharedData[index])}
                         <Select
-                          placeholder="Select a batch number"
+                          placeholder={sharedData[index].vaccineCode}
                           style={{ width: '100%' }}
-                          size="large"
-                        >
-                          <Select.Option value="HHFK88399434">
-                            {field?.vaccineName} - HHFK88399434
-                          </Select.Option>
+                          size="large">
                           <Select.Option value="HDKKD8777847">
                             HDKKD8777847
                           </Select.Option>
@@ -159,7 +144,7 @@ export default function BatchNumbers() {
                       >
                         <Input
                           size="large"
-                          placeholder="Disease Target"
+                          placeholder={sharedData[index].diseaseTarget}
                           disabled
                         />
                       </Form.Item>
@@ -173,14 +158,12 @@ export default function BatchNumbers() {
         <div className="px-4 py-4 sm:px-6 flex justify-end">
           <button
             onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
+            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Cancel
           </button>
           <button
             onClick={() => form.submit()}
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
+            className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Administer
           </button>
         </div>

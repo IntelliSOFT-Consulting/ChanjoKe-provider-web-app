@@ -16,7 +16,7 @@ server.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      message.error(error.response.data.message)
+      message.error(error.response.status === 401 ? 'Unauthorized: Incorrect credentials' : error.response.data.error)
     } else {
       message.error('Network Error')
     }

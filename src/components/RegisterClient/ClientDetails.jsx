@@ -168,6 +168,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   </div>
                   <div>
                     <Form.Item
+                      name="estimatedAge"
                       label={
                         <div>
                           <span className="font-bold">Age Input Method</span>
