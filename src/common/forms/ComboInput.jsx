@@ -6,7 +6,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function ComboInput({ label, people, val, setSelected }) {
+export default function ComboInput({ label, required, people, val, setSelected }) {
   const [query, setQuery] = useState('')
 
   const filteredPeople =
@@ -22,6 +22,7 @@ export default function ComboInput({ label, people, val, setSelected }) {
     }}>
       <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
         { label }
+        { required && <span className="text-red-500 ml-1 font-bold">*</span>}
       </Combobox.Label>
       <div className="relative mt-2">
         <Combobox.Input

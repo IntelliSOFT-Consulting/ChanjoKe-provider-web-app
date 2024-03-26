@@ -174,7 +174,6 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       render: (text, record) => {
         const completed = record.status === 'completed'
         const notDone = record.status === 'not-done'
-        console.log({ record })
         return (
           <Checkbox
             name={record.vaccineName}
@@ -205,12 +204,16 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: (text, _record) => {
-        const dependentVaccine = allVaccines?.find(
-          (vaccine) =>
-            _record?.dependentVaccine ===
-            vaccine?.vaccineCode?.coding?.[0]?.code
-        )
-        return text(patientData?.birthDate, dependentVaccine)
+        if (_record?.education) {
+          return moment(_record?.education?.[0]?.presentationDate).format('DD-MM-YYYY')
+        } else {
+          const dependentVaccine = allVaccines?.find(
+            (vaccine) =>
+              _record?.dependentVaccine ===
+              vaccine?.vaccineCode?.coding?.[0]?.code
+          )
+          return text(patientData?.birthDate, dependentVaccine)
+        }
       },
     },
     {
@@ -232,8 +235,8 @@ export default function RoutineVaccines({ userCategory, patientData }) {
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : 'gray'}>
-            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': '' }
+          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : (missed && text !== 'entered-in-error') ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
+            { text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': (missed && text !== 'entered-in-error') ? 'Missed': '' }
           </Tag>
         )
       },

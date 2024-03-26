@@ -83,6 +83,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
           <ComboInput
             label="County of Residence"
+            required={true}
             setSelected={(value) => {
               handleChange('residenceCounty', value.name)
               handleChange('subCounty', '')
@@ -94,8 +95,8 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
           <TextInput
             inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+            inputName="townCenter"
+            inputId="townCenter"
             value={formData.townCenter}
             onInputChange={(value) => handleChange('townCenter', value)}
             label="Town/Trading Center"
@@ -106,6 +107,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
           <ComboInput
             label="Sub County"
+            required={true}
             setSelected={(value) => {
               handleChange('subCounty', value.name)
               handleChange('ward', '')
@@ -116,8 +118,8 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
           <TextInput
             inputType="text"
-            inputName="firstName"
-            inputId="firstName"
+            inputName="estateOrHouseNo"
+            inputId="estateOrHouseNo"
             value={formData.estateOrHouseNo}
             onInputChange={(value) => handleChange('estateOrHouseNo', value)}
             label="Estate & House No./ Village"
@@ -128,6 +130,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
           <ComboInput
             label="Ward"
+            required={true}
             setSelected={(value) => {
               handleChange('ward', value.name)
               switchLocationURL(3, null)

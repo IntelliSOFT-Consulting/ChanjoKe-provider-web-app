@@ -1,24 +1,40 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import BaseTable from '../common/tables/BaseTable'
 import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
+import { useApiRequest } from '../api/useApiRequest'
 import { useEffect, useState } from 'react'
+import dayjs from 'dayjs'
 
 export default function ContraindicationDetails() {
 
   const [contraindicationInfo, setContraindicationInfo] = useState([])
-  const [loadingError, setLoadingError] = useState(true)
+  const [vaccinationDetails, setVaccinationDetails] = useState(null)
 
   const navigate = useNavigate()
+  const { get } = useApiRequest()
+  const { contraindicationID } = useParams()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const contraindicationInfomation = {
-    'Contraindication Date': 'Jan 1 2020',
-    'Next Vaccination Date': 'Jan 1 2020',
+  useEffect(() => {
+
+    if (vaccinationDetails !== null) {
+      console.log({ vaccinationDetails })
+      setContraindicationInfo(ConvertObjectToArray({
+        'Contraindication Date': dayjs(vaccinationDetails?.occurrenceDateTime).format('Do MMM YYYY'),
+        'Next Vaccination Date': dayjs(vaccinationDetails?.education?.[0]?.presentationDate).format('Do MMM YYYY'),
+      }))
+    }
+  }, [vaccinationDetails])
+
+  const fetchVaccinationDetails = async () => {
+    const response = await get(`/hapi/fhir/Immunization/${contraindicationID}`)
+    setVaccinationDetails(response)
   }
 
   useEffect(() => {
-    setContraindicationInfo(ConvertObjectToArray(contraindicationInfomation))
-  }, [contraindicationInfomation])
+    fetchVaccinationDetails()
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
@@ -29,7 +45,7 @@ export default function ContraindicationDetails() {
           </div>
         </div>
 
-        {/* <div className="grid grid-cols-2 gap-10 mx-7 px-10 py-10">
+        {vaccinationDetails?.note?.[1]?.authorString && <div className="grid grid-cols-2 gap-10 mx-7 px-10 py-10">
           <div>
 
             <BaseTable data={contraindicationInfo} />
@@ -39,14 +55,17 @@ export default function ContraindicationDetails() {
 
             <p className='font-bold'>Contraindications</p>
 
-            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Deserunt consectetur ex commodi omnis animi enim, ad sapiente fugit laudantium id minima, accusamus fuga incidunt aliquid, porro sint est mollitia voluptate quod perspiciatis!</p>
+            <p>
+              { vaccinationDetails?.note?.[1]?.authorString}
+            </p>
           </div>
-        </div> */}
+        </div>
+        }
 
-        {loadingError && <div className="text-center  mx-7 px-10 py-10">
+        {!vaccinationDetails?.note?.[1]?.authorString && <div className="text-center  mx-7 px-10 py-10">
             Contraindication not found
           </div>
-          }
+        }
 
         <div className="px-4 py-4 sm:px-6 flex justify-end">
           <button

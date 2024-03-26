@@ -94,6 +94,20 @@ function createPatientData(data) {
             "value": data.identificationNumber,
         },
         {
+          "type": {
+              "coding": [
+                  {
+                      "system": "http://hl7.org/fhir/administrative-identifier",
+                      "code": "estimated-age",
+                      "display": "Estimated Age"
+                  }
+              ],
+              "text": data.estimatedAge,
+          },
+          "system": "identification",
+          "value": data.estimatedAge,
+      },
+        {
             "type": {
                 "coding": [
                     {

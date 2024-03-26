@@ -23,7 +23,6 @@ export default function VaccinationDetails() {
   useEffect(() => {
 
     if (vaccinationDetails !== null) {
-      console.log({ vaccinationDetails: today.diff(dayjs(vaccinationDetails?.occurrenceDateTime).format('YYYY-MM-DD'), 'days') })
       setDoseInfo(ConvertObjectToArray({
         'Dose administered': vaccinationDetails?.doseQuantity?.value.toString(),
         'Date of last dose': dayjs(vaccinationDetails?.occurrenceDateTime).format('Do MMM YYYY'),
@@ -92,10 +91,10 @@ export default function VaccinationDetails() {
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
         <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 rounded-lg px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
           <div className="text-2xl font-semibold py-5">
-            { vaccinationDetails?.vaccineCode?.text }
+            { vaccinationDetails?.protocolApplied?.[0]?.targetDisease?.[0]?.text || 'Target Disease: ' }
           </div>
           <Link
-            to="/view-contraindication/fh8hoi3h8348jj"
+            to={`/view-contraindication/${vaccinationDetails?.id}`}
             className="ml-auto flex items-center gap-x-1 rounded-md bg-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Containdications
           </Link>
@@ -121,12 +120,13 @@ export default function VaccinationDetails() {
           AEFI
         </div>
 
-        <div className="px-10 py-5">
-          <Table
+        <div className="px-10 py-5 text-center">
+          No AEFIs recorded
+          {/* <Table
             dataSource={aefis}
             columns={columns}
             pagination={false}
-            size="small"/>
+            size="small"/> */}
         </div>
 
         <div className="px-4 py-4 sm:px-6 flex justify-end">
