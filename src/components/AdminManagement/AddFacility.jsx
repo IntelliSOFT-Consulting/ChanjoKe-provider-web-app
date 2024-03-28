@@ -17,7 +17,8 @@ import {
   convertLocationToFhir,
   formatFacilitiesToTable,
 } from '../../utils/formatter'
-import { debounce } from '../../utils/methods'
+import { debounce, getOffset } from '../../utils/methods'
+import { PlusIcon } from '@heroicons/react/24/solid'
 
 export default function AddFacility() {
   const [visible, setVisible] = useState(false)
@@ -62,7 +63,9 @@ export default function AddFacility() {
   const fetchSubCounties = async () => {
     const saved = localStorage.getItem('subCounties')
     if (!saved) {
-      const response = await get(`Location?type:code=SUB-COUNTY&_count=5000`)
+      const response = await get(
+        `/hapi/fhir/Location?type:code=SUB-COUNTY&_count=5000`
+      )
       if (response) {
         const converted = convertLocations(response)
         localStorage.setItem('subCounties', JSON.stringify(converted))
@@ -73,7 +76,9 @@ export default function AddFacility() {
   const fetchWards = async () => {
     const saved = localStorage.getItem('wards')
     if (!saved) {
-      const response = await get(`Location?type:code=WARD&_count=5000`)
+      const response = await get(
+        `/hapi/fhir/Location?type:code=WARD&_count=5000`
+      )
       if (response) {
         const converted = convertLocations(response)
         localStorage.setItem('wards', JSON.stringify(converted))
@@ -88,8 +93,9 @@ export default function AddFacility() {
     archived ? setArchivedLoading(true) : setLoading(true)
     const query = name ? `&name=${name}` : ''
     const archivedQuery = archived ? `&status=inactive` : '&status:not=inactive'
+    const offset = getOffset(archived ? archivedCurrentPage : currentPage)
     const response = await get(
-      `/hapi/fhir/Location?type:code=FACILITY&_count=12&_total=accurate&_getpagesoffset=${currentPage}${query}${archivedQuery}`
+      `/hapi/fhir/Location?type:code=FACILITY&_count=12&_total=accurate&_offset=${offset}${query}${archivedQuery}`
     )
     if (response) {
       if (archived) {
@@ -122,6 +128,7 @@ export default function AddFacility() {
   }, [currentPage])
 
   useEffect(() => {
+    console.log('archivedCurrentPage', archivedCurrentPage)
     fetchFacilities(null, true)
   }, [archivedCurrentPage])
 
@@ -177,13 +184,18 @@ export default function AddFacility() {
             Update
           </Button>
           <Popconfirm
-            title="Are you sure you want to archive this facility?"
-            onConfirm={() => handleArchive(record.kmflCode)}
+            title={
+              record.status === 'inactive'
+                ? 'Are you sure you want to restore this facility?'
+                : 'Are you sure you want to archive this facility?'
+            }
+            onConfirm={() => handleArchive(record.kmflCode, record.status)}
             okText="Yes"
             cancelText="No"
           >
             <Button className="mx-0 p-0" type="link" danger>
-              Archive
+              {console.log(record)}
+              {record.status === 'inactive' ? 'Restore' : 'Archive'}
             </Button>
           </Popconfirm>
         </Space>
@@ -196,19 +208,22 @@ export default function AddFacility() {
     if (name === 'county') {
       const countyKey = counties.find((county) => county.name === value)?.key
       form.setFieldsValue({ subCounty: null, ward: null })
-      fetchLocations(`Location?partof=${countyKey}`, 'county')
+      fetchLocations(`/hapi/fhir/Location?partof=${countyKey}`, 'county')
     } else if (name === 'subCounty') {
       const subCountyKey = subCounties.find(
         (subCounty) => subCounty.name === value
       )?.key
       form.setFieldsValue({ ward: null })
-      fetchLocations(`Location?partof=${subCountyKey}`, 'subCounty')
+      fetchLocations(`/hapi/fhir/Location?partof=${subCountyKey}`, 'subCounty')
     }
   }
 
   const handleSave = async (values) => {
     const payload = convertLocationToFhir(values)
-    const response = await put(`Location/${values.kmflCode}`, payload)
+    const response = await put(
+      `/hapi/fhir/Location/${values.kmflCode}`,
+      payload
+    )
     if (response) {
       setVisible(false)
       message.success('Facility added successfully')
@@ -217,18 +232,16 @@ export default function AddFacility() {
     }
   }
 
-  const handleArchive = async (code) => {
-    const facility = await get(`Location/${code}`)
+  const handleArchive = async (code, status = 'active') => {
+    const facility = await get(`/hapi/fhir/Location/${code}`)
     const payload = {
       ...facility,
-      status: 'inactive',
+      status: status === 'active' ? 'inactive' : 'active',
     }
 
-    const response = await put(`Location/${code}`, payload)
+    const response = await put(`/hapi/fhir/Location/${code}`, payload)
     if (response) {
-      setFacilities((facilities) => {
-        return facilities.filter((facility) => facility.kmflCode !== code)
-      })
+      await fetchFacilities()
       await fetchFacilities(null, true)
       message.success('Facility archived successfully')
     }
@@ -251,7 +264,7 @@ export default function AddFacility() {
             type="primary"
             onClick={() => setVisible(true)}
             className="rounded-md outline bg-[#163C94] flex items-center"
-            icon={<span className="material-symbols-outlined">add</span>}
+            icon={<PlusIcon className="text-white w-5 h-5 font-semibold" />}
           >
             Add Facility
           </Button>
@@ -260,12 +273,27 @@ export default function AddFacility() {
         <div className="px-4 py-5 sm:p-6">
           <div>
             <div className="my-4 flex">
-              <Input
-                allowClear
-                placeholder="Search Facility"
-                className="w-1/2 ml-auto"
-                onChange={handleSearch}
-              />
+              <Form
+                onFinish={(values) => {
+                  fetchFacilities(values.search)
+                }}
+                className="flex w-full items-center"
+              >
+                <Form.Item name="search" className="w-full mr-4">
+                  <Input
+                    allowClear
+                    placeholder="Search Facility"
+                    className="w-full ml-auto"
+                    onChange={handleSearch}
+                    size="large"
+                  />
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit" size="large">
+                    Search
+                  </Button>
+                </Form.Item>
+              </Form>
             </div>
             <div className="overflow-x-auto">
               <Table
@@ -274,6 +302,7 @@ export default function AddFacility() {
                 dataSource={facilities}
                 size="small"
                 loading={loading}
+                rowKey="kmflCode"
                 pagination={{
                   pageSize: 12,
                   showTotal: (total, range) =>
@@ -436,6 +465,7 @@ export default function AddFacility() {
           columns={columns}
           dataSource={archivedFacilities}
           loading={archivedLoading}
+          rowKey="kmflCode"
           size="small"
           pagination={{
             pageSize: 12,
@@ -446,6 +476,7 @@ export default function AddFacility() {
             current: archivedCurrentPage,
             total: archivedPageSize - 1,
             onChange: (page) => {
+              console.log(page)
               setArchivedCurrentPage(page)
             },
           }}

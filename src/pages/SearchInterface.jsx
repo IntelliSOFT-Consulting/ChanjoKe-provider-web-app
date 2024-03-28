@@ -131,7 +131,7 @@ export default function SearchInterface(props) {
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">{title}</div>
         <div className="px-4 py-5 sm:p-6">
           <Form
-            className="grid grid-cols-5 gap-4 mx-10"
+            className="grid grid-cols-5 gap-x-4 mx-10 mb-0"
             onFinish={handleSearch}
           >
             <div className="col-span-4">
@@ -147,7 +147,7 @@ export default function SearchInterface(props) {
             <div>
               <button
                 type="submit"
-                className="flex-shrink-0 rounded-lg w-full bg-[#163C94] border border-[#163C94] px-5 py-4 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+                className="flex-shrink-0 rounded-lg w-full bg-[#163C94] border border-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
               >
                 Search
               </button>

@@ -81,6 +81,7 @@ export const formatFacilitiesToTable = (bundle) => {
       level: facility.resource?.extension?.[0]?.valueCoding?.display,
       kmflCode: facility.resource.id,
       ownership: facility.resource?.managingOrganization?.display,
+      status: facility.resource?.status,
     }
   })
 }
