@@ -8,11 +8,14 @@ import moment from "moment"
 
 function convertUnderscoresAndCapitalize(inputString) {
   if (inputString !== undefined) {
-    const stringWithSpaces = inputString.replace(/_/g, ' ');
-    const capitalizedString =
-      stringWithSpaces.charAt(0).toUpperCase() + stringWithSpaces.slice(1);
+    // const stringWithSpaces = inputString.replace(/_/g, ' ');
+    // const capitalizedString =
+    //   stringWithSpaces.charAt(0).toUpperCase() + stringWithSpaces.slice(1);
 
-    return capitalizedString;
+    // return capitalizedString;
+
+    let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase());
   } else {
     return ''
   }
@@ -45,7 +48,8 @@ export default function ClientRecords() {
       'Last Name': data?.name?.[0]?.given[0],
       'Middle Name': data?.name?.[0]?.given[1],
       'Gender': data?.gender,
-      'Date of Birth': moment(data?.birthDate).format('Do MMM YYYY'),
+      'Phone Number': data?.telecom?.[0]?.value,
+      'Date of Birth': moment(data?.birthDate).format('DD-MM-YYYY'),
       'Identification Number': identificationNumber,
       'Identification Type': convertUnderscoresAndCapitalize(identificationType),
     }

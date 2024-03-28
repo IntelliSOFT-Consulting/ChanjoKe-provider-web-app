@@ -67,6 +67,18 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
     console.log('Failed:', errorInfo);
   };
 
+  const isUserOverI8 = () => {
+    const dateObject = form.getFieldValue('dateOfBirth')
+    const date = moment(dateObject?.$d).format('YYYY-MM-DD')
+    const stringAge = calculateAge(date)
+    const age = stringAge.match(/(\d+)\s*year/i)
+    if (age === null) {
+      return false
+    } else if (parseInt(age[1]) > 18) {
+      return true
+    }
+  }
+
   return (
     <>
       <h3 className="text-xl font-medium">Client Details</h3>
@@ -321,6 +333,28 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   </Form.Item>
                 </Col>
               </>
+              }
+
+              {isUserOverI8() &&
+                <Col className="gutter-row" span={8}>
+                  <Form.Item
+                    name="phoneNumber"
+                    label={
+                      <div>
+                        <span className="font-bold">Phone Number</span>
+                      </div>
+                    }
+                    rules={[
+                      {
+                        pattern: /^(\+?)([0-9]{7,15})$/,
+                        message: 'Please enter a valid phone number!',
+                      },
+                    ]}>
+                      <Input
+                        placeholder="Phone Number"
+                        className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                  </Form.Item>
+                </Col>
               }
 
               <Col className="gutter-row" span={8}>

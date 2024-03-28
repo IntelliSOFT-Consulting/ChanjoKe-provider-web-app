@@ -11,6 +11,7 @@ import { useApiRequest } from '../../api/useApiRequest'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { datePassed, lockVaccine } from '../../utils/validate'
+import { message } from 'antd'
 
 export default function NonRoutineVaccines({ userCategory, userID, patientData}) {
 
@@ -183,7 +184,10 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
               completed || notDone ||
               lockVaccine(6574.5, patientData.birthDate)
             }
-            onChange={() => handleCheckBox('administer', record)}
+            onChange={() => {
+              handleCheckBox('administer', record)
+              console.log('check validity of vaccine')
+            }}
           />
         )
       },
@@ -204,19 +208,26 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
       dataIndex: 'dueDate',
       key: 'dueDate',
       render: (text, _record) => {
-        const dependentVaccine = allVaccines?.find(
-          (vaccine) =>
-            _record?.dependentVaccine ===
-            vaccine?.vaccineCode?.coding?.[0]?.code
-        )
-        return `${moment(patientData?.birthDate).format('Do MMM YYYY')}`
+        if (_record?.education) {
+          return moment(_record?.education?.[0]?.presentationDate).format('DD-MM-YYYY')
+        } else {
+          const dependentVaccine = allVaccines?.find(
+            (vaccine) =>
+              _record?.dependentVaccine ===
+              vaccine?.vaccineCode?.coding?.[0]?.code
+          )
+          return `${moment(patientData?.birthDate).format('Do MMM YYYY')}`
+        }
       },
     },
     {
       title: 'Date Administered',
       dataIndex: 'occurrenceDateTime',
       key: 'occurrenceDateTime',
-      render: (text) => {
+      render: (text, _record) => {
+        if (_record?.status !== 'completed') {
+          return '-'
+        }
         return text ? moment(text).format('Do MMM YYYY') : '-'
       },
     },
@@ -231,8 +242,8 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : missed ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
-            {missed ? 'Missed' : text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': '' }
+          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : (missed && text !== 'entered-in-error') ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
+            { text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': (missed && text !== 'entered-in-error') ? 'Missed': '' }
           </Tag>
         )
       },
@@ -243,7 +254,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
       key: 'actions',
       render: (text, record) => (
         <Button
-          disabled={record?.id ? false : true}
+          disabled={record?.id && record.status !== 'not-done' ? false : true}
           onClick={() => {
             navigate(`/view-vaccination/${record?.id}`)
           }}
@@ -297,10 +308,13 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                     const administered = category.vaccines.filter(
                       (vaccine) => vaccine.status === 'completed'
                     )
+                    const contraindicated = category.vaccines.filter(
+                      (vaccine) => vaccine.status === 'entered-in-error'
+                    )
                     const someAdministered =
                       category.vaccines.filter(
-                        (vaccine) => vaccine.status !== 'complete' || vaccine.status === 'not-done'
-                      )?.length > 0 && administered.length > 0
+                        (vaccine) => vaccine.status !== 'complete' || vaccine.status === 'not-done' || vaccine.status === 'entered-in-error'
+                      )?.length > 0 && (administered.length > 0 || contraindicated.length > 0)
                     const allAdministered =
                       category.vaccines.filter(
                         (vaccine) => vaccine.status === 'completed'
@@ -313,7 +327,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                           //   vaccine?.adminRange?.start,
                           //   patientData.birthDate
                           // )
-                      )?.length === category.vaccines.length
+                      )?.length === category.vaccines.length 
 
                     return (
                       <>

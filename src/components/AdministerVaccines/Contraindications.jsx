@@ -31,7 +31,7 @@ export default function Contraindications() {
   }, [sharedData])
 
   function handleDialogClose() {
-    navigate(-1)
+    // navigate(-1)
     setDialogOpen(false)
   }
 

@@ -3,9 +3,6 @@ import dayjs from "dayjs"
 const createVaccineImmunization = (data, patientID, status) => {
   return {
     "resourceType": "Immunization",
-    "meta": {
-        "source": "#DFjDLA1QMCXdiQ15"
-    },
     "status": status,
     "vaccineCode": {
         "coding": [

@@ -34,7 +34,7 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox, di
               <thead>
                 <tr>
                   {headers.map((header, index) => (
-                    <th key={index} scope="col" className="border border-slate-300 py-3.5 pl-4 pr-3 bg-slate-200 text-sm font-bold text-gray-900 uppercase sm:pl-0">
+                    <th key={index} scope="col" className="border border-slate-300 py-3.5 pl-4 text-left pr-3 bg-slate-200 text-sm font-bold text-gray-900">
                       {header.title}
                     </th>
                   ))}
