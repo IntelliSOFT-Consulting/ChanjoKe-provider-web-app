@@ -61,7 +61,7 @@ const routineVaccines = [
   {
     vaccineName: 'Rotavirus 1',
     vaccineCode: 'IMROTA-1',
-    diseaseTarget: '',
+    diseaseTarget: 'Rotavirus',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -75,7 +75,7 @@ const routineVaccines = [
   {
     vaccineName: 'OPV II',
     vaccineCode: 'IMPO-OPV-II',
-    diseaseTarget: '',
+    diseaseTarget: 'Polio',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -99,7 +99,7 @@ const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 2',
     vaccineCode: 'IMDPT-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -123,7 +123,7 @@ const routineVaccines = [
   {
     vaccineName: 'PCV10 2',
     vaccineCode: 'IMPCV10-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Pneumonia',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -147,7 +147,7 @@ const routineVaccines = [
   {
     vaccineName: 'Rotavirus 2',
     vaccineCode: 'IMROTA-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Rotavirus',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -195,7 +195,7 @@ const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 3',
     vaccineCode: 'IMDPT-3',
-    diseaseTarget: '',
+    diseaseTarget: 'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -219,7 +219,7 @@ const routineVaccines = [
   {
     vaccineName: 'PCV10 3',
     vaccineCode: 'IMPCV10-3',
-    diseaseTarget: '',
+    diseaseTarget: 'Pneumonia',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -243,7 +243,7 @@ const routineVaccines = [
   {
     vaccineName: 'IPV',
     vaccineCode: 'IMPO-IPV I',
-    diseaseTarget: '',
+    diseaseTarget: 'Polio',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -257,7 +257,7 @@ const routineVaccines = [
   {
     vaccineName: 'Rotavirus 3',
     vaccineCode: 'IMROTA-3',
-    diseaseTarget: '',
+    diseaseTarget: 'Rotavirus',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -281,7 +281,7 @@ const routineVaccines = [
   {
     vaccineName: 'Vitamin A 1st Dose',
     vaccineCode: 'IMVIT-1',
-    diseaseTarget: '',
+    diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -295,7 +295,7 @@ const routineVaccines = [
   {
     vaccineName: 'Measles-Rubella',
     vaccineCode: 'IMMEAS-0',
-    diseaseTarget: '',
+    diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -309,7 +309,7 @@ const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 1)',
     vaccineCode: 'IMMALA-1',
-    diseaseTarget: '',
+    diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -323,7 +323,7 @@ const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 2)',
     vaccineCode: 'IMMALA-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -347,7 +347,7 @@ const routineVaccines = [
   {
     vaccineName: 'Measles-Rubella 1st Dose',
     vaccineCode: 'IMMEAS-1',
-    diseaseTarget: '',
+    diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -361,7 +361,7 @@ const routineVaccines = [
   {
     vaccineName: 'Yellow Fever',
     vaccineCode: 'IMYF-I',
-    diseaseTarget: '',
+    diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -375,7 +375,7 @@ const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 3)',
     vaccineCode: 'IMMALA-3',
-    diseaseTarget: '',
+    diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -399,7 +399,7 @@ const routineVaccines = [
   {
     vaccineName: 'Vitamin A 2nd Dose',
     vaccineCode: 'IMVIT-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -423,7 +423,7 @@ const routineVaccines = [
   {
     vaccineName: 'Measles-Rubella 2nd Dose',
     vaccineCode: 'IMMEAS-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -447,7 +447,7 @@ const routineVaccines = [
   {
     vaccineName: 'Vitamin A 3rd Dose',
     vaccineCode: 'IMVIT-3',
-    diseaseTarget: '',
+    diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -471,7 +471,7 @@ const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 4)',
     vaccineCode: 'IMMALA-4',
-    diseaseTarget: '',
+    diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -495,7 +495,7 @@ const routineVaccines = [
   {
     vaccineName: 'HPV Vaccine 1',
     vaccineCode: 'IMHPV-1',
-    diseaseTarget: '',
+    diseaseTarget: 'Human Papillomavirus',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -509,7 +509,7 @@ const routineVaccines = [
   {
     vaccineName: 'HPV Vaccine 2',
     vaccineCode: 'IMHPV-2',
-    diseaseTarget: '',
+    diseaseTarget: 'Human Papillomarivus',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
@@ -536,7 +536,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'AstraZeneca',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -546,7 +546,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Johnson & Johnson',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -556,7 +556,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Pfizer/BioNTech',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -566,7 +566,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Moderna',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -576,7 +576,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Sinopharm',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -587,7 +587,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 1',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Tetanus',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -597,7 +597,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 2',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Tetanus',
     doseNumber: '2',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -607,7 +607,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 3',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Tetanus',
     doseNumber: '3',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -617,7 +617,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 4',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Tetanus',
     doseNumber: '4',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -627,7 +627,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 5',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Tetanus',
     doseNumber: '5',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -638,7 +638,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Yellow Fever',
     vaccineCode: 'IMYF-I',
-    diseaseTarget: '',
+    diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -649,7 +649,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 1',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Rabies',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -659,7 +659,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 2',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Rabies',
     doseNumber: '3',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -669,7 +669,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 3',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Rabies',
     doseNumber: '3',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -679,7 +679,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 4',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Rabies',
     doseNumber: '4',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -689,7 +689,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 5',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Rabies',
     doseNumber: '5',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -700,7 +700,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Influenza 1',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Influenza',
     doseNumber: '1',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',
@@ -710,7 +710,7 @@ const nonRoutineVaccines = [
   {
     vaccineName: 'Influenza 2',
     vaccineCode: '',
-    diseaseTarget: '',
+    diseaseTarget: 'Influenza',
     doseNumber: '2',
     dueDate: 'Jan 1 2020',
     occurrenceDateTime: '',

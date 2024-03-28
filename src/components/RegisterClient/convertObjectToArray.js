@@ -6,7 +6,10 @@ dayjs.extend(weekdays)
 dayjs.extend(localeDate) 
 
 function convertCamelCaseString(inputString) {
-  return inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+  let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+  console.log({ stringWithSpaces })
+  return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase());
+  // return inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
 const ConvertObjectToArray = (inputObject) => {
@@ -17,9 +20,11 @@ const ConvertObjectToArray = (inputObject) => {
 
   for (const key in inputObject) {
     const item = {
-      title: `${convertCamelCaseString(capitalizeFirstLetter(key))}`,
-      value: typeof inputObject[key] === 'object' ? dayjs(inputObject[key]).format('YYYY-MM-DD') :  inputObject[key],
+      title: `${convertCamelCaseString(key)}`,
+      value: typeof inputObject[key] === 'object' ? dayjs(inputObject[key]).format('DD-MM-YYYY') :  inputObject[key],
     };
+
+    console.log({ item })
 
     clientDetails.push(item);
   }

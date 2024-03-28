@@ -32,6 +32,15 @@ export default function RegisterClient({ editClientID }) {
   const { data, loading, error } = useGet(`Patient/${editClientID}`)
   const { data: observationData } = useGet(`Observation?patient=Patient/${editClientID}`)
 
+  function convertUnderscoresAndCapitalize(inputString) {
+    if (inputString !== undefined) {
+      let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+      return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase());
+    } else {
+      return ''
+    }
+  }
+
   useEffect(() => {
     let currentweight = ''
     let identificationType = ''
@@ -57,11 +66,12 @@ export default function RegisterClient({ editClientID }) {
       middleName: data?.name?.[0]?.given[1] || '',
       lastName: data?.name?.[0]?.given[0] || '',
       dateOfBirth: data?.birthDate ? dayjs(data?.birthDate) : '',
+      phoneNumber: data?.telecom?.[0]?.value,
       age: calculateAge(data?.birthDate),
       gender: data?.gender,
       currentWeight: currentweight,
       identificationNumber,
-      identificationType,
+      identificationType: convertUnderscoresAndCapitalize(identificationType),
     })
 
     const caregivers = data?.contact.map((caregiver) => {
@@ -105,6 +115,10 @@ export default function RegisterClient({ editClientID }) {
         SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, newClientResponse?.id))
       }
       setResponse(newClientResponse)
+
+      setTimeout(() => {
+        handleDialogClose()
+      }, 2000)
     } else {
       setDialogText('Client details updated successfully!')
       setDialogOpen(true)
@@ -115,6 +129,9 @@ export default function RegisterClient({ editClientID }) {
       if (currentWeight) {
         SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, editClientID))
       }
+      setTimeout(() => {
+        handleDialogClose()
+      }, 2000)
     }
   }
 

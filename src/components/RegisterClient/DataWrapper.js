@@ -131,7 +131,7 @@ function createPatientData(data) {
     "telecom": [
         {
             "system": "phone",
-            "value": "",
+            "value": data.phoneNumber,
         }
     ],
     "gender": data.gender,

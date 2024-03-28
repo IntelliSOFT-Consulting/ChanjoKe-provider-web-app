@@ -1,7 +1,7 @@
 import ChanjoKE from '../assets/login bg.png'
 import MOHLogo from '../assets/moh-logo.png'
 import { useNavigate, Link } from 'react-router-dom'
-import { Form, Input } from 'antd'
+import { Form, Input, Select } from 'antd'
 import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
@@ -13,6 +13,10 @@ export default function Login() {
   const { post } = useApiRequest()
 
   const [loading, setLoading] = useState(false)
+  const [locations, setLocations] = useState([
+    { name: 'Outreach', value: 'outreach' },
+    { name: 'Facility', value: 'facility' },
+  ])
 
   const onFinish = async (values) => {
 
@@ -93,6 +97,29 @@ export default function Login() {
               className="site-form-item-icon" />}
               type="password"
               placeholder='Password'/>
+          </Form.Item>
+
+          <Form.Item
+            name="location"
+            className='w-full'
+            rules={[
+              {
+                required: true,
+                message: 'Please select your location',
+              },
+            ]}>
+            <Select
+              size='middle'
+              placeholder='Location'
+              // className='w-full ps-3'
+              // suffixIcon={<LockOutlined style={{ left: '11px !important!'}} />}
+              >
+              {locations.map((option) => (
+                <Select.Option value={option.value}>
+                  {option.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <div className='text-right mx-10 text-[#707070] mt-3'>
