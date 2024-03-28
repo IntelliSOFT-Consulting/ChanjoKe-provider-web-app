@@ -17,7 +17,6 @@ export default function ContraindicationDetails() {
   useEffect(() => {
 
     if (vaccinationDetails !== null) {
-      console.log({ vaccinationDetails })
       setContraindicationInfo(ConvertObjectToArray({
         'Contraindication Date': dayjs(vaccinationDetails?.occurrenceDateTime).format('Do MMM YYYY'),
         'Next Vaccination Date': dayjs(vaccinationDetails?.education?.[0]?.presentationDate).format('Do MMM YYYY'),

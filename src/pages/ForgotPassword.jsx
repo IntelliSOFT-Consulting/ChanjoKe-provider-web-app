@@ -49,9 +49,6 @@ export default function ForgotPassword() {
         }, 3000)
       }
     }
-
-    console.log({ response })
-    console.log({ values })
   }
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">

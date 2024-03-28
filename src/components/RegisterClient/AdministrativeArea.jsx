@@ -64,7 +64,6 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
       setWards(locationArray)
     }
 
-    console.log({ g: adminArea, form: formData })
   }, [locationURL, data])
 
   const switchLocationURL = (level, value) => {

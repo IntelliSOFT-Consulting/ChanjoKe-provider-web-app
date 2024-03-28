@@ -85,15 +85,29 @@ export default function RoutineVaccines({ userCategory, patientData }) {
         doseNumber: vaccine?.resource?.doseQuantity?.value,
       }
     })
+    const element = document.getElementById(userCategory)
 
     if (Array.isArray(vaccData) && vaccData) {
       const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
 
       setMappedVaccines(mapVaccinesByCategory(mergedVax))
+
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }
     }  else {
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }
       setMappedVaccines(mapVaccinesByCategory(routineVaccines))
     }
-  }, [data?.entry])
+  }, [data?.entry, loading])
 
   function mapVaccinesByCategory(vaccines) {
     const categoriesMap = {}
@@ -301,6 +315,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                   defaultOpen={
                     category.category === userCategory ? true : false
                   }
+                  id={`${userCategory}`}
                   className="pt-2"
                 >
                   {({ open }) => {

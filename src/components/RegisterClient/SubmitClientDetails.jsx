@@ -7,8 +7,6 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
   const clientDetailsArray = ConvertObjectToArray(clientDetails)
   const administrativeAreaArray = ConvertObjectToArray(administrativeArea)
 
-  console.log({ clientDetails })
-
   const tHeaders = [
     {title: 'Caregiver\'s Name', class: '', key: 'caregiverName'},
     {title: 'Caregiver\'s Relationship', class: '', key: 'caregiverType'},

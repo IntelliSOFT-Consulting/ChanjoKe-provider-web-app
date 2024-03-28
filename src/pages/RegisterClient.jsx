@@ -115,10 +115,6 @@ export default function RegisterClient({ editClientID }) {
         SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, newClientResponse?.id))
       }
       setResponse(newClientResponse)
-
-      setTimeout(() => {
-        handleDialogClose()
-      }, 2000)
     } else {
       setDialogText('Client details updated successfully!')
       setDialogOpen(true)
@@ -129,9 +125,6 @@ export default function RegisterClient({ editClientID }) {
       if (currentWeight) {
         SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, editClientID))
       }
-      setTimeout(() => {
-        handleDialogClose()
-      }, 2000)
     }
   }
 
