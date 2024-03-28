@@ -18,6 +18,7 @@ import {
   formatFacilitiesToTable,
 } from '../../utils/formatter'
 import { debounce, getOffset } from '../../utils/methods'
+import { PlusIcon } from '@heroicons/react/24/solid'
 
 export default function AddFacility() {
   const [visible, setVisible] = useState(false)
@@ -231,7 +232,7 @@ export default function AddFacility() {
     }
   }
 
-  const handleArchive = async (code, status='active') => {
+  const handleArchive = async (code, status = 'active') => {
     const facility = await get(`/hapi/fhir/Location/${code}`)
     const payload = {
       ...facility,
@@ -263,7 +264,7 @@ export default function AddFacility() {
             type="primary"
             onClick={() => setVisible(true)}
             className="rounded-md outline bg-[#163C94] flex items-center"
-            icon={<span className="material-symbols-outlined">add</span>}
+            icon={<PlusIcon className="text-white w-5 h-5 font-semibold" />}
           >
             Add Facility
           </Button>
@@ -301,6 +302,7 @@ export default function AddFacility() {
                 dataSource={facilities}
                 size="small"
                 loading={loading}
+                rowKey="kmflCode"
                 pagination={{
                   pageSize: 12,
                   showTotal: (total, range) =>
@@ -463,6 +465,7 @@ export default function AddFacility() {
           columns={columns}
           dataSource={archivedFacilities}
           loading={archivedLoading}
+          rowKey="kmflCode"
           size="small"
           pagination={{
             pageSize: 12,
