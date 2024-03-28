@@ -7,8 +7,7 @@ export default function classifyUserByAge(dateString) {
 
   // Define age categories
   const ageCategories = [
-    { category: 'at_birth', maxAge: 2 },
-    { category: '2_weeks', maxAge: 14 },
+    { category: 'at_birth', maxAge: 14 },
     { category: '6_weeks', maxAge: 6 * 7 },
     { category: '10_weeks', maxAge: 10 * 7 },
     { category: '6_months', maxAge: 6 * 30.44 },

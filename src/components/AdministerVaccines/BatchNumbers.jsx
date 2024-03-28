@@ -24,7 +24,6 @@ export default function BatchNumbers() {
     if (!sharedData || sharedData?.length === 0) {
       navigate(-1)
     }
-    console.log({ sharedData })
   }, [sharedData])
 
   const handleFormSubmit = async () => {

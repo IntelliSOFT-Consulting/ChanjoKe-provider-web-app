@@ -1,5 +1,4 @@
 export default function calculateEstimatedBirthDate(selectedWeek, selectedMonth, selectedYear) {
-  console.log({ selectedWeek, selectedMonth, selectedYear })
   const currentDate = new Date();
   
   const daysFromWeeks = selectedWeek * 7;

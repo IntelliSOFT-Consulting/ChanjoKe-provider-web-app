@@ -72,7 +72,6 @@ export const formatFacilitiesToTable = (bundle) => {
     const ward = wards.find((ward) => ward.key?.toLowerCase() === wardName?.toLowerCase());
     const subCounty = subCounties.find((subCounty) => subCounty.key?.toLowerCase() === ward?.parent?.toLowerCase())
     const county = counties.find((county) => county.key?.toLowerCase() === subCounty?.parent?.toLowerCase())
-    console.log({ ward, subCounty, county })
     return {
       key: facility.resource.id,
       name: toTitleCase(facility.resource?.name),

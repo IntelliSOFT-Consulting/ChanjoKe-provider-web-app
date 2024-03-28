@@ -27,23 +27,22 @@ export default function Contraindications() {
   }, {})
 
   useEffect(() => {
+    const vaccinesToSelect = sharedData.map((vaccine) => ({ name: vaccine.vaccineName, value: vaccine.vaccineName }))
+    setVaccinesToSelect(vaccinesToSelect)
     setVaccines(sharedData)
   }, [sharedData])
 
   function handleDialogClose() {
-    // navigate(-1)
     setDialogOpen(false)
   }
 
   const handleFormSubmit = async () => {
-    if (Array.isArray(sharedData) && sharedData.length > 0) {
-      const data = sharedData.map((immunization) => {
+    if (Array.isArray(vaccines) && vaccines.length > 0) {
+      const data = vaccines.map((immunization) => {
         immunization.contraindicationDetails = formData.contraindicationDetails
         immunization.education = [
           { presentationDate: formData.nextVaccinationDate }
         ]
-
-        console.log({ immunization })
         return createVaccineImmunization(
           immunization,
           currentPatient.id,
@@ -84,11 +83,17 @@ export default function Contraindications() {
             <div>
 
               <SelectMenu
-                data={vaccines.map((vaccine) => ({ name: vaccine.vaccineName, value: vaccine.vaccineCode }))}
+                data={vaccinesToSelect}
                 required={true}
                 label="Vaccines to Contraindicate"
                 value={formData.vaccinesToContraindicate || 'Vaccines to Contraindicate'}
-                onInputChange={(value) => handleChange('vaccinesToContraindicate', value.name)}/>
+                onInputChange={(value) => {
+                  const vaccineExists = vaccines.find((vaccine) => vaccine.vaccineName === value.name)
+                  if (!vaccineExists) {
+                    const inShared = sharedData.find((vaccine) => vaccine.vaccineName === value.name)
+                    setVaccines([...vaccines, inShared ])
+                  }
+                }}/>
 
               <div className="py-4 flex">
                 {vaccines.map((vaccine) => (
@@ -97,7 +102,7 @@ export default function Contraindications() {
                     <button
                       onClick={() => {
                         const vaccinesLeft = vaccines.filter((vacc) => vacc.vaccineName !== vaccine.vaccineName)
-                        setVaccines([...vaccines, vaccinesLeft])
+                        setVaccines(vaccinesLeft)
                       }}
                       type="button"
                       class="flex-shrink-0 size-4 inline-flex items-center justify-center rounded-full hover:bg-blue-200 focus:outline-none focus:bg-blue-200">
@@ -121,7 +126,7 @@ export default function Contraindications() {
                   required={true}
                   rows="4"
                   cols="50"
-                  inputPlaceholder="  Enter Contraindications"/>
+                  inputPlaceholder="Enter Contraindications"/>
 
                 <TextInput
                   inputType="date"

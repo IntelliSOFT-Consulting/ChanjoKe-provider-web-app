@@ -70,8 +70,6 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
       { title: 'remove', btnAction: 'removeCareGiver' }
     ]
 
-    console.log({ values })
-
     setCaregivers([...caregivers, values])
     form.resetFields()
   };
