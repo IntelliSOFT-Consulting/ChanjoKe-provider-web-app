@@ -8,12 +8,6 @@ import moment from "moment"
 
 function convertUnderscoresAndCapitalize(inputString) {
   if (inputString !== undefined) {
-    // const stringWithSpaces = inputString.replace(/_/g, ' ');
-    // const capitalizedString =
-    //   stringWithSpaces.charAt(0).toUpperCase() + stringWithSpaces.slice(1);
-
-    // return capitalizedString;
-
     let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
     return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase());
   } else {
@@ -38,8 +32,8 @@ export default function ClientRecords() {
     let identificationType = ''
     let identificationNumber = ''
     if (data?.identifier && Array.isArray(data?.identifier)) {
-      const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
-      identificationType = userID?.[0]?.type?.coding?.[0]?.code || userID?.[0]?.system
+      const userID = data?.identifier.filter((id) => id?.system === 'identification_type')
+      identificationType = userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
 

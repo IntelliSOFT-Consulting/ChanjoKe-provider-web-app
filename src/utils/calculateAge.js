@@ -1,8 +1,8 @@
-
 export default function calculateAge(dateString) {
   if (!dateString) {
-    return 'N/A'
+    return 'N/A';
   }
+
   const today = new Date();
   const birthDate = new Date(dateString);
 
@@ -12,22 +12,23 @@ export default function calculateAge(dateString) {
   const ageInHours = ageInMinutes / 60;
   const ageInDays = ageInHours / 24;
   const ageInWeeks = ageInDays / 7;
-  const ageInMonths = today.getMonth() - birthDate.getMonth() + (12 * (today.getFullYear() - birthDate.getFullYear()));
-  const ageInYears = today.getFullYear() - birthDate.getFullYear();
+  const ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
+  const ageInYears = ageInMonths / 12;
 
   if (ageInDays <= 7) {
-    return Math.floor(ageInDays) > 1 ? `${Math.floor(ageInDays)} days` : `${Math.floor(ageInDays)} day`;
+    return ageInDays.toFixed(2) > 1 ? `${ageInDays.toFixed(2)} days` : `${ageInDays.toFixed(2)} day`;
   } else if (ageInMonths < 2) {
     const weeks = Math.floor(ageInWeeks);
-    const days = Math.floor(ageInDays % 7);
-    return days > 0 ? `${weeks} week${weeks > 1 ? 's' : ''}, ${days} days` : `${weeks} week${weeks > 1 ? 's' : ''}`;
+    const days = ageInDays - weeks * 7;
+    return days > 0 ? `${weeks} week${weeks > 1 ? 's' : ''}, ${days.toFixed(2)} days` : `${weeks} week${weeks > 1 ? 's' : ''}`;
   } else if (ageInMonths < 12) {
     const months = Math.floor(ageInMonths);
-    const weeks = Math.floor(ageInWeeks % 4);
+    const remainingDays = ageInDays - (months * 30.44); // average number of days in a month
+    const weeks = Math.floor(remainingDays / 7);
     return weeks > 0 ? `${months} month${months > 1 ? 's' : ''}, ${weeks} week${weeks > 1 ? 's' : ''}` : `${months} month${months > 1 ? 's' : ''}`;
   } else {
     const years = Math.floor(ageInYears);
-    const months = Math.floor(ageInMonths % 12);
-    return months > 0 ? `${years} year${years > 1 ? 's' : ''}, ${months} month${months > 1 ? 's' : ''}` : `${years} year${years > 1 ? 's' : ''}`;
+    const remainingMonths = ageInMonths - years * 12;
+    return remainingMonths > 0 ? `${years} year${years > 1 ? 's' : ''}, ${remainingMonths.toFixed(2)} months` : `${years} year${years > 1 ? 's' : ''}`;
   }
 }

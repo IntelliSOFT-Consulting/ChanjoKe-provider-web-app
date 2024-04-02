@@ -45,6 +45,7 @@ export default function RegisterClient({ editClientID }) {
     let currentweight = ''
     let identificationType = ''
     let identificationNumber = ''
+    let estimatedAge = ''
     if (observationData?.entry && Array.isArray(observationData?.entry) && observationData?.entry.length) {
       const weight = observationData?.entry.map((observation) => {
         return observation?.resource?.code?.coding?.[0]?.code === 'CURRENT_WEIGHT' ? observation?.resource?.code?.text : ''
@@ -54,8 +55,11 @@ export default function RegisterClient({ editClientID }) {
     }
 
     if (data?.identifier && Array.isArray(data?.identifier)) {
-      const userID = data?.identifier.filter((id) => (id?.type?.coding?.[0]?.display !== 'SYSTEM_GENERATED' ? id : ''))
-      identificationType = userID?.[0]?.type?.coding?.[0]?.code || userID?.[0]?.system
+      const estimatedAgeVal = data?.identifier.filter((id) => id?.system === 'estimated-age')
+      const userID = data?.identifier.filter((id) => id?.system === 'identification_type')
+      estimatedAge = estimatedAgeVal?.[0].value 
+
+      identificationType = userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
 
@@ -69,6 +73,7 @@ export default function RegisterClient({ editClientID }) {
       phoneNumber: data?.telecom?.[0]?.value,
       age: calculateAge(data?.birthDate),
       gender: data?.gender,
+      estimatedAge,
       currentWeight: currentweight,
       identificationNumber,
       identificationType: convertUnderscoresAndCapitalize(identificationType),

@@ -193,12 +193,21 @@ export default function RoutineVaccines({ userCategory, patientData }) {
             name={record.vaccineName}
             value={record.vaccineName}
             defaultChecked={completed}
+            className="tooltip"
             disabled={
               completed || notDone ||
               lockVaccine(record?.adminRange?.start, patientData.birthDate)
             }
             onChange={() => handleCheckBox('administer', record)}
-          />
+          >
+            { (lockVaccine(record?.adminRange?.start, patientData.birthDate) || notDone || completed) && <span className='tooltiptext'>
+            { lockVaccine(record?.adminRange?.start, patientData.birthDate)
+              ? 'This client is not currently eligible for this vaccine'
+              : completed
+              ? 'Vaccine already administered'
+              : 'Vaccine not administered'}
+            </span> }
+          </Checkbox>
         )
       },
       width: '5%',
@@ -234,8 +243,11 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       title: 'Date Administered',
       dataIndex: 'occurrenceDateTime',
       key: 'occurrenceDateTime',
-      render: (text) => {
-        return text ? moment(text).format('DD-MM-YYYY') : '-'
+      render: (text, _record) => {
+        if (_record?.status !== 'completed') {
+          return '-'
+        }
+        return text ? moment(text).format('Do MMM YYYY') : '-'
       },
     },
     {
