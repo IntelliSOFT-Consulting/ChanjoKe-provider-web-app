@@ -117,7 +117,7 @@ export default function NotAdministered() {
               <div className="py-4 flex">
                 {vaccines.map((vaccine) => (
                   <span class="inline-flex items-center gap-x-3 py-2 ps-5 pe-2 rounded-full text-xs font-medium bg-blue-100 mx-2">
-                    {vaccine.vaccineName}
+                    {vaccine.name}
                     <button
                       onClick={() => {
                         const vaccinesLeft = vaccines.filter((vacc) => vacc.vaccineName !== vaccine.vaccineName)

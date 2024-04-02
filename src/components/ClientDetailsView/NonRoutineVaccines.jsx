@@ -180,15 +180,21 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
             name={record.vaccineName}
             value={record.vaccineName}
             defaultChecked={completed}
+            className="tooltip"
             disabled={
               completed || notDone ||
               lockVaccine(6574.5, patientData.birthDate)
             }
-            onChange={() => {
-              handleCheckBox('administer', record)
-              console.log('check validity of vaccine')
-            }}
-          />
+            onChange={() => handleCheckBox('administer', record)}
+          >
+            { (lockVaccine(6574.5, patientData.birthDate) || notDone || completed) && <span className='tooltiptext'>
+            { lockVaccine(6574.5, patientData.birthDate)
+              ? 'This client is not currently eligible for this vaccine'
+              : completed
+              ? 'Vaccine already administered'
+              : 'Vaccine not administered'}
+            </span> }
+          </Checkbox>
         )
       },
       width: '5%',

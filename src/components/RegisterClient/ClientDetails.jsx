@@ -46,9 +46,15 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   form.setFieldsValue({ weightMetric: 'Kgs' });
 
   useEffect(() => {
+    console.log({ editClientDetails })
     form.setFieldsValue(editClientDetails)
     setUserAge(editClientDetails?.age || 'Age')
     setLoading(true)
+
+    // If estimated age isn't set, set it to true
+    if (editClientDetails?.estimatedAge === '') {
+      form.setFieldValue('estimatedAge', 'true')
+    }
 
     const days = daysBetweenTodayAndDate(moment(editClientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD'))
     const mappedIDs = identificationOptions.filter(option =>
@@ -74,7 +80,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
     const age = stringAge.match(/(\d+)\s*year/i)
     if (age === null) {
       return false
-    } else if (parseInt(age[1]) > 18) {
+    } else if (parseInt(age[1]) >= 18) {
       return true
     }
   }
@@ -114,7 +120,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="First Name"
                       autoComplete="off"
-                      className='block w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
+                      className='block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
                 </Form.Item>
               </Col>
 
@@ -130,7 +136,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="Middle Name"
                       autoComplete="off"
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
               </Col>
 
@@ -151,7 +157,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="Last Name"
                       autoComplete="off"
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
               </Col>
 
@@ -186,18 +192,16 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                           <span className="font-bold">Age Input Method</span>
                         </div>
                       }>
-                    <Radio.Group onChange={(value) => {
-                      setActualAge(value.target.value)
-                      }} value={actualAge}>
-                      <Radio value={true}>Actual</Radio>
-                      <Radio value={false}>Estimated</Radio>
+                    <Radio.Group>
+                      <Radio value={"true"}>Actual</Radio>
+                      <Radio value={"false"}>Estimated</Radio>
                     </Radio.Group>
                   </Form.Item>
                   </div>
                 </div>
               
               </Col>
-              { actualAge && <>
+              { form.getFieldValue("estimatedAge") === "true" && <>
                 <Col className="gutter-row" span={8}>
                   <Form.Item
                     name="dateOfBirth"
@@ -225,7 +229,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         );
                         setIdOptions(mappedIDs)
                       }}
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
                 </Col>
 
@@ -246,13 +250,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         placeholder="Age"
                         value={userAge}
                         disabled={true}
-                        className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                        className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
                 </Col>
               </>
               }
 
-              {!actualAge && <>
+              {form.getFieldValue("estimatedAge") === "false" && <>
                 <Col className="gutter-row grid grid-cols-3 gap-4 flex mt-7" span={8}>
                   <Form.Item>     
                     <InputNumber
@@ -329,7 +333,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <DatePicker
                       disabled={true}
                       format="DD-MM-YYYY"
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
                 </Col>
               </>
@@ -352,7 +356,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     ]}>
                       <Input
                         placeholder="Phone Number"
-                        className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                        className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
                 </Col>
               }
@@ -393,13 +397,14 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="Document Identification Number"
                       autoComplete="off"
-                      className='block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
               </Col>
 
               <Col className="gutter-row" span={8}>
                 <Form.Item
                   name="currentWeight"
+                  size="large"
                   label={
                     <div>
                       <span className="font-bold">Current Weight</span>
@@ -409,6 +414,8 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                       <Input
                         placeholder="Current Weight"
                         autoComplete="off"
+                        className='rounded'
+                        size='large'
                         addonAfter={
                           <Form.Item name='weightMetric' className='mb-0 block rounded-md'>
                         <Select
@@ -417,12 +424,11 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                           onChange={(value) => {
                             form.setFieldsValue({ weightMetric: value });
                           }}>
-                          <Select.Option value="Kgs">KGs</Select.Option>
+                          <Select.Option value="Kg">KG</Select.Option>
                           <Select.Option value="Grams">Grams</Select.Option>
                         </Select>
                         </Form.Item>
-                        } 
-                        className='rounded' />
+                        } />
                 </Form.Item>
               </Col>
 

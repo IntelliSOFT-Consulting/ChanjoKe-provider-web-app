@@ -104,7 +104,7 @@ function createPatientData(data) {
               ],
               "text": data.estimatedAge,
           },
-          "system": "identification",
+          "system": "estimated-age",
           "value": data.estimatedAge,
       },
         {
@@ -186,11 +186,6 @@ function createObservationData(value, patient, encounter) {
 }
 
 function deconstructPatientData(data, searchType) {
-
-  const idNumber =
-  data?.resource?.identifier?.find(
-    (item) => item.type?.text === 'SYSTEM_GENERATED'
-  )?.value || null;
 
     let actions = [
         {
