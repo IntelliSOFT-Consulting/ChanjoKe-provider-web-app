@@ -234,8 +234,11 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       title: 'Date Administered',
       dataIndex: 'occurrenceDateTime',
       key: 'occurrenceDateTime',
-      render: (text) => {
-        return text ? moment(text).format('DD-MM-YYYY') : '-'
+      render: (text, _record) => {
+        if (_record?.status !== 'completed') {
+          return '-'
+        }
+        return text ? moment(text).format('Do MMM YYYY') : '-'
       },
     },
     {
