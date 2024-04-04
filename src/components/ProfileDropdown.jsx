@@ -1,11 +1,15 @@
 import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
+import { useDispatch} from 'react-redux'
+import { logout } from '../redux/actions/userActions'
 import { Link, useNavigate } from 'react-router-dom'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ')
 
 export default function ProfileDropdown() {
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
+
+  const dispatch = useDispatch()
 
   return (
     <Menu as="div" className="relative">
@@ -52,8 +56,7 @@ export default function ProfileDropdown() {
             {({ active }) => (
               <button
                 onClick={() => {
-                  localStorage.clear()
-                  navigate('/auth')
+                  dispatch(logout())
                 }}
                 className={classNames(active ? 'bg-gray-100 w-full' : '', 'block px-4 w-full py-2 text-left text-sm text-gray-700')}>
                 Log Out
