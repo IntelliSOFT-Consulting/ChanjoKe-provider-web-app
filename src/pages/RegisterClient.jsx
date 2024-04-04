@@ -75,8 +75,8 @@ export default function RegisterClient({ editClientID }) {
       gender: data?.gender,
       estimatedAge,
       currentWeight: currentweight,
-      identificationNumber,
       identificationType: convertUnderscoresAndCapitalize(identificationType),
+      identificationNumber,
     })
 
     const caregivers = data?.contact.map((caregiver) => {

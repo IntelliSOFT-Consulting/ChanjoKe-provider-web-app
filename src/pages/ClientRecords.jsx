@@ -44,8 +44,8 @@ export default function ClientRecords() {
       'Gender': data?.gender,
       'Phone Number': data?.telecom?.[0]?.value,
       'Date of Birth': moment(data?.birthDate).format('DD-MM-YYYY'),
-      'Identification Number': identificationNumber,
       'Identification Type': convertUnderscoresAndCapitalize(identificationType),
+      'Identification Number': identificationNumber,
     }
 
     const addressDetails = {
