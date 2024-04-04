@@ -1,223 +1,209 @@
-import SelectMenu from '../../common/forms/SelectMenu'
-import TextInput from '../../common/forms/TextInput'
-import FormState from '../../utils/formState'
+import { useLocations } from '../../hooks/useLocation'
+import { usePractitioner } from '../../hooks/usePractitioner'
+import {
+  Select,
+  Input,
+  Form,
+  Button,
+  Space,
+  Modal,
+  Card,
+  message,
+  Popconfirm,
+} from 'antd'
 
 export default function AddUser() {
-  const counties = [
-    { id: 1, name: 'Nairobi' },
-    { id: 2, name: 'Kirinyaga' },
-    { id: 3, name: 'Narok' },
-    { id: 4, name: 'Mombasa' },
-  ]
+  const [form] = Form.useForm()
 
-  const subCounties = [
-    { id: 1, name: 'Kasarani' },
-  ]
+  const {
+    counties,
+    subCounties,
+    wards,
+    facilities,
+    handleCountyChange,
+    handleSubCountyChange,
+    handleWardChange,
+  } = useLocations(form)
 
-  const countyLevel = [
-    { id: 1, name: 'Level 1' },
-    { id: 2, name: 'Level 2' },
-  ]
-
-  const roleGroup = [
-    { id: 1, name: 'Nurse' }
-  ]
-
-  const formRules = {
-    firstName: {
-      required: true
-    },
-    lastName: {
-      required: true
-    },
-    username: {
-      required: true
-    },
-    phoneNumber: {
-      required: true
-    },
-    email: {
-      required: true
-    },
-    county: {
-      required: true
-    },
-    subCounty: {
-      required: true
-    },
-    level: {
-      required: true
-    },
-    roleGroup: {
-      required: true
-    }
-  }
-
-  const formStructure = {
-    firstName: '',
-    lastName: '',
-    username: '',
-    phoneNumber: '',
-    email: '',
-    county: '',
-    subCounty: '',
-    level: '',
-    roleGroup: ''
-  }
-
-  const { formData, formErrors, handleChange } = FormState(formStructure, formRules)
+  const { handleCreatePractitioner } = usePractitioner({ pageSize: 12 })
 
   return (
-    <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
-      <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-        Add User
-      </div>
+    <Card
+      title={
+        <div className="px-4 text-2xl font-semibold py-2 sm:px-6">Add User</div>
+      }
+      className="mt-6"
+    >
       <div className="px-4 py-5 sm:p-6">
+        <Form
+          layout="vertical"
+          form={form}
+          autoComplete="off"
+          onFinish={handleCreatePractitioner}
+        >
+          <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+            Personal Details
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <Form.Item
+              label="First Name"
+              name="firstName"
+              rules={[{ required: true, message: 'First Name is required' }]}
+            >
+              <Input placeholder="First Name" />
+            </Form.Item>
 
-        <form>
-        
-          <div className="grid grid-cols-3 gap-10">
-            {/* Column 1 */}
-            <div>
+            <Form.Item
+              label="Last Name"
+              name="lastName"
+              rules={[{ required: true, message: 'Last Name is required' }]}
+            >
+              <Input placeholder="Last Name" />
+            </Form.Item>
 
-              <TextInput
-                inputType="text"
-                inputName="firstName"
-                inputId="firstName"
-                label="First Name"
-                required={true}
-                value={formData.firstName}
-                error={formErrors.firstName}
-                onInputChange={(value) => handleChange('firstName', value)}
-                inputPlaceholder="First Name"/>
-
-              <TextInput
-                inputType="number"
-                inputName="phoneNumber"
-                inputId="phoneNumber"
-                label="Phone Number"
-                required={true}
-                value={formData.phoneNumber}
-                error={formErrors.phoneNumber}
-                onInputChange={(value) => handleChange('phoneNumber', value)}
-                inputPlaceholder="Phone Number"/>
-
-            </div>
-
-            {/* Column 2 */}
-            <div>
-
-              <TextInput
-                inputType="text"
-                inputName="lastName"
-                inputId="lastName"
-                label="Last Name"
-                required={true}
-                value={formData.lastName}
-                error={formErrors.lastName}
-                onInputChange={(value) => handleChange('lastName', value)}
-                inputPlaceholder="Last Name"/>
-
-              <TextInput
-                inputType="email"
-                inputName="email"
-                inputId="email"
-                label="Email"
-                required={true}
-                value={formData.email}
-                error={formErrors.email}
-                onInputChange={(value) => handleChange('email', value)}
-                inputPlaceholder="Email"/>
-
-            </div>
-
-            {/* Column 3 */}
-            <div>
-
-              <TextInput
-                inputType="text"
-                inputName="username"
-                inputId="username"
-                label="Username"
-                required={true}
-                value={formData.username}
-                error={formErrors.username}
-                onInputChange={(value) => handleChange('username', value)}
-                inputPlaceholder="Username"/>
-            </div>
+            <Form.Item
+              label="Username"
+              name="username"
+              rules={[{ required: true, message: 'Username is required' }]}
+            >
+              <Input placeholder="Username" />
+            </Form.Item>
           </div>
 
-          <h3 className="text-base mt-5 text-[#163C94] font-medium border-b-2 border-[#163C94]">Location Details</h3>
+          <div>
+            <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+              Contact Details
+            </h4>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <Form.Item
+              label="Phone Number"
+              name="phoneNumber"
+              rules={[
+                { required: true, message: 'Phone Number is required' },
+                {
+                  validator: (_, value) => {
+                    if (value && value.length < 10) {
+                      return Promise.reject(
+                        new Error('Phone number must be 10 digits')
+                      )
+                    }
+                    return Promise.resolve()
+                  },
+                },
+              ]}
+            >
+              <Input placeholder="07********" />
+            </Form.Item>
 
-          <div className="grid grid-cols-3 gap-10 mt-10">
-            {/* Column 1 */}
-            <div>
-
-              <SelectMenu
-                label="Select County"
-                required={true}
-                data={counties}
-                error={formErrors.county}
-                value={formData.county || 'Select County'}
-                onInputChange={(value) => handleChange('county', value)}/>
-
-            </div>
-
-            {/* Column 2 */}
-            <div>
-
-              <SelectMenu
-                label="Select Subcounty"
-                required={true}
-                data={subCounties}
-                error={formErrors.subCounty}
-                value={formData.subCounty || 'Select Subcounty'}
-                onInputChange={(value) => handleChange('subCounty', value)}/>
-
-            </div>
-
-            {/* Column 3 */}
-            <div>
-
-              <SelectMenu
-                label="Select Level"
-                required={true}
-                data={countyLevel}
-                error={formErrors.level}
-                value={formData.level || 'Select Center'}
-                onInputChange={(value) => handleChange('level', value)}/>
-
-            </div>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: 'Email is required' },
+                {
+                  type: 'email',
+                  message: 'Email is not valid',
+                },
+              ]}
+            >
+              <Input placeholder="Email" />
+            </Form.Item>
           </div>
 
-          <h3 className="text-base mt-5 text-[#163C94] font-medium border-b-2 border-[#163C94]">Role Details</h3>
+          <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+            Location Details
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10">
+            <Form.Item
+              label="Select County"
+              name="county"
+              rules={[{ required: true, message: 'Please select a county' }]}
+            >
+              <Select
+                placeholder="Select County"
+                onChange={handleCountyChange}
+                options={counties.map((county) => ({
+                  value: county.key,
+                  label: county.name,
+                }))}
+              />
+            </Form.Item>
 
-          <div className="grid grid-cols-3 gap-10 mt-10">
-            {/* Column 1 */}
-            <div>
+            <Form.Item
+              label="Select Subcounty"
+              name="subCounty"
+              rules={[{ required: true, message: 'Please select a subcounty' }]}
+            >
+              <Select
+                placeholder="Select Subcounty"
+                onChange={handleSubCountyChange}
+                options={subCounties.map((subCounty) => ({
+                  value: subCounty.key,
+                  label: subCounty.name,
+                }))}
+              />
+            </Form.Item>
 
-              <SelectMenu
-                label="Select Role Group"
-                required={true}
-                data={roleGroup}
-                error={formErrors.roleGroup}
-                value={formData.roleGroup || 'Select Role Group'}
-                onInputChange={(value) => handleChange('roleGroup', value)}/>
+            <Form.Item
+              label="Ward"
+              name="ward"
+              rules={[{ required: true, message: 'Please select a ward' }]}
+            >
+              <Select
+                placeholder="Select a Ward"
+                options={wards.map((ward) => ({
+                  value: ward.key,
+                  label: ward.name,
+                }))}
+                onChange={handleWardChange}
+              />
+            </Form.Item>
 
-            </div>
-
-            {/* Column 2 */}
-            <div>
-            </div>
-
-            {/* Column 3 */}
-            <div>
-            </div>
+            <Form.Item
+              label="Facility"
+              name="facility"
+              rules={[{ required: true, message: 'Please select a facility' }]}
+            >
+              <Select
+                placeholder="Select Facility"
+                options={facilities.map((facility) => ({
+                  value: facility.key,
+                  label: facility.name,
+                }))}
+              />
+            </Form.Item>
           </div>
 
-        </form>
+          <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+            Role Details
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4">
+            <Form.Item
+              label="Select Role Group"
+              name="roleGroup"
+              rules={[
+                { required: true, message: 'Please select a role group' },
+              ]}
+            >
+              <Select placeholder="Select Role Group">
+                <Select.Option value="Doctor">Doctor</Select.Option>
+                <Select.Option value="Nurse">Nurse</Select.Option>
+                <Select.Option value="Pharmacist">Pharmacist</Select.Option>
+                <Select.Option value="Lab Technician">
+                  Lab Technician
+                </Select.Option>
+              </Select>
+            </Form.Item>
+          </div>
 
+          <div className="flex justify-end border-t pt-4">
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </div>
+        </Form>
       </div>
-    </div>
+    </Card>
   )
 }

@@ -8,6 +8,37 @@ import reportWebVitals from './reportWebVitals'
 import { ConfigProvider } from 'antd'
 import { Provider } from 'react-redux'
 import store from './redux/store'
+import { createUseStyles } from 'react-jss'
+
+const useStyles = createUseStyles({
+  '@global': {
+    '.ant-card-body': {
+      padding: '0px !important',
+    },
+    '.ant-tabs-nav-list':{
+      width: '100%',
+    },
+    '.ant-tabs-tab': {
+      backgroundColor: '#EDF1F7 !important',
+      margin: '0px !important',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    '.ant-tabs-tab-active': {
+      backgroundColor: '#DFEAFA !important',
+    },
+    '.ant-tabs-tab-btn': {
+      marginLeft: '1.5rem !important',
+      marginRight: '1.5rem !important',
+      fontWeight: '600 !important',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }
+  },
+})
 
 const defaultData = {
   borderRadius: 6,
@@ -21,22 +52,24 @@ const defaultData = {
 }
 
 const App = () => {
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false)
+
+  const classes = useStyles()
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 1012px)');
+    const mediaQuery = window.matchMedia('(max-width: 1012px)')
     const handleWidthChange = (e) => {
-      setIsMobileOrTablet(e.matches);
-    };
+      setIsMobileOrTablet(e.matches)
+    }
 
-    handleWidthChange(mediaQuery);
+    handleWidthChange(mediaQuery)
 
-    mediaQuery.addListener(handleWidthChange);
+    mediaQuery.addListener(handleWidthChange)
 
     return () => {
-      mediaQuery.removeListener(handleWidthChange);
-    };
-  }, []);
+      mediaQuery.removeListener(handleWidthChange)
+    }
+  }, [])
 
   return (
     <React.StrictMode>
@@ -71,10 +104,10 @@ const App = () => {
             },
           }}
         >
-          {isMobileOrTablet &&
-            <IsMobileView />}
-          {!isMobileOrTablet &&
-            <RouterProvider router={routes} />}
+          <div className={classes.root}>
+            {isMobileOrTablet && <IsMobileView />}
+            {!isMobileOrTablet && <RouterProvider router={routes} />}
+          </div>
         </ConfigProvider>
       </Provider>
     </React.StrictMode>

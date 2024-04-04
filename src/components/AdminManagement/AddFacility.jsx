@@ -11,6 +11,7 @@ import {
   Card,
   message,
   Popconfirm,
+  Tabs,
 } from 'antd'
 import {
   convertLocations,
@@ -23,15 +24,12 @@ import { PlusIcon } from '@heroicons/react/24/solid'
 export default function AddFacility() {
   const [visible, setVisible] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [archivedCurrentPage, setArchivedCurrentPage] = useState(1)
+  const [activeTab, setActiveTab] = useState('1')
   const [pageSize, setPageSize] = useState(0)
-  const [archivedPageSize, setArchivedPageSize] = useState(0)
   const [counties, setCounties] = useState([])
   const [subCounties, setSubCounties] = useState([])
   const [wards, setWards] = useState([])
   const [facilities, setFacilities] = useState([])
-  const [archivedFacilities, setArchivedFacilities] = useState([])
-  const [archivedLoading, setArchivedLoading] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const [form] = Form.useForm()
@@ -90,47 +88,35 @@ export default function AddFacility() {
   }
 
   const fetchFacilities = async (name = null, archived = false) => {
-    archived ? setArchivedLoading(true) : setLoading(true)
+    setLoading(true)
     const query = name ? `&name=${name}` : ''
     const archivedQuery = archived ? `&status=inactive` : '&status:not=inactive'
-    const offset = getOffset(archived ? archivedCurrentPage : currentPage)
+    const offset = getOffset(currentPage)
     const response = await get(
       `/hapi/fhir/Location?type:code=FACILITY&_count=12&_total=accurate&_offset=${offset}${query}${archivedQuery}`
     )
     if (response) {
-      if (archived) {
-        setArchivedFacilities(formatFacilitiesToTable(response))
-        setArchivedPageSize(response.total)
-      } else {
-        setFacilities(formatFacilitiesToTable(response))
-        setPageSize(response.total)
-      }
+      setFacilities(formatFacilitiesToTable(response))
+      setPageSize(response.total)
 
       form.resetFields()
       setVisible(false)
     }
-    archived ? setArchivedLoading(false) : setLoading(false)
+    setLoading(false)
+  }
+
+  const fetchData = async () => {
+    await fetchLocations('/hapi/fhir/Location?partof=0&_count=50')
+    await Promise.all([fetchSubCounties(), fetchWards()])
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchLocations('/hapi/fhir/Location?partof=0&_count=50')
-      await Promise.all([fetchSubCounties(), fetchWards()])
-      await fetchFacilities()
-      await fetchFacilities(null, true)
-    }
-
     fetchData()
   }, [])
 
   useEffect(() => {
-    fetchFacilities()
-  }, [currentPage])
-
-  useEffect(() => {
-    console.log('archivedCurrentPage', archivedCurrentPage)
-    fetchFacilities(null, true)
-  }, [archivedCurrentPage])
+    fetchFacilities(null, activeTab === '2')
+  }, [currentPage, activeTab])
 
   const columns = [
     {
@@ -194,7 +180,6 @@ export default function AddFacility() {
             cancelText="No"
           >
             <Button className="mx-0 p-0" type="link" danger>
-              {console.log(record)}
               {record.status === 'inactive' ? 'Restore' : 'Archive'}
             </Button>
           </Popconfirm>
@@ -227,8 +212,7 @@ export default function AddFacility() {
     if (response) {
       setVisible(false)
       message.success('Facility added successfully')
-      await fetchFacilities()
-      await fetchFacilities(null, true)
+      await fetchFacilities(null, activeTab === '2')
     }
   }
 
@@ -241,13 +225,15 @@ export default function AddFacility() {
 
     const response = await put(`/hapi/fhir/Location/${code}`, payload)
     if (response) {
-      await fetchFacilities()
-      await fetchFacilities(null, true)
+      await fetchFacilities(null, activeTab === '2')
       message.success('Facility archived successfully')
     }
   }
 
-  const handleSearch = debounce((e) => fetchFacilities(e.target.value), 500)
+  const handleSearch = debounce(
+    (e) => fetchFacilities(e.target.value, activeTab === '2'),
+    500
+  )
 
   return (
     <div>
@@ -271,53 +257,69 @@ export default function AddFacility() {
         }
       >
         <div className="px-4 py-5 sm:p-6">
-          <div>
-            <div className="my-4 flex">
-              <Form
-                onFinish={(values) => {
-                  fetchFacilities(values.search)
-                }}
-                className="flex w-full items-center"
-              >
-                <Form.Item name="search" className="w-full mr-4">
-                  <Input
-                    allowClear
-                    placeholder="Search Facility"
-                    className="w-full ml-auto"
-                    onChange={handleSearch}
-                    size="large"
-                  />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit" size="large">
-                    Search
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
-            <div className="overflow-x-auto">
-              <Table
-                id="facility"
-                columns={columns}
-                dataSource={facilities}
-                size="small"
-                loading={loading}
-                rowKey="kmflCode"
-                pagination={{
-                  pageSize: 12,
-                  showTotal: (total, range) =>
-                    `${range[0]} - ${range[1]} of ${pageSize - 1} facilities`,
-                  showSizeChanger: false,
-                  defaultCurrent: 1,
-                  current: currentPage,
-                  total: pageSize - 1,
-                  onChange: async (page) => {
-                    setCurrentPage(page)
-                  },
-                }}
-              />
-            </div>
-          </div>
+          <Tabs
+            defaultActiveKey="1"
+            onChange={(key) => {
+              setActiveTab(key)
+              setCurrentPage(1)
+            }}
+            items={['Active Facilities', 'Archived Facilities'].map(
+              (item, index) => ({
+                key: (index + 1).toString(),
+                label: item,
+                children: (
+                  <div>
+                    <div className="my-2 flex">
+                      <Form
+                        onFinish={(values) => {
+                          fetchFacilities(values.search, activeTab === '2')
+                        }}
+                        className="flex w-full items-center"
+                      >
+                        <Form.Item name="search" className="w-full mr-4">
+                          <Input
+                            allowClear
+                            placeholder="Search Facility"
+                            className="w-full ml-auto"
+                            onChange={handleSearch}
+                            size="large"
+                            autocomplete="off"
+                          />
+                        </Form.Item>
+                        <Form.Item>
+                          <Button type="primary" htmlType="submit" size="large">
+                            Search
+                          </Button>
+                        </Form.Item>
+                      </Form>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <Table
+                        id="facility"
+                        columns={columns}
+                        dataSource={facilities}
+                        size="small"
+                        loading={loading}
+                        rowKey="kmflCode"
+                        pagination={{
+                          pageSize: 12,
+                          showTotal: (total, range) =>
+                            `${range[0]} - ${range[1]} of ${pageSize - 1} facilities`,
+                          showSizeChanger: false,
+                          defaultCurrent: 1,
+                          current: currentPage,
+                          total: pageSize - 1,
+                          onChange: async (page) => {
+                            setCurrentPage(page)
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+                ),
+              })
+            )}
+          />
 
           <Modal
             width={700}
@@ -457,30 +459,6 @@ export default function AddFacility() {
             </Form>
           </Modal>
         </div>
-      </Card>
-
-      <Card title="Archived Facilities" className="mt-10">
-        <Table
-          id="archived-facility"
-          columns={columns}
-          dataSource={archivedFacilities}
-          loading={archivedLoading}
-          rowKey="kmflCode"
-          size="small"
-          pagination={{
-            pageSize: 12,
-            showTotal: (total, range) =>
-              `${range[0]} - ${range[1]} of ${archivedPageSize - 1} facilities`,
-            showSizeChanger: false,
-            defaultCurrent: 1,
-            current: archivedCurrentPage,
-            total: archivedPageSize - 1,
-            onChange: (page) => {
-              console.log(page)
-              setArchivedCurrentPage(page)
-            },
-          }}
-        />
       </Card>
     </div>
   )
