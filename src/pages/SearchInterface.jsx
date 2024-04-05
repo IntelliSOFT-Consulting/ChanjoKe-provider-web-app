@@ -79,7 +79,16 @@ export default function SearchInterface(props) {
   })
 
   const handleSearch = () => {
-    setSearchUrl(`Patient?name=${searchValue}&_sort=-_lastUpdated`)
+    if (!isNaN(Number(searchValue))) {
+      if (searchValue.startsWith('07')) {
+        setSearchUrl(`Patient?telecom=${searchValue}&_sort=-_lastUpdated`)
+      } else {
+        setSearchUrl(`Patient?identifier=${searchValue}&_sort=-_lastUpdated`)
+      }
+    } else {
+      setSearchUrl(`Patient?name=${searchValue}&_sort=-_lastUpdated`)
+    }
+    
   }
 
   const handleAction = (onActionBtn, data) => {

@@ -15,8 +15,8 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
   ];
 
   const tHeaders = [
-    {title: 'Caregiver\'s Type', class: '', key: 'caregiverType'},
-    {title: 'Caregiver\'s Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver Type', class: '', key: 'caregiverType'},
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
     {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
     {title: 'Actions', class: '', key: 'actions'},
   ]
@@ -41,8 +41,8 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
         caregiverType: data.caregiverType,
         phoneNumber: data.phoneNumber,
         actions: [
-          { title: 'edit', btnAction: 'editCareGiver' },
-          { title: 'remove', btnAction: 'removeCareGiver' }
+          { title: 'edit', btnAction: 'editCareGiver', class: 'text-blue-300' },
+          { title: 'remove', btnAction: 'removeCareGiver', class: 'text-red-400' }
         ]
       })
       
@@ -66,8 +66,8 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
 
     values.id = uuidv4()
     values.actions = [
-      { title: 'edit', btnAction: 'editCareGiver' },
-      { title: 'remove', btnAction: 'removeCareGiver' }
+      { title: 'edit', btnAction: 'editCareGiver', class: 'text-blue-300' },
+      { title: 'remove', btnAction: 'removeCareGiver', class: 'text-red-400' }
     ]
 
     setCaregivers([...caregivers, values])
@@ -98,13 +98,13 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverType"
               label={
                 <div>
-                  <span className="font-bold">Caregiver's Type</span>
+                  <span className="font-bold">Caregiver Type</span>
                 </div>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Please input the caregiver\'s type!',
+                  message: 'Please input the caregiver type!',
                 },
               ]}>
               <Select size='large'>
@@ -122,13 +122,13 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverName"
               label={
                 <div>
-                  <span className="font-bold">Caregiver's Name</span>
+                  <span className="font-bold">Caregiver Name</span>
                 </div>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Please input the caregiver\'s name!',
+                  message: 'Please input the caregiver name!',
                 },
               ]}>
                 <Input
@@ -157,9 +157,10 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
                 },
               ]}>
                 <Input
-                  placeholder="eg 0700232003"
+                  prefix={<span className='flex'>+254</span>}
+                  placeholder="0700 000000"
                   autoComplete="off"
-                  className='block w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
+                  className='flex w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
             </Form.Item>
 
             <div className="w-full grid justify-items-end">
@@ -199,7 +200,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
             nextPage()
           }}
           disabled={caregivers && caregivers.length > 0 ? false : true}
-          className="bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+          className={caregivers && caregivers.length > 0 ? "bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" : "bg-[#9cb7e3] border-[#9cb7e3] outline-[#9cb7e3] hover:bg-[#9cb7e3] focus-visible:outline-[#9cb7e3] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"}>
           Next
         </button>      
       </div> 

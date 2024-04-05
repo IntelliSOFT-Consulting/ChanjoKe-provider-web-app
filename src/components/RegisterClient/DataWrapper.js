@@ -21,13 +21,13 @@ function organizeData(items) {
       };
   
       filteredItems.forEach(item => {
-      if (item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No' || item.system === 'Nemis' || item?.type?.coding?.[0]?.display === 'NEMIS No' || item?.type?.coding?.[0]?.code === 'nemis') {
+      if (item?.type?.coding?.[0]?.display === 'Nemis' || item?.type?.text === 'NEMIS No' || item.system === 'NEMIS No' || item.system === 'Nemis' || item?.type?.coding?.[0]?.display === 'NEMIS No' || item?.type?.coding?.[0]?.code === 'nemis') {
           hierarchy['NEMIS_NUMBER'] = item.value;
       } else if (item?.system === 'Passport' || item?.type?.coding?.[0]?.display === 'Passport') {
           hierarchy['PASSPORT'] = item.value;
-      } else if (item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate' || item?.type?.coding?.[0]?.display === 'birth_notification_number' || item?.type?.coding?.[0]?.display === 'birth_certificate') {
+      } else if (item?.type?.coding?.[0]?.display === 'Birth Certificate' || item?.type?.coding?.[0]?.display === 'Birth Notification Number' || item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate' || item?.type?.coding?.[0]?.display === 'birth_notification_number' || item?.type?.coding?.[0]?.display === 'birth_certificate') {
           hierarchy['BIRTH_CERTIFICATE'] = item.value;
-      } else if (item?.system === 'National ID' || item.system === 'ID Number') {
+      } else if (item?.system === 'National ID' || item.system === 'ID Number' || item?.type?.coding?.[0]?.display === 'ID Number') {
           hierarchy['NATIONAL_ID'] = item.value;
       } else {
           hierarchy['DEFAULT'] = item.value;
