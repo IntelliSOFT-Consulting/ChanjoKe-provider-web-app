@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useApiRequest } from '../api/useApiRequest'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import LoadingIcon from '../common/icons/loadingIcon'
+import LocationLogo from '../common/icons/LocationLogo'
 import { login } from '../redux/actions/userActions'
 
 export default function Login() {
@@ -115,8 +115,7 @@ export default function Login() {
                 <Select
                   size="large"
                   placeholder="Location"
-                  // className='w-full ps-3'
-                  // suffixIcon={<LockOutlined style={{ left: '11px !important!'}} />}
+                  suffixIcon={<LocationLogo width={16} height={16} style={{ left: '11px !important'}} />}
                 >
                   {locations.map((option) => (
                     <Select.Option value={option.value}>
@@ -137,9 +136,7 @@ export default function Login() {
                   loading={loading}
                   disabled={loading}
                   className='ml-auto mt-4'
-                  size='large'
-                >
-
+                  size='large'>
                  Login
                 </Button>
 

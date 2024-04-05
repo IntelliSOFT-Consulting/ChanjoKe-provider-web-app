@@ -150,7 +150,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
       textClass: 'text-center',
     },
     {
-      btnText: 'Contraindications',
+      btnText: 'Contraindicate',
       url: '/add-contraindication',
       bgClass: 'bg-[#5370B0] text-white',
       textClass: 'text-center',

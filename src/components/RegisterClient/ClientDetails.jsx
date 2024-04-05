@@ -37,7 +37,6 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   const [years, setYears] = useState(null)
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
-  const [actualAge, setActualAge] = useState(true)
   const [idOptions, setIdOptions] = useState([])
 
   const [form] = Form.useForm();
@@ -355,8 +354,9 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                       },
                     ]}>
                       <Input
+                        prefix={<span className='flex'>+254</span>}
                         placeholder="Phone Number"
-                        className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                        className='flex w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
                 </Col>
               }
