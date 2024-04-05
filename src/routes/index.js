@@ -25,7 +25,6 @@ import VaccinationReports from '../pages/VaccinationReports'
 import SearchInterface from '../pages/SearchInterface'
 import AEFIType from '../components/AEFI/AEFIType'
 import AEFIAction from '../components/AEFI/AEFIAction'
-import Appointments from '../pages/Appointments'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
@@ -41,6 +40,7 @@ import Contraindications from '../components/AdministerVaccines/Contraindication
 import NotAdministered from '../components/AdministerVaccines/NotAdministered'
 import VaccinationDetails from '../pages/VaccinationDetails'
 import ContraindicationDetails from '../pages/ContraindicationDetails'
+import ReferralDetails from '../pages/ReferralDetails'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -186,9 +186,9 @@ const router = createBrowserRouter([
         element: <FAQs />,
       },
       {
-        path: '/appointments',
-        element: <Appointments />,
-      },
+        path: '/referral-details',
+        element: <ReferralDetails />
+      }
     ],
   },
   {
