@@ -6,7 +6,7 @@ import SelectDialog from '../common/dialog/SelectDialog'
 import Pagination from '../components/Pagination'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
-import { Form, Input } from 'antd'
+import { Form, Input, DatePicker } from 'antd'
 
 export default function SearchInterface(props) {
   const [title, setTitle] = useState('Search')
@@ -117,6 +117,12 @@ export default function SearchInterface(props) {
     if (props.searchType === 'aefi') {
       setTitle('Adverse Event Following Immunisation')
     }
+    if (props.searchType === 'appointments') {
+      setTitle('Appointments')
+    }
+    if (props.searchType === 'referrals') {
+      setTitle('Referrals')
+    }
   }, [props.searchType])
 
   return (
@@ -139,10 +145,38 @@ export default function SearchInterface(props) {
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">{title}</div>
         <div className="px-4 py-5 sm:p-6">
+          {props.searchType === 'referrals' && <Form layout='vertical' colon={true}>
+          <div className='grid grid-cols-2 mx-10'>
+            <div>
+              <div className='grid grid-cols-2 gap-4'>
+                <Form.Item
+                  label="Start Date">
+                  <DatePicker
+                    format="DD-MM-YYYY"
+                    className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+
+                <Form.Item label="End Date">
+                  <DatePicker
+                    format="DD-MM-YYYY"
+                    className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                </Form.Item>
+              
+              </div>
+              <div>
+                
+              </div>
+            </div>
+            <div>
+
+            </div>
+          </div>
+          </Form>}
           <Form
             className="grid grid-cols-5 gap-x-4 mx-10 mb-0"
             onFinish={handleSearch}
           >
+            
             <div className="col-span-4">
               <Input
                 onChange={(e) => {

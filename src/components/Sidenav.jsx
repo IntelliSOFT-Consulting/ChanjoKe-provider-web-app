@@ -69,7 +69,7 @@ export default function Sidenav() {
     { name: 'Register Client', href: '/register-client/_', icon: 'registerClientLogo' },
     { name: 'Update Client History', href: '/search/updateClient', icon: 'updateClientLogo' },
     { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: 'administerVaccineLogo' },
-    { name: 'Appointments', href: '/appointments', icon: 'appointmentLogo' },
+    { name: 'Appointments', href: '/search/appointments', icon: 'appointmentLogo' },
     { name: 'AEFI', href: '/search/aefi', icon: 'aefiLogo' },
     { name: 'Defaulter Tracing', href: '/defaulter-tracing', icon: 'defaulterTracingLogo' },
     {

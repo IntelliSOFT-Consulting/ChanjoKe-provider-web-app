@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import NonRoutineVaccines from '../../components/ClientDetailsView/NonRoutineVaccines';
 import RoutineVaccines from '../../components/ClientDetailsView/RoutineVaccines';
 import VaccineAppointments from '../../components/ClientDetailsView/VaccineAppointments';
+import Referrals from '../../components/ClientDetailsView/Referrals';
 
 const tabs = [
   { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
   { name: 'Non Routine Vaccines', id: 'nonRoutineVaccines', href: '#', current: false },
-  { name: 'Appointments', id: 'appointments', href: '#', current: false }
+  { name: 'Appointments', id: 'appointments', href: '#', current: false },
+  { name: 'Referrals', id: 'referrals', href: '#', current: false }
 ];
 
 function classNames(...classes) {
@@ -66,6 +68,7 @@ export default function BaseTabs(props) {
       {currentTab === 'routineVaccines' && <RoutineVaccines userCategory={props.userCategory} patientData={props.patientData} />}
       {currentTab === 'nonRoutineVaccines' && <NonRoutineVaccines userCategory={props.userCategory} patientData={props.patientData} />}
       {currentTab === 'appointments' && <VaccineAppointments userCategory={props.userCategory} patientData={props.patientData} />}
+      {currentTab === 'referrals' && <Referrals userCategory={props.userCategory} patientData={props.patientData} />}
     </div>
   );
 }
