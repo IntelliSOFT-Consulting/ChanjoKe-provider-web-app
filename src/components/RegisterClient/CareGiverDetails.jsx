@@ -15,8 +15,8 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
   ];
 
   const tHeaders = [
-    {title: 'Caregiver\'s Type', class: '', key: 'caregiverType'},
-    {title: 'Caregiver\'s Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver Type', class: '', key: 'caregiverType'},
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
     {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
     {title: 'Actions', class: '', key: 'actions'},
   ]
@@ -98,13 +98,13 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverType"
               label={
                 <div>
-                  <span className="font-bold">Caregiver's Type</span>
+                  <span className="font-bold">Caregiver Type</span>
                 </div>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Please input the caregiver\'s type!',
+                  message: 'Please input the caregiver type!',
                 },
               ]}>
               <Select size='large'>
@@ -122,13 +122,13 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverName"
               label={
                 <div>
-                  <span className="font-bold">Caregiver's Name</span>
+                  <span className="font-bold">Caregiver Name</span>
                 </div>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Please input the caregiver\'s name!',
+                  message: 'Please input the caregiver name!',
                 },
               ]}>
                 <Input
