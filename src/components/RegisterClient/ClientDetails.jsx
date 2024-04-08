@@ -38,16 +38,18 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
   const [idOptions, setIdOptions] = useState([])
+  const [estimatedAge, setEstimatedAge] = useState("")
 
   const [form] = Form.useForm();
   const navigate = useNavigate()
 
-  form.setFieldsValue({ weightMetric: 'Kgs' });
+  form.setFieldsValue({ weightMetric: 'Kilogram(s)' });
 
   useEffect(() => {
     console.log({ editClientDetails })
     form.setFieldsValue(editClientDetails)
     setUserAge(editClientDetails?.age || 'Age')
+    setEstimatedAge(editClientDetails?.estimatedAge)
     setLoading(true)
 
     // If estimated age isn't set, set it to true
@@ -191,7 +193,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                           <span className="font-bold">Age Input Method</span>
                         </div>
                       }>
-                    <Radio.Group>
+                    <Radio.Group onChange={(e) => setEstimatedAge(e.target.value)}>
                       <Radio value={"true"}>Actual</Radio>
                       <Radio value={"false"}>Estimated</Radio>
                     </Radio.Group>
@@ -200,7 +202,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 </div>
               
               </Col>
-              { form.getFieldValue("estimatedAge") === "true" && <>
+              { estimatedAge === "true" && <>
                 <Col className="gutter-row" span={8}>
                   <Form.Item
                     name="dateOfBirth"
@@ -255,7 +257,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
               </>
               }
 
-              {form.getFieldValue("estimatedAge") === "false" && <>
+              {estimatedAge === "false" && <>
                 <Col className="gutter-row grid grid-cols-3 gap-4 flex mt-7" span={8}>
                   <Form.Item>     
                     <InputNumber
@@ -420,11 +422,11 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                           <Form.Item name='weightMetric' className='mb-0 block rounded-md'>
                         <Select
                           style={{ width: 100 }}
-                          defaultValue={'Kgs'}
+                          defaultValue={'Kilograms'}
                           onChange={(value) => {
                             form.setFieldsValue({ weightMetric: value });
                           }}>
-                          <Select.Option value="Kg">KG</Select.Option>
+                          <Select.Option value="Kilograms">Kilograms</Select.Option>
                           <Select.Option value="Grams">Grams</Select.Option>
                         </Select>
                         </Form.Item>

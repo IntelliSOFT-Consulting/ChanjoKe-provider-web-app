@@ -44,10 +44,18 @@ export default function ClientDetailsView() {
   };
 
   const stats = [
-    { dob: moment(patientData?.birthDate).format('Do MMM YYYY'), age: calculateAge(patientData?.birthDate), gender: patientData?.gender }
+    {
+      name: `${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''}`,
+      systemID: `${systemGenID || ''}`,
+      dob: moment(patientData?.birthDate).format('Do MMM YYYY'),
+      age: calculateAge(patientData?.birthDate),
+      gender: patientData?.gender
+    }
   ]
 
   const tHeaders = [
+    {title: 'Name', class: '', key: 'name'},
+    {title: 'System ID', class: '', key: 'systemID'},
     {title: 'D.O.B', class: '', key: 'dob'},
     {title: 'Age', class: '', key: 'age'},
     {title: 'Gender', class: '', key: 'gender'},
@@ -90,15 +98,7 @@ export default function ClientDetailsView() {
       </div>
       
       <div className="px-4 py-5 sm:p-6">
-      {patientData?.name &&
-            <>
-              <p className="text-2xl font-bold ml-8">
-                {`${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''}`}
-                {systemGenID && `- (System ID:  ${systemGenID || ''})`}
-              </p>
-            </>
-          }
-        <div className="container grid grid-cols-2 gap-10">
+        <div className="container gap-10 px-24">
           <div>
             {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
             {patientData?.name &&

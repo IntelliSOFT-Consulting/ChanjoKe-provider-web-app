@@ -80,8 +80,8 @@ export default function ClientRecords() {
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
-        <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-          Register Client
+        <div className="px-4 text-2xl font-semibold py-8 sm:px-6">
+          
         </div>
         <div className="px-4 py-5 sm:p-6">
         <div className="grid grid-cols-2 gap-10 mx-7">
