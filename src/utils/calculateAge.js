@@ -16,11 +16,11 @@ export default function calculateAge(dateString) {
   const ageInYears = ageInMonths / 12;
 
   if (ageInDays <= 7) {
-    return ageInDays.toFixed(2) > 1 ? `${ageInDays.toFixed(2)} days` : `${ageInDays.toFixed(2)} day`;
+    return ageInDays.toFixed(0) > 1 ? `${ageInDays.toFixed(0)} days` : `${ageInDays.toFixed(0)} day`;
   } else if (ageInMonths < 2) {
     const weeks = Math.floor(ageInWeeks);
     const days = ageInDays - weeks * 7;
-    return days > 0 ? `${weeks} week${weeks > 1 ? 's' : ''}, ${days.toFixed(2)} days` : `${weeks} week${weeks > 1 ? 's' : ''}`;
+    return days > 0 ? `${weeks} week${weeks > 1 ? 's' : ''}, ${days.toFixed(0)} days` : `${weeks} week${weeks > 1 ? 's' : ''}`;
   } else if (ageInMonths < 12) {
     const months = Math.floor(ageInMonths);
     const remainingDays = ageInDays - (months * 30.44); // average number of days in a month
@@ -29,6 +29,6 @@ export default function calculateAge(dateString) {
   } else {
     const years = Math.floor(ageInYears);
     const remainingMonths = ageInMonths - years * 12;
-    return remainingMonths > 0 ? `${years} year${years > 1 ? 's' : ''}, ${remainingMonths.toFixed(2)} months` : `${years} year${years > 1 ? 's' : ''}`;
+    return remainingMonths > 0 ? `${years} year${years > 1 ? 's' : ''}, ${remainingMonths.toFixed(0)} months` : `${years} year${years > 1 ? 's' : ''}`;
   }
 }
