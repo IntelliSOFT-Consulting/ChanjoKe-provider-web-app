@@ -1,18 +1,29 @@
 import ChanjoKE from '../assets/login bg.png'
 import MOHLogo from '../assets/moh-logo.png'
-import { useNavigate, Link } from 'react-router-dom'
-import { Form, Input, Select, Button } from 'antd'
+import { Link, useNavigate } from 'react-router-dom'
+import { Button, Form, Input, Select } from 'antd'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useApiRequest } from '../api/useApiRequest'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import LocationLogo from '../common/icons/LocationLogo'
 import { login } from '../redux/actions/userActions'
+import { createUseStyles } from 'react-jss'
+import { MapPinIcon } from '@heroicons/react/24/outline'
+
+const useStyles = createUseStyles({
+  selector: {
+    '& .ant-select-selector': {
+      paddingLeft: '2rem !important',
+    },
+  },
+})
 
 export default function Login() {
   const navigate = useNavigate()
   const { post } = useApiRequest()
   const dispatch = useDispatch()
+
+  const classes = useStyles()
 
   const { user, loading, error } = useSelector((state) => state.userInfo)
 
@@ -74,7 +85,7 @@ export default function Login() {
                 ]}
               >
                 <Input
-                  size='large'
+                  size="large"
                   prefix={<UserOutlined className="site-form-item-icon" />}
                   placeholder="ID Number"
                 />
@@ -95,7 +106,7 @@ export default function Login() {
                 ]}
               >
                 <Input.Password
-                  size='large'
+                  size="large"
                   prefix={<LockOutlined className="site-form-item-icon" />}
                   type="password"
                   placeholder="Password"
@@ -104,7 +115,7 @@ export default function Login() {
 
               <Form.Item
                 name="location"
-                className="w-full"
+                className="w-full relative"
                 rules={[
                   {
                     required: true,
@@ -112,10 +123,18 @@ export default function Login() {
                   },
                 ]}
               >
+                <div className="absolute top-2 left-2 z-10">
+                  <MapPinIcon
+                    width={20}
+                    height={20}
+                    style={{ left: '11px !important' }}
+                  />
+                </div>
                 <Select
                   size="large"
                   placeholder="Location"
-                  suffixIcon={<LocationLogo width={16} height={16} style={{ left: '11px !important'}} />}
+                  className={classes.selector}
+                  allowClear
                 >
                   {locations.map((option) => (
                     <Select.Option value={option.value}>
@@ -129,17 +148,16 @@ export default function Login() {
                 <Link to="/forgot-password">Forgot password?</Link>
               </div>
 
-
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  disabled={loading}
-                  className='ml-auto mt-4'
-                  size='large'>
-                 Login
-                </Button>
-
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                disabled={loading}
+                className="ml-auto mt-4"
+                size="large"
+              >
+                Login
+              </Button>
             </Form>
           </div>
         </div>
