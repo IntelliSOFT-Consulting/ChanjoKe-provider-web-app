@@ -56,14 +56,12 @@ export default function RegisterClient({ editClientID }) {
 
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const estimatedAgeVal = data?.identifier.filter((id) => id?.system === 'estimated-age')
-      const userID = data?.identifier.filter((id) => id?.system === 'identification_type')
+      const userID = data?.identifier.filter((id) => (id?.system === 'identification_type' || id?.system === 'identification' ))
       estimatedAge = estimatedAgeVal?.[0].value 
 
       identificationType = userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
-
-    const ID = organizeData(data?.identifier).BIRTH_CERTIFICATE || organizeData(data?.identifier).NATIONAL_ID || organizeData(data?.identifier).NEMIS_NUMBER || organizeData(data?.identifier).PASSPORT
 
     setClientDetails({
       firstName: data?.name?.[0]?.family || '',

@@ -200,7 +200,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
             }
             onChange={() => handleCheckBox('administer', record)}
           >
-            { (lockVaccine(record?.adminRange?.start, patientData.birthDate) || notDone || completed) && <span className='tooltiptext'>
+            { (lockVaccine(record?.adminRange?.start, patientData.birthDate) || notDone || completed) && <span className='tooltipright'>
             { lockVaccine(record?.adminRange?.start, patientData.birthDate)
               ? 'This client is not currently eligible for this vaccine'
               : completed

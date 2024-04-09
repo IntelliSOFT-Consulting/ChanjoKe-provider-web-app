@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
 
@@ -20,7 +20,7 @@ export default function ComboInput({ label, required, people, val, setSelected }
     <Combobox as="div" className="mb-3" onChange={(value) => {
       setSelected(value)
     }}>
-      <Combobox.Label className="block text-sm font-medium leading-6 text-gray-900">
+      <Combobox.Label className="block text-sm font-bold leading-6 text-[#707070]">
         { label }
         { required && <span className="text-red-500 ml-1 font-bold">*</span>}
       </Combobox.Label>

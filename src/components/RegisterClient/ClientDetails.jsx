@@ -14,8 +14,8 @@ dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
 const identificationOptions = [
-  { name: 'BIRTH NOTIFICATION NUMBER', value: 'birth_notification_number', minAge: 0, maxAge: 1095 },
-  { name: 'BIRTH CERTIFICATE', value: 'birth_certificate', minAge: 0, maxAge: 36525 },
+  { name: 'BIRTH NOTIFICATION NUMBER', value: 'Birth_notification_number', minAge: 0, maxAge: 1095 },
+  { name: 'BIRTH CERTIFICATE', value: 'Birth_certificate', minAge: 0, maxAge: 36525 },
   { name: 'ID NUMBER', value: 'ID_number', minAge: 6575, maxAge: 36525 },
   { name: 'NEMIS NUMBER', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
   { name: 'PASSPORT', value: 'passport', minAge: 0, maxAge: 36525 }, 
@@ -38,7 +38,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   const [loading, setLoading] = useState(false)
   const [userAge, setUserAge] = useState(null)
   const [idOptions, setIdOptions] = useState([])
-  const [estimatedAge, setEstimatedAge] = useState("")
+  const [estimatedAge, setEstimatedAge] = useState("true")
 
   const [form] = Form.useForm();
   const navigate = useNavigate()
@@ -49,7 +49,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
     console.log({ editClientDetails })
     form.setFieldsValue(editClientDetails)
     setUserAge(editClientDetails?.age || 'Age')
-    setEstimatedAge(editClientDetails?.estimatedAge)
+    setEstimatedAge(editClientDetails?.estimatedAge || "true")
     setLoading(true)
 
     // If estimated age isn't set, set it to true
@@ -372,7 +372,10 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                       <span className="text-red-400 mx-2">*</span>
                     </div>
                   }>
-                  <Select size='large' disabled={form.getFieldValue('dateOfBirth') ? false : true}>
+                  <Select
+                    size='large'
+                    disabled={form.getFieldValue('dateOfBirth') ? false : true}
+                    defaultValue={editClientDetails.identificationType}>
                     {idOptions.map((option) => (
                       <Select.Option value={option.value}>
                         {option.name}
@@ -437,11 +440,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
             </Row>
 
             <div className="px-4 py-4 sm:px-6 flex justify-end">
-              <button
-                onClick={() => navigate(-1)}
-                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-3 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                Back
-              </button>
+
               <button
                 htmlType="submit"
                 className='bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'>

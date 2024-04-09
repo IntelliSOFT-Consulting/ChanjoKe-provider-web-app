@@ -1,7 +1,5 @@
 import TextInput from "../../common/forms/TextInput"
-import SelectMenu from '../../common/forms/SelectMenu'
 import FormState from "../../utils/formState"
-import RequiredValidator from '../../utils/requiredValidator'
 import { useEffect, useState } from "react"
 import useGet from "../../api/useGet"
 import { deconstructLocationData } from "./DataWrapper"
@@ -21,7 +19,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
     }
   }
 
-  const { formData, formErrors, handleChange } = FormState({
+  const { formData, handleChange } = FormState({
     residenceCounty: '',  
     subCounty: '',
     ward: '',
@@ -31,7 +29,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
   const [locationURL, setLocationUrl] = useState({ name: 'Location?partof=0&_sort=name&_count=50', level: 1})
 
-  const { data, loading, error } = useGet(locationURL.name)
+  const { data } = useGet(locationURL.name)
   const [counties, setCounties] = useState([])
   const [subCounties, setSubCounties] = useState([])
   const [wards, setWards] = useState([])
@@ -64,6 +62,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
       setWards(locationArray)
     }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationURL, data])
 
   const switchLocationURL = (level, value) => {
@@ -88,6 +87,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
               handleChange('subCounty', '')
               handleChange('ward', '')
               switchLocationURL(1, value)
+              setAdministrativeAreaDetails({ ...formData, residenceCounty: value.name })
             }}
             val={formData?.residenceCounty}
             people={counties}/>
@@ -97,7 +97,10 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             inputName="townCenter"
             inputId="townCenter"
             value={formData.townCenter}
-            onInputChange={(value) => handleChange('townCenter', value)}
+            onInputChange={(value) => {
+              handleChange('townCenter', value)
+              setAdministrativeAreaDetails({ ...formData, townCenter: value })
+            }}
             label="Town/Trading Center"
             inputPlaceholder="eg Elgeyo Marakwet Market"/>
         </div>
@@ -105,12 +108,13 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
         <div>
 
           <ComboInput
-            label="Sub County"
+            label="Sub-County"
             required={true}
             setSelected={(value) => {
               handleChange('subCounty', value.name)
               handleChange('ward', '')
               switchLocationURL(2, value)
+              setAdministrativeAreaDetails({ ...formData, subCounty: value.name })
             }}
             val={formData?.subCounty}
             people={subCounties}/>
@@ -120,8 +124,11 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             inputName="estateOrHouseNo"
             inputId="estateOrHouseNo"
             value={formData.estateOrHouseNo}
-            onInputChange={(value) => handleChange('estateOrHouseNo', value)}
-            label="Estate & House No./ Village"
+            onInputChange={(value) => {
+              handleChange('estateOrHouseNo', value)
+              setAdministrativeAreaDetails({ ...formData, estateOrHouseNo: value })
+            }}
+            label="Estate & House Number/Village"
             inputPlaceholder="eg Jamii House, House Number 14"/>
         </div>
 
@@ -133,6 +140,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             setSelected={(value) => {
               handleChange('ward', value.name)
               switchLocationURL(3, null)
+              setAdministrativeAreaDetails({ ...formData, ward: value.name })
             }}
             val={formData?.ward}
             people={wards}/>

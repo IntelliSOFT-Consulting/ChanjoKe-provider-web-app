@@ -4,8 +4,18 @@ import ConvertObjectToArray from "./convertObjectToArray";
 
 export default function ClientDetails({ clientDetails, caregiverDetails, administrativeArea, submitPatientDetails, handleBack }) {
 
-  const clientDetailsArray = ConvertObjectToArray(clientDetails)
-  const administrativeAreaArray = ConvertObjectToArray(administrativeArea)
+  console.log({ clientDetails })
+
+  const client = { ...clientDetails }
+  const ageValue = client.estimatedAge === 'true' ? 'Actual' : 'Estimated'
+  delete client.estimatedAge
+  client.estimatedAge = ageValue
+
+  const administrative = { CountyOfResidence: administrativeArea.residenceCounty, ...administrativeArea }
+  delete administrative.residenceCounty
+
+  const clientDetailsArray = ConvertObjectToArray(client)
+  const administrativeAreaArray = ConvertObjectToArray(administrative)
 
   const tHeaders = [
     {title: 'Caregiver\'s Name', class: '', key: 'caregiverName'},

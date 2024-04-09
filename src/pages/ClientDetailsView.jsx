@@ -97,17 +97,18 @@ export default function ClientDetailsView() {
         </div>
       </div>
       
-      <div className="px-4 py-5 sm:p-6">
-        <div className="container gap-10 px-24">
-          <div>
-            {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
-            {patientData?.name &&
-              <SearchTable
-                headers={tHeaders}
-                data={stats} />}
+      <div className="container px-4 py-5 sm:p-6">
+        <div className="grid grid-cols-3">
+          <div className="col-span-2">
+            <div>
+              {!patientData?.name &&  <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
+              {patientData?.name &&
+                <SearchTable
+                  headers={tHeaders}
+                  data={stats} />}
+            </div>
           </div>
-          <div>
-          </div>
+          <div></div>
         </div>
       </div>
 
