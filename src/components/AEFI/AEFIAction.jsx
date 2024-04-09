@@ -5,11 +5,19 @@ import FormState from '../../utils/formState'
 
 export default function AEFIAction() {
   const reactionTypes = [
-    { id: 1, name: 'Type of AEFI' },
+    { name: 'Life threatening', value: 'Life threatening' },
+    { name: 'Mild', value: 'Mild' },
+    { name: 'Moderate', value: 'Moderate' },
+    { name: 'Severe', value: 'Severe' },
+    { name: 'Fatal', value: 'Fatal' },
   ]
 
   const aefiOutcomes = [
-    { id: 1, name: 'AEFI Outcome'}
+    { name: 'Recovered', value: 'Recovered' },
+    { name: 'Recovering', value: 'Recovering' },
+    { name: 'Not Recovered', value: 'Not Recovered' },
+    { name: 'Unknown', value: 'Unknown' },
+    { name: 'Died', value: 'Died' },
   ]
 
   const formRules = {
@@ -68,7 +76,7 @@ export default function AEFIAction() {
                   data={reactionTypes}
                   error={formErrors.reactionSeverity}
                   value={formData.reactionSeverity || 'Reaction Severity'}
-                  onInputChange={(value) => handleChange('reactionSeverity', value)}/>
+                  onInputChange={(value) => handleChange('reactionSeverity', value.value)}/>
 
                 <TextArea
                   inputName="actionTaken"

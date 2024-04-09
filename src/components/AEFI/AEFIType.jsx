@@ -6,7 +6,16 @@ import { useNavigate } from 'react-router-dom'
 
 export default function AEFIType() {
   const aefiTypes = [
-    { id: 1, name: 'Type of AEFI' },
+    { id: 1, name: 'High fever', value: 'High fever' },
+    { id: 2, name: 'Convulsions', value: 'Convulsions' },
+    { id: 3, name: 'Anaphylaxis', value: 'Anaphylaxis' },
+    { id: 4, name: 'Paralysis', value: 'Paralysis' },
+    { id: 5, name: 'Toxic shock', value: 'Toxic shock' },
+    { id: 6, name: 'Injection site abcess', value: 'Injection site abcess' },
+    { id: 7, name: 'Severe local reaction', value: 'Severe local reaction' },
+    { id: 8, name: 'Generalized urticaria (hives)', value: 'Generalized urticaria (hives)'  },
+    { id: 9, name: 'BCG Lymphadentitis', value: 'BCG Lymphadentitis'},
+    { id: 9, name: 'Encaphalopathy/Menengitis', value: 'Encaphalopathy/Menengitis'},
   ]
 
   const formRules = {

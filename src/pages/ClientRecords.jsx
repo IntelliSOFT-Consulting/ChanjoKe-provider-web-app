@@ -17,22 +17,19 @@ function convertUnderscoresAndCapitalize(inputString) {
 
 export default function ClientRecords() {
 
-  const [patientData, setPatientData] = useState({})
-
   const { clientID } = useParams()
   const navigate = useNavigate()
-  const { data, loading, error } = useGet(`Patient/${clientID}`)
+  const { data } = useGet(`Patient/${clientID}`)
 
   const [clientDetailsArray, setClientDetails] = useState([])
   const [caregiverDetails, setCaregiverDetails] = useState([])
   const [administrativeAreaArray, setAreaDetails] = useState([])
 
   useEffect(() => {
-    setPatientData(data)
     let identificationType = ''
     let identificationNumber = ''
     if (data?.identifier && Array.isArray(data?.identifier)) {
-      const userID = data?.identifier.filter((id) => id?.system === 'identification_type')
+      const userID = data?.identifier.filter((id) => (id?.system === 'identification_type' || id?.system === 'identification' ))
       identificationType = userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
@@ -50,10 +47,10 @@ export default function ClientRecords() {
 
     const addressDetails = {
       'County of Residence': data?.address?.[0]?.city,
-      'Sub County': data?.address?.[0].district,
+      'Sub-County': data?.address?.[0].district,
       'Ward': data?.address?.[0].state,
       'Town/Trading Center': data?.address?.[0].line?.[0],
-      'Estate & House No / Village': data?.address?.[0].line?.[1]
+      'Estate & House Number/Village': data?.address?.[0].line?.[1]
     }
 
     if (Array.isArray(data?.contact)) {
@@ -80,13 +77,17 @@ export default function ClientRecords() {
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
-        <div className="px-4 text-2xl font-semibold py-8 sm:px-6">
-          
+        <div className="px-4 text-2xl font-semibold py-4 flex justify-end px-14">
+          <button
+            onClick={() => navigate(`/register-client/${clientID}`)}
+            className={'bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'}>
+              Update records
+          </button>
         </div>
         <div className="px-4 py-5 sm:p-6">
         <div className="grid grid-cols-2 gap-10 mx-7">
           {/* Column 1 */}
-          <div style={{ textTransform: 'capitalize' }}>
+          <div>
             <h2 className="text-xl font-semibold mb-5">
               Client Details
             </h2>
@@ -121,11 +122,7 @@ export default function ClientRecords() {
             className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-6 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             Back
           </button>
-          <button
-            onClick={() => navigate(`/register-client/${clientID}`)}
-            className={'bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'}>
-              Update records
-          </button>
+          
         </div>
       </div>
     </>
