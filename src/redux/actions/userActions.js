@@ -64,10 +64,10 @@ export const login = (values) => async (dispatch) => {
     //   })
     //
     //   const user = { ...response?.data?.user, ...auth }
-    //   dispatch({
-    //     type: GET_USER_SUCCESS,
-    //     payload: user,
-    //   })
+      dispatch({
+        type: GET_USER_SUCCESS,
+        payload: auth,
+      })
 
       JSON.stringify(localStorage.setItem('practitioner', JSON.stringify(auth)))
     // }
