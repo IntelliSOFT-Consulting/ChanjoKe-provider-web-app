@@ -113,16 +113,7 @@ export default function Login() {
                 />
               </Form.Item>
 
-              <Form.Item
-                name="location"
-                className="w-full relative"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select your location',
-                  },
-                ]}
-              >
+              <div className="relative">
                 <div className="absolute top-2 left-2 z-10">
                   <MapPinIcon
                     width={20}
@@ -130,19 +121,30 @@ export default function Login() {
                     style={{ left: '11px !important' }}
                   />
                 </div>
-                <Select
-                  size="large"
-                  placeholder="Location"
-                  className={classes.selector}
-                  allowClear
+                <Form.Item
+                  name="location"
+                  className="w-full"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please select your location',
+                    },
+                  ]}
                 >
-                  {locations.map((option) => (
-                    <Select.Option value={option.value}>
-                      {option.name}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                  <Select
+                    size="large"
+                    placeholder="Location"
+                    className={classes.selector}
+                    allowClear
+                  >
+                    {locations.map((option) => (
+                      <Select.Option value={option.value}>
+                        {option.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </div>
 
               <div className="text-right mx-10 text-[#707070] mt-3">
                 <Link to="/forgot-password">Forgot password?</Link>
