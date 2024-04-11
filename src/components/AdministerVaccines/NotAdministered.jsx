@@ -51,10 +51,8 @@ export default function NotAdministered() {
     setDialogOpen(false)
   }
 
-  console.log('vaccines', vaccines)
 
   const handleFormSubmit = async (values) => {
-    console.log(vaccines)
     const selectedVaccines = vaccines.filter((vaccine) =>
       values.vaccinesToContraindicate.includes(vaccine.vaccineName)
     )
