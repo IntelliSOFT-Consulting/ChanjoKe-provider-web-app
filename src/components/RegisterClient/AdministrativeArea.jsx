@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import useGet from "../../api/useGet"
 import { deconstructLocationData } from "./DataWrapper"
 import ComboInput from "../../common/forms/ComboInput"
+import { AutoComplete } from "antd"
 
 export default function AdministrativeArea({ adminArea, setAdministrativeAreaDetails, handleBack, handleNext }) {
 
@@ -79,18 +80,24 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
         <div>
 
-          <ComboInput
-            label="County of Residence"
-            required={true}
-            setSelected={(value) => {
-              handleChange('residenceCounty', value.name)
+        <label className="font-bold text-gray-500">County of Residence<span className="text-red-500"> *</span></label>
+
+          <AutoComplete
+            style={{ width: 350 }}
+            className="mb-3"
+            options={counties.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
+            placeholder="County of Residence"
+            size="large"
+            onSelect={(e, val) => {
+              handleChange('residenceCounty', val.name)
               handleChange('subCounty', '')
               handleChange('ward', '')
-              switchLocationURL(1, value)
-              setAdministrativeAreaDetails({ ...formData, residenceCounty: value.name })
+              switchLocationURL(1, val)
+              setAdministrativeAreaDetails({ ...formData, residenceCounty: val.name })
             }}
-            val={formData?.residenceCounty}
-            people={counties}/>
+            filterOption={(inputValue, option) => 
+              option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+            }/>
 
           <TextInput
             inputType="text"
@@ -107,17 +114,24 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
     
         <div>
 
-          <ComboInput
-            label="Sub-County"
-            required={true}
-            setSelected={(value) => {
+          <label className="klfont-bold text-gray-500">Sub-County<span className="text-red-500"> *</span></label>
+
+          <AutoComplete
+            style={{ width: 350 }}
+            options={subCounties.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
+            placeholder="Sub-County"
+            className="mb-3"
+            size="large"
+            defaultValue={formData?.subCounty}
+            onSelect={(e, value) => {
               handleChange('subCounty', value.name)
               handleChange('ward', '')
               switchLocationURL(2, value)
               setAdministrativeAreaDetails({ ...formData, subCounty: value.name })
             }}
-            val={formData?.subCounty}
-            people={subCounties}/>
+            filterOption={(inputValue, option) => 
+              option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+            }/>
 
           <TextInput
             inputType="text"
@@ -134,16 +148,22 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
         <div>
 
-          <ComboInput
-            label="Ward"
-            required={true}
-            setSelected={(value) => {
-              handleChange('ward', value.name)
-              switchLocationURL(3, null)
-              setAdministrativeAreaDetails({ ...formData, ward: value.name })
-            }}
-            val={formData?.ward}
-            people={wards}/>
+          <label className="flex font-bold text-gray-500">Ward <span className="text-red-500"> *</span></label>
+
+          <AutoComplete
+              size="large"
+              style={{ width: 350 }}
+              options={wards.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
+              placeholder="Ward"
+              className="mb-3"
+              onSelect={(e, value) => {
+                handleChange('ward', value.name)
+                switchLocationURL(3, null)
+                setAdministrativeAreaDetails({ ...formData, ward: value.name })
+              }}
+              filterOption={(inputValue, option) => 
+                option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+              }/>
 
         </div>
       </div>
