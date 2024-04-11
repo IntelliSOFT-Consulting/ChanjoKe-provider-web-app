@@ -1,6 +1,9 @@
 import BaseTable from "../../common/tables/BaseTable";
 import SearchTable from "../../common/tables/SearchTable";
 import ConvertObjectToArray from "./convertObjectToArray";
+import dayjs from "dayjs";
+import calculateAge from "../../utils/calculateAge";
+import { useEffect, useState } from "react";
 
 export default function ClientDetails({ clientDetails, caregiverDetails, administrativeArea, submitPatientDetails, handleBack }) {
 
@@ -11,17 +14,38 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
   delete client.estimatedAge
   client.estimatedAge = ageValue
 
+  const [tHeaders, setTHeaders] = useState([
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
+  ])
+  const [isOver18, setIsOver18] = useState(false)
+
+  useEffect(() => {
+    const date = dayjs(clientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD')
+    const stringAge = calculateAge(date)
+    const age = stringAge.match(/(\d+)\s*year/i)
+    if (age === null) {
+      setIsOver18(false)
+    } else if (parseInt(age[1]) >= 18) {
+      setIsOver18(true)
+      setTHeaders([
+        {title: 'Next of kin type', class: '', key: 'caregiverType'},
+        {title: 'Next of kin Name', class: '', key: 'caregiverName'},
+        {title: 'Phone Number', class: '', key: 'phoneNumber'},
+        {title: 'Actions', class: '', key: 'actions'},
+      ])
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOver18, tHeaders])
+
+  
+
   const administrative = { CountyOfResidence: administrativeArea.residenceCounty, ...administrativeArea }
   delete administrative.residenceCounty
 
   const clientDetailsArray = ConvertObjectToArray(client)
   const administrativeAreaArray = ConvertObjectToArray(administrative)
-
-  const tHeaders = [
-    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
-    {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
-    {title: 'Phone Number', class: '', key: 'phoneNumber'},
-  ]
 
   return (
     <>
@@ -49,7 +73,7 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
 
       <div>
         <h2 className="text-xl font-semibold ml-7 mb-5 mt-5">
-          Caregiver Details
+          {isOver18 ? 'Next of kin': 'Caregiver'} Details
         </h2>
 
         <SearchTable headers={tHeaders} data={caregiverDetails} />

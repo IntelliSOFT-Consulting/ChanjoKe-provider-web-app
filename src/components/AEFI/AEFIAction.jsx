@@ -46,6 +46,8 @@ export default function AEFIAction() {
 
     const uniqueEncounterID = uuidv4()
 
+    let patientID = ''
+
     vaccinesToAEFI.map((vaccine) => {
       const AEFI = {
         "Type of AEFI": aefiDetails.aefiType,
@@ -64,6 +66,8 @@ export default function AEFIAction() {
       Object.keys(AEFI).map(async (key) => {
         const aefiResource = createAEFI(key, AEFI[key], vaccine?.patient ,vaccine?.id, uniqueEncounterID )
 
+        patientID = vaccine.patient.reference.replace(/^Patient\//, '')
+
         return await post('/hapi/fhir/Observation', aefiResource)
       })
 
@@ -72,6 +76,7 @@ export default function AEFIAction() {
       form.resetFields()
     
     })
+    navigate(`/client-details/${patientID}`)
   };
 
   const handleDialogClose = () => {

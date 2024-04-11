@@ -71,18 +71,17 @@ export default function VaccinationDetails() {
 
     const vaccinationaefiresponses = await get(`/hapi/fhir/Observation?part-of=Immunization/${vaccinationID}`)
 
-    const type = vaccinationaefiresponses?.entry.find((item) => item?.resource?.code?.text === "Type of AEFI")
-    const date = vaccinationaefiresponses?.entry.find((item) => item?.resource?.code?.text === 'Onset of event')
+    if (Array.isArray(vaccinationaefiresponses) && vaccinationaefiresponses.length) {
+      const type = vaccinationaefiresponses?.entry.find((item) => item?.resource?.code?.text === "Type of AEFI")
+      const date = vaccinationaefiresponses?.entry.find((item) => item?.resource?.code?.text === 'Onset of event')
 
-    setVaccinationAEFIs([
-      {
-        symptomName: type?.resource?.valueCodeableConcept?.coding?.[0]?.display,
-        occurenceDate: dayjs(date?.resource?.valueCodeableConcept?.coding?.[0]?.display).format('Do MMM YYYY'), 
-        actions: [{ title: 'edit', url: '#'}, { title: 'view', url: '#'}]},
-    ])
-
-    
-    console.log({ vaccinationaefiresponses, type, date })
+      setVaccinationAEFIs([
+        {
+          symptomName: type?.resource?.valueCodeableConcept?.coding?.[0]?.display,
+          occurenceDate: dayjs(date?.resource?.valueCodeableConcept?.coding?.[0]?.display).format('Do MMM YYYY'), 
+          actions: [{ title: 'edit', url: '#'}, { title: 'view', url: '#'}]},
+      ])
+    }
   }
 
   useEffect(() => {

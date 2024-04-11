@@ -409,7 +409,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                                   <Button
                                     to="/aefi-report"
                                     className="text-[#163C94]"
-                                    disabled={!someAdministered || !vaccinesToAdminister.length}
+                                    disabled={!vaccinesToAdminister.length && !allAdministered}
                                     onClick={() => {
                                       dispatch(setAEFIVaccines(administered))
                                       setSharedData({ vaccinesToAdminister })
