@@ -154,6 +154,7 @@ export default function RegisterClient({ editClientID }) {
           {step === 2 &&
           <CareGiverDetails
             editCaregivers={caregiverDetails}
+            dateOfBirth={dayjs(clientDetails?.dateOfBirth?.$d)}
             nextPage={() => updateStep(step + 1)}
             updateCaregiverDetails={setCaregiverDetails}
             handleBack={() => updateStep(step - 1)} />
