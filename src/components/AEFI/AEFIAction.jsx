@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { Col, Row, Form, Input, Select } from 'antd'
 import { useSharedState } from '../../shared/sharedState'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import { createAEFI } from './DataWrapper'
 import { useState } from 'react'
+import { useApiRequest } from '../../api/useApiRequest'
+import { v4 as uuidv4 } from 'uuid'
 
 const { TextArea } = Input;
 
@@ -26,11 +29,12 @@ export default function AEFIAction() {
   ]
 
   const [form] = Form.useForm()
+  const { post } = useApiRequest()
 
   const navigate = useNavigate()
   const [isDialogOpen, setDialogOpen] = useState(false);
 
-  const { sharedData } = useSharedState()
+  const { sharedData, setSharedData } = useSharedState()
 
   const onFinish = (values) => {
 
@@ -40,16 +44,14 @@ export default function AEFIAction() {
 
     const aefiDetails = sharedData?.aefiDetails
 
-    console.log({ vaccinesToAEFI, aefiDetails, values })
-
-    // Create a list of observations based off every single input
+    const uniqueEncounterID = uuidv4()
 
     vaccinesToAEFI.map((vaccine) => {
       const AEFI = {
         "Type of AEFI": aefiDetails.aefiType,
-        "Onset of event": aefiDetails.aefiOnset.$d,
+        "Onset of event": aefiDetails.eventOnset.$d,
         "Brief Details on the AEFI": aefiDetails.aefiDetails,
-        "Past medical history": aefiDetails.aefiMedicalHistory,
+        "Past medical history": aefiDetails.pastMedicalHistory        ,
         "Reaction severity": values.reactionSeverity,
         "Action taken": values.actionTaken,
         "AEFI Outcome": values.aefiOutcome,
@@ -58,6 +60,17 @@ export default function AEFIAction() {
         "Health Care Worker Name": values.healthCareWorkerName,
         "Designation": values.designation
       }
+
+      Object.keys(AEFI).map(async (key) => {
+        const aefiResource = createAEFI(key, AEFI[key], vaccine?.patient ,vaccine?.id, uniqueEncounterID )
+
+        return await post('/hapi/fhir/Observation', aefiResource)
+      })
+
+      setSharedData(null)
+
+      form.resetFields()
+    
     })
   };
 
