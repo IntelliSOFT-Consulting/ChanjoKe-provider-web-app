@@ -3,29 +3,46 @@ import SearchTable from '../../common/tables/SearchTable';
 import { v4 as uuidv4 } from 'uuid'
 import ConfirmationDialog from '../../common/dialog/ConfirmationDialog'
 import { Col, Row, Form, Input, Select } from 'antd'
+import dayjs from 'dayjs';
+import calculateAge from '../../utils/calculateAge';
 
-export default function CaregiverDetails({ editCaregivers = [], updateCaregiverDetails, handleBack, nextPage }) {
+export default function CaregiverDetails({ editCaregivers = [], updateCaregiverDetails, dateOfBirth, handleBack, nextPage }) {
   const caregiverTypes = [
     { id: 1, name: 'Father', value: 'Father' },
     { id: 2, name: 'Mother', value: 'Mother' },
     { id: 3, name: 'Guardian', value: 'Guardian' },
   ];
 
-  const tHeaders = [
-    {title: 'Caregiver Type', class: '', key: 'caregiverType'},
-    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
-    {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
-    {title: 'Actions', class: '', key: 'actions'},
-  ]
-
   const [caregivers, setCaregivers] = useState(editCaregivers)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [caregiverToRemove, setCaregiverToRemove] = useState('')
+  const [isOver18, setIsOver18] = useState(false)
+  const [tHeaders, setTHeaders] = useState([
+    {title: 'Caregiver Type', class: '', key: 'caregiverType'},
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
+    {title: 'Actions', class: '', key: 'actions'},
+  ])
 
   const [form] = Form.useForm()
 
   useEffect(() => {
     updateCaregiverDetails(caregivers)
+
+    const date = dayjs(dateOfBirth).format('YYYY-MM-DD')
+    const stringAge = calculateAge(date)
+    const age = stringAge.match(/(\d+)\s*year/i)
+    if (age === null) {
+      setIsOver18(false)
+    } else if (parseInt(age[1]) >= 18) {
+      setIsOver18(true)
+      setTHeaders([
+        {title: 'Next of kin type', class: '', key: 'caregiverType'},
+        {title: 'Next of kin Name', class: '', key: 'caregiverName'},
+        {title: 'Phone Number', class: '', key: 'phoneNumber'},
+        {title: 'Actions', class: '', key: 'actions'},
+      ])
+    }
   }, [caregivers])
 
   const handleAction = (onActionBtn, data) => {
@@ -81,7 +98,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
         onClose={() => setIsDialogOpen(false)}
         onAccept={handleAcceptRemoveCaregiver}
         title="Remove Caregiver" />
-      <h3 className="text-xl font-medium px-6">Caregiver Details</h3>
+      <h3 className="text-xl font-medium px-6">{isOver18 ? `Next of kin details`: `Caregiver details`}</h3>
 
       <Form
         onFinish={onFinish}
@@ -95,13 +112,13 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverType"
               label={
                 <div>
-                  <span className="font-bold">Caregiver Type</span>
+                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} type</span>
                 </div>
               }
               rules={[
                 {
                   required: true,
-                  message: 'Please input the caregiver type!',
+                  message: 'Please input the caregiver/next of kin type!',
                 },
               ]}>
               <Select size='large'>
@@ -119,7 +136,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverName"
               label={
                 <div>
-                  <span className="font-bold">Caregiver Name</span>
+                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} name</span>
                 </div>
               }
               rules={[

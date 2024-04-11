@@ -179,7 +179,7 @@ const router = createBrowserRouter([
         element: <VaccinationDetails />,
       },
       {
-        path: '/new-appointment',
+        path: '/new-appointment/:userID',
         element: <NewAppointment />,
       },
       {

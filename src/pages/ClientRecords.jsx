@@ -5,6 +5,7 @@ import useGet from "../api/useGet"
 import { useState, useEffect } from "react"
 import ConvertObjectToArray from "../components/RegisterClient/convertObjectToArray"
 import moment from "moment"
+import calculateAge from "../utils/calculateAge"
 
 function convertUnderscoresAndCapitalize(inputString) {
   if (inputString !== undefined) {
@@ -24,6 +25,12 @@ export default function ClientRecords() {
   const [clientDetailsArray, setClientDetails] = useState([])
   const [caregiverDetails, setCaregiverDetails] = useState([])
   const [administrativeAreaArray, setAreaDetails] = useState([])
+  const [isOver18, setIsOver18] = useState(false)
+  const [tHeaders, setTHeaders] = useState([
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
+  ])
 
   useEffect(() => {
     let identificationType = ''
@@ -64,15 +71,24 @@ export default function ClientRecords() {
       setCaregiverDetails(caregiverArray)
     }
 
+    const date = moment(data?.birthDate).format('YYYY-MM-DD')
+    const stringAge = calculateAge(date)
+    const age = stringAge.match(/(\d+)\s*year/i)
+    if (age === null) {
+      setIsOver18(false)
+    } else if (parseInt(age[1]) >= 18) {
+      setIsOver18(true)
+      setTHeaders([
+        {title: 'Next of kin type', class: '', key: 'caregiverType'},
+        {title: 'Next of kin Name', class: '', key: 'caregiverName'},
+        {title: 'Phone Number', class: '', key: 'phoneNumber'},
+        {title: 'Actions', class: '', key: 'actions'},
+      ])
+    }
+
     setClientDetails(ConvertObjectToArray(clientDetails))
     setAreaDetails(ConvertObjectToArray(addressDetails))
   }, [data])
-
-  const tHeaders = [
-    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
-    {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
-    {title: 'Phone Number', class: '', key: 'phoneNumber'},
-  ]
 
   return (
     <>
@@ -109,7 +125,7 @@ export default function ClientRecords() {
 
         <div>
             <h2 className="text-xl font-semibold ml-7 mb-5 mt-5">
-              Caregiver Details
+              {isOver18 ? 'Next of kin': 'Caregiver'} Details
             </h2>
 
             <SearchTable headers={tHeaders} data={caregiverDetails} />
