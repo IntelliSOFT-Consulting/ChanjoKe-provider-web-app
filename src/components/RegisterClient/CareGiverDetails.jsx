@@ -140,7 +140,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="phoneNumber"
               label={
                 <div>
-                  <span className="font-bold">Contact Phone Number</span>
+                  <span className="font-bold">Phone Number</span>
                 </div>
               }
               rules={[

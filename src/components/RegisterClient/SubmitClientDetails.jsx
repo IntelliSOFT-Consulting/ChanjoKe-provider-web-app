@@ -20,7 +20,7 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
   const tHeaders = [
     {title: 'Caregiver Name', class: '', key: 'caregiverName'},
     {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
-    {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
   ]
 
   return (

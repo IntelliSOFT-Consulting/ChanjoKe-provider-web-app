@@ -46,9 +46,10 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   form.setFieldsValue({ weightMetric: 'Kilogram(s)' });
 
   useEffect(() => {
-    console.log({ editClientDetails })
     form.setFieldsValue(editClientDetails)
-    setUserAge(editClientDetails?.age || 'Age')
+    const dateOfBirth = moment(editClientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD')
+    const stringAge = calculateAge(dateOfBirth)
+    setUserAge(stringAge || 'Age')
     setEstimatedAge(editClientDetails?.estimatedAge || "true")
     setLoading(true)
 
@@ -68,10 +69,6 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
     values.currentWeight = `${values.currentWeight || 0} ${values.weightMetric}`
     delete values.weightMetric
     setClientDetails(values)
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
   };
 
   const isUserOverI8 = () => {
@@ -99,8 +96,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           autoComplete="on"
           validateTrigger="onBlur"
           form={form}
-          initialValues={editClientDetails}
-          onFinishFailed={onFinishFailed}>
+          initialValues={editClientDetails}>
             
             <Row className='mt-5 px-6' gutter={16}>
 

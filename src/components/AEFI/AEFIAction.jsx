@@ -41,6 +41,24 @@ export default function AEFIAction() {
     const aefiDetails = sharedData?.aefiDetails
 
     console.log({ vaccinesToAEFI, aefiDetails, values })
+
+    // Create a list of observations based off every single input
+
+    vaccinesToAEFI.map((vaccine) => {
+      const AEFI = {
+        "Type of AEFI": aefiDetails.aefiType,
+        "Onset of event": aefiDetails.aefiOnset.$d,
+        "Brief Details on the AEFI": aefiDetails.aefiDetails,
+        "Past medical history": aefiDetails.aefiMedicalHistory,
+        "Reaction severity": values.reactionSeverity,
+        "Action taken": values.actionTaken,
+        "AEFI Outcome": values.aefiOutcome,
+        "Name of person reporting": values.reporter,
+        "Phone Number": values.phoneNumber,
+        "Health Care Worker Name": values.healthCareWorkerName,
+        "Designation": values.designation
+      }
+    })
   };
 
   const handleDialogClose = () => {
