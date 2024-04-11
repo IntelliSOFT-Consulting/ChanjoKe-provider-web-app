@@ -1,17 +1,17 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import BaseTable from '../common/tables/BaseTable'
-import Table from '../components/DataTable'
+import SearchTable from '../common/tables/SearchTable'
 import { Button } from 'antd'
 import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
 import { useEffect, useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import dayjs from 'dayjs'
-import moment from 'moment'
 
 export default function VaccinationDetails() {
 
   const [doseInfo, setDoseInfo] = useState([])
   const [clientInfo, setClientInfo] = useState([])
+  const [vaccinationAEFIs, setVaccinationAEFIs] = useState([])
   const [vaccinationDetails, setVaccinationDetails] = useState(null)
   const { get } = useApiRequest()
 
@@ -39,12 +39,12 @@ export default function VaccinationDetails() {
 
   const columns = [
     {
-      title: 'Symptoms',
+      title: 'AEFI Type',
       dataIndex: 'symptomName',
       key: 'symptomName',
     },
     {
-      title: 'Date',
+      title: 'Date Reported',
       dataIndex: 'occurenceDate',
       key: 'occurenceDate',
     },
@@ -65,17 +65,24 @@ export default function VaccinationDetails() {
     },
   ]
 
-  const aefis = [
-    { symptomName: 'High Fever', occurenceDate: 'Jan 1 2020', actions: [{ title: 'view', url: '#'}]},
-    { symptomName: 'Nausea', occurenceDate: 'Jan 1 2020', actions: [{ title: 'view', url: '#'}]},
-    { symptomName: 'Migranes', occurenceDate: 'Jan 1 2020', actions: [{ title: 'view', url: '#'}]}
-  ]
-
   const fetchVaccinationDetails = async () => {
     const response = await get(`/hapi/fhir/Immunization/${vaccinationID}`)
     setVaccinationDetails(response)
 
-    console.log({ response })
+    const vaccinationaefiresponses = await get(`/hapi/fhir/Observation?part-of=Immunization/${vaccinationID}`)
+
+    const type = vaccinationaefiresponses?.entry.find((item) => item?.resource?.code?.text === "Type of AEFI")
+    const date = vaccinationaefiresponses?.entry.find((item) => item?.resource?.code?.text === 'Onset of event')
+
+    setVaccinationAEFIs([
+      {
+        symptomName: type?.resource?.valueCodeableConcept?.coding?.[0]?.display,
+        occurenceDate: dayjs(date?.resource?.valueCodeableConcept?.coding?.[0]?.display).format('Do MMM YYYY'), 
+        actions: [{ title: 'edit', url: '#'}, { title: 'view', url: '#'}]},
+    ])
+
+    
+    console.log({ vaccinationaefiresponses, type, date })
   }
 
   useEffect(() => {
@@ -120,13 +127,11 @@ export default function VaccinationDetails() {
           AEFI
         </div>
 
-        <div className="px-10 py-5 text-center">
-          No AEFIs recorded
-          {/* <Table
-            dataSource={aefis}
-            columns={columns}
-            pagination={false}
-            size="small"/> */}
+        <div className="px-10 py-5">
+          {!vaccinationAEFIs.length && <><div className='text-center'>No AEFIs recorded</div></>}
+          {vaccinationAEFIs.length > 0 && <SearchTable
+            data={vaccinationAEFIs}
+            headers={columns}/>}
         </div>
 
         <div className="px-4 py-4 sm:px-6 flex justify-end">
