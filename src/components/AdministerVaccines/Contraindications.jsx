@@ -46,9 +46,7 @@ export default function Contraindications() {
       immunization.contraindicationDetails = values.contraindicationDetails
       immunization.education = [
         {
-          presentationDate: moment(values.nextVaccinationDate).format(
-            'YYYY-MM-DD'
-          ),
+          presentationDate: values.nextVaccinationDate.format('YYYY-MM-DD'),
         },
       ]
       return createVaccineImmunization(
