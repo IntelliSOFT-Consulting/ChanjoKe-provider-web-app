@@ -1,9 +1,8 @@
-import FormState from '../../utils/formState'
-import { useNavigate } from 'react-router-dom'
 import { DatePicker, Form, Input, Select } from 'antd'
+import { useNavigate } from 'react-router-dom'
+import { useSharedState } from '../../shared/sharedState';
 
 export default function AEFIType() {
-  const [form] = Form.useForm()
   const aefiTypes = [
     { id: 1, label: 'High fever', value: 'High fever' },
     { id: 2, label: 'Convulsions', value: 'Convulsions' },
@@ -25,37 +24,15 @@ export default function AEFIType() {
     },
   ]
 
-  const formRules = {
-    aefiType: {
-      required: true,
-    },
-    aefiDetails: {
-      required: true,
-    },
-    eventOnset: {
-      required: true,
-    },
-    pastMedicalHistory: {
-      required: true,
-    },
-  }
-
-  const formStructure = {
-    aefiType: '',
-    aefiDetails: '',
-    eventOnset: '',
-    pastMedicalHistory: '',
-  }
-
-  const { formData, formErrors, handleChange } = FormState(
-    formStructure,
-    formRules
-  )
   const navigate = useNavigate()
+  const [form] = Form.useForm()
 
-  const handleFinish = (values) => {
+  const { sharedData, setSharedData } = useSharedState()
+
+  const onFinish = (values) => {
+    setSharedData({ ...sharedData, aefiDetails: values })
     navigate('/aefi-action')
-  }
+  };
 
   return (
     <>
@@ -70,7 +47,7 @@ export default function AEFIType() {
             layout="vertical"
             form={form}
             autoComplete="off"
-            onFinish={handleFinish}
+            onFinish={onFinish}
           >
             <div className="grid mt-5 grid-cols-2 gap-10">
               {/* Column 1 */}

@@ -41,6 +41,7 @@ import NotAdministered from '../components/AdministerVaccines/NotAdministered'
 import VaccinationDetails from '../pages/VaccinationDetails'
 import ContraindicationDetails from '../pages/ContraindicationDetails'
 import ReferralDetails from '../pages/ReferralDetails'
+import NewAppointment from '../components/ClientDetailsView/NewAppointment'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -176,6 +177,10 @@ const router = createBrowserRouter([
       {
         path: '/view-vaccination/:vaccinationID',
         element: <VaccinationDetails />,
+      },
+      {
+        path: '/new-appointment',
+        element: <NewAppointment />,
       },
       {
         path: '/view-contraindication/:contraindicationID',

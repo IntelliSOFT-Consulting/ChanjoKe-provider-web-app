@@ -1,11 +1,8 @@
-import TextInput from '../../common/forms/TextInput';
-import SelectMenu from '../../common/forms/SelectMenu';
 import { useState, useEffect } from 'react';
 import SearchTable from '../../common/tables/SearchTable';
-import FormState from '../../utils/formState'
 import { v4 as uuidv4 } from 'uuid'
 import ConfirmationDialog from '../../common/dialog/ConfirmationDialog'
-import { Col, Row, Radio, DatePicker, Form, Input, Select } from 'antd'
+import { Col, Row, Form, Input, Select } from 'antd'
 
 export default function CaregiverDetails({ editCaregivers = [], updateCaregiverDetails, handleBack, nextPage }) {
   const caregiverTypes = [
