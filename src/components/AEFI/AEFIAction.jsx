@@ -2,8 +2,11 @@ import SelectMenu from '../../common/forms/SelectMenu'
 import TextInput from '../../common/forms/TextInput'
 import TextArea from '../../common/forms/TextArea'
 import FormState from '../../utils/formState'
+import { Form, Input, Select, DatePicker } from 'antd'
 
 export default function AEFIAction() {
+
+  const { form } = Form.useForm()
   const reactionTypes = [
     { name: 'Life threatening', value: 'Life threatening' },
     { name: 'Mild', value: 'Mild' },

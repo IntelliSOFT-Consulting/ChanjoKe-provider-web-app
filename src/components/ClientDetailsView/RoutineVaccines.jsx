@@ -53,19 +53,21 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
   }
- 
+
   useEffect(() => {
     const fetchPatientImmunization = async () => {
-      const response = await get(`/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`);
-      setData(response);
+      const response = await get(
+        `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
+      )
+      setData(response)
       setLoading(false)
     }
-  
+
     if (patientData?.id) {
-      fetchPatientImmunization();
+      fetchPatientImmunization()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientData]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientData])
 
   useEffect(() => {
     const vaccData = data?.entry?.map((vaccine) => {
@@ -98,7 +100,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
           block: 'start',
         })
       }
-    }  else {
+    } else {
       if (element) {
         element.scrollIntoView({
           behavior: 'smooth',
@@ -120,7 +122,9 @@ export default function RoutineVaccines({ userCategory, patientData }) {
           categoriesMap[category] = []
         }
 
-        rest.actions = [{ title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }]
+        rest.actions = [
+          { title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' },
+        ]
 
         categoriesMap[category].push(rest)
       })
@@ -195,18 +199,23 @@ export default function RoutineVaccines({ userCategory, patientData }) {
             defaultChecked={completed}
             className="tooltip"
             disabled={
-              completed || notDone ||
+              completed ||
+              notDone ||
               lockVaccine(record?.adminRange?.start, patientData.birthDate)
             }
             onChange={() => handleCheckBox('administer', record)}
           >
-            { (lockVaccine(record?.adminRange?.start, patientData.birthDate) || notDone || completed) && <span className='tooltipright'>
-            { lockVaccine(record?.adminRange?.start, patientData.birthDate)
-              ? 'This client is not currently eligible for this vaccine'
-              : completed
-              ? 'Vaccine already administered'
-              : 'Vaccine not administered'}
-            </span> }
+            {(lockVaccine(record?.adminRange?.start, patientData.birthDate) ||
+              notDone ||
+              completed) && (
+              <span className="tooltipright">
+                {lockVaccine(record?.adminRange?.start, patientData.birthDate)
+                  ? 'This client is not currently eligible for this vaccine'
+                  : completed
+                    ? 'Vaccine already administered'
+                    : 'Vaccine not administered'}
+              </span>
+            )}
           </Checkbox>
         )
       },
@@ -228,7 +237,9 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       key: 'dueDate',
       render: (text, _record) => {
         if (_record?.education) {
-          return moment(_record?.education?.[0]?.presentationDate).format('DD-MM-YYYY')
+          return moment(_record?.education?.[0]?.presentationDate).format(
+            'DD-MM-YYYY'
+          )
         } else {
           const dependentVaccine = allVaccines?.find(
             (vaccine) =>
@@ -261,8 +272,28 @@ export default function RoutineVaccines({ userCategory, patientData }) {
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : (missed && text !== 'entered-in-error') ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
-            { text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': (missed && text !== 'entered-in-error') ? 'Missed': '' }
+          <Tag
+            color={
+              text === 'completed'
+                ? 'green'
+                : text === 'not-done'
+                  ? 'red'
+                  : missed && text !== 'entered-in-error'
+                    ? 'red'
+                    : text === 'entered-in-error'
+                      ? 'yellow'
+                      : 'gray'
+            }
+          >
+            {text === 'completed'
+              ? 'Administered'
+              : text === 'not-done'
+                ? 'Not Administered'
+                : text === 'entered-in-error'
+                  ? 'Contraindicated'
+                  : missed && text !== 'entered-in-error'
+                    ? 'Missed'
+                    : ''}
           </Tag>
         )
       },
@@ -336,7 +367,9 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                     )
                     const someAdministered =
                       category.vaccines.filter(
-                        (vaccine) => vaccine.status !== 'complete' || vaccine.status === 'not-done'
+                        (vaccine) =>
+                          vaccine.status !== 'complete' ||
+                          vaccine.status === 'not-done'
                       )?.length > 0 && administered.length > 0
                     const allAdministered =
                       category.vaccines.filter(
@@ -344,12 +377,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                       )?.length === category.vaccines.length
                     const allNotAdministered =
                       category.vaccines.filter(
-                        (vaccine) =>
-                          vaccine.status !== 'completed' &&
-                          !lockVaccine(
-                            vaccine?.adminRange?.start,
-                            patientData.birthDate
-                          )
+                        (vaccine) => vaccine.status !== 'completed'
                       )?.length === category.vaccines.length
 
                     return (
