@@ -36,6 +36,11 @@ const useStyles = createUseStyles({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    '.ant-picker-cell-selected': {
+      '& div': {
+        backgroundColor: '#163C94 !important',
+      }
     }
   },
 })
