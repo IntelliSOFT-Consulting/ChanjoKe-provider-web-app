@@ -187,7 +187,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
             }
             onChange={() => handleCheckBox('administer', record)}
           >
-            { (lockVaccine(6574.5, patientData.birthDate) || notDone || completed) && <span className='tooltiptext'>
+            { (lockVaccine(6574.5, patientData.birthDate) || notDone || completed) && <span className='tooltipright'>
             { lockVaccine(6574.5, patientData.birthDate)
               ? 'This client is not currently eligible for this vaccine'
               : completed
@@ -364,10 +364,10 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                                   <Button
                                     to="/aefi-report"
                                     className="text-[#163C94]"
-                                    disabled={allNotAdministered}
+                                    disabled={!someAdministered}
                                     onClick={() => {
-                                      // dispatch(setAEFIVaccines(administered))
-                                      // navigate('/aefi-report')
+                                      setSharedData({ vaccinesToAdminister })
+                                      navigate('/aefi-report')
                                     }}
                                     type="link"
                                   >

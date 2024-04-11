@@ -18,9 +18,9 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
   const administrativeAreaArray = ConvertObjectToArray(administrative)
 
   const tHeaders = [
-    {title: 'Caregiver\'s Name', class: '', key: 'caregiverName'},
-    {title: 'Caregiver\'s Relationship', class: '', key: 'caregiverType'},
-    {title: 'Contact Phone Number', class: '', key: 'phoneNumber'},
+    {title: 'Caregiver Name', class: '', key: 'caregiverName'},
+    {title: 'Caregiver Relationship', class: '', key: 'caregiverType'},
+    {title: 'Phone Number', class: '', key: 'phoneNumber'},
   ]
 
   return (

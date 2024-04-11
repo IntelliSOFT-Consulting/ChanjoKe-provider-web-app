@@ -1,12 +1,14 @@
-import SelectMenu from '../../common/forms/SelectMenu'
-import TextInput from '../../common/forms/TextInput'
-import TextArea from '../../common/forms/TextArea'
-import FormState from '../../utils/formState'
-import { Form, Input, Select, DatePicker } from 'antd'
+
+import { useNavigate } from 'react-router-dom'
+import { Col, Row, Form, Input, Select } from 'antd'
+import { useSharedState } from '../../shared/sharedState'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import { useState } from 'react'
+
+const { TextArea } = Input;
 
 export default function AEFIAction() {
 
-  const { form } = Form.useForm()
   const reactionTypes = [
     { name: 'Life threatening', value: 'Life threatening' },
     { name: 'Mild', value: 'Mild' },
@@ -23,152 +25,240 @@ export default function AEFIAction() {
     { name: 'Died', value: 'Died' },
   ]
 
-  const formRules = {
-    reactionSeverity: {
-      required: true,
-    },
-    actionTaken: {
-      required: true,
-    },
-    aefiOutcome: {
-      required: true,
-    },
-    nameOfPersonReporting: {
-      required: true,
-    },
-    phoneNumber: {
-      required: true,
-    },
-    hcwName: {
-      required: true,
-    },
-    designation: {
-      required: true,
-    },
-  }
+  const [form] = Form.useForm()
 
-  const formStructure = {
-    reactionSeverity: '',
-    actionTaken: '',
-    aefiOutcome: '',
-    nameOfPersonReporting: '',
-    phoneNumber: '',
-    hcwName: '',
-    designation: '',
-  }
+  const navigate = useNavigate()
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
-  const { formData, formErrors, handleChange } = FormState(formStructure, formRules)
+  const { sharedData } = useSharedState()
+
+  const onFinish = (values) => {
+
+    setDialogOpen(true)
+
+    const vaccinesToAEFI = sharedData?.vaccinesToAdminister
+
+    const aefiDetails = sharedData?.aefiDetails
+
+    console.log({ vaccinesToAEFI, aefiDetails, values })
+
+    // Create a list of observations based off every single input
+
+    vaccinesToAEFI.map((vaccine) => {
+      const AEFI = {
+        "Type of AEFI": aefiDetails.aefiType,
+        "Onset of event": aefiDetails.aefiOnset.$d,
+        "Brief Details on the AEFI": aefiDetails.aefiDetails,
+        "Past medical history": aefiDetails.aefiMedicalHistory,
+        "Reaction severity": values.reactionSeverity,
+        "Action taken": values.actionTaken,
+        "AEFI Outcome": values.aefiOutcome,
+        "Name of person reporting": values.reporter,
+        "Phone Number": values.phoneNumber,
+        "Health Care Worker Name": values.healthCareWorkerName,
+        "Designation": values.designation
+      }
+    })
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false)
+    // Navigate back to user page
+  }
 
   return (
     <>
+    <ConfirmDialog
+        open={isDialogOpen}
+        description="AEFI Recorded"
+        onClose={handleDialogClose} />
+
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
           <h3 className="text-xl font-medium">Adverse Event Following Immunisation</h3>
         </div>
         <div className="px-4 py-5 sm:p-6">
 
-          <form>
-          
-            <div className="grid mt-5 grid-cols-2 gap-10">
-              {/* Column 1 */}
-              <div>
+        <Form
+          onFinish={onFinish}
+          layout="vertical"
+          form={form}
+          autoComplete="off">
+            <Row className='mt-5 px-6' gutter={16}>
+              <Col className="gutter-row" span={12}>
+                <Form.Item
+                  name="reactionSeverity"
+                  label={
+                    <div>
+                      <span className="font-bold">Reaction Severity</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Add reaction severity!',
+                    },
+                  ]}>
+                  <Select size='large'>
+                    {reactionTypes.map((option) => (
+                      <Select.Option value={option.value}>
+                        {option.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
 
-                <SelectMenu
-                  label="Reaction Severity"
-                  required={true}
-                  data={reactionTypes}
-                  error={formErrors.reactionSeverity}
-                  value={formData.reactionSeverity || 'Reaction Severity'}
-                  onInputChange={(value) => handleChange('reactionSeverity', value.value)}/>
+              <Col className='gutter-row' span={12}>
+                <Form.Item
+                  name="phoneNumber"
+                  label={
+                    <div>
+                      <span className="font-bold">Phone Number</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please input the phone number!',
+                    },
+                    {
+                      pattern: /^(\+?)([0-9]{7,15})$/,
+                      message: 'Please enter a valid phone number!',
+                    },
+                  ]}>
+                    <Input
+                      prefix={<span className='flex'>+254</span>}
+                      placeholder="0700 000000"
+                      autoComplete="off"
+                      className='flex w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400' />
+                </Form.Item>
+              </Col>
 
-                <TextArea
-                  inputName="actionTaken"
-                  inputId="actionTaken"
-                  label="Action Taken"
-                  value={formData.actionTaken}
-                  error={formErrors.actionTaken}
-                  onInputChange={(value) => handleChange('actionTaken', value)}
-                  required={true}
-                  rows="4"
-                  cols="50"
-                  inputPlaceholder="Action Taken"/>
+              <Col className='gutter-row' span={12}>
+                <Form.Item
+                   name="actionTaken"
+                   label={
+                     <div>
+                       <span className="font-bold">Action taken</span>
+                     </div>
+                   }
+                   rules={[
+                     {
+                       required: true,
+                       message: 'Action taken on AEFI',
+                     },
+                   ]}>
+                  <TextArea rows={4} />
+                </Form.Item>
+              </Col>
 
-                <SelectMenu
-                  label="AEFI Outcome"
-                  required={true}
-                  data={aefiOutcomes}
-                  error={formErrors.aefiOutcome}
-                  value={formData.aefiOutcome || 'AEFI Outcome'}
-                  onInputChange={(value) => handleChange('aefiOutcome', value)}/>
+              <Col className="gutter-row" span={12}>
+                <Form.Item
+                  name="healthCareWorkerName"
+                  label={
+                    <div>
+                      <span className="font-bold">Health Care Worker Name</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please HCW Name!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Health Care Worker Name"
+                      autoComplete="off"
+                      className='block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400' />
+                </Form.Item>
+              </Col>
+
+              <Col className="gutter-row" span={12}>
+                <Form.Item
+                  name="aefiOutcome"
+                  label={
+                    <div>
+                      <span className="font-bold">AEFI Outcome</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Add AEFI Outcome!',
+                    },
+                  ]}>
+                  <Select size='large'>
+                    {aefiOutcomes.map((option) => (
+                      <Select.Option value={option.value}>
+                        {option.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col className="gutter-row" span={12}>
+                <Form.Item
+                  name="designation"
+                  label={
+                    <div>
+                      <span className="font-bold">Designation</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please HCW Designation!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Designation"
+                      autoComplete="off"
+                      className='block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400' />
+                </Form.Item>
+              </Col>
+
+              <Col className="gutter-row" span={12}>
+                <Form.Item
+                  name="reporter"
+                  label={
+                    <div>
+                      <span className="font-bold">Name of person reporting</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Name of reporting!',
+                    },
+                  ]}>
+                    <Input
+                      placeholder="Name of person reporting"
+                      autoComplete="off"
+                      className='block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400' />
+                </Form.Item>
+              </Col>
 
 
-                <TextInput
-                  inputType="text"
-                  inputName="nameOfPersonReporting"
-                  inputId="nameOfPersonReporting"
-                  label="Name of person reporting"
-                  required={true}
-                  error={formErrors.nameOfPersonReporting}
-                  value={formData.nameOfPersonReporting}
-                  onInputChange={(value) => (handleChange('nameOfPersonReporting', value))}
-                  inputPlaceholder="Name of person reporting"/>
+            </Row>
 
-              </div>
-
-              {/* Column 2 */}
-              <div>
-
-                <TextInput
-                  inputType="text"
-                  inputName="phoneNumber"
-                  inputId="phoneNumber"
-                  label="Phone Number"
-                  required={true}
-                  value={formData.phoneNumber}
-                  onInputChange={(value) => (handleChange('phoneNumber', value))}
-                  inputPlaceholder="Phone Number"/>
-
-                <TextInput
-                  inputType="text"
-                  inputName="hcwName"
-                  inputId="hcwName"
-                  label="Health Care Worker Name"
-                  required={true}
-                  value={formData.hcwName}
-                  onInputChange={(value) => (handleChange('hcwName', value))}
-                  inputPlaceholder="Health Care Worker Name"/>
-
-                <TextInput
-                  inputType="text"
-                  inputName="designation"
-                  inputId="designation"
-                  label="Designation"
-                  required={true}
-                  value={formData.designation}
-                  onInputChange={(value) => (handleChange('designation', value))}
-                  inputPlaceholder="Designation"/>
-
-              </div>
-
+            <div className="px-4 py-4 sm:px-6 flex justify-end">
+              <button
+                onClick={() => navigate(-1)}
+                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                Back
+              </button>
+              {/* <button
+                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                Preview
+              </button> */}
+              <button
+                className="ml-4 flex-shrink-0 rounded-md bg-[#0b7114] border border-[#0b7114] outline outline-[#0b7114] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0b7114] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0b7114]">
+                Submit
+              </button>
             </div>
-
-          </form>
-
-          <div className="px-4 py-4 sm:px-6 flex justify-end">
-            <button
-              className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              Back
-            </button>
-            <button
-              className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              Preview
-            </button>
-            <button
-              className="ml-4 flex-shrink-0 rounded-md bg-[#0b7114] border border-[#0b7114] outline outline-[#0b7114] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0b7114] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0b7114]">
-              Submit
-            </button>
-          </div>
-
+        </Form>
         </div>
       </div> 
     </>
