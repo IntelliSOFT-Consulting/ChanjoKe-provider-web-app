@@ -23,7 +23,7 @@ import AddUser from '../components/AdminManagement/AddUser'
 import AddFacility from '../components/AdminManagement/AddFacility'
 import VaccinationReports from '../pages/VaccinationReports'
 import SearchInterface from '../pages/SearchInterface'
-import AEFIType from '../components/AEFI/AEFIType'
+import CreateAEFI from '../components/AEFI/CreateAEFI'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
@@ -139,7 +139,7 @@ const router = createBrowserRouter([
       { path: '/profile', element: <Profile /> },
       {
         path: '/aefi-report',
-        element: <AEFIType />,
+        element: <CreateAEFI />,
       },
       {
         path: '/client-details/:clientID',

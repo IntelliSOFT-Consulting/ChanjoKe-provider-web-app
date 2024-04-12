@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Alert, Checkbox, DatePicker, Form, Input, Select } from 'antd'
+import { useState, useEffect } from 'react'
+import { Alert, Checkbox, DatePicker, Form, Input, Select, Radio } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { useSharedState } from '../../shared/sharedState'
 import { useSelector } from 'react-redux'
@@ -7,7 +7,7 @@ import useAefi from '../../hooks/useAefi'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import moment from 'moment'
 
-export default function AEFIType() {
+export default function CreateAEFI() {
   const [currentStep, setCurrentStep] = useState(1)
   const [showModal, setShowModal] = useState(false)
   const [errors, setErrors] = useState([])
@@ -51,6 +51,15 @@ export default function AEFIType() {
   const [form] = Form.useForm()
 
   const { sharedData, setSharedData } = useSharedState()
+
+  const { user } = useSelector((state) => state.userInfo)
+  const aefiVaccines = useSelector((state) => state.AEFIVaccines)
+
+  useEffect(() => {
+    if (!aefiVaccines?.length || !user) {
+      navigate(-1)
+    }
+  }, [])
 
   const onFinish = async (values) => {
     if (currentStep === 1) {
@@ -120,7 +129,22 @@ export default function AEFIType() {
             <div
               className={`grid mt-5 grid-cols-2 gap-10 ${currentStep === 2 ? 'hidden' : 'block'}`}
             >
-              {/* Column 1 */}
+              <Form.Item
+                className="col-span-2"
+                label="Type of AEFI Report"
+                name="aefiReportType"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select a type of AEFI Report',
+                  },
+                ]}
+              >
+                <Radio.Group>
+                  <Radio value="Initial">Initial Report</Radio>
+                  <Radio value="Follow-up">Follow-up Report</Radio>
+                </Radio.Group>
+              </Form.Item>
               <div>
                 <Form.Item
                   label="Type of AEFI"
