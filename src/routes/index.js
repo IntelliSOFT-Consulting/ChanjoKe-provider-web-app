@@ -24,7 +24,6 @@ import AddFacility from '../components/AdminManagement/AddFacility'
 import VaccinationReports from '../pages/VaccinationReports'
 import SearchInterface from '../pages/SearchInterface'
 import AEFIType from '../components/AEFI/AEFIType'
-import AEFIAction from '../components/AEFI/AEFIAction'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
@@ -143,10 +142,6 @@ const router = createBrowserRouter([
         element: <AEFIType />,
       },
       {
-        path: '/aefi-action',
-        element: <AEFIAction />,
-      },
-      {
         path: '/client-details/:clientID',
         element: <ClientDetailsView />,
       },
@@ -192,8 +187,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/referral-details',
-        element: <ReferralDetails />
-      }
+        element: <ReferralDetails />,
+      },
     ],
   },
   {
