@@ -12,7 +12,11 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
   const client = { ...clientDetails }
   const ageValue = client.estimatedAge === 'true' ? 'Actual' : 'Estimated'
   delete client.estimatedAge
-  client.estimatedAge = ageValue
+  client.clientAge = ageValue
+  // const metric = client.weightMetric
+  // delete client.weightMetric
+  client.currentWeight = `${client.currentWeight} Kilograms`
+
 
   const [tHeaders, setTHeaders] = useState([
     {title: 'Caregiver Name', class: '', key: 'caregiverName'},
@@ -30,10 +34,9 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
     } else if (parseInt(age[1]) >= 18) {
       setIsOver18(true)
       setTHeaders([
-        {title: 'Next of kin type', class: '', key: 'caregiverType'},
-        {title: 'Next of kin Name', class: '', key: 'caregiverName'},
+        {title: 'Next of Kin Type', class: '', key: 'caregiverType'},
+        {title: 'Next of Kin Name', class: '', key: 'caregiverName'},
         {title: 'Phone Number', class: '', key: 'phoneNumber'},
-        {title: 'Actions', class: '', key: 'actions'},
       ])
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

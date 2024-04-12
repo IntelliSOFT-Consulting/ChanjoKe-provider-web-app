@@ -5,6 +5,7 @@ import useGet from "../../api/useGet"
 import { deconstructLocationData } from "./DataWrapper"
 import ComboInput from "../../common/forms/ComboInput"
 import { AutoComplete } from "antd"
+import { DownOutlined } from '@ant-design/icons'
 
 export default function AdministrativeArea({ adminArea, setAdministrativeAreaDetails, handleBack, handleNext }) {
 
@@ -43,6 +44,8 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
     handleChange('ward', adminArea?.ward || '')
     handleChange('townCenter', adminArea?.townCenter || '')
     handleChange('estateOrHouseNo', adminArea?.estateOrHouseNo || '')
+
+    console.log({ elements: formData.residenceCounty })
     
 
     if (locationURL.level === 1 && Array.isArray(data?.entry)) {
@@ -83,11 +86,12 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
         <label className="font-bold text-gray-500">County of Residence<span className="text-red-500"> *</span></label>
 
           <AutoComplete
-            style={{ width: 350 }}
-            className="mb-3"
+            className="mb-3 w-full mt-2"
             options={counties.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
             placeholder="County of Residence"
             size="large"
+            suffixIcon={<DownOutlined />}
+            defaultValue={formData.residenceCounty}
             onSelect={(e, val) => {
               handleChange('residenceCounty', val.name)
               handleChange('subCounty', '')
@@ -114,13 +118,13 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
     
         <div>
 
-          <label className="klfont-bold text-gray-500">Sub-County<span className="text-red-500"> *</span></label>
+          <label className="font-bold text-gray-500">Sub-County<span className="text-red-500"> *</span></label>
 
           <AutoComplete
-            style={{ width: 350 }}
+            className="mb-3 w-full mt-2"
             options={subCounties.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
             placeholder="Sub-County"
-            className="mb-3"
+            suffixIcon={<DownOutlined />}
             size="large"
             defaultValue={formData?.subCounty}
             onSelect={(e, value) => {
@@ -152,10 +156,10 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
 
           <AutoComplete
               size="large"
-              style={{ width: 350 }}
+              suffixIcon={<DownOutlined />}
+              className="mb-3 w-full mt-2"
               options={wards.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
               placeholder="Ward"
-              className="mb-3"
               onSelect={(e, value) => {
                 handleChange('ward', value.name)
                 switchLocationURL(3, null)

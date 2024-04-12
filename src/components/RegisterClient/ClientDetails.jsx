@@ -43,8 +43,6 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   const [form] = Form.useForm();
   const navigate = useNavigate()
 
-  form.setFieldsValue({ weightMetric: 'Kilogram(s)' });
-
   useEffect(() => {
     form.setFieldsValue(editClientDetails)
     const dateOfBirth = moment(editClientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD')
@@ -66,8 +64,8 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   }, [editClientDetails])
 
   const onFinish = (values) => {
-    values.currentWeight = `${values.currentWeight || 0} ${values.weightMetric}`
-    delete values.weightMetric
+    console.log({ values })
+    values.currentWeight = `${values.currentWeight || 0}`
     setClientDetails(values)
   };
 
@@ -80,6 +78,16 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
       return false
     } else if (parseInt(age[1]) >= 18) {
       return true
+    }
+  }
+
+  const capitalizeInput = (e) => {
+    const inputName = e.target.dataset?.name
+    const value = e.target.value
+
+    if (value) {
+      const capitalized = value.replace(/\b\w/g, (char) => char.toUpperCase());
+      form.setFieldValue(inputName, capitalized)
     }
   }
 
@@ -117,6 +125,8 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="First Name"
                       autoComplete="off"
+                      data-name="firstName"
+                      onChange={(e) => capitalizeInput(e)}
                       className='block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
                 </Form.Item>
               </Col>
@@ -133,6 +143,8 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="Middle Name"
                       autoComplete="off"
+                      onChange={(e) => capitalizeInput(e)}
+                      data-name="middleName"
                       className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
               </Col>
@@ -153,6 +165,8 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   ]}>
                     <Input
                       placeholder="Last Name"
+                      data-name="lastName"
+                      onChange={(e) => capitalizeInput(e)}
                       autoComplete="off"
                       className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
@@ -189,10 +203,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                           <span className="font-bold">Age Input Method</span>
                         </div>
                       }>
-                    <Radio.Group onChange={(e) => setEstimatedAge(e.target.value)}>
-                      <Radio value={"true"}>Actual</Radio>
-                      <Radio value={"false"}>Estimated</Radio>
-                    </Radio.Group>
+                        <div className="radio-group-container">
+                          <Radio.Group onChange={(e) => setEstimatedAge(e.target.value)}>
+                            <Radio value={"true"}>Actual</Radio>
+                            <Radio value={"false"}>Estimated</Radio>
+                          </Radio.Group>
+                        </div>
+                    
                   </Form.Item>
                   </div>
                 </div>
@@ -351,7 +368,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     }
                     rules={[
                       {
-                        pattern: /^(\+?)([0-9]{7,15})$/,
+                        pattern: /^(\+?)([0-9]{7,10})$/,
                         message: 'Please enter a valid phone number!',
                       },
                     ]}>
@@ -396,7 +413,11 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                   rules={[
                     {
                       required: true,
-                      message: 'Please input identifier!',
+                      message: 'Please input identification number!',
+                    },
+                    {
+                      pattern: /^(\+?[A-Z]?[0-9]{7,14})$/,
+                      message: 'Please enter a valid identification number!',
                     },
                   ]}>
                     <Input
@@ -414,8 +435,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <div>
                       <span className="font-bold">Current Weight</span>
                     </div>
-                  }
-                  rules={[]}>
+                  }>
                       <Input
                         placeholder="Current Weight"
                         autoComplete="off"
@@ -423,16 +443,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         size='large'
                         addonAfter={
                           <Form.Item name='weightMetric' className='mb-0 block rounded-md'>
-                        <Select
-                          style={{ width: 100 }}
-                          defaultValue={'Kilograms'}
-                          onChange={(value) => {
-                            form.setFieldsValue({ weightMetric: value });
-                          }}>
-                          <Select.Option value="Kilograms">Kilograms</Select.Option>
-                          <Select.Option value="Grams">Grams</Select.Option>
-                        </Select>
-                        </Form.Item>
+                            <Select
+                              style={{ width: 100 }}
+                              defaultValue={'Kilograms'}>
+                              <Select.Option value="Kilograms">Kilograms</Select.Option>
+                              <Select.Option value="Grams">Grams</Select.Option>
+                            </Select>
+                          </Form.Item>
                         } />
                 </Form.Item>
               </Col>
