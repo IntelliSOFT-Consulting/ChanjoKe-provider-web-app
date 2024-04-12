@@ -218,13 +218,17 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                       disabledDate={(current) => current && current >= moment().endOf('day')}
                       format="DD-MM-YYYY"
                       onChange={(e) => {
-                        const date = moment(e.$d).format('YYYY-MM-DD')
-                        setUserAge(calculateAge(date))
-                        const days = daysBetweenTodayAndDate(date)
-                        const mappedIDs = identificationOptions.filter(option =>
-                          days >= option.minAge && days <= option.maxAge
-                        );
-                        setIdOptions(mappedIDs)
+                        if (e !== null) {
+                          const date = moment(e.$d).format('YYYY-MM-DD')
+                          setUserAge(calculateAge(date))
+                          const days = daysBetweenTodayAndDate(date)
+                          const mappedIDs = identificationOptions.filter(option =>
+                            days >= option.minAge && days <= option.maxAge
+                          );
+                          setIdOptions(mappedIDs)
+                        } else {
+                          setUserAge(null)
+                        }
                       }}
                       className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
