@@ -1,4 +1,4 @@
-const createAEFI = (form, value, patientID, immunizationID) => {
+const createAEFI = (form, value, patient, immunizationID, encounterID) => {
   return {
     "resourceType": "Observation",
     "code": {
@@ -12,11 +12,11 @@ const createAEFI = (form, value, patientID, immunizationID) => {
         "text": form
     },
     "subject": {
-        "reference": `Patient/${patientID}`
+        "reference": patient
     },
-    // "encounter": {
-    //     // "reference": "Encounter/ae0cd8a7-174b-4c28-95ef-e70050275ea0"
-    // },
+    "encounter": {
+        "reference": `Encounter/${encounterID}`
+    },
     "partOf": {
       "reference": `Immunization/${immunizationID}`
     },
