@@ -187,8 +187,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/referral-details',
-        element: <ReferralDetails />
-      }
+        element: <ReferralDetails />,
+      },
     ],
   },
   {

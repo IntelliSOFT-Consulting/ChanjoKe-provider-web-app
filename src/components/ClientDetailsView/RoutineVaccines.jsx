@@ -9,7 +9,7 @@ import moment from 'moment'
 import { useApiRequest } from '../../api/useApiRequest'
 import Loader from '../../common/spinners/LoadingArrows'
 import Table from '../DataTable'
-import { Badge, Button, Checkbox, Tag } from 'antd'
+import { Badge, Button, Checkbox, Tag, Tooltip } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import { setAEFIVaccines } from '../../redux/actions/vaccineActions'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
@@ -60,14 +60,6 @@ export default function RoutineVaccines({ userCategory, patientData }) {
   }
 
   useEffect(() => {
-    if (patientData?.id) {
-      dispatch(setCurrentPatient(patientData))
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientData])
-
-  useEffect(() => {
     const fetchPatientImmunization = async () => {
       const response = await get(
         `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
@@ -76,11 +68,14 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       setLoading(false)
     }
 
-    if (currentPatient) {
+    if (patientData?.id) {
+      dispatch(setCurrentPatient(patientData))
       fetchPatientImmunization()
       getAefis()
     }
-  }, [currentPatient])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientData])
 
   useEffect(() => {
     const vaccData = data?.entry?.map((vaccine) => {
@@ -394,6 +389,10 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                         (vaccine) => vaccine.status !== 'completed'
                       )?.length === category.vaccines.length
 
+                    const aeFisRecorded = isVaccineInAefi(
+                      administered?.map((vaccine) => vaccine.id)
+                    )
+
                     return (
                       <>
                         <dt>
@@ -420,19 +419,29 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                               </span>
                               <span>
                                 {open ? (
-                                  <Button
-                                    to="/aefi-report"
-                                    className="text-[#163C94]"
-                                    disabled={allNotAdministered}
-                                    onClick={() => {
-                                      dispatch(setAEFIVaccines(administered))
-                                      setSharedData({ vaccinesToAdminister })
-                                      navigate('/aefi-report')
-                                    }}
-                                    type="link"
+                                  <Tooltip
+                                    title={
+                                      aeFisRecorded
+                                        ? 'AEFI recorded for some vaccines'
+                                        : null
+                                    }
                                   >
-                                    AEFIs
-                                  </Button>
+                                    <Button
+                                      to="/aefi-report"
+                                      className="text-[#163C94]"
+                                      disabled={
+                                        allNotAdministered || aeFisRecorded
+                                      }
+                                      onClick={() => {
+                                        dispatch(setAEFIVaccines(administered))
+                                        setSharedData({ vaccinesToAdminister })
+                                        navigate('/aefi-report')
+                                      }}
+                                      type="link"
+                                    >
+                                      AEFIs
+                                    </Button>
+                                  </Tooltip>
                                 ) : (
                                   <PlusSmallIcon
                                     className="h-6 w-6"
