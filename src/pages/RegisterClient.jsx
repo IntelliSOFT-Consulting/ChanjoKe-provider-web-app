@@ -3,7 +3,7 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useEffect, useState } from 'react'
-import { createObservationData, createPatientData, organizeData } from '../components/RegisterClient/DataWrapper'
+import { createObservationData, createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import calculateAge from '../utils/calculateAge'
 import usePost from '../api/usePost'
@@ -20,7 +20,6 @@ export default function RegisterClient({ editClientID }) {
 
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [dialogText, setDialogText] = useState('')
-  const [allFormsValid, setAllFormsValid] = useState(false)
   const [step, updateStep] = useState(1)
   const [response, setResponse] = useState(null)
 

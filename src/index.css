@@ -141,3 +141,17 @@ code {
 .tooltip:hover .tooltipright {
   visibility: visible;
 }
+
+.radio-group-container {
+  display: inline-block; /* Ensures the container remains inline */
+  width: 250px; /* Set a fixed width for the container */
+}
+
+.ant-radio-group {
+  white-space: nowrap; /* Prevents the radio buttons from wrapping */
+}
+
+.ant-radio-group .ant-radio-button-wrapper {
+  display: inline-flex !important; /* Ensures radio buttons remain inline */
+  margin-right: 8px; /* Add some spacing between radio buttons */
+}

@@ -37,8 +37,8 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
     } else if (parseInt(age[1]) >= 18) {
       setIsOver18(true)
       setTHeaders([
-        {title: 'Next of kin type', class: '', key: 'caregiverType'},
-        {title: 'Next of kin Name', class: '', key: 'caregiverName'},
+        {title: 'Next of Kin Type', class: '', key: 'caregiverType'},
+        {title: 'Next of Kin Name', class: '', key: 'caregiverName'},
         {title: 'Phone Number', class: '', key: 'phoneNumber'},
         {title: 'Actions', class: '', key: 'actions'},
       ])
@@ -88,6 +88,16 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
     form.resetFields()
   };
 
+  const capitalizeInput = (e) => {
+    const inputName = e.target.dataset?.name
+    const value = e.target.value
+
+    if (value) {
+      const capitalized = value.replace(/\b\w/g, (char) => char.toUpperCase());
+      form.setFieldValue(inputName, capitalized)
+    }
+  }
+
   return (
     <>
 
@@ -98,7 +108,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
         onClose={() => setIsDialogOpen(false)}
         onAccept={handleAcceptRemoveCaregiver}
         title="Remove Caregiver" />
-      <h3 className="text-xl font-medium px-6">{isOver18 ? `Next of kin details`: `Caregiver details`}</h3>
+      <h3 className="text-xl font-medium px-6">{isOver18 ? `Next of Kin Details`: `Caregiver Details`}</h3>
 
       <Form
         onFinish={onFinish}
@@ -112,7 +122,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverType"
               label={
                 <div>
-                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} type</span>
+                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} Type</span>
                 </div>
               }
               rules={[
@@ -136,7 +146,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverName"
               label={
                 <div>
-                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} name</span>
+                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} Name</span>
                 </div>
               }
               rules={[
@@ -148,6 +158,8 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
                 <Input
                   placeholder="eg John Doe"
                   autoComplete="off"
+                  data-name="caregiverName"
+                  onChange={(e) => capitalizeInput(e)}
                   className='block w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
             </Form.Item>
           </Col>
@@ -166,7 +178,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
                   message: 'Please input the phone number!',
                 },
                 {
-                  pattern: /^(\+?)([0-9]{7,15})$/,
+                  pattern: /^(\+?)([0-9]{7,10})$/,
                   message: 'Please enter a valid phone number!',
                 },
               ]}>
