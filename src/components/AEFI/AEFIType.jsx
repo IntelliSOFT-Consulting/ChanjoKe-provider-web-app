@@ -1,8 +1,23 @@
-import { DatePicker, Form, Input, Select } from 'antd'
+import { useState } from 'react'
+import { Alert, Checkbox, DatePicker, Form, Input, Select } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import { useSharedState } from '../../shared/sharedState';
+import { useSharedState } from '../../shared/sharedState'
+import { useSelector } from 'react-redux'
+import useAefi from '../../hooks/useAefi'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import moment from 'moment'
 
 export default function AEFIType() {
+  const [currentStep, setCurrentStep] = useState(1)
+  const [showModal, setShowModal] = useState(false)
+  const [errors, setErrors] = useState([])
+  const [isTreatmentGiven, setIsTreatmentGiven] = useState(false)
+  const [isSpecimenCollected, setIsSpecimenCollected] = useState(false)
+
+  const currentPatient = useSelector((state) => state.currentPatient)
+
+  const { submitAefi } = useAefi()
+
   const aefiTypes = [
     { id: 1, label: 'High fever', value: 'High fever' },
     { id: 2, label: 'Convulsions', value: 'Convulsions' },
@@ -24,15 +39,45 @@ export default function AEFIType() {
     },
   ]
 
+  const aefiOutcomes = [
+    { label: 'Recovered', value: 'Recovered' },
+    { label: 'Recovering', value: 'Recovering' },
+    { label: 'Not Recovered', value: 'Not Recovered' },
+    { label: 'Unknown', value: 'Unknown' },
+    { label: 'Died', value: 'Died' },
+  ]
+
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
   const { sharedData, setSharedData } = useSharedState()
 
-  const onFinish = (values) => {
-    setSharedData({ ...sharedData, aefiDetails: values })
-    navigate('/aefi-action')
-  };
+  const onFinish = async (values) => {
+    if (currentStep === 1) {
+      setCurrentStep(2)
+      return
+    }
+
+    await submitAefi(values)
+    setShowModal(true)
+    const timer = setTimeout(() => {
+      setShowModal(false)
+      navigate(`/client-details/${currentPatient.id}`)
+    }, 1500)
+
+    return () => clearTimeout(timer)
+  }
+
+  const validateForm = () => {
+    form
+      .validateFields()
+      .then(() => {
+        form.submit()
+      })
+      .catch((err) => {
+        setErrors(err.errorFields?.map((err) => err?.errors[0]))
+      })
+  }
 
   return (
     <>
@@ -43,20 +88,48 @@ export default function AEFIType() {
           </h3>
         </div>
         <div className="px-4 py-5 sm:p-6">
+          {errors.length > 0 && (
+            <Alert
+              className="mx-6"
+              description={
+                <ul className="list-decimal ml-2">
+                  {errors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              }
+              type="error"
+              showIcon={errors.length === 1}
+              closable
+              onClose={() => setErrors([])}
+            />
+          )}
+
+          <ConfirmDialog
+            open={showModal}
+            description="AEFI has been successfully submitted"
+            onConfirm={() => navigate(`/client-details/${currentPatient.id}`)}
+            onClose={() => setShowModal(false)}
+          />
           <Form
             layout="vertical"
             form={form}
             autoComplete="off"
             onFinish={onFinish}
           >
-            <div className="grid mt-5 grid-cols-2 gap-10">
+            <div
+              className={`grid mt-5 grid-cols-2 gap-10 ${currentStep === 2 ? 'hidden' : 'block'}`}
+            >
               {/* Column 1 */}
               <div>
                 <Form.Item
                   label="Type of AEFI"
                   name="aefiType"
                   rules={[
-                    { required: true, message: 'Please select a type of AEFI' },
+                    {
+                      required: true,
+                      message: 'Please select a type of AEFI',
+                    },
                   ]}
                 >
                   <Select
@@ -97,6 +170,9 @@ export default function AEFIType() {
                   <DatePicker
                     style={{ width: '100%' }}
                     placeholder="Onset of event"
+                    disabledDate={(current) => {
+                      return current && current > moment().endOf('day')
+                    }}
                   />
                 </Form.Item>
 
@@ -114,22 +190,95 @@ export default function AEFIType() {
                 </Form.Item>
               </div>
             </div>
+
+            <div
+              className={`mt-5 px-6 grid-cols-1 md:grid-cols-2 gap-x-10 ${currentStep === 1 ? 'hidden' : 'grid'}`}
+              gutter={16}
+            >
+              <Form.Item name="actionTaken" label="Action taken">
+                <Checkbox.Group
+                  onChange={(values) => {
+                    setIsTreatmentGiven(values.includes('Treatment given'))
+                    setIsSpecimenCollected(
+                      values.includes('specimen collected')
+                    )
+                  }}
+                >
+                  <Checkbox value="Treatment given">Treatment Given</Checkbox>
+                  <Checkbox value="specimen collected">
+                    Specimen collected for investigation
+                  </Checkbox>
+                </Checkbox.Group>
+              </Form.Item>
+
+              <div className="col-span-2 grid-cols-1 md:grid-cols-2 gap-x-10">
+                {isTreatmentGiven && (
+                  <Form.Item
+                    name="treatmentDetails"
+                    label="Specify treatment Details"
+                  >
+                    <Input.TextArea
+                      rows={4}
+                      placeholder="Specify treatment Details"
+                    />
+                  </Form.Item>
+                )}
+
+                {isSpecimenCollected && (
+                  <Form.Item
+                    name="specimenDetails"
+                    label="Specify specimen Details"
+                  >
+                    <Input.TextArea
+                      rows={4}
+                      placeholder="Specify specimen Details"
+                    />
+                  </Form.Item>
+                )}
+              </div>
+
+              <div className="col-span-2">
+                <Form.Item
+                  name="aefiOutcome"
+                  className="w-full md:w-1/2"
+                  label={
+                    <div>
+                      <span className="font-bold">AEFI Outcome</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Add AEFI Outcome!',
+                    },
+                  ]}
+                >
+                  <Select size="large" options={aefiOutcomes} />
+                </Form.Item>
+              </div>
+            </div>
           </Form>
 
           <div className="px-4 py-4 sm:px-6 flex justify-end">
-            <button
-              onClick={() => navigate(-1)}
-              className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Back
-            </button>
+            {currentStep === 2 && (
+              <button
+                onClick={() => setCurrentStep(1)}
+                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Back
+              </button>
+            )}
             <button
               onClick={() => {
-                form.submit()
+                if (currentStep === 1) {
+                  setCurrentStep(2)
+                  return
+                }
+                validateForm()
               }}
               className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
             >
-              Next
+              {currentStep === 1 ? 'Next' : 'Submit'}
             </button>
           </div>
         </div>

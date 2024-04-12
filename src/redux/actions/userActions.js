@@ -55,22 +55,21 @@ export const login = (values) => async (dispatch) => {
   dispatch({ type: GET_USER_REQUEST })
   try {
     const { data: auth } = await server.post('/auth/provider/login', values)
-    // if (auth) {
-    //
-    //   const response = await server.get(`/auth/provider/me`, {
-    //     headers: {
-    //       Authorization: `Bearer ${auth.access_token}`,
-    //     },
-    //   })
-    //
-    //   const user = { ...response?.data?.user, ...auth }
-      dispatch({
-        type: GET_USER_SUCCESS,
-        payload: auth,
+    if (auth) {
+      const response = await server.get(`/auth/provider/me`, {
+        headers: {
+          Authorization: `Bearer ${auth.access_token}`,
+        },
       })
 
-      JSON.stringify(localStorage.setItem('practitioner', JSON.stringify(auth)))
-    // }
+      const user = { ...response?.data?.user, ...auth }
+      dispatch({
+        type: GET_USER_SUCCESS,
+        payload: user,
+      })
+
+      JSON.stringify(localStorage.setItem('practitioner', JSON.stringify(user)))
+    }
   } catch (error) {
     dispatch({ type: GET_USER_FAILURE, payload: error.response.data })
     message.error(error.response?.data?.error)
