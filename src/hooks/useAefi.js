@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { useSelector } from 'react-redux'
 import { message } from 'antd'
-import { useParams} from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 export default function useAefi() {
   const [aefis, setAefis] = useState([])
   const [loading, setLoading] = useState(false)
-
 
   const { post, get } = useApiRequest()
 
@@ -24,7 +23,7 @@ export default function useAefi() {
     return {
       resourceType: 'AdverseEvent',
       subject: {
-        reference: `Patient/${currentPatient?.id  || clientID}`,
+        reference: `Patient/${currentPatient?.id || clientID}`,
       },
       recorder: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
@@ -35,8 +34,7 @@ export default function useAefi() {
           {
             code: values.aefiType,
             display: values.aefiType,
-            system:
-              'http://terminology.hl7.org/CodeSystem/adverse-event-type',
+            system: 'http://terminology.hl7.org/CodeSystem/adverse-event-type',
           },
         ],
         text: values.aefiDetails,
@@ -132,15 +130,15 @@ export default function useAefi() {
     }
   }
 
-  const isVaccineInAefi = (vaccineId) => {
+  const isVaccineInAefi = (vaccineIds) => {
     return aefis?.some((aefi) => {
       return aefi.resource.suspectEntity?.some((entity) => {
-        return entity.instance.reference === `Immunization/${vaccineId}`
+        return vaccineIds?.some((vaccineId) => {
+          return entity.instance.reference === `Immunization/${vaccineId}`
+        })
       })
     })
   }
 
-
-
-  return { submitAefi, getAefis, aefis, loading, isVaccineInAefi}
+  return { submitAefi, getAefis, aefis, loading, isVaccineInAefi }
 }
