@@ -12,10 +12,9 @@ export default function useAefi() {
 
   const currentPatient = useSelector((state) => state.currentPatient)
   const { user } = useSelector((state) => state.userInfo)
+  const aefiVaccines = useSelector((state) => state.AEFIVaccines)
 
   const { clientID } = useParams()
-
-  const aefiVaccines = useSelector((state) => state.AEFIVaccines)
 
   const fhirEndpoint = '/hapi/fhir/AdverseEvent'
 
@@ -54,17 +53,19 @@ export default function useAefi() {
       detected: new Date(values.eventOnset).toISOString(),
       recordedDate: new Date().toISOString(),
       mitigatingAction: {
-        coding: values?.actionTaken?.map((action) => {
-          return {
-            code: action,
-            display:
-              action === 'Treatment given'
-                ? values.treatmentDetails
-                : values.specimenDetails,
-            system:
-              'http://terminology.hl7.org/CodeSystem/adverse-event-mitigating-action',
-          }
-        }),
+        coding: values?.actionTaken
+          ? values?.actionTaken?.map((action) => {
+              return {
+                code: action,
+                display:
+                  action === 'Treatment given'
+                    ? values.treatmentDetails
+                    : values.specimenDetails,
+                system:
+                  'http://terminology.hl7.org/CodeSystem/adverse-event-mitigating-action',
+              }
+            })
+          : [],
       },
       outcome: {
         coding: [
@@ -77,15 +78,19 @@ export default function useAefi() {
         ],
       },
       suspectEntity: [
-        ...aefiVaccines.map((vaccine) => {
+        ...(aefiVaccines?.map((vaccine) => {
           return {
             instance: {
               reference: `Immunization/${vaccine.id}`,
             },
           }
-        }),
+        }) || []),
         {
-          casualty: values.aefiDetails,
+          casuality: [
+            {
+              id: values.aefiReportType,
+            },
+          ],
         },
       ],
       location: {
@@ -94,17 +99,6 @@ export default function useAefi() {
       extension: [
         {
           url: 'https://www.hl7.org/fhir/adverseevent-definitions.html#AdverseEvent.mitigatingAction',
-          coding: values.actionTaken.map((action) => {
-            return {
-              code: action,
-              display:
-                action === 'Treatment given'
-                  ? values.treatmentDetails
-                  : values.specimenDetails,
-              system:
-                'http://terminology.hl7.org/CodeSystem/adverse-event-mitigating-action',
-            }
-          }),
           pastMedicalHistory: values.pastMedicalHistory,
         },
       ],

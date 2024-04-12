@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { routineVaccines } from './vaccineData'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
@@ -9,11 +9,11 @@ import moment from 'moment'
 import { useApiRequest } from '../../api/useApiRequest'
 import Loader from '../../common/spinners/LoadingArrows'
 import Table from '../DataTable'
-import { Badge, Button, Checkbox, Tag, Tooltip } from 'antd'
+import { Badge, Button, Checkbox, Tag } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import { setAEFIVaccines } from '../../redux/actions/vaccineActions'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import useAefi from '../../hooks/useAefi'
 
 export default function RoutineVaccines({ userCategory, patientData }) {
@@ -26,11 +26,10 @@ export default function RoutineVaccines({ userCategory, patientData }) {
   const { setSharedData } = useSharedState()
   const { get } = useApiRequest()
   const navigate = useNavigate()
-  const currentPatient = useSelector((state) => state.currentPatient)
 
   const dispatch = useDispatch()
 
-  const { getAefis, isVaccineInAefi, loading: loadingAefis } = useAefi()
+  const { getAefis, loading: loadingAefis } = useAefi()
 
   function mergeVaccines(localVaccines, apiVaccines) {
     if (Array.isArray(apiVaccines) && apiVaccines.length) {
@@ -59,15 +58,15 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       .join(' ')
   }
 
-  useEffect(() => {
-    const fetchPatientImmunization = async () => {
-      const response = await get(
-        `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
-      )
-      setData(response)
-      setLoading(false)
-    }
+  const fetchPatientImmunization = async () => {
+    const response = await get(
+      `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
+    )
+    setData(response)
+    setLoading(false)
+  }
 
+  useEffect(() => {
     if (patientData?.id) {
       dispatch(setCurrentPatient(patientData))
       fetchPatientImmunization()
@@ -95,6 +94,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
         doseNumber: vaccine?.resource?.doseQuantity?.value,
       }
     })
+
     const element = document.getElementById(userCategory)
 
     if (Array.isArray(vaccData) && vaccData) {
@@ -364,9 +364,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                 <Disclosure
                   as="div"
                   key={category.category}
-                  defaultOpen={
-                    category.category === userCategory ? true : false
-                  }
+                  defaultOpen={category.category === userCategory}
                   id={`${userCategory}`}
                   className="pt-2"
                 >
@@ -388,10 +386,6 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                       category.vaccines.filter(
                         (vaccine) => vaccine.status !== 'completed'
                       )?.length === category.vaccines.length
-
-                    const aeFisRecorded = isVaccineInAefi(
-                      administered?.map((vaccine) => vaccine.id)
-                    )
 
                     return (
                       <>
@@ -419,29 +413,19 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                               </span>
                               <span>
                                 {open ? (
-                                  <Tooltip
-                                    title={
-                                      aeFisRecorded
-                                        ? 'AEFI recorded for some vaccines'
-                                        : null
-                                    }
+                                  <Button
+                                    to="/aefi-report"
+                                    className="text-[#163C94]"
+                                    disabled={allNotAdministered}
+                                    onClick={() => {
+                                      dispatch(setAEFIVaccines(administered))
+                                      setSharedData({ vaccinesToAdminister })
+                                      navigate('/aefi-report')
+                                    }}
+                                    type="link"
                                   >
-                                    <Button
-                                      to="/aefi-report"
-                                      className="text-[#163C94]"
-                                      disabled={
-                                        allNotAdministered || aeFisRecorded
-                                      }
-                                      onClick={() => {
-                                        dispatch(setAEFIVaccines(administered))
-                                        setSharedData({ vaccinesToAdminister })
-                                        navigate('/aefi-report')
-                                      }}
-                                      type="link"
-                                    >
-                                      AEFIs
-                                    </Button>
-                                  </Tooltip>
+                                    AEFIs
+                                  </Button>
                                 ) : (
                                   <PlusSmallIcon
                                     className="h-6 w-6"
