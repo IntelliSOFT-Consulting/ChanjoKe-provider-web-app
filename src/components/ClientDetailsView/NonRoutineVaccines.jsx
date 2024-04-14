@@ -222,7 +222,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
               _record?.dependentVaccine ===
               vaccine?.vaccineCode?.coding?.[0]?.code
           )
-          return `${moment(patientData?.birthDate).format('Do MMM YYYY')}`
+          return `${moment(patientData?.birthDate).format('DD MMM YYYY')}`
         }
       },
     },
@@ -234,7 +234,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
         if (_record?.status !== 'completed') {
           return '-'
         }
-        return text ? moment(text).format('Do MMM YYYY') : '-'
+        return text ? moment(text).format('DD MMM YYYY') : '-'
       },
     },
     {

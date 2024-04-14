@@ -70,6 +70,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
   }, [locationURL, data])
 
   const switchLocationURL = (level, value) => {
+    console.log({ value })
     if (value) {
       setLocationUrl({ name: `Location?partof=Location/${value.id}&_count=50&_sort=name`, level: level + 1 })
     }
@@ -84,6 +85,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
         <div>
 
         <label className="font-bold text-gray-500">County of Residence<span className="text-red-500"> *</span></label>
+        <span>{formData.residenceCounty}</span>
 
           <AutoComplete
             className="mb-3 w-full mt-2"
@@ -91,13 +93,13 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             placeholder="County of Residence"
             size="large"
             suffixIcon={<DownOutlined />}
-            defaultValue={formData.residenceCounty}
-            onSelect={(e, val) => {
-              handleChange('residenceCounty', val.name)
+            value={formData?.residenceCounty}
+            onChange={(value, items) => {
+              handleChange('residenceCounty', value)
               handleChange('subCounty', '')
               handleChange('ward', '')
-              switchLocationURL(1, val)
-              setAdministrativeAreaDetails({ ...formData, residenceCounty: val.name })
+              switchLocationURL(1, items)
+              setAdministrativeAreaDetails({ ...formData, residenceCounty: value })
             }}
             filterOption={(inputValue, option) => 
               option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
@@ -126,12 +128,13 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             placeholder="Sub-County"
             suffixIcon={<DownOutlined />}
             size="large"
-            defaultValue={formData?.subCounty}
-            onSelect={(e, value) => {
-              handleChange('subCounty', value.name)
+            value={formData?.subCounty}
+            onChange={(value, items) => {
+              handleChange('subCounty', value)
               handleChange('ward', '')
-              switchLocationURL(2, value)
-              setAdministrativeAreaDetails({ ...formData, subCounty: value.name })
+              console.log({ items })
+              switchLocationURL(2, items)
+              setAdministrativeAreaDetails({ ...formData, subCounty: value })
             }}
             filterOption={(inputValue, option) => 
               option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
@@ -160,10 +163,11 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
               className="mb-3 w-full mt-2"
               options={wards.map((county) => ({ value: county.name, name: county.name, id: county.id }))}
               placeholder="Ward"
-              onSelect={(e, value) => {
-                handleChange('ward', value.name)
+              value={formData.ward}
+              onChange={(value) => {
+                handleChange('ward', value)
                 switchLocationURL(3, null)
-                setAdministrativeAreaDetails({ ...formData, ward: value.name })
+                setAdministrativeAreaDetails({ ...formData, ward: value })
               }}
               filterOption={(inputValue, option) => 
                 option.name.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
