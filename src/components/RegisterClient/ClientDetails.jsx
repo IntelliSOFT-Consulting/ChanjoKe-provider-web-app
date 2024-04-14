@@ -14,11 +14,11 @@ dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
 const identificationOptions = [
-  { name: 'BIRTH NOTIFICATION NUMBER', value: 'Birth_notification_number', minAge: 0, maxAge: 1095 },
-  { name: 'BIRTH CERTIFICATE', value: 'Birth_certificate', minAge: 0, maxAge: 36525 },
-  { name: 'ID NUMBER', value: 'ID_number', minAge: 6575, maxAge: 36525 },
-  { name: 'NEMIS NUMBER', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
-  { name: 'PASSPORT', value: 'passport', minAge: 0, maxAge: 36525 }, 
+  { name: 'Birth Notification Number', value: 'Birth_notification_number', minAge: 0, maxAge: 1095 },
+  { name: 'Birth Certificate', value: 'Birth_Certificate', minAge: 0, maxAge: 36525 },
+  { name: 'ID Number', value: 'ID_number', minAge: 6575, maxAge: 36525 },
+  { name: 'NEMIS Number', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
+  { name: 'Passport Number', value: 'passport', minAge: 0, maxAge: 36525 }, 
 ]
 
 function daysBetweenTodayAndDate(inputDate) {
@@ -204,7 +204,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         </div>
                       }>
                         <div className="radio-group-container">
-                          <Radio.Group onChange={(e) => setEstimatedAge(e.target.value)}>
+                          <Radio.Group defaultValue={"true"} onChange={(e) => setEstimatedAge(e.target.value)}>
                             <Radio value={"true"}>Actual</Radio>
                             <Radio value={"false"}>Estimated</Radio>
                           </Radio.Group>
@@ -375,6 +375,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                       <Input
                         prefix={<span className='flex'>+254</span>}
                         placeholder="Phone Number"
+                        maxLength={10}
                         className='flex w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                   </Form.Item>
                 </Col>
@@ -423,6 +424,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <Input
                       placeholder="Document Identification Number"
                       autoComplete="off"
+                      maxLength={15}
                       className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
               </Col>

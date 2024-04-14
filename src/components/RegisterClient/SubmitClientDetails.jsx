@@ -7,15 +7,15 @@ import { useEffect, useState } from "react";
 
 export default function ClientDetails({ clientDetails, caregiverDetails, administrativeArea, submitPatientDetails, handleBack }) {
 
-  console.log({ clientDetails })
-
   const client = { ...clientDetails }
-  const ageValue = client.estimatedAge === 'true' ? 'Actual' : 'Estimated'
   delete client.estimatedAge
-  client.clientAge = ageValue
+  delete client.weightMetric
   // const metric = client.weightMetric
   // delete client.weightMetric
   client.currentWeight = `${client.currentWeight} Kilograms`
+
+  client.age = calculateAge(dayjs(clientDetails?.dateOfBirth?.$d).format('DD-MM-YYYY'))
+  delete client.estimatedAge
 
 
   const [tHeaders, setTHeaders] = useState([

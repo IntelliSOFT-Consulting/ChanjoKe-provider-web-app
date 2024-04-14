@@ -56,7 +56,7 @@ export default function ClientDetailsView() {
       systemID: `${systemGenID || ''}`,
       dob: moment(patientData?.birthDate).format('Do MMM YYYY'),
       age: calculateAge(patientData?.birthDate),
-      gender: patientData?.gender,
+      gender: patientData?.gender?.replace(/\b\w/g, (char) => char.toUpperCase()),
     },
   ]
 

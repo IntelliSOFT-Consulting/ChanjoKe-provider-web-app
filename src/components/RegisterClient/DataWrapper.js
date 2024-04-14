@@ -25,7 +25,7 @@ function organizeData(items) {
           hierarchy['NEMIS_NUMBER'] = item.value;
       } else if (item?.system === 'Passport' || item?.type?.coding?.[0]?.display === 'Passport') {
           hierarchy['PASSPORT'] = item.value;
-      } else if (item?.type?.coding?.[0]?.display === 'Birth Certificate' || item?.type?.coding?.[0]?.display === 'Birth_certificate' || item?.type?.coding?.[0]?.display === 'Birth_notification_number' || item?.type?.coding?.[0]?.display === 'Birth Notification Number' || item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate' || item?.type?.coding?.[0]?.display === 'birth_notification_number' || item?.type?.coding?.[0]?.display === 'birth_certificate') {
+      } else if (item?.type?.coding?.[0]?.display === 'Birth Certificate' || item?.type?.coding?.[0]?.display === 'Birth_Certificate' || item?.type?.coding?.[0]?.display === 'Birth_certificate' || item?.type?.coding?.[0]?.display === 'Birth_notification_number' || item?.type?.coding?.[0]?.display === 'Birth Notification Number' || item?.system === 'Birth Notification Number' || item?.system ==='Birth Certificate' || item?.type?.coding?.[0]?.display === 'birth_notification_number' || item?.type?.coding?.[0]?.display === 'birth_certificate') {
           hierarchy['BIRTH_CERTIFICATE'] = item.value;
       } else if (item?.system === 'National ID' || item.system === 'ID Number' || item?.type?.coding?.[0]?.display === 'ID Number' || item?.type?.coding?.[0]?.display === 'ID_number') {
           hierarchy['NATIONAL_ID'] = item.value;
@@ -219,7 +219,7 @@ function deconstructLocationData(data) {
     return {
         id: data?.resource?.id,
         fullUrl: data?.fullUrl,
-        name: data?.resource?.name,
+        name: data?.resource?.name?.charAt(0).toUpperCase() + data?.resource?.name?.slice(1).toLowerCase(),
         source: data?.resource?.meta?.source,
         partOf: data?.resource?.partOf
     }
