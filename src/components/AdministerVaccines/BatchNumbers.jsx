@@ -1,28 +1,44 @@
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import { useSharedState } from '../../shared/sharedState'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
-import usePost from '../../api/usePost'
 import { useApiRequest } from '../../api/useApiRequest'
 import { useSelector } from 'react-redux'
 import { Form, Input, Select } from 'antd'
+import useObservations from '../../hooks/useObservations'
+import moment from 'moment'
 
 export default function BatchNumbers() {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const { sharedData } = useSharedState()
-  const { SubmitForm } = usePost()
   const { post } = useApiRequest()
 
   const [form] = Form.useForm()
 
   const currentPatient = useSelector((state) => state.currentPatient)
 
+  const { getLatestObservation } = useObservations()
+
   const navigate = useNavigate()
+
+  const getWeight = async () => {
+    const observation = await getLatestObservation(currentPatient.id)
+    const today = moment().format('YYYY-MM-DD')
+    const observationDate = observation.resource.meta.lastUpdated.split('T')[0]
+
+    if (observation && observationDate === today) {
+      const weight = observation.resource.code?.text
+
+      form.setFieldValue('currentWeight', weight)
+    }
+  }
 
   useEffect(() => {
     if (!sharedData || sharedData?.length === 0) {
       navigate(-1)
+    } else {
+      getWeight()
     }
   }, [sharedData])
 
@@ -57,7 +73,7 @@ export default function BatchNumbers() {
     <>
       <ConfirmDialog
         open={isDialogOpen}
-        description={`Vaccination data updated successfully`}
+        description="The vaccine has been successfully administered"
         onClose={() => navigate(-1)}
       />
 
@@ -70,16 +86,6 @@ export default function BatchNumbers() {
           layout="vertical"
           form={form}
           onFinish={handleFormSubmit}
-          initialValues={{
-            vaccines: sharedData?.map((vaccine) => ({
-              vaccines: [
-                {
-                  batchNumber: vaccine.batchNumber,
-                  diseaseTarget: vaccine.diseaseTarget,
-                },
-              ],
-            })),
-          }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 px-6 gap-10">
             <div className="col-span-2 border-b ">
@@ -107,48 +113,56 @@ export default function BatchNumbers() {
               </Form.Item>
             </div>
 
-            <Form.List name="vaccines">
+            <Form.List
+              name="vaccines"
+              initialValue={sharedData?.map((vaccine) => ({
+                batchNumber: vaccine.batchNumber,
+                diseaseTarget: vaccine.diseaseTarget,
+              }))}
+            >
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map((field, index) => (
-                    <div
-                      key={field.key}
-                      className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-10"
-                    >
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'batchNumber']}
-                        label="Batch Number"
+                  {fields?.map((field, index) => {
+                    return (
+                      <div
+                        key={field.key}
+                        className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-x-10"
                       >
-                        {console.log('field', sharedData[index])}
-                        <Select
-                          placeholder={sharedData[index].vaccineCode}
-                          style={{ width: '100%' }}
-                          size="large">
-                          <Select.Option value="HDKKD8777847">
-                            HDKKD8777847
-                          </Select.Option>
-                          <Select.Option value="OPVJJD788778">
-                            OPVJJD788778
-                          </Select.Option>
-                          <Select.Option value="OPV667HHD889">
-                            OPV667HHD889
-                          </Select.Option>
-                        </Select>
-                      </Form.Item>
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'diseaseTarget']}
-                        label="Disease Target"
-                      >
-                        <Input
-                          size="large"
-                          placeholder={sharedData[index].diseaseTarget}
-                          disabled
-                        />
-                      </Form.Item>
-                    </div>
-                  ))}
+                        <Form.Item
+                          name={[field.name, 'batchNumber']}
+                          label="Batch Number"
+                        >
+                          <Select
+                            placeholder={
+                              sharedData[index].vaccineCode?.coding[0].code
+                            }
+                            style={{ width: '100%' }}
+                            size="large"
+                          >
+                            <Select.Option value="HDKKD8777847">
+                              HDKKD8777847
+                            </Select.Option>
+                            <Select.Option value="OPVJJD788778">
+                              OPVJJD788778
+                            </Select.Option>
+                            <Select.Option value="OPV667HHD889">
+                              OPV667HHD889
+                            </Select.Option>
+                          </Select>
+                        </Form.Item>
+                        <Form.Item
+                          name={[field.name, 'diseaseTarget']}
+                          label="Disease Target"
+                        >
+                          <Input
+                            size="large"
+                            placeholder={sharedData[index].diseaseTarget}
+                            disabled
+                          />
+                        </Form.Item>
+                      </div>
+                    )
+                  })}
                 </>
               )}
             </Form.List>
@@ -157,12 +171,14 @@ export default function BatchNumbers() {
         <div className="px-4 py-4 sm:px-6 flex justify-end">
           <button
             onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
             Cancel
           </button>
           <button
             onClick={() => form.submit()}
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
             Administer
           </button>
         </div>
