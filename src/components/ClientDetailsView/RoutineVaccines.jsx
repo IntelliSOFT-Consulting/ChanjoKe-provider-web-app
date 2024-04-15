@@ -11,7 +11,7 @@ import Loader from '../../common/spinners/LoadingArrows'
 import Table from '../DataTable'
 import { Badge, Button, Checkbox, Tag } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
-import { setAEFIVaccines } from '../../redux/actions/vaccineActions'
+import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
 import { useDispatch } from 'react-redux'
 import useAefi from '../../hooks/useAefi'
@@ -344,6 +344,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
             <button
               onClick={() => {
                 setDialogOpen(true)
+                dispatch(setSelectedVaccines(vaccinesToAdminister))
                 setSharedData(vaccinesToAdminister)
               }}
               disabled={vaccinesToAdminister.length > 0 ? false : true}
@@ -418,7 +419,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                                     className="text-[#163C94]"
                                     disabled={allNotAdministered}
                                     onClick={() => {
-                                      dispatch(setAEFIVaccines(administered))
+                                      dispatch(setSelectedVaccines(administered))
                                       setSharedData({ vaccinesToAdminister })
                                       navigate('/aefi-report')
                                     }}

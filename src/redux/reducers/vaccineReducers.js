@@ -1,8 +1,8 @@
-import { SET_AEFI_VACCINES } from '../constants/vaccineConstants'
+import { SET_SELECTED_VACCINES } from '../constants/vaccineConstants'
 
-export const setAEFIVaccinesReducer = (state = null, action) => {
+export const setSelectedVaccinesReducer = (state = null, action) => {
   switch (action.type) {
-    case SET_AEFI_VACCINES:
+    case SET_SELECTED_VACCINES:
       return action.payload
     default:
       return state
