@@ -1,8 +1,8 @@
-import { SET_AEFI_VACCINES } from '../constants/vaccineConstants'
+import { SET_SELECTED_VACCINES } from '../constants/vaccineConstants'
 
-export const setAEFIVaccines = (vaccines) => (dispatch) => {
+export const setSelectedVaccines = (vaccines) => (dispatch) => {
   dispatch({
-    type: SET_AEFI_VACCINES,
+    type: SET_SELECTED_VACCINES,
     payload: vaccines,
   })
 }

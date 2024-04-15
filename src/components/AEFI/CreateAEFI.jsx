@@ -53,10 +53,10 @@ export default function CreateAEFI() {
   const { sharedData, setSharedData } = useSharedState()
 
   const { user } = useSelector((state) => state.userInfo)
-  const aefiVaccines = useSelector((state) => state.AEFIVaccines)
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   useEffect(() => {
-    if (!aefiVaccines?.length || !user) {
+    if (!selectedVaccines?.length || !user) {
       navigate(-1)
     }
   }, [])

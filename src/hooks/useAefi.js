@@ -12,7 +12,7 @@ export default function useAefi() {
 
   const currentPatient = useSelector((state) => state.currentPatient)
   const { user } = useSelector((state) => state.userInfo)
-  const aefiVaccines = useSelector((state) => state.AEFIVaccines)
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   const { clientID } = useParams()
 
@@ -78,7 +78,7 @@ export default function useAefi() {
         ],
       },
       suspectEntity: [
-        ...(aefiVaccines?.map((vaccine) => {
+        ...(selectedVaccines?.map((vaccine) => {
           return {
             instance: {
               reference: `Immunization/${vaccine.id}`,
