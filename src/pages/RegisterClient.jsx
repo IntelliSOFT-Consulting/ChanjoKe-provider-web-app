@@ -56,7 +56,7 @@ export default function RegisterClient({ editClientID }) {
     if (data?.identifier && Array.isArray(data?.identifier)) {
       const estimatedAgeVal = data?.identifier.filter((id) => id?.system === 'estimated-age')
       const userID = data?.identifier.filter((id) => (id?.system === 'identification_type' || id?.system === 'identification' ))
-      estimatedAge = estimatedAgeVal?.[0].value 
+      estimatedAge = estimatedAgeVal?.[0]?.value 
 
       identificationType = userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value

@@ -7,13 +7,16 @@ import ConvertObjectToArray from "../components/RegisterClient/convertObjectToAr
 import moment from "moment"
 import calculateAge from "../utils/calculateAge"
 
-function convertUnderscoresAndCapitalize(inputString) {
-  if (inputString !== undefined) {
-    let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
-    return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase());
-  } else {
-    return ''
-  }
+function convertCamelCaseString(inputString) {
+  let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+  stringWithSpaces = stringWithSpaces.replace(/\b\w+/g, (word) => {
+    // Check if the word includes 'of', and if so, keep it lowercase
+    if (word.toLowerCase().includes('of')) {
+      return word.toLowerCase();
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+  return stringWithSpaces;
 }
 
 export default function ClientRecords() {
@@ -46,10 +49,13 @@ export default function ClientRecords() {
       'Last Name': data?.name?.[0]?.given[0],
       'Middle Name': data?.name?.[0]?.given[1],
       'Gender': data?.gender,
-      'Phone Number': data?.telecom?.[0]?.value,
       'Date of Birth': moment(data?.birthDate).format('DD-MM-YYYY'),
-      'Identification Type': convertUnderscoresAndCapitalize(identificationType),
+      'Identification Type': convertCamelCaseString(identificationType),
       'Identification Number': identificationNumber,
+    }
+
+    if (data?.telecom?.[0]?.value) {
+      clientDetails['Phone Number'] = data?.telecom?.[0]?.value;
     }
 
     const addressDetails = {
@@ -79,10 +85,9 @@ export default function ClientRecords() {
     } else if (parseInt(age[1]) >= 18) {
       setIsOver18(true)
       setTHeaders([
-        {title: 'Next of kin type', class: '', key: 'caregiverType'},
-        {title: 'Next of kin Name', class: '', key: 'caregiverName'},
+        {title: 'Next of Kin Type', class: '', key: 'caregiverType'},
+        {title: 'Next of Kin Name', class: '', key: 'caregiverName'},
         {title: 'Phone Number', class: '', key: 'phoneNumber'},
-        {title: 'Actions', class: '', key: 'actions'},
       ])
     }
 
@@ -125,7 +130,7 @@ export default function ClientRecords() {
 
         <div>
             <h2 className="text-xl font-semibold ml-7 mb-5 mt-5">
-              {isOver18 ? 'Next of kin': 'Caregiver'} Details
+              {isOver18 ? 'Next of Kin': 'Caregiver'} Details
             </h2>
 
             <SearchTable headers={tHeaders} data={caregiverDetails} />

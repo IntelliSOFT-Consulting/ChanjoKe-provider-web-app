@@ -1,7 +1,7 @@
 export default function TextInput(props) {
   return (
     <div>
-      <label className='text-sm text-[#707070] font-semibold'>
+      <label className='font-semibold'>
         { props.label }
         { props.required && <span className="text-red-500 ml-1 font-bold">*</span>}
       </label>
@@ -29,8 +29,8 @@ export default function TextInput(props) {
           onChange={(e) => props.onInputChange(e.target.value)}
           className={
             `${props.leadingIcon
-            ? 'block w-full rounded-md border-0 py-3 pl-10 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]'
-            : 'block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]'}
+            ? 'block w-full rounded-md border-0 py-3 pl-10 text-sm text-[#707070] ring-1 ring-gray-300 placeholder:text-gray-400'
+            : 'block w-full rounded-md border-0 py-3 text-sm text-[#707070] ring-1 ring-gray-300 placeholder:text-gray-400'}
             
             ${props.disabled ? 'bg-gray-300' : ''}
             `

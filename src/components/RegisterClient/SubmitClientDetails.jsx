@@ -14,7 +14,7 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
   // delete client.weightMetric
   client.currentWeight = `${client.currentWeight} Kilograms`
 
-  client.age = calculateAge(dayjs(clientDetails?.dateOfBirth?.$d).format('DD-MM-YYYY'))
+  client.age = calculateAge(clientDetails?.dateOfBirth?.$d)
   delete client.estimatedAge
 
 
@@ -76,7 +76,7 @@ export default function ClientDetails({ clientDetails, caregiverDetails, adminis
 
       <div>
         <h2 className="text-xl font-semibold ml-7 mb-5 mt-5">
-          {isOver18 ? 'Next of kin': 'Caregiver'} Details
+          {isOver18 ? 'Next of Kin': 'Caregiver'} Details
         </h2>
 
         <SearchTable headers={tHeaders} data={caregiverDetails} />
