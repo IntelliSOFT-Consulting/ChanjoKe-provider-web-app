@@ -122,7 +122,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverType"
               label={
                 <div>
-                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} Type</span>
+                  <span className="font-bold">{isOver18 ? 'Next of Kin': 'Caregiver'} Type</span>
                 </div>
               }
               rules={[
@@ -146,7 +146,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
               name="caregiverName"
               label={
                 <div>
-                  <span className="font-bold">{isOver18 ? 'Next of kin': 'Caregiver'} Name</span>
+                  <span className="font-bold">{isOver18 ? 'Next of Kin': 'Caregiver'} Name</span>
                 </div>
               }
               rules={[
