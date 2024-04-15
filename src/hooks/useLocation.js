@@ -16,8 +16,6 @@ export const useLocations = (form) => {
     fetchCounties()
   }, [])
 
-  console.log('counties', counties)
-
   const fetchLocations = async (partof) => {
     const url = `${fhirRoute}?partof=${partof}&_count=50`
     const response = await get(url)
