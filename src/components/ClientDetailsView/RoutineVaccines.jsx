@@ -266,7 +266,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
         if (_record?.status !== 'completed') {
           return '-'
         }
-        return text ? moment(text).format('DD MMM YYYY') : '-'
+        return text ? moment(text).format('DD-MM-YYYY') : '-'
       },
     },
     {
