@@ -73,7 +73,7 @@ export default function BatchNumbers() {
     <>
       <ConfirmDialog
         open={isDialogOpen}
-        description={`Vaccination data updated successfully`}
+        description="The vaccine has been successfully administered"
         onClose={() => navigate(-1)}
       />
 
