@@ -1,14 +1,12 @@
-import TextInput from '../../common/forms/TextInput'
 import moment from 'moment'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import FormState from '../../utils/formState'
 import { useSharedState } from '../../shared/sharedState'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
 import { useNavigate } from 'react-router-dom'
 import { useApiRequest } from '../../api/useApiRequest'
-import { DatePicker, Input, Select, Form } from 'antd'
+import { DatePicker, Form, Select } from 'antd'
 
 export default function NotAdministered() {
   const navigate = useNavigate()
@@ -83,7 +81,7 @@ export default function NotAdministered() {
       setDialogOpen(true)
       const time = setTimeout(() => {
         setDialogOpen(false)
-        navigate(-1)
+        navigate(`/client-details/${currentPatient.id}`)
       }, 2000)
       return () => clearTimeout(time)
     }
