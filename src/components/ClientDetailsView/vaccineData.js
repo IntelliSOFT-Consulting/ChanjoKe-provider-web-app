@@ -15,7 +15,7 @@ const routineVaccines = [
     vaccineName: 'bOPV',
     vaccineCode: 'IMPO-bOPV',
     diseaseTarget: 'Polio',
-    doseNumber: '1',
+    doseNumber: '0',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
