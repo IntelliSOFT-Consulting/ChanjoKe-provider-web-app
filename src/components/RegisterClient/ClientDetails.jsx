@@ -14,7 +14,7 @@ dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
 const identificationOptions = [
-  { name: 'Birth Notification Number', value: 'Birth_notification_number', minAge: 0, maxAge: 1095 },
+  { name: 'Birth Notification Number', value: 'Birth_Notification_Number', minAge: 0, maxAge: 1095 },
   { name: 'Birth Certificate', value: 'Birth_Certificate', minAge: 0, maxAge: 36525 },
   { name: 'ID Number', value: 'ID_number', minAge: 6575, maxAge: 36525 },
   { name: 'NEMIS Number', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
@@ -64,10 +64,16 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   }, [editClientDetails])
 
   const onFinish = (values) => {
-    console.log({ values })
     values.currentWeight = `${values.currentWeight || 0}`
     setClientDetails(values)
   };
+
+  function handleInputKeyDown(e) {
+    const regex = /^[0-9-]*$/;
+    if (!regex.test(e.key) && e.key !== 'Backspace') {
+        e.preventDefault();
+    }
+}
 
   const isUserOverI8 = () => {
     const dateObject = form.getFieldValue('dateOfBirth')
@@ -234,6 +240,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     <DatePicker
                       disabledDate={(current) => current && current >= moment().endOf('day')}
                       format="DD-MM-YYYY"
+                      onKeyDown={handleInputKeyDown}
                       onChange={(e) => {
                         if (e !== null) {
                           const date = moment(e.$d).format('YYYY-MM-DD')
@@ -415,10 +422,6 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     {
                       required: true,
                       message: 'Please input identification number!',
-                    },
-                    {
-                      pattern: /^(\+?[A-Z]?[0-9]{7,14})$/,
-                      message: 'Please enter a valid identification number!',
                     },
                   ]}>
                     <Input

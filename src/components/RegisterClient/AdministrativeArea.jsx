@@ -196,7 +196,7 @@ export default function AdministrativeArea({ adminArea, setAdministrativeAreaDet
             setAdministrativeAreaDetails(formData)
           }}
           disabled={(!formData.residenceCounty || !formData.subCounty || !formData.ward) ? true : false}
-          className={(!formData.residenceCounty || !formData.subCounty || !formData.ward) ? "bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" : "bg-[#9cb7e3] tooltip border-[#9cb7e3] outline-[#9cb7e3] hover:bg-[#9cb7e3] focus-visible:outline-[#9cb7e3] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"}>
+          className={(!formData.residenceCounty || !formData.subCounty || !formData.ward) ? "bg-[#9cb7e3] tooltip border-[#9cb7e3] outline-[#9cb7e3] hover:bg-[#9cb7e3] focus-visible:outline-[#9cb7e3] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2": "bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"}>
           Preview
         </button>      
       </div> 

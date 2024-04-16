@@ -219,7 +219,7 @@ function deconstructLocationData(data) {
     return {
         id: data?.resource?.id,
         fullUrl: data?.fullUrl,
-        name: data?.resource?.name?.charAt(0).toUpperCase() + data?.resource?.name?.slice(1).toLowerCase(),
+        name: data?.resource?.name?.split(' ').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(' '),
         source: data?.resource?.meta?.source,
         partOf: data?.resource?.partOf
     }

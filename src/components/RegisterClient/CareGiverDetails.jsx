@@ -186,6 +186,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
                   prefix={<span className='flex'>+254</span>}
                   placeholder="0700 000000"
                   autoComplete="off"
+                  maxLength={10}
                   className='flex w-full rounded-md py-3 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
             </Form.Item>
 
