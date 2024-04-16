@@ -7,8 +7,7 @@ export default function usePatient() {
 
   const getPatient = async (patientId) => {
     try {
-      const response = await get(`${fhirWndpoint}/Patient/${patientId}`)
-      return response.data
+      return await get(`${fhirWndpoint}/Patient/${patientId}`)
     } catch (error) {
       return error
     }
@@ -17,7 +16,7 @@ export default function usePatient() {
   const savePatient = async (patientData) => {
     try {
       const response = await post(`${fhirWndpoint}/Patient`, patientData)
-      return response.data
+      return response
     } catch (error) {
       return error
     }
@@ -26,7 +25,7 @@ export default function usePatient() {
   const updatePatient = async (patientId, patientData) => {
     try {
       const response = await put(`${fhirWndpoint}/Patient/${patientId}`, patientData)
-      return response.data
+      return response
     } catch (error) {
       return error
     }

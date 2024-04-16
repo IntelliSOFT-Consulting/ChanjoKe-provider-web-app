@@ -110,11 +110,11 @@ export default function useAefi() {
     await post(fhirEndpoint, payload)
   }
 
-  const getAefis = async () => {
+  const getAefis = async (patientId = null) => {
     setLoading(true)
     try {
       const data = await get(
-        `/hapi/fhir/AdverseEvent?subject=Patient/${currentPatient?.id || clientID}`
+        `/hapi/fhir/AdverseEvent?subject=Patient/${patientId || currentPatient?.id || clientID}`
       )
       setAefis(data.entry)
     } catch (error) {
@@ -122,6 +122,19 @@ export default function useAefi() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const getVaccineAefis = async (patient, vaccineId) => {
+    const patientAefis = await get(
+      `/hapi/fhir/AdverseEvent?subject=Patient/${patient}`
+    )
+
+    return patientAefis?.entry?.filter((aefi) => {
+      const suspectEntityIds = aefi.resource.suspectEntity?.map(
+        (entity) => entity.instance.reference
+      )
+      return suspectEntityIds?.includes(`Immunization/${vaccineId}`)
+    })
   }
 
   const isVaccineInAefi = (vaccineIds) => {
@@ -134,5 +147,12 @@ export default function useAefi() {
     })
   }
 
-  return { submitAefi, getAefis, aefis, loading, isVaccineInAefi }
+  return {
+    submitAefi,
+    getAefis,
+    aefis,
+    loading,
+    isVaccineInAefi,
+    getVaccineAefis,
+  }
 }
