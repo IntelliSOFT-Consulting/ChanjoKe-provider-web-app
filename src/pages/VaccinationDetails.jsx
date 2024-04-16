@@ -26,7 +26,7 @@ export default function VaccinationDetails() {
   const { vaccinationID } = useParams()
 
   const formatAefis = (aefis) => {
-    return aefis.map((aefi) => {
+    return aefis?.map((aefi) => {
       return {
         symptomName: aefi?.resource?.event?.coding?.[0]?.display,
         occurenceDate: dayjs(aefi?.resource?.detected).format('DD-MM-YYYY'),
@@ -191,12 +191,12 @@ export default function VaccinationDetails() {
         </div>
 
         <div className="px-10 py-5">
-          {!vaccinationAEFIs.length && (
+          {!vaccinationAEFIs?.length && (
             <>
               <div className="text-center">No AEFIs recorded</div>
             </>
           )}
-          {vaccinationAEFIs.length > 0 && (
+          {vaccinationAEFIs?.length > 0 && (
             <Table
               dataSource={vaccinationAEFIs}
               columns={columns}

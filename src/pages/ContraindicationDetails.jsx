@@ -62,7 +62,7 @@ export default function ContraindicationDetails() {
         }
 
         {!vaccinationDetails?.note?.[1]?.authorString && <div className="text-center  mx-7 px-10 py-10">
-            Contraindication not found
+          <p className="text-gray-500">No Contraindication Details Found</p>
           </div>
         }
 
