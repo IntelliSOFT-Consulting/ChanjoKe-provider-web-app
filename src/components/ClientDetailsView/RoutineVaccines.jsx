@@ -210,13 +210,11 @@ export default function RoutineVaccines({ userCategory, patientData }) {
             className="tooltip"
             disabled={
               completed ||
-              notDone ||
               lockVaccine(record?.adminRange?.start, patientData.birthDate)
             }
             onChange={() => handleCheckBox('administer', record)}
           >
             {(lockVaccine(record?.adminRange?.start, patientData.birthDate) ||
-              notDone ||
               completed) && (
               <span className="tooltipright">
                 {lockVaccine(record?.adminRange?.start, patientData.birthDate)

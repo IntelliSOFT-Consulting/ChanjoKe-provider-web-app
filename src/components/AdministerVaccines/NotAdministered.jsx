@@ -32,8 +32,7 @@ export default function NotAdministered() {
   }, [sharedData])
 
   const currentPatient = useSelector((state) => state.currentPatient)
-  const { post } = useApiRequest()
-
+  const { put } = useApiRequest()
 
   const fhirReasons = [
     { label: 'Immunity', value: 'IMMUNE' },
@@ -50,7 +49,6 @@ export default function NotAdministered() {
     navigate(-1)
     setDialogOpen(false)
   }
-
 
   const handleFormSubmit = async (values) => {
     const selectedVaccines = vaccines.filter((vaccine) =>
@@ -72,8 +70,12 @@ export default function NotAdministered() {
     })
 
     const responses = await Promise.all(
-      data?.map(async (administerVaccine) => {
-        return await post('/hapi/fhir/Immunization', administerVaccine)
+      data?.map(async (administerVaccine, index) => {
+        const vaccineId = selectedVaccines[index].id
+        return await put(`/hapi/fhir/Immunization/${vaccineId}`, {
+          ...administerVaccine,
+          id: vaccineId,
+        })
       })
     )
 
@@ -118,6 +120,27 @@ export default function NotAdministered() {
                   name="vaccinesToContraindicate"
                   rules={[
                     { required: true, message: 'Please select a vaccine' },
+                    {
+                      validator: (_, value) => {
+                        const selected = vaccines.filter((vaccine) =>
+                          value.includes(vaccine.vaccineName)
+                        )
+
+                        const notDone = selected.filter(
+                          (vaccine) => vaccine.status === 'not-done'
+                        )
+                        if (notDone.length > 0) {
+                          const vaccineNames = notDone
+                            .map((item) => item.vaccineName)
+                            .join(', ')
+                          return Promise.reject(
+                            `${vaccineNames} already marked as not administered`
+                          )
+                        }
+
+                        return Promise.resolve()
+                      },
+                    },
                   ]}
                 >
                   <Select
