@@ -13,7 +13,7 @@ import { Badge, Button, Checkbox, Tag } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import useAefi from '../../hooks/useAefi'
 
 export default function RoutineVaccines({ userCategory, patientData }) {
@@ -22,6 +22,8 @@ export default function RoutineVaccines({ userCategory, patientData }) {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   const { setSharedData } = useSharedState()
   const { get } = useApiRequest()

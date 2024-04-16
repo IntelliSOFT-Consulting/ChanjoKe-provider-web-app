@@ -103,6 +103,40 @@ export default function Contraindications() {
                   name="vaccinesToContraindicate"
                   rules={[
                     { required: true, message: 'Please select a vaccine' },
+                    {
+                      validator: (_, value) => {
+                        //   if vaccine status is "entered-in-error" and education.presentationDate is less than today, then show error "This vaccine is already contraindicated, the next due date is XX".
+                        const selectedVaccines = vaccines.filter((vaccine) =>
+                          value.includes(vaccine.vaccineName)
+                        )
+
+                        const contraindicatedVaccines = selectedVaccines.filter(
+                          (vaccine) =>
+                            vaccine.status === 'entered-in-error' &&
+                            moment(
+                              vaccine.education?.[0]?.presentationDate
+                            ).isAfter(moment())
+                        )
+
+                        if (contraindicatedVaccines.length > 0) {
+                          const vaccineNames = contraindicatedVaccines
+                            .map((vaccine) => vaccine.vaccineName)
+                            ?.join(', ')
+
+                          const nextDueDates = contraindicatedVaccines
+                            .map((vaccine) =>
+                              moment(
+                                vaccine.education?.[0]?.presentationDate
+                              ).format('DD-MM-YYYY')
+                            )
+                            ?.join(', ')
+                          return Promise.reject(
+                            `${vaccineNames} already contraindicated, the next due date(s) is ${nextDueDates}`
+                          )
+                        }
+                        return Promise.resolve()
+                      },
+                    },
                   ]}
                 >
                   <Select
@@ -167,7 +201,6 @@ export default function Contraindications() {
           <button
             onClick={() => {
               form.submit()
-              console.log('clicked')
             }}
             className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
