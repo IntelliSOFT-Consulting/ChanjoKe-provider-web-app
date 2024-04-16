@@ -93,7 +93,7 @@ export default function CaregiverDetails({ editCaregivers = [], updateCaregiverD
     const value = e.target.value
 
     if (value) {
-      const capitalized = value.replace(/\b\w/g, (char) => char.toUpperCase());
+      const capitalized = value?.replace(/\b\w/g, (char) => char.toUpperCase());
       form.setFieldValue(inputName, capitalized)
     }
   }

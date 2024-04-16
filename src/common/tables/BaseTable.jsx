@@ -1,6 +1,6 @@
 function convertUnderscoresAndCapitalize(inputString) {
   if (typeof inputString === 'string') {
-    const stringWithSpaces = inputString.replace(/_/g, ' ');
+    const stringWithSpaces = inputString?.replace(/_/g, ' ');
     const capitalizedString =
       stringWithSpaces.charAt(0).toUpperCase() + stringWithSpaces.slice(1);
 

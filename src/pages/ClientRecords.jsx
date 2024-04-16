@@ -8,8 +8,8 @@ import moment from "moment"
 import calculateAge from "../utils/calculateAge"
 
 function convertCamelCaseString(inputString) {
-  let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
-  stringWithSpaces = stringWithSpaces.replace(/\b\w+/g, (word) => {
+  let stringWithSpaces = inputString?.replace(/([a-z])([A-Z])/g, '$1 $2');
+  stringWithSpaces = stringWithSpaces?.replace(/\b\w+/g, (word) => {
     // Check if the word includes 'of', and if so, keep it lowercase
     if (word.toLowerCase().includes('of')) {
       return word.toLowerCase();

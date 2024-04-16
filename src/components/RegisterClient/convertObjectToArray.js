@@ -6,8 +6,8 @@ dayjs.extend(weekdays)
 dayjs.extend(localeDate) 
 
 function convertCamelCaseString(inputString) {
-  let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
-  stringWithSpaces = stringWithSpaces.replace(/\b\w+/g, (word) => {
+  let stringWithSpaces = inputString?.replace(/([a-z])([A-Z])/g, '$1 $2');
+  stringWithSpaces = stringWithSpaces?.replace(/\b\w+/g, (word) => {
     const lowercaseWords = ['of', 'or'];
     if (lowercaseWords.includes(word.toLowerCase())) {
       return word.toLowerCase();
