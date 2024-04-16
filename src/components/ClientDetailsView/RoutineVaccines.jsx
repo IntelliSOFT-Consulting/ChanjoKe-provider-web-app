@@ -201,7 +201,6 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       key: 'vaccineName',
       render: (text, record) => {
         const completed = record.status === 'completed'
-        const notDone = record.status === 'not-done'
         return (
           <Checkbox
             name={record.vaccineName}

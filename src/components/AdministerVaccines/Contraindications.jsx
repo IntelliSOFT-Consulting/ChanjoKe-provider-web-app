@@ -70,7 +70,7 @@ export default function Contraindications() {
       setDialogOpen(true)
       const time = setTimeout(() => {
         setDialogOpen(false)
-        navigate(-1)
+        navigate(`/client-details/${currentPatient.id}`)
       }, 2000)
       return () => clearTimeout(time)
     }
