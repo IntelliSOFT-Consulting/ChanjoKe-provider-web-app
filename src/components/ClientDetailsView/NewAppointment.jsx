@@ -62,7 +62,7 @@ export default function NewAppointment() {
   const mapped = mapVaccinesByCategory(routineVaccines)
 
   const addVaccines = mapped.map((vaccine) => ({
-    name: vaccine.category.replace(/_/g, ' '),
+    name: vaccine.category?.replace(/_/g, ' '),
     value: vaccine.category
   }))
 

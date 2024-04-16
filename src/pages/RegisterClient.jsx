@@ -33,8 +33,8 @@ export default function RegisterClient({ editClientID }) {
 
   function convertUnderscoresAndCapitalize(inputString) {
     if (inputString !== undefined) {
-      let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
-      return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase());
+      let stringWithSpaces = inputString?.replace(/([a-z])([A-Z])/g, '$1 $2');
+      return stringWithSpaces?.replace(/\b\w/g, (char) => char.toUpperCase());
     } else {
       return ''
     }
