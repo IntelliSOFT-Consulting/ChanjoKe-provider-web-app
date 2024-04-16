@@ -16,7 +16,7 @@ export default function Contraindications() {
   const { sharedData } = useSharedState()
   const [isDialogOpen, setDialogOpen] = useState(false)
   const currentPatient = useSelector((state) => state.currentPatient)
-  const { post } = useApiRequest()
+  const { put } = useApiRequest()
 
   const [form] = Form.useForm()
 
@@ -57,8 +57,12 @@ export default function Contraindications() {
     })
 
     const responses = await Promise.all(
-      data?.map(async (administerVaccine) => {
-        return await post('/hapi/fhir/Immunization', administerVaccine)
+      data?.map(async (administerVaccine, index) => {
+        const vaccineId = selectedVaccines[index].id
+        return await put(`/hapi/fhir/Immunization/${vaccineId}`, {
+          ...administerVaccine,
+          id: vaccineId,
+        })
       })
     )
 
