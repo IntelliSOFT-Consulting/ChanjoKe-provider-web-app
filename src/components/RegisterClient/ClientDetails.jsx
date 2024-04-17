@@ -157,14 +157,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           onFinish={onFinish}
           layout="vertical"
           colon={true}
-          autoComplete="on"
+          autoComplete="off"
           validateTrigger="onBlur"
           form={form}
           initialValues={{ age: 0, ...editClientDetails }}
         >
           <div className={currentStep === 1 ? 'block' : 'hidden'}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10">
-              {}
               <Form.Item
                 name="firstName"
                 label={
@@ -369,15 +368,18 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
               {isAdult && (
                 <Form.Item
                   name="phoneNumber"
-                  label={
-                    <div>
-                      <span className="font-bold">Phone Number</span>
-                    </div>
-                  }
+                  label="Phone Number"
                   rules={[
                     {
-                      pattern: /^(\+?)([0-9]{7,15})$/,
-                      message: 'Please enter a valid phone number',
+                      validator: (_, value) => {
+                        if (value) {
+                          //   validate 9 digit phone number (no country code and numeric)
+                          if (!/^\d{9}$/.test(value)) {
+                            return Promise.reject('Invalid phone number')
+                          }
+                        }
+                        return Promise.resolve()
+                      },
                     },
                   ]}
                 >
@@ -399,7 +401,15 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                         />
                       </Form.Item>
                     }
-                    placeholder="Phone Number"
+                    placeholder="7xxxxxxxx"
+                    onChange={(e) => {
+                      if (e.target.value.length > 9) {
+                        form.setFieldValue(
+                          'phoneNumber',
+                          e.target.value.slice(0, 9)
+                        )
+                      }
+                    }}
                     size="large"
                   />
                 </Form.Item>
