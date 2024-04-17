@@ -8,7 +8,7 @@ const routineVaccines = [
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
-    adminRange: { start: 0, end: 59, unit: 'months' },
+    adminRange: { start: 0, end: 1794, unit: 'days' },
     dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
