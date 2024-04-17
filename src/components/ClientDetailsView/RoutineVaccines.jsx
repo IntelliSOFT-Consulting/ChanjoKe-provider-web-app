@@ -14,6 +14,7 @@ import { datePassed, lockVaccine } from '../../utils/validate'
 import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
 import { useDispatch, useSelector } from 'react-redux'
+import { createImmunizationRecommendation } from './DataWrapper'
 import useAefi from '../../hooks/useAefi'
 
 export default function RoutineVaccines({ userCategory, patientData }) {
@@ -74,11 +75,11 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       fetchPatientImmunization()
       getAefis()
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientData])
 
   useEffect(() => {
+
     const vaccData = data?.entry?.map((vaccine) => {
       return {
         vaccineName: vaccine?.resource?.vaccineCode?.text,

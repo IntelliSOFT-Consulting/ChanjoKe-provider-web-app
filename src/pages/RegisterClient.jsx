@@ -3,6 +3,8 @@ import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
 import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useEffect, useState } from 'react'
+import { routineVaccines } from '../components/ClientDetailsView/vaccineData'
+import { createImmunizationRecommendation } from '../components/ClientDetailsView/DataWrapper'
 import { createObservationData, createPatientData } from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import calculateAge from '../utils/calculateAge'
@@ -11,6 +13,7 @@ import { useNavigate } from 'react-router-dom'
 import useGet from '../api/useGet'
 import usePut from '../api/usePut'
 import dayjs from 'dayjs'
+import { useApiRequest } from '../api/useApiRequest'
 
 export default function RegisterClient({ editClientID }) {
 
@@ -27,6 +30,7 @@ export default function RegisterClient({ editClientID }) {
   const { SubmitForm } = usePost()
   const { SubmitForm: SubmitObservationForm } = usePost()
   const { SubmitUpdateForm } = usePut()
+  const { post } = useApiRequest()
   
   const { data, loading, error } = useGet(`Patient/${editClientID}`)
   const { data: observationData } = useGet(`Observation?patient=Patient/${editClientID}`)
@@ -107,6 +111,8 @@ export default function RegisterClient({ editClientID }) {
   const SubmitDetails = async () => {
     const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea, id: editClientID || '' })
 
+
+
     if (editClientID === '_') {
       setDialogText('Client added successfully!')
       setDialogOpen(true)
@@ -117,6 +123,16 @@ export default function RegisterClient({ editClientID }) {
         SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, newClientResponse?.id))
       }
       setResponse(newClientResponse)
+
+      const mapped = routineVaccines.map((vaccine) => 
+      ({ ...vaccine, dueDate: vaccine.dueDate(newClientResponse?.birthDate) }))
+
+      const immunizationRecommendation = createImmunizationRecommendation(mapped, newClientResponse)
+
+      const immunizationRecommendationResponse = await post('/hapi/fhir/ImmunizationRecommendation', immunizationRecommendation)
+
+      console.log({ immunizationRecommendationResponse })
+
     } else {
       setDialogText('Client details updated successfully!')
       setDialogOpen(true)

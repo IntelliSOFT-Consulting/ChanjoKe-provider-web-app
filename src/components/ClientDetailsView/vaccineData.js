@@ -8,19 +8,21 @@ const routineVaccines = [
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
-    adminRange: { start: 0, end: 0 },
-    dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
+    adminRange: { start: 0, end: 59 },
+    dueDate: (dob, _) => moment(dob).add(59, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'bOPV',
     vaccineCode: 'IMPO-bOPV',
     diseaseTarget: 'Polio',
-    doseNumber: '0',
+    doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
-    adminRange: { start: 0, end: 0 },
-    dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
+    adminRange: { start: 0, end: 14 },
+    dueDate: (dob, _) => {
+      return moment(dob).add(14, 'days').format('DD-MM-YYYY')
+    },
   },
   {
     vaccineName: 'OPV I',
