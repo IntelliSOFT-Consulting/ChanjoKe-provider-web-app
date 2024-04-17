@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { routineVaccines } from './vaccineData'
+import { routineVaccines } from '../../data/vaccineData'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
@@ -419,7 +419,9 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                                     className="text-[#163C94]"
                                     disabled={allNotAdministered}
                                     onClick={() => {
-                                      dispatch(setSelectedVaccines(administered))
+                                      dispatch(
+                                        setSelectedVaccines(administered)
+                                      )
                                       setSharedData({ vaccinesToAdminister })
                                       navigate('/aefi-report')
                                     }}

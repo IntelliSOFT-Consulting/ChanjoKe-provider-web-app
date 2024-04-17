@@ -37,10 +37,13 @@ export default function Contraindications() {
     setDialogOpen(false)
   }
 
+
   const handleFormSubmit = async (values) => {
     const selectedVaccines = vaccines.filter((vaccine) =>
       values.vaccinesToContraindicate.includes(vaccine.vaccineName)
     )
+
+
 
     const data = selectedVaccines.map((immunization) => {
       immunization.contraindicationDetails = values.contraindicationDetails

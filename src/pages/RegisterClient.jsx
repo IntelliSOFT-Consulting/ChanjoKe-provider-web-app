@@ -1,44 +1,43 @@
 import ClientDetails from '../components/RegisterClient/ClientDetails'
-import CareGiverDetails from '../components/RegisterClient/CareGiverDetails'
-import AdministrativeArea from '../components/RegisterClient/AdministrativeArea'
 import SubmitClientDetails from '../components/RegisterClient/SubmitClientDetails'
 import { useEffect, useState } from 'react'
-import { routineVaccines } from '../components/ClientDetailsView/vaccineData'
-import { createImmunizationRecommendation } from '../components/ClientDetailsView/DataWrapper'
-import { createObservationData, createPatientData } from '../components/RegisterClient/DataWrapper'
+import {
+  createObservationData,
+  createPatientData,
+} from '../components/RegisterClient/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import calculateAge from '../utils/calculateAge'
 import usePost from '../api/usePost'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import useGet from '../api/useGet'
 import usePut from '../api/usePut'
 import dayjs from 'dayjs'
-import { useApiRequest } from '../api/useApiRequest'
 
-export default function RegisterClient({ editClientID }) {
-
+export default function RegisterClient() {
   const [clientDetails, setClientDetails] = useState(null)
   const [caregiverDetails, setCaregiverDetails] = useState([])
   const [administrativeArea, setAdministrativeAreaDetails] = useState(null)
 
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isDialogOpen, setDialogOpen] = useState(false)
   const [dialogText, setDialogText] = useState('')
   const [step, updateStep] = useState(1)
   const [response, setResponse] = useState(null)
 
   const navigate = useNavigate()
+  const { clientID } = useParams()
   const { SubmitForm } = usePost()
   const { SubmitForm: SubmitObservationForm } = usePost()
   const { SubmitUpdateForm } = usePut()
-  const { post } = useApiRequest()
-  
-  const { data, loading, error } = useGet(`Patient/${editClientID}`)
-  const { data: observationData } = useGet(`Observation?patient=Patient/${editClientID}`)
+
+  const { data, loading, error } = useGet(`Patient/${clientID}`)
+  const { data: observationData } = useGet(
+    `Observation?patient=Patient/${clientID}`
+  )
 
   function convertUnderscoresAndCapitalize(inputString) {
     if (inputString !== undefined) {
-      let stringWithSpaces = inputString?.replace(/([a-z])([A-Z])/g, '$1 $2');
-      return stringWithSpaces?.replace(/\b\w/g, (char) => char.toUpperCase());
+      let stringWithSpaces = inputString.replace(/([a-z])([A-Z])/g, '$1 $2')
+      return stringWithSpaces.replace(/\b\w/g, (char) => char.toUpperCase())
     } else {
       return ''
     }
@@ -49,20 +48,34 @@ export default function RegisterClient({ editClientID }) {
     let identificationType = ''
     let identificationNumber = ''
     let estimatedAge = ''
-    if (observationData?.entry && Array.isArray(observationData?.entry) && observationData?.entry.length) {
+    if (
+      observationData?.entry &&
+      Array.isArray(observationData?.entry) &&
+      observationData?.entry.length
+    ) {
       const weight = observationData?.entry.map((observation) => {
-        return observation?.resource?.code?.coding?.[0]?.code === 'CURRENT_WEIGHT' ? observation?.resource?.code?.text : ''
+        return observation?.resource?.code?.coding?.[0]?.code ===
+          'CURRENT_WEIGHT'
+          ? observation?.resource?.code?.text
+          : ''
       })
       const finalWeight = weight.reverse()
       currentweight = finalWeight[0]
     }
 
     if (data?.identifier && Array.isArray(data?.identifier)) {
-      const estimatedAgeVal = data?.identifier.filter((id) => id?.system === 'estimated-age')
-      const userID = data?.identifier.filter((id) => (id?.system === 'identification_type' || id?.system === 'identification' ))
-      estimatedAge = estimatedAgeVal?.[0]?.value 
+      const estimatedAgeVal = data?.identifier.filter(
+        (id) => id?.system === 'estimated-age'
+      )
+      const userID = data?.identifier.filter(
+        (id) =>
+          id?.system === 'identification_type' ||
+          id?.system === 'identification'
+      )
+      estimatedAge = estimatedAgeVal?.[0].value
 
-      identificationType = userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
+      identificationType =
+        userID?.[0]?.type?.coding?.[0]?.display || userID?.[0]?.system
       identificationNumber = userID?.[0]?.value
     }
 
@@ -87,61 +100,62 @@ export default function RegisterClient({ editClientID }) {
         phoneNumber: caregiver?.telecom?.[0]?.value,
         actions: [
           { title: 'edit', btnAction: 'editCareGiver' },
-          { title: 'remove', btnAction: 'removeCareGiver' }
-        ]
+          { title: 'remove', btnAction: 'removeCareGiver' },
+        ],
       }
     })
     setCaregiverDetails(caregivers)
-    
+
     setAdministrativeAreaDetails({
       residenceCounty: data?.address?.[0]?.city,
       townCenter: data?.address?.[0]?.line?.[0],
       subCounty: data?.address?.[0]?.district,
       estateOrHouseNo: data?.address?.[0]?.line?.[1],
-      ward: data?.address?.[0]?.state
+      ward: data?.address?.[0]?.state,
     })
-
-  }, [editClientID, data, observationData])
+  }, [clientID, data, observationData])
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false)
     navigate(`/client-details/${response?.id}`)
-  };
+  }
 
   const SubmitDetails = async () => {
-    const postData = createPatientData({ ...clientDetails, caregivers: [...caregiverDetails], ...administrativeArea, id: editClientID || '' })
+    const postData = createPatientData({
+      ...clientDetails,
+      caregivers: [...caregiverDetails],
+      ...administrativeArea,
+      id: clientID || '',
+    })
 
-
-
-    if (editClientID === '_') {
+    if (clientID === '_') {
       setDialogText('Client added successfully!')
       setDialogOpen(true)
       const newClientResponse = await SubmitForm('Patient', postData)
       const currentWeight = clientDetails.hasOwnProperty('currentWeight')
 
       if (currentWeight) {
-        SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, newClientResponse?.id))
+        SubmitObservationForm(
+          'Observation',
+          createObservationData(
+            clientDetails?.currentWeight,
+            newClientResponse?.id
+          )
+        )
       }
       setResponse(newClientResponse)
-
-      const mapped = routineVaccines.map((vaccine) => 
-      ({ ...vaccine, dueDate: vaccine.dueDate(newClientResponse?.birthDate) }))
-
-      const immunizationRecommendation = createImmunizationRecommendation(mapped, newClientResponse)
-
-      const immunizationRecommendationResponse = await post('/hapi/fhir/ImmunizationRecommendation', immunizationRecommendation)
-
-      console.log({ immunizationRecommendationResponse })
-
     } else {
       setDialogText('Client details updated successfully!')
       setDialogOpen(true)
-      setResponse(await SubmitUpdateForm(`Patient/${editClientID}`, postData))
+      setResponse(await SubmitUpdateForm(`Patient/${clientID}`, postData))
 
       const currentWeight = clientDetails.hasOwnProperty('currentWeight')
 
       if (currentWeight) {
-        SubmitObservationForm('Observation', createObservationData(clientDetails?.currentWeight, editClientID))
+        SubmitObservationForm(
+          'Observation',
+          createObservationData(clientDetails?.currentWeight, clientID)
+        )
       }
     }
   }
@@ -151,47 +165,33 @@ export default function RegisterClient({ editClientID }) {
       <ConfirmDialog
         open={isDialogOpen}
         description={dialogText}
-        onClose={handleDialogClose} />
+        onClose={handleDialogClose}
+      />
 
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-          {editClientID === '_' ? 'Register Client' : 'Edit Client Details'}
+          {clientID === '_' ? 'Register Client' : 'Edit Client Details'}
         </div>
         <div className="px-4 py-5 sm:p-6">
-          {step === 1 &&
           <ClientDetails
             editClientDetails={clientDetails}
             setClientDetails={(value) => {
               setClientDetails(value)
               updateStep(step + 1)
-            }} />
-          }
-          {step === 2 &&
-          <CareGiverDetails
-            editCaregivers={caregiverDetails}
-            dateOfBirth={dayjs(clientDetails?.dateOfBirth?.$d)}
-            nextPage={() => updateStep(step + 1)}
-            updateCaregiverDetails={setCaregiverDetails}
-            handleBack={() => updateStep(step - 1)} />
-          }
-          {step === 3 && 
-          <AdministrativeArea
-            adminArea={administrativeArea}
-            setAdministrativeAreaDetails={setAdministrativeAreaDetails}
-            handleNext={() => updateStep(step + 1)}
-            handleBack={() => updateStep(step - 1)}/>
-          }
-          {step === 4 &&
-          <SubmitClientDetails
-            clientDetails={clientDetails}
-            caregiverDetails={caregiverDetails}
-            administrativeArea={administrativeArea}
-            handleBack={() => updateStep(step - 1)}
-            submitPatientDetails={SubmitDetails}/>
-          }
-        </div>
+            }}
+          />
 
+          {step === 4 && (
+            <SubmitClientDetails
+              clientDetails={clientDetails}
+              caregiverDetails={caregiverDetails}
+              administrativeArea={administrativeArea}
+              handleBack={() => updateStep(step - 1)}
+              submitPatientDetails={SubmitDetails}
+            />
+          )}
+        </div>
       </div>
     </>
-  );
+  )
 }

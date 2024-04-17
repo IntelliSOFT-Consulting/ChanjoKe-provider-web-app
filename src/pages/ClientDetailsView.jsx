@@ -56,7 +56,9 @@ export default function ClientDetailsView() {
       systemID: `${systemGenID || ''}`,
       dob: moment(patientData?.birthDate).format('Do MMM YYYY'),
       age: calculateAge(patientData?.birthDate),
-      gender: patientData?.gender?.replace(/\b\w/g, (char) => char.toUpperCase()),
+      gender: patientData?.gender?.replace(/\b\w/g, (char) =>
+        char.toUpperCase()
+      ),
     },
   ]
 
@@ -104,7 +106,7 @@ export default function ClientDetailsView() {
           </div>
         </div>
 
-        <div className="container px-4 py-5 sm:p-6">
+        <div className="container px-4 py-2 sm:p-3">
           <div className="overflow-auto">
             {!patientData?.name && (
               <div className="my-10 mx-auto flex justify-center">
@@ -118,7 +120,7 @@ export default function ClientDetailsView() {
         </div>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-4">
         <BaseTabs
           userCategory={clientCategory}
           userID={patientData?.id}

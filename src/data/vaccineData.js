@@ -1,5 +1,5 @@
 import moment from 'moment'
-const routineVaccines = [
+export const routineVaccines = [
   {
     vaccineName: 'BCG',
     vaccineCode: 'IMBCG-I',
@@ -8,21 +8,19 @@ const routineVaccines = [
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
-    adminRange: { start: 0, end: 59 },
-    dueDate: (dob, _) => moment(dob).add(59, 'days').format('DD-MM-YYYY'),
+    adminRange: { start: 0, end: 1794, unit: 'days' },
+    dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'bOPV',
     vaccineCode: 'IMPO-bOPV',
     diseaseTarget: 'Polio',
-    doseNumber: '1',
+    doseNumber: '0',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
-    adminRange: { start: 0, end: 14 },
-    dueDate: (dob, _) => {
-      return moment(dob).add(14, 'days').format('DD-MM-YYYY')
-    },
+    adminRange: { start: 0, end: 1825, unit: 'days' },
+    dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'OPV I',
@@ -32,7 +30,7 @@ const routineVaccines = [
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
-    adminRange: { start: 42, end: 42 },
+    adminRange: { start: 42, end: 42, unit: 'days' },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
@@ -43,7 +41,7 @@ const routineVaccines = [
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
-    adminRange: { start: 42, end: 42 },
+    adminRange: { start: 42, end: 1825, unit: 'days' },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
@@ -56,7 +54,8 @@ const routineVaccines = [
     category: '6_weeks',
     adminRange: {
       start: 42,
-      end: 42,
+      end: 1825,
+      unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
@@ -70,7 +69,11 @@ const routineVaccines = [
     category: '6_weeks',
     adminRange: {
       start: 42,
-      end: 42,
+      end: 365,
+    },
+    constraints: {
+      gender: 'Female',
+      HIVStatus: 'Positive',
     },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
@@ -84,9 +87,11 @@ const routineVaccines = [
     category: '10_weeks',
     adminRange: {
       start: 70,
-      end: 70,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMPO-OPV-I',
+    dependencyPeriod: 28,
     dueDate: (dob, opv1) => {
       const date =
         opv1?.status === 'completed'
@@ -101,16 +106,19 @@ const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 2',
     vaccineCode: 'IMDPT-2',
-    diseaseTarget: 'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+    diseaseTarget:
+      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
     adminRange: {
       start: 70,
-      end: 70,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMDPT-1',
+    dependencyPeriod: 28,
     dueDate: (dob, dpt1) => {
       const date =
         dpt1?.status === 'completed'
@@ -132,9 +140,11 @@ const routineVaccines = [
     category: '10_weeks',
     adminRange: {
       start: 70,
-      end: 70,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMPCV10-1',
+    dependencyPeriod: 28,
     dueDate: (dob, pcv1) => {
       const date =
         pcv1?.status === 'completed'
@@ -156,9 +166,11 @@ const routineVaccines = [
     category: '10_weeks',
     adminRange: {
       start: 70,
-      end: 70,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMROTA-1',
+    dependencyPeriod: 28,
     dueDate: (dob, rota1) => {
       const date =
         rota1?.status === 'completed'
@@ -180,9 +192,11 @@ const routineVaccines = [
     category: '14_weeks',
     adminRange: {
       start: 98,
-      end: 98,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMPO-OPV-II',
+    dependencyPeriod: 28,
     dueDate: (dob, opv2) => {
       const date =
         opv2?.status === 'completed'
@@ -197,16 +211,19 @@ const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 3',
     vaccineCode: 'IMDPT-3',
-    diseaseTarget: 'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+    diseaseTarget:
+      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
     adminRange: {
       start: 98,
-      end: 98,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMDPT-2',
+    dependencyPeriod: 28,
     dueDate: (dob, dpt2) => {
       const date =
         dpt2?.status === 'completed'
@@ -228,9 +245,11 @@ const routineVaccines = [
     category: '14_weeks',
     adminRange: {
       start: 98,
-      end: 98,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMPCV10-2',
+    dependencyPeriod: 28,
     dueDate: (dob, pcv2) => {
       const date =
         pcv2?.status === 'completed'
@@ -252,7 +271,8 @@ const routineVaccines = [
     category: '14_weeks',
     adminRange: {
       start: 98,
-      end: 98,
+      end: 1825,
+      unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(98, 'days').format('DD-MM-YYYY'),
   },
@@ -266,9 +286,11 @@ const routineVaccines = [
     category: '14_weeks',
     adminRange: {
       start: 98,
-      end: 98,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMROTA-2',
+    dependencyPeriod: 28,
     dueDate: (dob, rota2) => {
       const date =
         rota2?.status === 'completed'
@@ -290,7 +312,8 @@ const routineVaccines = [
     category: '6_months',
     adminRange: {
       start: 180,
-      end: 180,
+      end: 1825,
+      unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(180, 'days').format('DD-MM-YYYY'),
   },
@@ -304,7 +327,12 @@ const routineVaccines = [
     category: '6_months',
     adminRange: {
       start: 180,
-      end: 180,
+      end: 183,
+      unit: 'days',
+    },
+    constraints: {
+      HIVStatus: 'Positive',
+      outbreak: true,
     },
     dueDate: (dob, _) => moment(dob).add(180, 'days').format('DD-MM-YYYY'),
   },
@@ -318,7 +346,8 @@ const routineVaccines = [
     category: '6_months',
     adminRange: {
       start: 180,
-      end: 180,
+      end: 1825,
+      unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(180, 'days').format('DD-MM-YYYY'),
   },
@@ -332,9 +361,11 @@ const routineVaccines = [
     category: '7_months',
     adminRange: {
       start: 210,
-      end: 210,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMMALA-1',
+    dependencyPeriod: 30,
     dueDate: (dob, malaria1) => {
       const date =
         malaria1?.status === 'completed'
@@ -356,7 +387,8 @@ const routineVaccines = [
     category: '9_months',
     adminRange: {
       start: 270,
-      end: 270,
+      end: 5475,
+      unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(270, 'days').format('DD-MM-YYYY'),
   },
@@ -370,7 +402,8 @@ const routineVaccines = [
     category: '9_months',
     adminRange: {
       start: 270,
-      end: 270,
+      end: 5475,
+      unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(270, 'days').format('DD-MM-YYYY'),
   },
@@ -384,9 +417,11 @@ const routineVaccines = [
     category: '9_months',
     adminRange: {
       start: 270,
-      end: 270,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMMALA-2',
+    dependencyPeriod: 30,
     dueDate: (dob, malaria2) => {
       const date =
         malaria2?.status === 'completed'
@@ -408,9 +443,11 @@ const routineVaccines = [
     category: '12_months',
     adminRange: {
       start: 360,
-      end: 360,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMVIT-1',
+    dependencyPeriod: 180,
     dueDate: (dob, vit1) => {
       const date =
         vit1?.status === 'completed'
@@ -432,9 +469,11 @@ const routineVaccines = [
     category: '18_months',
     adminRange: {
       start: 540,
-      end: 540,
+      end: 5475,
+      unit: 'days',
     },
     dependentVaccine: 'IMMEAS-1',
+    dependencyPeriod: 180,
     dueDate: (dob, measles1) => {
       const date =
         measles1?.status === 'completed'
@@ -456,9 +495,11 @@ const routineVaccines = [
     category: '18_months',
     adminRange: {
       start: 540,
-      end: 540,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMVIT-2',
+    dependencyPeriod: 180,
     dueDate: (dob, vit2) => {
       const date =
         vit2?.status === 'completed'
@@ -480,9 +521,11 @@ const routineVaccines = [
     category: '24_months',
     adminRange: {
       start: 720,
-      end: 720,
+      end: 1825,
+      unit: 'days',
     },
     dependentVaccine: 'IMMALA-3',
+    dependencyPeriod: 180,
     dueDate: (dob, malaria3) => {
       const date =
         malaria3?.status === 'completed'
@@ -505,6 +548,10 @@ const routineVaccines = [
     adminRange: {
       start: 3650,
       end: 3650,
+      unit: 'days',
+    },
+    constraints: {
+      gender: 'Male',
     },
     dueDate: (dob, _) => moment(dob).add(3650, 'days').format('DD-MM-YYYY'),
   },
@@ -519,8 +566,10 @@ const routineVaccines = [
     adminRange: {
       start: 3650,
       end: 3650,
+      unit: 'days',
     },
     dependentVaccine: 'IMHPV-1',
+    dependencyPeriod: 180,
     dueDate: (dob, hpv1) => {
       const date =
         hpv1?.status === 'completed'
@@ -534,191 +583,363 @@ const routineVaccines = [
   },
 ]
 
-const nonRoutineVaccines = [
+export const nonRoutineVaccines = [
   {
     vaccineName: 'AstraZeneca',
-    vaccineCode: '',
+    vaccineCode: 'IMCOV-ASTR-1',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    adminRange: {
+      start: 6570,
+      end: Infinity,
+      unit: 'days',
+    },
+  },
+  {
+    vaccineName: 'AstraZeneca 2nd Dose',
+    vaccineCode: 'IMCOV-ASTR-2',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
+    doseNumber: '1',
+    dueDate: null,
+    occurrenceDateTime: '',
+    status: 'upcoming',
+    category: 'covid_19',
+    dependentVaccine: 'IMCOV-ASTR-1',
+    dependencyPeriod: 84,
+    adminRange: {
+      start: 6570,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Johnson & Johnson',
-    vaccineCode: '',
+    vaccineCode: 'IMCOV-JnJ-0',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    adminRange: {
+      start: 6570,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
-    vaccineName: 'Pfizer/BioNTech',
-    vaccineCode: '',
+    vaccineName: 'Pfizer/BioNTech 1st Dose',
+    vaccineCode: 'IMCOV-PFIZER-1',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    adminRange: {
+      start: 4380,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
-    vaccineName: 'Moderna',
-    vaccineCode: '',
+    vaccineName: 'Pfizer/BioNTech 2nd Dose',
+    vaccineCode: 'IMCOV-PFIZER-2',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    dependentVaccine: 'IMCOV-PFIZER-1',
+    dependencyPeriod: 28,
+    adminRange: {
+      start: 4380,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
-    vaccineName: 'Sinopharm',
-    vaccineCode: '',
+    vaccineName: 'Moderna 1st Dose',
+    vaccineCode: 'IMCOV-MOD-1',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    adminRange: {
+      start: 6570,
+      end: Infinity,
+      unit: 'days',
+    },
   },
-
+  {
+    vaccineName: 'Moderna 2nd Dose',
+    vaccineCode: 'IMCOV-MOD-2',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
+    doseNumber: '2',
+    dueDate: null,
+    occurrenceDateTime: '',
+    status: 'upcoming',
+    category: 'covid_19',
+    dependentVaccine: 'IMCOV-MOD-1',
+    dependencyPeriod: 28,
+    adminRange: {
+      start: 6570,
+      end: Infinity,
+      unit: 'days',
+    },
+  },
+  {
+    vaccineName: 'Sinopharm 1st Dose',
+    vaccineCode: 'IMCOV-SINO-1',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
+    doseNumber: '1',
+    dueDate: null,
+    occurrenceDateTime: '',
+    status: 'upcoming',
+    category: 'covid_19',
+    adminRange: {
+      start: 6570,
+      end: 21900,
+      unit: 'days',
+    },
+  },
+  {
+    vaccineName: 'Sinopharm 2nd Dose',
+    vaccineCode: 'IMCOV-SINO-2',
+    diseaseTarget: 'Covid 19 (SARS-CoV-2)',
+    doseNumber: '1',
+    dueDate: null,
+    occurrenceDateTime: '',
+    status: 'upcoming',
+    category: 'covid_19',
+    dependentVaccine: 'IMCOV-SINO-1',
+    dependencyPeriod: 28,
+    adminRange: {
+      start: 6570,
+      end: 21900,
+      unit: 'days',
+    },
+  },
   {
     vaccineName: 'Tetanus 1',
-    vaccineCode: '',
+    vaccineCode: 'IMTD-1',
     diseaseTarget: 'Tetanus',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
+    adminRange: {
+      start: 548,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Tetanus 2',
-    vaccineCode: '',
+    vaccineCode: 'IMTD-2',
     diseaseTarget: 'Tetanus',
     doseNumber: '2',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
+    dependentVaccine: 'IMTD-1',
+    dependencyPeriod: 30,
+    adminRange: {
+      start: 588,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Tetanus 3',
-    vaccineCode: '',
+    vaccineCode: 'IMTD-3',
     diseaseTarget: 'Tetanus',
     doseNumber: '3',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
+    dependentVaccine: 'IMTD-2',
+    dependencyPeriod: 183,
+    adminRange: {
+      start: 771,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Tetanus 4',
-    vaccineCode: '',
+    vaccineCode: 'IMTD-4',
     diseaseTarget: 'Tetanus',
     doseNumber: '4',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
+    dependentVaccine: 'IMTD-3',
+    dependencyPeriod: 365,
+    adminRange: {
+      start: 1136,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Tetanus 5',
-    vaccineCode: '',
+    vaccineCode: 'IMTD-5',
     diseaseTarget: 'Tetanus',
     doseNumber: '5',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
+    dependentVaccine: 'IMTD-4',
+    dependencyPeriod: 365,
+    adminRange: {
+      start: 1501,
+      end: Infinity,
+      unit: 'days',
+    },
   },
-
   {
     vaccineName: 'Yellow Fever',
     vaccineCode: 'IMYF-I',
     diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'yellow_fever',
+    adminRange: {
+      start: 273,
+      end: Infinity,
+      unit: 'days',
+    },
   },
 
   {
     vaccineName: 'Rabies 1',
-    vaccineCode: '',
+    vaccineCode: 'IMRABIES-RABIES-1',
     diseaseTarget: 'Rabies',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
+    adminRange: {
+      start: 0,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Rabies 2',
-    vaccineCode: '',
+    vaccineCode: 'IMRABIES-RABIES-2',
     diseaseTarget: 'Rabies',
     doseNumber: '3',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
+    dependentVaccine: 'IMRABIES-RABIES-1',
+    dependencyPeriod: 3,
+    adminRange: {
+      start: 3,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Rabies 3',
-    vaccineCode: '',
+    vaccineCode: 'IMRABIES-RABIES-3',
     diseaseTarget: 'Rabies',
     doseNumber: '3',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
+    dependentVaccine: 'IMRABIES-RABIES-2',
+    dependencyPeriod: 4,
+    adminRange: {
+      start: 7,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Rabies 4',
-    vaccineCode: '',
+    vaccineCode: 'IMRABIES-RABIES-4',
     diseaseTarget: 'Rabies',
     doseNumber: '4',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
+    dependentVaccine: 'IMRABIES-RABIES-3',
+    dependencyPeriod: 7,
+    adminRange: {
+      start: 14,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Rabies 5',
-    vaccineCode: '',
+    vaccineCode: 'IMRABIES-RABIES-5',
     diseaseTarget: 'Rabies',
     doseNumber: '5',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
+    dependentVaccine: 'IMRABIES-RABIES-4',
+    dependencyPeriod: 14,
+    adminRange: {
+      start: 28,
+      end: Infinity,
+      unit: 'days',
+    },
   },
 
   {
     vaccineName: 'Influenza 1',
-    vaccineCode: '',
+    vaccineCode: 'IMINFLU-1',
     diseaseTarget: 'Influenza',
     doseNumber: '1',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'influenza',
+    adminRange: {
+      start: 182,
+      end: Infinity,
+      unit: 'days',
+    },
   },
   {
     vaccineName: 'Influenza 2',
-    vaccineCode: '',
+    vaccineCode: 'IMINFLU-2',
     diseaseTarget: 'Influenza',
     doseNumber: '2',
-    dueDate: 'Jan 1 2020',
+    dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'influenza',
+    dependentVaccine: 'IMINFLU-1',
+    dependencyPeriod: 122,
+    adminRange: {
+      start: 304,
+      end: Infinity,
+      unit: 'days',
+    },
   },
 ]
-
-export { routineVaccines, nonRoutineVaccines }
