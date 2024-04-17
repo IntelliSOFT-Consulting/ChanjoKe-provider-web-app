@@ -1,4 +1,7 @@
 import dayjs from "dayjs"
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc);
 
 const createVaccineImmunization = (data, patientID, status) => {
   return {
@@ -44,6 +47,54 @@ const createVaccineImmunization = (data, patientID, status) => {
         }
     ]
 }
+}
+
+const recommendation = (recommendation) => {
+    return {
+        "vaccineCode": {
+            "text": recommendation.vaccineName,
+            "code": recommendation.vaccineCode,
+        },
+        "targetDisease": {
+            "text": recommendation.diseaseTarget,
+        },
+        // "contraindicatedVaccineCode": [
+        //     {
+        //         "text": "bOPV"
+        //     }
+        // ],
+        // PS: Add item to contraindication
+        "forecastStatus": {
+            "text": recommendation.forecastStatus,
+        },
+        // "forecastReason": [
+        //     {
+        //         "text": "Next Immunization date"
+        //     }
+        // ],
+        "dateCriterion": [
+            {
+                "code": {
+                    "text": "Date vaccine due"
+                },
+                "value": dayjs(recommendation.dueDate).utc()
+            }
+        ],
+        "description": `category: ${recommendation.category}`,
+        "doseNumberString": recommendation.doseNumber.toString(),
+        // "seriesDosesString": "5"
+    }
+}
+
+const createImmunizationRecommendation = (recommendations, patient) => {
+    return {
+        "resourceType": "ImmunizationRecommendation",
+        "patient": {
+            "reference": `Patient/${patient?.id}`
+        },
+        "date": dayjs(Date.now()).utc(),
+        "recommendation": recommendations.map((r) => recommendation(r)),
+    }
 }
 
 const createAppointment = (data, patientID, status) => {
@@ -95,4 +146,5 @@ const createAppointment = (data, patientID, status) => {
 export {
   createVaccineImmunization,
   createAppointment,
+  createImmunizationRecommendation
 }
