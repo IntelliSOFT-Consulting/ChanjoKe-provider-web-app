@@ -88,6 +88,14 @@ export default function CaregiverDetails({ form }) {
                         />
                       </Form.Item>
                     }
+                    onChange={(e) => {
+                      if (e.target.value.length > 9) {
+                        form.setFieldValue(
+                          ['caregiver', key, 'phoneNumber'],
+                          e.target.value.slice(0, 9)
+                        )
+                      }
+                    }}
                   />
                 </Form.Item>
               </div>
