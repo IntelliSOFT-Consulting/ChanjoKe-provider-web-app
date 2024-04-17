@@ -1,4 +1,4 @@
-import { nonRoutineVaccines } from './vaccineData'
+import { nonRoutineVaccines } from '../../data/vaccineData'
 import { useState, useEffect } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'

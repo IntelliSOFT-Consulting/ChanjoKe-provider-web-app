@@ -1,16 +1,6 @@
 import { useLocations } from '../../hooks/useLocation'
 import { usePractitioner } from '../../hooks/usePractitioner'
-import {
-  Select,
-  Input,
-  Form,
-  Button,
-  Space,
-  Modal,
-  Card,
-  message,
-  Popconfirm,
-} from 'antd'
+import { Select, Input, Form, Button, Card } from 'antd'
 
 export default function AddUser() {
   const [form] = Form.useForm()

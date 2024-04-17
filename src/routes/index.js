@@ -48,10 +48,6 @@ function SearchInterfaceWrapper() {
   return <SearchInterface searchType={searchType} />
 }
 
-function RegisterClientWrapper() {
-  const { clientID } = useParams()
-  return <RegisterClient editClientID={clientID} />
-}
 
 const AuthRoute = ({ element }) => {
   const { user } = useSelector((state) => state.userInfo)
@@ -92,7 +88,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/register-client/:clientID',
-        element: <RegisterClientWrapper />,
+        element: <RegisterClient />,
       },
       {
         path: '/defaulter-tracing',

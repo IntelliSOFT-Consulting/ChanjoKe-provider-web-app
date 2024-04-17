@@ -1,7 +1,7 @@
 import { Col, Row, Radio, DatePicker, Form, Input, Select } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSharedState } from '../../shared/sharedState'
-import { routineVaccines } from './vaccineData'
+import { routineVaccines } from '../../data/vaccineData'
 import { useState, useEffect } from 'react'
 import { useApiRequest } from '../../api/useApiRequest'
 import dayjs from 'dayjs'

@@ -1,14 +1,4 @@
-function generateUniqueCode(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
-  
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      code += characters.charAt(randomIndex);
-    }
-  
-    return code;
-}
+import { generateUniqueCode } from '../../utils/methods'
 
 function organizeData(items) {
     if (Array.isArray(items)) {

@@ -1,5 +1,5 @@
 import moment from 'moment'
-const routineVaccines = [
+export const routineVaccines = [
   {
     vaccineName: 'BCG',
     vaccineCode: 'IMBCG-I',
@@ -583,7 +583,7 @@ const routineVaccines = [
   },
 ]
 
-const nonRoutineVaccines = [
+export const nonRoutineVaccines = [
   {
     vaccineName: 'AstraZeneca',
     vaccineCode: 'IMCOV-ASTR-1',
@@ -943,5 +943,3 @@ const nonRoutineVaccines = [
     },
   },
 ]
-
-export { routineVaccines, nonRoutineVaccines }

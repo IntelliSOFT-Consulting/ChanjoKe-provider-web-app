@@ -1,107 +1,157 @@
-import calculateAge from '../../utils/calculateAge'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import moment from 'moment'
 import dayjs from 'dayjs'
 import weekdays from 'dayjs/plugin/weekday'
 import localeDate from 'dayjs/plugin/localeData'
-import calculateEstimatedBirthDate from '../../utils/calculateDate'
-import { Col, Row, Radio, DatePicker, Form, Input, Select, InputNumber } from 'antd'
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Alert,
+} from 'antd'
 import { useNavigate } from 'react-router-dom'
+import {
+  calculateAges,
+  generateDateOfBirth,
+  writeAge,
+} from '../../utils/methods'
+import CaregiverDetails from './CareGiverDetails'
+import AdministrativeArea from './AdministrativeArea'
+import { identificationOptions } from '../../data/options/clientDetails'
+import { useSelector } from 'react-redux'
+import usePatient from '../../hooks/usePatient'
+import useEncounter from '../../hooks/useEncounter'
+import useObservations from '../../hooks/useObservations'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import { countryCodes } from '../../data/countryCodes'
 
-const Option = Select.Option;
 dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
-const identificationOptions = [
-  { name: 'Birth Notification Number', value: 'Birth_Notification_Number', minAge: 0, maxAge: 1095 },
-  { name: 'Birth Certificate', value: 'Birth_Certificate', minAge: 0, maxAge: 36525 },
-  { name: 'ID Number', value: 'ID_number', minAge: 6575, maxAge: 36525 },
-  { name: 'NEMIS Number', value: 'NEMIS_no', minAge: 1095, maxAge: 6575 },
-  { name: 'Passport Number', value: 'passport', minAge: 0, maxAge: 36525 }, 
-]
-
 function daysBetweenTodayAndDate(inputDate) {
-  const currentDate = new Date();
-  const targetDate = new Date(inputDate);
-  const timeDifference = targetDate - currentDate;
-  const daysDifference = Math.ceil(Math.abs(timeDifference) / (1000 * 60 * 60 * 24));
+  const currentDate = new Date()
+  const targetDate = new Date(inputDate)
+  const timeDifference = targetDate - currentDate
+  const daysDifference = Math.ceil(
+    Math.abs(timeDifference) / (1000 * 60 * 60 * 24)
+  )
 
-  return daysDifference;
+  return daysDifference
 }
 
 export default function ClientDetails({ editClientDetails, setClientDetails }) {
-
-  const [weeks, setWeeks] = useState(null)
-  const [months, setMonths] = useState(null)
-  const [years, setYears] = useState(null)
+  const [isAdult, setIsAdult] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [userAge, setUserAge] = useState(null)
   const [idOptions, setIdOptions] = useState([])
-  const [estimatedAge, setEstimatedAge] = useState("true")
+  const [estimatedAge, setEstimatedAge] = useState(true)
+  const [currentStep, setCurrentStep] = useState(1)
+  const [success, setSuccess] = useState(false)
+  const [errors, setErrors] = useState(null)
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm()
+
+  const { user } = useSelector((state) => state.userInfo)
+
   const navigate = useNavigate()
 
-  useEffect(() => {
-    form.setFieldsValue(editClientDetails)
-    const dateOfBirth = moment(editClientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD')
-    const stringAge = calculateAge(dateOfBirth)
-    setUserAge(stringAge || 'Age')
-    setEstimatedAge(editClientDetails?.estimatedAge || "true")
-    setLoading(true)
+  const { createPatient } = usePatient()
+  const { createEncounter } = useEncounter()
+  const { createObservation } = useObservations()
 
-    // If estimated age isn't set, set it to true
-    if (editClientDetails?.estimatedAge === '') {
-      form.setFieldValue('estimatedAge', 'true')
-    }
+  // useEffect(() => {
+  //   if (editClientDetails) {
+  //     form.setFieldsValue(editClientDetails)
+  //   }
+  //   setLoading(false)
+  // }, [editClientDetails])
 
-    const days = daysBetweenTodayAndDate(moment(editClientDetails?.dateOfBirth?.$d).format('YYYY-MM-DD'))
-    const mappedIDs = identificationOptions.filter(option =>
-      days >= option.minAge && days <= option.maxAge
-    );
-    setIdOptions(mappedIDs)
-  }, [editClientDetails])
-
-  const onFinish = (values) => {
-    values.currentWeight = `${values.currentWeight || 0}`
-    setClientDetails(values)
-  };
-
-  function handleInputKeyDown(e) {
-    const regex = /^[0-9-]*$/;
-    if (!regex.test(e.key) && e.key !== 'Backspace') {
-        e.preventDefault();
-    }
-}
-
-  const isUserOverI8 = () => {
-    const dateObject = form.getFieldValue('dateOfBirth')
-    const date = moment(dateObject?.$d).format('YYYY-MM-DD')
-    const stringAge = calculateAge(date)
-    const age = stringAge.match(/(\d+)\s*year/i)
-    if (age === null) {
+  // validate the form and set errors in case of any validation errors with the failing field error messages
+  const validateForm = async () => {
+    try {
+      await form.validateFields()
+      form.submit()
+    } catch (error) {
+      const errorMessages = error.errorFields
+        .map((error) =>
+          error.errors
+            ?.join(', ')
+            .replace('Please input ', '')
+            .replace('Please select ', '')
+        )
+        ?.join(', ')
+      setErrors(errorMessages)
       return false
-    } else if (parseInt(age[1]) >= 18) {
-      return true
     }
   }
 
-  const capitalizeInput = (e) => {
-    const inputName = e.target.dataset?.name
-    const value = e.target.value
+  const onFinish = async (values) => {
+    setSaving(true)
+    const patient = await createPatient(values)
+    const encounter = await createEncounter(
+      patient.id,
+      user?.fhirPractitionerId,
+      user?.facility?.replace('Location/', '')
+    )
+    await createObservation(values, patient.id, encounter.id)
 
-    if (value) {
-      const capitalized = value?.replace(/\b\w/g, (char) => char.toUpperCase());
-      form.setFieldValue(inputName, capitalized)
-    }
+    setSaving(false)
+
+    setSuccess(true)
+
+    const timeout = setTimeout(() => {
+      setClientDetails(patient)
+      navigate(`/client-details/${patient.id}`)
+    }, 1500)
+
+    return () => clearTimeout(timeout)
+  }
+
+  const calculateDob = () => {
+    const { years, months, weeks } = form.getFieldValue()
+    const birthDate = generateDateOfBirth({ years, months, weeks })
+    form.setFieldValue('dateOfBirth', dayjs(birthDate))
+
+    setIsAdult(years >= 18)
+
+    if (!years) return
+    const identificationsQualified = identificationOptions.filter(
+      (option) => years >= option.minAge && years <= option.maxAge
+    )
+
+    setIdOptions(identificationsQualified)
   }
 
   return (
     <>
-      <h3 className="text-xl font-medium">Client Details</h3>
+      {errors && (
+        <Alert
+          message="Please provide the following information:"
+          description={errors}
+          type="error"
+          closable
+          onClose={() => setErrors(null)}
+        />
+      )}
+      {currentStep === 1 && (
+        <h3 className="text-xl font-medium mb-6">Client Details</h3>
+      )}
 
-      {loading && 
+      {success && (
+        <ConfirmDialog
+          title="Success"
+          description="Client details saved successfully"
+          onClose={() => setSuccess(false)}
+          open={success}
+        />
+      )}
+
+      {!loading && (
         <Form
           name="clientDetails"
           onFinish={onFinish}
@@ -110,371 +160,348 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           autoComplete="on"
           validateTrigger="onBlur"
           form={form}
-          initialValues={editClientDetails}>
-            
-            <Row className='mt-5 px-6' gutter={16}>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="firstName"
-                  label={
-                    <div>
-                      <span className="font-bold">First Name</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input first name!',
-                    },
-                  ]}>
-                    <Input
-                      placeholder="First Name"
-                      autoComplete="off"
-                      data-name="firstName"
-                      onChange={(e) => capitalizeInput(e)}
-                      className='block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400' />
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="middleName"
-                  label={
-                    <div>
-                      <span className="font-bold">Middle Name</span>
-                    </div>
-                  }
-                  rules={[]}>
-                    <Input
-                      placeholder="Middle Name"
-                      autoComplete="off"
-                      onChange={(e) => capitalizeInput(e)}
-                      data-name="middleName"
-                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="lastName"
-                  label={
-                    <div>
-                      <span className="font-bold">Last Name</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please input last name!',
-                    },
-                  ]}>
-                    <Input
-                      placeholder="Last Name"
-                      data-name="lastName"
-                      onChange={(e) => capitalizeInput(e)}
-                      autoComplete="off"
-                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <div className="grid grid-cols-2 gap-4">
+          initialValues={{ age: 0, ...editClientDetails }}
+        >
+          <div className={currentStep === 1 ? 'block' : 'hidden'}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10">
+              {}
+              <Form.Item
+                name="firstName"
+                label={
                   <div>
-                    <Form.Item
-                      name="gender"
-                      label={
-                        <div>
-                          <span className="font-bold">Gender</span>
-                        </div>
+                    <span className="font-bold">First Name</span>
+                  </div>
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input first name',
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="First Name"
+                  autoComplete="off"
+                  className="block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="middleName"
+                label={
+                  <div>
+                    <span className="font-bold">Middle Name</span>
+                  </div>
+                }
+                rules={[]}
+              >
+                <Input
+                  placeholder="Middle Name"
+                  autoComplete="off"
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="lastName"
+                label={
+                  <div>
+                    <span className="font-bold">Last Name</span>
+                  </div>
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input last name',
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Last Name"
+                  autoComplete="off"
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
+
+              <div>
+                <Form.Item
+                  name="gender"
+                  label={
+                    <div>
+                      <span className="font-bold">Gender</span>
+                    </div>
+                  }
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Please select gender',
+                    },
+                  ]}
+                >
+                  <Radio.Group>
+                    <Radio value="male">Male</Radio>
+                    <Radio value="female">Female</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </div>
+              <div>
+                <Form.Item name="estimatedAge" label="Age Input Method">
+                  <Radio.Group
+                    onChange={(e) => setEstimatedAge(e.target.value)}
+                  >
+                    <Radio value={true}>Actual</Radio>
+                    <Radio value={false}>Estimated</Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </div>
+
+              {estimatedAge ? (
+                <>
+                  <Form.Item
+                    name="dateOfBirth"
+                    label="Date of Birth"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input date of birth',
+                      },
+                    ]}
+                  >
+                    <DatePicker
+                      disabledDate={(current) =>
+                        current && current >= moment().endOf('day')
                       }
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Please select gender',
-                        },
-                      ]}>
-                      
-                      <Radio.Group>
-                        <Radio value="male">Male</Radio>
-                        <Radio value="female">Female</Radio>
-                      </Radio.Group>
+                      format="DD-MM-YYYY"
+                      onChange={(e) => {
+                        if (!e) return
+                        const estimate = calculateAges(new Date(e.toDate()))
+
+                        const ages = ['years', 'months', 'weeks', 'days']
+                        ages.forEach((age) => {
+                          form.setFieldValue(age, estimate[age])
+                        })
+                        form.setFieldValue('age', writeAge(estimate))
+
+                        const identificationsQualified =
+                          identificationOptions.filter(
+                            (option) =>
+                              estimate.years >= option.minAge &&
+                              estimate.years <= option.maxAge
+                          )
+
+                        setIdOptions(identificationsQualified)
+
+                        setIsAdult(estimate.years >= 18)
+                      }}
+                      className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label="Age"
+                    name="age"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please input age',
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Age"
+                      disabled={true}
+                      className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                    />
+                  </Form.Item>
+                </>
+              ) : (
+                <>
+                  <div className="gutter-row grid grid-cols-3 gap-4 mt-7">
+                    <Form.Item name="years" label="Years">
+                      <InputNumber
+                        size="large"
+                        placeholder="Years"
+                        max={99}
+                        min={0}
+                        onChange={calculateDob}
+                        className="w-full"
+                      />
+                    </Form.Item>
+                    <Form.Item name="months" label="Months">
+                      <InputNumber
+                        size="large"
+                        placeholder="Months"
+                        min={0}
+                        onChange={calculateDob}
+                        className="w-full"
+                      />
+                    </Form.Item>
+                    <Form.Item name="weeks" label="Weeks">
+                      <InputNumber
+                        size="large"
+                        placeholder="Weeks"
+                        min={0}
+                        className="w-full"
+                        onChange={calculateDob}
+                      />
                     </Form.Item>
                   </div>
-                  <div>
-                    <Form.Item
-                      name="estimatedAge"
-                      label={
-                        <div>
-                          <span className="font-bold">Age Input Method</span>
-                        </div>
-                      }>
-                        <div className="radio-group-container">
-                          <Radio.Group defaultValue={"true"} onChange={(e) => setEstimatedAge(e.target.value)}>
-                            <Radio value={"true"}>Actual</Radio>
-                            <Radio value={"false"}>Estimated</Radio>
-                          </Radio.Group>
-                        </div>
-                    
-                  </Form.Item>
-                  </div>
-                </div>
-              
-              </Col>
-              { estimatedAge === "true" && <>
-                <Col className="gutter-row" span={8}>
+
                   <Form.Item
                     name="dateOfBirth"
                     label={
                       <div>
-                        <span className="font-bold">Date of Birth</span>
+                        <span className="font-bold">
+                          Estimated date of birth
+                        </span>
                       </div>
                     }
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Please input date of birth!',
-                      },
-                    ]}>
-                    
-                    <DatePicker
-                      disabledDate={(current) => current && current >= moment().endOf('day')}
-                      format="DD-MM-YYYY"
-                      onKeyDown={handleInputKeyDown}
-                      onChange={(e) => {
-                        if (e !== null) {
-                          const date = moment(e.$d).format('YYYY-MM-DD')
-                          setUserAge(calculateAge(date))
-                          const days = daysBetweenTodayAndDate(date)
-                          const mappedIDs = identificationOptions.filter(option =>
-                            days >= option.minAge && days <= option.maxAge
-                          );
-                          setIdOptions(mappedIDs)
-                        } else {
-                          setUserAge(null)
-                        }
-                      }}
-                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                  </Form.Item>
-                </Col>
-
-                <Col className="gutter-row" span={8}>
-                  <Form.Item
-                    label={
-                      <div>
-                        <span className="font-bold">Age</span>
-                      </div>
-                    }
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Please input age!',
-                      },
-                    ]}>
-                      <Input
-                        placeholder="Age"
-                        value={userAge}
-                        disabled={true}
-                        className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                  </Form.Item>
-                </Col>
-              </>
-              }
-
-              {estimatedAge === "false" && <>
-                <Col className="gutter-row grid grid-cols-3 gap-4 flex mt-7" span={8}>
-                  <Form.Item>     
-                    <InputNumber
-                      size='large'
-                      placeholder="Years"
-                      max={99}
-                      min={1}
-                      value={years}
-                      onChange={(e) => {
-                        setYears(e)
-                        const est = calculateEstimatedBirthDate(weeks, months, e)
-                        form.setFieldValue('dateOfBirth', dayjs(est))
-                        const date = moment(est).format('YYYY-MM-DD')
-                        setUserAge(calculateAge(date))
-                        const days = daysBetweenTodayAndDate(date)
-                        const mappedIDs = identificationOptions.filter(option =>
-                          days >= option.minAge && days <= option.maxAge
-                        );
-                        setIdOptions(mappedIDs)
-                      }}
-                      className='w-full' />
-                  </Form.Item>
-                  <Form.Item>
-                    <InputNumber
-                      size='large'
-                      placeholder="Months"
-                      max={11}
-                      min={1}
-                      onChange={(e) => {
-                        setMonths(e)
-                        const est = calculateEstimatedBirthDate(weeks, e, years)
-                        form.setFieldValue('dateOfBirth', dayjs(est))
-                        const date = moment(est).format('YYYY-MM-DD')
-                        setUserAge(calculateAge(date))
-                        const days = daysBetweenTodayAndDate(date)
-                        const mappedIDs = identificationOptions.filter(option =>
-                          days >= option.minAge && days <= option.maxAge
-                        );
-                        setIdOptions(mappedIDs)
-                      }}
-                      className='w-full'/>
-                  </Form.Item>
-                  <Form.Item>
-                    <InputNumber
-                      size='large'
-                      placeholder="Weeks"
-                      max={3}
-                      min={1}
-                      className='w-full'
-                      onChange={(e) => {
-                        setWeeks(e)
-                        const est = calculateEstimatedBirthDate(e, months, years)
-                        form.setFieldValue('dateOfBirth', dayjs(est))
-                        const date = moment(est).format('YYYY-MM-DD')
-                        setUserAge(calculateAge(date))
-                        const days = daysBetweenTodayAndDate(date)
-                        const mappedIDs = identificationOptions.filter(option =>
-                          days >= option.minAge && days <= option.maxAge
-                        );
-                        setIdOptions(mappedIDs)
-                      }}/>
-                  </Form.Item>
-                </Col>
-
-                <Col className="gutter-row" span={8}>
-                  <Form.Item
-                    name="dateOfBirth"
-                    label={
-                      <div>
-                        <span className="font-bold">Estimated date of birth</span>
-                      </div>
-                    }>
-                    
+                  >
                     <DatePicker
                       disabled={true}
                       format="DD-MM-YYYY"
-                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                      className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                    />
                   </Form.Item>
-                </Col>
-              </>
-              }
+                </>
+              )}
 
-              {isUserOverI8() &&
-                <Col className="gutter-row" span={8}>
-                  <Form.Item
-                    name="phoneNumber"
-                    label={
-                      <div>
-                        <span className="font-bold">Phone Number</span>
-                      </div>
-                    }
-                    rules={[
-                      {
-                        pattern: /^(\+?)([0-9]{7,10})$/,
-                        message: 'Please enter a valid phone number!',
-                      },
-                    ]}>
-                      <Input
-                        prefix={<span className='flex'>+254</span>}
-                        placeholder="Phone Number"
-                        maxLength={10}
-                        className='flex w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
-                  </Form.Item>
-                </Col>
-              }
-
-              <Col className="gutter-row" span={8}>
+              {isAdult && (
                 <Form.Item
-                  name="identificationType"
+                  name="phoneNumber"
                   label={
                     <div>
-                      <span className="font-bold">Identification Type</span>
-                      <span className="text-red-400 mx-2">*</span>
-                    </div>
-                  }>
-                  <Select
-                    size='large'
-                    disabled={form.getFieldValue('dateOfBirth') ? false : true}
-                    defaultValue={editClientDetails.identificationType}>
-                    {idOptions.map((option) => (
-                      <Select.Option value={option.value}>
-                        {option.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="identificationNumber"
-                  label={
-                    <div>
-                      <span className="font-bold">Document Identification Number</span>
+                      <span className="font-bold">Phone Number</span>
                     </div>
                   }
                   rules={[
                     {
-                      required: true,
-                      message: 'Please input identification number!',
+                      pattern: /^(\+?)([0-9]{7,15})$/,
+                      message: 'Please enter a valid phone number',
                     },
-                  ]}>
-                    <Input
-                      placeholder="Document Identification Number"
-                      autoComplete="off"
-                      maxLength={15}
-                      className='block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
+                  ]}
+                >
+                  <Input
+                    addonBefore={
+                      <Form.Item name="phoneCode" noStyle>
+                        <Select
+                          size="large"
+                          style={{ width: 120 }}
+                          showSearch
+                          options={countryCodes}
+                          defaultValue={'+254'}
+                          filterOption={(input, option) =>
+                            option.label
+                              .toLowerCase()
+                              .indexOf(input.toLowerCase()) >= 0
+                          }
+                          placeholder="Code"
+                        />
+                      </Form.Item>
+                    }
+                    placeholder="Phone Number"
+                    size="large"
+                  />
                 </Form.Item>
-              </Col>
+              )}
 
-              <Col className="gutter-row" span={8}>
-                <Form.Item
-                  name="currentWeight"
+              <Form.Item name="identificationType" label="Identification Type">
+                <Select
                   size="large"
-                  label={
-                    <div>
-                      <span className="font-bold">Current Weight</span>
-                    </div>
-                  }>
-                      <Input
-                        placeholder="Current Weight"
-                        autoComplete="off"
-                        className='rounded'
-                        size='large'
-                        addonAfter={
-                          <Form.Item name='weightMetric' className='mb-0 block rounded-md'>
-                            <Select
-                              style={{ width: 100 }}
-                              defaultValue={'Kilograms'}>
-                              <Select.Option value="Kilograms">Kilograms</Select.Option>
-                              <Select.Option value="Grams">Grams</Select.Option>
-                            </Select>
-                          </Form.Item>
-                        } />
-                </Form.Item>
-              </Col>
+                  disabled={idOptions.length === 0}
+                  options={idOptions}
+                />
+              </Form.Item>
 
-            </Row>
+              <Form.Item
+                name="identificationNumber"
+                label="Identification Number"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input identifier',
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Document Identification Number"
+                  autoComplete="off"
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
 
-            <div className="px-4 py-4 sm:px-6 flex justify-end">
-
-              <button
-                htmlType="submit"
-                className='bg-[#163C94] border-[#163C94] outline-[#163C94] hover:bg-[#163C94] focus-visible:outline-[#163C94] ml-4 flex-shrink-0 rounded-md border outline  px-5 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'>
-                Next
-              </button>
+              <Form.Item
+                name="currentWeight"
+                size="large"
+                label="Current Weight"
+                rules={[]}
+              >
+                <Input
+                  placeholder="Current Weight"
+                  autoComplete="off"
+                  className="rounded"
+                  size="large"
+                  addonAfter={
+                    <Form.Item
+                      name="weightMetric"
+                      className="mb-0 block rounded-md"
+                    >
+                      <Select style={{ width: 100 }} defaultValue={'Kg'}>
+                        <Select.Option value="kg">Kilograms</Select.Option>
+                        <Select.Option value="g">Grams</Select.Option>
+                      </Select>
+                    </Form.Item>
+                  }
+                />
+              </Form.Item>
             </div>
+          </div>
 
+          <div className={currentStep === 2 ? 'block px-6' : 'hidden'}>
+            <CaregiverDetails form={form} />
+          </div>
+
+          <div className={currentStep === 3 ? 'block px-6' : 'hidden'}>
+            <AdministrativeArea form={form} />
+          </div>
+
+          <div className="px-4 py-4 sm:px-6 flex justify-end">
+            {currentStep > 1 && (
+              <Button
+                className="mr-4"
+                onClick={() => setCurrentStep(currentStep - 1)}
+              >
+                Back
+              </Button>
+            )}
+            {currentStep === 3 && (
+              <Button
+                type="primary"
+                // htmlType="submit"
+                loading={saving}
+                disabled={saving}
+                onClick={validateForm}
+              >
+                Submit
+              </Button>
+            )}
+            {currentStep < 3 && (
+              <Button
+                type="primary"
+                onClick={() => setCurrentStep(currentStep + 1)}
+              >
+                Next
+              </Button>
+            )}
+          </div>
         </Form>
-      }
+      )}
 
-      {!loading && <div className="my-10 mx-auto flex justify-center"><LoadingArrows /></div>}
-
+      {loading && (
+        <div className="my-10 mx-auto flex justify-center">
+          <LoadingArrows />
+        </div>
+      )}
     </>
   )
 }
