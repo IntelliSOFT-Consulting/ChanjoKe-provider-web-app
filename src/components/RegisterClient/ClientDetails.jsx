@@ -351,7 +351,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     label={
                       <div>
                         <span className="font-bold">
-                          Estimated date of birth
+                          Estimated Date of Birth
                         </span>
                       </div>
                     }

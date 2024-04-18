@@ -20,7 +20,7 @@ export default function usePatient() {
                 value: data.identificationType,
               },
             ],
-            text: data.identificationType,
+            text: data.identificationNumber,
           },
           system: 'identification',
           value: data.identificationNumber,
@@ -79,10 +79,13 @@ export default function usePatient() {
                   display: caregiver.caregiverType,
                 },
               ],
+              text: caregiver.caregiverType,
             },
           ],
           name: {
             text: caregiver.caregiverName,
+            given: caregiver.caregiverName.split(' '),
+            family: caregiver.caregiverName.split(' ')[1],
           },
           telecom: [
             {
@@ -93,7 +96,6 @@ export default function usePatient() {
         }
       }),
     }
-
     return await post(`${fhirEndpoint}/Patient`, patientResource)
   }
 

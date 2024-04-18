@@ -32,86 +32,88 @@ export default function useVaccination() {
 
   const formatRecommendationsToFHIR = (patient) => {
     const recommendations = filterVaccinationRecommendations(patient)
-    return recommendations.map((recommendation) => {
-      let dueDays =
-        getAgeInUnits(patient.birthDate, 'days') +
-        recommendation.adminRange.start
-      let dueDate = moment(patient.birthDate)
-        .add(dueDays, 'days')
-        .format('YYYY-MM-DD')
-      if (recommendation.dependentVaccine && recommendation.dependencyPeriod) {
-        const dependentVaccine = recommendations.find(
-          (vaccine) => vaccine.code === recommendation.dependentVaccine
-        )
-        const dependentVaccineDueDate =
+
+    return {
+      resourceType: 'ImmunizationRecommendation',
+      patient: {
+        reference: `Patient/${patient.id}`,
+      },
+      date: moment().format('YYYY-MM-DD'),
+      authority: {
+        reference: user?.facility,
+      },
+      recommendation: recommendations.map((recommendation) => {
+        let dueDays =
           getAgeInUnits(patient.birthDate, 'days') +
-          dependentVaccine.adminRange.start
-        dueDays = dependentVaccineDueDate + recommendation.dependencyPeriod
-        dueDate = moment(patient.birthDate)
+          recommendation.adminRange.start
+        let dueDate = moment(patient.birthDate)
           .add(dueDays, 'days')
           .format('YYYY-MM-DD')
-      }
+        if (
+          recommendation.dependentVaccine &&
+          recommendation.dependencyPeriod
+        ) {
+          const dependentVaccine = recommendations.find(
+            (vaccine) => vaccine.code === recommendation.dependentVaccine
+          )
+          const dependentVaccineDueDate =
+            getAgeInUnits(patient.birthDate, 'days') +
+            dependentVaccine.adminRange.start
+          dueDays = dependentVaccineDueDate + recommendation.dependencyPeriod
+          dueDate = moment(patient.birthDate)
+            .add(dueDays, 'days')
+            .format('YYYY-MM-DD')
+        }
 
-      return {
-        resourceType: 'ImmunizationRecommendation',
-        patient: {
-          reference: `Patient/${patient.id}`,
-        },
-        date: moment().format('YYYY-MM-DD'),
-        authority: {
-          reference: user?.facility,
-        },
-        recommendation: [
-          {
-            date: moment().format('YYYY-MM-DD'),
-            vaccineCode: {
+        return {
+          date: moment().format('YYYY-MM-DD'),
+          vaccineCode: {
+            coding: [
+              {
+                code: recommendation.vaccineName,
+                display: recommendation.vaccineCode,
+              },
+            ],
+          },
+          targetDisease: [
+            {
               coding: [
                 {
-                  code: recommendation.vaccineName,
-                  display: recommendation.vaccineCode,
+                  code: recommendation.diseaseTarget,
+                  display: recommendation.diseaseTarget,
                 },
               ],
             },
-            targetDisease: [
+          ],
+          forecastStatus: {
+            coding: [
               {
+                code: 'due',
+                display: 'Due',
+              },
+            ],
+          },
+          dateCriterion: [
+            {
+              code: {
                 coding: [
                   {
-                    code: recommendation.diseaseTarget,
-                    display: recommendation.diseaseTarget,
+                    code: 'due',
+                    display: 'Due',
                   },
                 ],
               },
-            ],
-            forecastStatus: {
-              coding: [
-                {
-                  code: 'due',
-                  display: 'Due',
-                },
-              ],
+              value: dueDate,
             },
-            dateCriterion: [
-              {
-                code: {
-                  coding: [
-                    {
-                      code: 'due',
-                      display: 'Due',
-                    },
-                  ],
-                },
-                value: dueDate,
-              },
-            ],
-            seriesDoses: recommendations.filter(
-              (item) =>
-                item.vaccineCode.slice(0, -1) ===
-                recommendation.vaccineCode.slice(0, -1)
-            ),
-          },
-        ],
-      }
-    })
+          ],
+          seriesDoses: recommendations.filter(
+            (item) =>
+              item.vaccineCode.slice(0, -1) ===
+              recommendation.vaccineCode.slice(0, -1)
+          ),
+        }
+      }),
+    }
   }
 
   const createRecommendations = async (patient) => {

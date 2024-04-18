@@ -7,17 +7,17 @@ export const caregiverTypes = [
 export const identificationOptions = [
   {
     label: 'Birth Notification Number',
-    value: 'BIRTH_NOTIFICATION_NUMBER',
+    value: 'Birth_notification_number',
     minAge: 0,
     maxAge: 2.9,
   },
   {
     label: 'Birth Certificate',
-    value: 'BIRTH_CERTIFICATE',
+    value: 'Birth_certificate',
     minAge: 0,
     maxAge: Infinity,
   },
-  { label: 'ID Number', value: 'ID_NUMBER', minAge: 18, maxAge: Infinity },
-  { label: 'NEMIS Number', value: 'NEMIS_NUMBER', minAge: 3, maxAge: 17.9 },
-  { label: 'Passport', value: 'PASSPORT', minAge: 3, maxAge: Infinity },
+  { label: 'National ID', value: 'ID_number', minAge: 18, maxAge: Infinity },
+  { label: 'NEMIS Number', value: 'Nemis_number', minAge: 3, maxAge: 17.9 },
+  { label: 'Passport', value: 'Passport', minAge: 3, maxAge: Infinity },
 ]
