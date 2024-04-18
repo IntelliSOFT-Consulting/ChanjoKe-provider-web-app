@@ -65,7 +65,7 @@ export default function CaregiverDetails({ form }) {
                   className="mb-0"
                 >
                   <Input
-                    placeholder="Phone Number"
+                    placeholder="7xxxxxxxx"
                     size="large"
                     addonBefore={
                       <Form.Item
