@@ -16,6 +16,7 @@ import { setCurrentPatient } from '../../redux/actions/patientActions'
 import { useDispatch, useSelector } from 'react-redux'
 import { createImmunizationRecommendation } from './DataWrapper'
 import useAefi from '../../hooks/useAefi'
+import dayjs from 'dayjs'
 
 export default function RoutineVaccines({ userCategory, patientData }) {
   const [mappedVaccines, setMappedVaccines] = useState([])
@@ -74,6 +75,35 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       dispatch(setCurrentPatient(patientData))
       fetchPatientImmunization()
       getAefis()
+
+      const mapped = routineVaccines.map((vaccine) => {
+        // const dependentVaccine = allVaccines?.find(
+        //   (vaccine) =>
+        //     _record?.dependentVaccine ===
+        //     vaccine?.vaccineCode?.coding?.[0]?.code
+        // )
+        const today = moment()
+        const userAgeInDays = today.diff(patientData?.birthDate, 'days') + 1
+        const dueDate = vaccine.dueDate(patientData?.birthDate)
+
+        // console.log({
+        //   vaccine: vaccine.vaccineName,
+        //   code: vaccine.vaccineCode,
+        //   birthDate: patientData?.birthDate,
+        //   vaccineDueDate: vaccine.dueDate(patientData?.birthDate)
+        // })
+
+        if (userAgeInDays > vaccine.adminRange.end) {
+          // user is too old for vaccine
+        } else if (userAgeInDays < vaccine.adminRange.end) {
+          // user has not yet reached the age limit for vaccine
+          return { ...vaccine, vaccineDueDate: dueDate, forecastStatus: 'due' }
+        }
+      })
+
+      const immunizationRecommendation = createImmunizationRecommendation(mapped, patientData)
+
+      console.log({ immunizationRecommendation, patientData })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientData])

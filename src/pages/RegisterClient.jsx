@@ -5,12 +5,15 @@ import {
   createObservationData,
   createPatientData,
 } from '../components/RegisterClient/DataWrapper'
+import { createImmunizationRecommendation } from '../components/ClientDetailsView/DataWrapper'
 import ConfirmDialog from '../common/dialog/ConfirmDialog'
 import calculateAge from '../utils/calculateAge'
 import usePost from '../api/usePost'
 import { useNavigate, useParams } from 'react-router-dom'
 import useGet from '../api/useGet'
 import usePut from '../api/usePut'
+import { useApiRequest } from '../api/useApiRequest'
+import { routineVaccines } from '../data/vaccineData'
 import dayjs from 'dayjs'
 
 export default function RegisterClient() {
@@ -28,6 +31,7 @@ export default function RegisterClient() {
   const { SubmitForm } = usePost()
   const { SubmitForm: SubmitObservationForm } = usePost()
   const { SubmitUpdateForm } = usePut()
+  const { post } = useApiRequest()
 
   const { data, loading, error } = useGet(`Patient/${clientID}`)
   const { data: observationData } = useGet(
@@ -144,6 +148,27 @@ export default function RegisterClient() {
         )
       }
       setResponse(newClientResponse)
+
+      const today = dayjs()
+      const userAgeInDays = today.diff(newClientResponse?.birthDate, 'days') + 1
+      
+
+      const mapped = routineVaccines.map((vaccine) => {
+        const dueDate = vaccine.dueDate(newClientResponse?.birthDate)
+        if (userAgeInDays > vaccine.adminRange.end) {
+          // user is too old for vaccine
+        } else if (userAgeInDays < vaccine.adminRange.end) {
+          // user has not yet reached the age limit for vaccine
+          return { ...vaccine, vaccineDueDate: dueDate, forecastStatus: 'due' }
+        }
+      })
+
+      const immunizationRecommendation = createImmunizationRecommendation(mapped, newClientResponse)
+
+      const immunizationRecommendationResponse = await post('/hapi/fhir/ImmunizationRecommendation', immunizationRecommendation)
+
+      console.log({ immunizationRecommendationResponse })
+
     } else {
       setDialogText('Client details updated successfully!')
       setDialogOpen(true)

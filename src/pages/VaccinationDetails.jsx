@@ -64,9 +64,6 @@ export default function VaccinationDetails() {
     }
   }, [vaccinationDetails])
 
-  // console.log('vaccinationDetails', vaccinationDetails)
-  // console.log('patientInfo', patientInfo)
-
   useEffect(() => {
     if (patientInfo) {
       fetchAefiInfo(patientInfo.id)

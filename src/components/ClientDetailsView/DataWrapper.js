@@ -50,39 +50,35 @@ const createVaccineImmunization = (data, patientID, status) => {
 }
 
 const recommendation = (recommendation) => {
-    return {
-        "vaccineCode": {
-            "text": recommendation.vaccineName,
-            "code": recommendation.vaccineCode,
-        },
-        "targetDisease": {
-            "text": recommendation.diseaseTarget,
-        },
-        // "contraindicatedVaccineCode": [
-        //     {
-        //         "text": "bOPV"
-        //     }
-        // ],
-        // PS: Add item to contraindication
-        "forecastStatus": {
-            "text": recommendation.forecastStatus,
-        },
-        // "forecastReason": [
-        //     {
-        //         "text": "Next Immunization date"
-        //     }
-        // ],
-        "dateCriterion": [
-            {
-                "code": {
-                    "text": "Date vaccine due"
-                },
-                "value": dayjs(recommendation.dueDate).utc()
-            }
-        ],
-        "description": `category: ${recommendation.category}`,
-        "doseNumberString": recommendation.doseNumber.toString(),
-        // "seriesDosesString": "5"
+
+    console.log({ recommendation })
+
+    if (!recommendation) {
+
+    } else {
+        return {
+            "vaccineCode": {
+                "text": recommendation?.vaccineName,
+                "code": recommendation?.vaccineCode,
+            },
+            "targetDisease": {
+                "text": recommendation?.diseaseTarget,
+            },
+            "forecastStatus": {
+                "text": recommendation?.forecastStatus,
+            },
+            "dateCriterion": [
+                {
+                    "code": {
+                        "text": "Date vaccine due"
+                    },
+                    "value": dayjs(recommendation?.vaccineDueDate).format('YYYY-MM-DDTHH:mm:ssZ') !== 'Invalid Date' ? dayjs(recommendation?.vaccineDueDate).format('YYYY-MM-DDTHH:mm:ssZ') : ''
+                }
+            ],
+            "description": `category: ${recommendation?.category}`,
+            "doseNumberString": recommendation?.doseNumber.toString(),
+            // "seriesDosesString": "5"
+        }
     }
 }
 
@@ -92,8 +88,10 @@ const createImmunizationRecommendation = (recommendations, patient) => {
         "patient": {
             "reference": `Patient/${patient?.id}`
         },
-        "date": dayjs(Date.now()).utc(),
-        "recommendation": recommendations.map((r) => recommendation(r)),
+        "date": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+        "recommendation": recommendations
+            .filter(recommendation => recommendation)
+            .map((r) => recommendation(r)),
     }
 }
 
