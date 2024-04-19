@@ -48,7 +48,6 @@ function SearchInterfaceWrapper() {
   return <SearchInterface searchType={searchType} />
 }
 
-
 const AuthRoute = ({ element }) => {
   const { user } = useSelector((state) => state.userInfo)
 
@@ -88,6 +87,10 @@ const router = createBrowserRouter([
       },
       {
         path: '/register-client/:clientID',
+        element: <RegisterClient />,
+      },
+      {
+        path: '/register-client',
         element: <RegisterClient />,
       },
       {

@@ -28,8 +28,6 @@ const ConvertObjectToArray = (inputObject) => {
       value: typeof inputObject[key] === 'object' ? dayjs(inputObject[key]).format('DD-MM-YYYY') :  convertCamelCaseString(inputObject[key]),
     };
 
-    console.log({ item })
-
     clientDetails.push(item);
   }
 

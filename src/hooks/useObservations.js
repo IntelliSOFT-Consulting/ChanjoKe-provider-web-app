@@ -3,7 +3,7 @@ import { useApiRequest } from '../api/useApiRequest'
 
 const fhirApi = '/hapi/fhir'
 export default function useObservations() {
-  const { get, post } = useApiRequest()
+  const { get, post, put } = useApiRequest()
   const [observations, setObservations] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -52,6 +52,19 @@ export default function useObservations() {
       },
     }
 
+    if (values.clientID) {
+      const firstObservation = await getFirstObservation(values.clientID)
+      if (firstObservation) {
+        observation.encounter = {
+          reference: `Encounter/${firstObservation.encounter.reference.split('/')[1]}`,
+        }
+
+        observation.id = firstObservation.id
+      }
+
+      return await put(`${fhirApi}/Observation/${observation.id}`, observation)
+    }
+
     return await post(`${fhirApi}/Observation`, observation)
   }
 
@@ -77,6 +90,13 @@ export default function useObservations() {
     return response.entry?.[0]
   }
 
+  const getFirstObservation = async (patientId) => {
+    const response = await get(
+      `${fhirApi}/Observation?patient=Patient/${patientId}&_sort=_lastUpdated`
+    )
+    return response.entry?.[0]?.resource
+  }
+
   return {
     createObservation,
     observations,
@@ -84,5 +104,6 @@ export default function useObservations() {
     error,
     getObservations,
     getLatestObservation,
+    getFirstObservation,
   }
 }

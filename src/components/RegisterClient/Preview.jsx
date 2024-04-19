@@ -1,10 +1,8 @@
 import { Descriptions } from 'antd'
 import { camelToTitle, titleCase } from '../../utils/methods'
-import { useLocations} from '../../hooks/useLocation'
 
-export default function Preview({ form, caregivers, errors }) {
 
-  const { counties } = useLocations(form)
+export default function Preview({ form, caregivers, counties }) {
   const values = form.getFieldsValue()
   const sections = [
     {
