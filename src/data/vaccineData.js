@@ -1,57 +1,68 @@
 import moment from 'moment'
+
 export const routineVaccines = [
   {
     vaccineName: 'BCG',
     vaccineCode: 'IMBCG-I',
+    nhddCode: '10517',
     diseaseTarget: 'Tuberculosis',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
+    description: 'routine',
     adminRange: { start: 0, end: 1794, unit: 'days' },
     dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'bOPV',
     vaccineCode: 'IMPO-bOPV',
+    nhddCode: '54379',
     diseaseTarget: 'Polio',
     doseNumber: '0',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
+    description: 'routine',
     adminRange: { start: 0, end: 1825, unit: 'days' },
     dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'OPV I',
     vaccineCode: 'IMPO-OPV-I',
+    nhddCode: '54379',
     diseaseTarget: 'Polio',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
+    description: 'routine',
     adminRange: { start: 42, end: 42, unit: 'days' },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'DPT-HepB+Hib 1',
     vaccineCode: 'IMDPT-1',
+    nhddCode: '50732',
     diseaseTarget: 'DPT-HepB+Hib 1',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
+    description: 'routine',
     adminRange: { start: 42, end: 1825, unit: 'days' },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'PCV10 1',
     vaccineCode: 'IMPCV10-1',
+    nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
+    description: 'routine',
     adminRange: {
       start: 42,
       end: 1825,
@@ -62,11 +73,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Rotavirus 1',
     vaccineCode: 'IMROTA-1',
+    nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
+    description: 'routine',
     adminRange: {
       start: 42,
       end: 365,
@@ -80,11 +93,13 @@ export const routineVaccines = [
   {
     vaccineName: 'OPV II',
     vaccineCode: 'IMPO-OPV-II',
+    nhddCode: '54379',
     diseaseTarget: 'Polio',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
+    description: 'routine',
     adminRange: {
       start: 70,
       end: 1825,
@@ -106,12 +121,14 @@ export const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 2',
     vaccineCode: 'IMDPT-2',
+    nhddCode: '18035',
     diseaseTarget:
       'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
+    description: 'routine',
     adminRange: {
       start: 70,
       end: 1825,
@@ -133,11 +150,13 @@ export const routineVaccines = [
   {
     vaccineName: 'PCV10 2',
     vaccineCode: 'IMPCV10-2',
+    nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
+    description: 'routine',
     adminRange: {
       start: 70,
       end: 1825,
@@ -159,11 +178,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Rotavirus 2',
     vaccineCode: 'IMROTA-2',
+    nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
+    description: 'routine',
     adminRange: {
       start: 70,
       end: 1825,
@@ -185,11 +206,13 @@ export const routineVaccines = [
   {
     vaccineName: 'OPV III',
     vaccineCode: 'IMPO-OPV-III',
+    nhddCode: '54379',
     diseaseTarget: 'Polio',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
+    description: 'routine',
     adminRange: {
       start: 98,
       end: 1825,
@@ -211,12 +234,14 @@ export const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 3',
     vaccineCode: 'IMDPT-3',
+    nhddCode: '50732',
     diseaseTarget:
       'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
+    description: 'routine',
     adminRange: {
       start: 98,
       end: 1825,
@@ -238,11 +263,13 @@ export const routineVaccines = [
   {
     vaccineName: 'PCV10 3',
     vaccineCode: 'IMPCV10-3',
+    nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
+    description: 'routine',
     adminRange: {
       start: 98,
       end: 1825,
@@ -264,11 +291,13 @@ export const routineVaccines = [
   {
     vaccineName: 'IPV',
     vaccineCode: 'IMPO-IPV I',
+    nhddCode: '3549',
     diseaseTarget: 'Polio',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
+    description: 'routine',
     adminRange: {
       start: 98,
       end: 1825,
@@ -279,11 +308,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Rotavirus 3',
     vaccineCode: 'IMROTA-3',
+    nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
     doseNumber: '3',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
+    description: 'routine',
     adminRange: {
       start: 98,
       end: 1825,
@@ -305,11 +336,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Vitamin A 1st Dose',
     vaccineCode: 'IMVIT-1',
+    nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_months',
+    description: 'routine',
     adminRange: {
       start: 180,
       end: 1825,
@@ -320,11 +353,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Measles-Rubella',
     vaccineCode: 'IMMEAS-0',
+    nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_months',
+    description: 'routine',
     adminRange: {
       start: 180,
       end: 183,
@@ -339,11 +374,13 @@ export const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 1)',
     vaccineCode: 'IMMALA-1',
+    nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_months',
+    description: 'routine',
     adminRange: {
       start: 180,
       end: 1825,
@@ -354,11 +391,13 @@ export const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 2)',
     vaccineCode: 'IMMALA-2',
+    nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '7_months',
+    description: 'routine',
     adminRange: {
       start: 210,
       end: 1825,
@@ -380,11 +419,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Measles-Rubella 1st Dose',
     vaccineCode: 'IMMEAS-1',
+    nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '9_months',
+    description: 'routine',
     adminRange: {
       start: 270,
       end: 5475,
@@ -395,11 +436,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Yellow Fever',
     vaccineCode: 'IMYF-I',
+    nhddCode: '1002',
     diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '9_months',
+    description: 'routine',
     adminRange: {
       start: 270,
       end: 5475,
@@ -410,11 +453,13 @@ export const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 3)',
     vaccineCode: 'IMMALA-3',
+    nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '9_months',
+    description: 'routine',
     adminRange: {
       start: 270,
       end: 1825,
@@ -436,11 +481,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Vitamin A 2nd Dose',
     vaccineCode: 'IMVIT-2',
+    nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '12_months',
+    description: 'routine',
     adminRange: {
       start: 360,
       end: 1825,
@@ -462,11 +509,13 @@ export const routineVaccines = [
   {
     vaccineName: 'Measles-Rubella 2nd Dose',
     vaccineCode: 'IMMEAS-2',
+    nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '18_months',
+    description: 'routine',
     adminRange: {
       start: 540,
       end: 5475,
@@ -488,6 +537,7 @@ export const routineVaccines = [
   {
     vaccineName: 'Vitamin A 3rd Dose',
     vaccineCode: 'IMVIT-3',
+    nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
     occurrenceDateTime: '',
@@ -499,6 +549,7 @@ export const routineVaccines = [
       unit: 'days',
     },
     dependentVaccine: 'IMVIT-2',
+    description: 'routine',
     dependencyPeriod: 180,
     dueDate: (dob, vit2) => {
       const date =
@@ -514,6 +565,7 @@ export const routineVaccines = [
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 4)',
     vaccineCode: 'IMMALA-4',
+    nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
     occurrenceDateTime: '',
@@ -525,6 +577,7 @@ export const routineVaccines = [
       unit: 'days',
     },
     dependentVaccine: 'IMMALA-3',
+    description: 'routine',
     dependencyPeriod: 180,
     dueDate: (dob, malaria3) => {
       const date =
@@ -540,6 +593,7 @@ export const routineVaccines = [
   {
     vaccineName: 'HPV Vaccine 1',
     vaccineCode: 'IMHPV-1',
+    nhddCode: '29659',
     diseaseTarget: 'Human Papillomavirus',
     doseNumber: '1',
     occurrenceDateTime: '',
@@ -558,11 +612,13 @@ export const routineVaccines = [
   {
     vaccineName: 'HPV Vaccine 2',
     vaccineCode: 'IMHPV-2',
+    nhddCode: '29659',
     diseaseTarget: 'Human Papillomarivus',
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10-14_years',
+    description: 'routine',
     adminRange: {
       start: 3650,
       end: 3650,
@@ -587,12 +643,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'AstraZeneca',
     vaccineCode: 'IMCOV-ASTR-1',
+    nhddCode: '16927',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: Infinity,
@@ -602,6 +660,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'AstraZeneca 2nd Dose',
     vaccineCode: 'IMCOV-ASTR-2',
+    nhddCode: '16927',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
@@ -609,6 +668,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-ASTR-1',
+    description: 'non-routine',
     dependencyPeriod: 84,
     adminRange: {
       start: 6570,
@@ -619,12 +679,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Johnson & Johnson',
     vaccineCode: 'IMCOV-JnJ-0',
+    nhddCode: '16927',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: Infinity,
@@ -634,12 +696,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Pfizer/BioNTech 1st Dose',
     vaccineCode: 'IMCOV-PFIZER-1',
+    nhddCode: '16929',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    description: 'non-routine',
     adminRange: {
       start: 4380,
       end: Infinity,
@@ -649,6 +713,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Pfizer/BioNTech 2nd Dose',
     vaccineCode: 'IMCOV-PFIZER-2',
+    nhddCode: '16929',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
@@ -656,6 +721,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-PFIZER-1',
+    description: 'non-routine',
     dependencyPeriod: 28,
     adminRange: {
       start: 4380,
@@ -666,12 +732,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Moderna 1st Dose',
     vaccineCode: 'IMCOV-MOD-1',
+    nhddCode: '16931',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: Infinity,
@@ -681,6 +749,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Moderna 2nd Dose',
     vaccineCode: 'IMCOV-MOD-2',
+    nhddCode: '16931',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '2',
     dueDate: null,
@@ -688,6 +757,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-MOD-1',
+    description: 'non-routine',
     dependencyPeriod: 28,
     adminRange: {
       start: 6570,
@@ -698,12 +768,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Sinopharm 1st Dose',
     vaccineCode: 'IMCOV-SINO-1',
+    nhddCode: '16489',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: 21900,
@@ -713,6 +785,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Sinopharm 2nd Dose',
     vaccineCode: 'IMCOV-SINO-2',
+    nhddCode: '16489',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
@@ -720,6 +793,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-SINO-1',
+    description: 'non-routine',
     dependencyPeriod: 28,
     adminRange: {
       start: 6570,
@@ -730,12 +804,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 1',
     vaccineCode: 'IMTD-1',
+    nhddCode: '50732',
     diseaseTarget: 'Tetanus',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
+    description: 'non-routine',
     adminRange: {
       start: 548,
       end: Infinity,
@@ -745,6 +821,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 2',
     vaccineCode: 'IMTD-2',
+    nhddCode: '50732',
     diseaseTarget: 'Tetanus',
     doseNumber: '2',
     dueDate: null,
@@ -752,6 +829,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-1',
+    description: 'non-routine',
     dependencyPeriod: 30,
     adminRange: {
       start: 588,
@@ -762,6 +840,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 3',
     vaccineCode: 'IMTD-3',
+    nhddCode: '50732',
     diseaseTarget: 'Tetanus',
     doseNumber: '3',
     dueDate: null,
@@ -769,6 +848,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-2',
+    description: 'non-routine',
     dependencyPeriod: 183,
     adminRange: {
       start: 771,
@@ -779,6 +859,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 4',
     vaccineCode: 'IMTD-4',
+    nhddCode: '50732',
     diseaseTarget: 'Tetanus',
     doseNumber: '4',
     dueDate: null,
@@ -786,6 +867,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-3',
+    description: 'non-routine',
     dependencyPeriod: 365,
     adminRange: {
       start: 1136,
@@ -796,6 +878,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 5',
     vaccineCode: 'IMTD-5',
+    nhddCode: '50732',
     diseaseTarget: 'Tetanus',
     doseNumber: '5',
     dueDate: null,
@@ -803,6 +886,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-4',
+    description: 'non-routine',
     dependencyPeriod: 365,
     adminRange: {
       start: 1501,
@@ -813,12 +897,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Yellow Fever',
     vaccineCode: 'IMYF-I',
+    nhddCode: '1002',
     diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'yellow_fever',
+    description: 'non-routine',
     adminRange: {
       start: 273,
       end: Infinity,
@@ -829,12 +915,14 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 1',
     vaccineCode: 'IMRABIES-RABIES-1',
+    nhddCode: '13809',
     diseaseTarget: 'Rabies',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
+    description: 'non-routine',
     adminRange: {
       start: 0,
       end: Infinity,
@@ -844,6 +932,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 2',
     vaccineCode: 'IMRABIES-RABIES-2',
+    nhddCode: '13809',
     diseaseTarget: 'Rabies',
     doseNumber: '3',
     dueDate: null,
@@ -851,6 +940,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-1',
+    description: 'non-routine',
     dependencyPeriod: 3,
     adminRange: {
       start: 3,
@@ -861,6 +951,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 3',
     vaccineCode: 'IMRABIES-RABIES-3',
+    nhddCode: '13809',
     diseaseTarget: 'Rabies',
     doseNumber: '3',
     dueDate: null,
@@ -868,6 +959,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-2',
+    description: 'non-routine',
     dependencyPeriod: 4,
     adminRange: {
       start: 7,
@@ -878,6 +970,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 4',
     vaccineCode: 'IMRABIES-RABIES-4',
+    nhddCode: '13809',
     diseaseTarget: 'Rabies',
     doseNumber: '4',
     dueDate: null,
@@ -885,6 +978,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-3',
+    description: 'non-routine',
     dependencyPeriod: 7,
     adminRange: {
       start: 14,
@@ -895,6 +989,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Rabies 5',
     vaccineCode: 'IMRABIES-RABIES-5',
+    nhddCode: '13809',
     diseaseTarget: 'Rabies',
     doseNumber: '5',
     dueDate: null,
@@ -902,6 +997,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-4',
+    description: 'non-routine',
     dependencyPeriod: 14,
     adminRange: {
       start: 28,
@@ -909,16 +1005,17 @@ export const nonRoutineVaccines = [
       unit: 'days',
     },
   },
-
   {
     vaccineName: 'Influenza 1',
     vaccineCode: 'IMINFLU-1',
+    nhddCode: '6306',
     diseaseTarget: 'Influenza',
     doseNumber: '1',
     dueDate: null,
     occurrenceDateTime: '',
     status: 'upcoming',
     category: 'influenza',
+    description: 'non-routine',
     adminRange: {
       start: 182,
       end: Infinity,
@@ -928,6 +1025,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Influenza 2',
     vaccineCode: 'IMINFLU-2',
+    nhddCode: '6306',
     diseaseTarget: 'Influenza',
     doseNumber: '2',
     dueDate: null,
@@ -935,6 +1033,7 @@ export const nonRoutineVaccines = [
     status: 'upcoming',
     category: 'influenza',
     dependentVaccine: 'IMINFLU-1',
+    description: 'non-routine',
     dependencyPeriod: 122,
     adminRange: {
       start: 304,
