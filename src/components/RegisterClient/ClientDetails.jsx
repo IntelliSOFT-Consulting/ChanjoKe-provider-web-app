@@ -145,13 +145,12 @@ export default function ClientDetails() {
   }
 
   const calculateDob = () => {
-    const { years, months, weeks } = form.getFieldValue()
+    const { years = 0, months = 0, weeks = 0 } = form.getFieldValue()
     const birthDate = generateDateOfBirth({ years, months, weeks })
     form.setFieldValue('dateOfBirth', dayjs(birthDate))
 
     setIsAdult(years >= 18)
 
-    if (!years) return
     const identificationsQualified = identificationOptions.filter(
       (option) => years >= option.minAge && years <= option.maxAge
     )
@@ -560,7 +559,7 @@ export default function ClientDetails() {
                 type="primary"
                 onClick={() => setCurrentStep(currentStep + 1)}
               >
-                Next
+                {currentStep === 3 ? 'Preview' : 'Next'}
               </Button>
             )}
           </div>

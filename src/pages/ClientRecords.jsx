@@ -50,13 +50,13 @@ export default function ClientRecords() {
     }
 
     const clientDetails = {
-      'First Name': data?.name?.[0]?.family,
-      'Last Name': data?.name?.[0]?.given[0],
+      'First Name': data?.name?.[0]?.given[0],
+      'Last Name': data?.name?.[0]?.family,
       'Middle Name': data?.name?.[0]?.given[1],
-      Gender: data?.gender,
+      Gender: titleCase(data?.gender),
       'Date of Birth': moment(data?.birthDate).format('DD-MM-YYYY'),
       'Identification Type': convertCamelCaseString(identificationType),
-      'Identification Number': identificationNumber,
+      'Document Number': identificationNumber,
     }
 
     if (data?.telecom?.[0]?.value) {
