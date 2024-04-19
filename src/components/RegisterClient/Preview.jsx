@@ -1,9 +1,16 @@
 import { Descriptions } from 'antd'
 import { camelToTitle, titleCase } from '../../utils/methods'
 
-
+const defaultCaregiver = {
+  caregiverType: '',
+  caregiverName: '',
+  phoneNumber: '',
+}
 export default function Preview({ form, caregivers, counties }) {
   const values = form.getFieldsValue()
+  if (caregivers?.length === 0) {
+    caregivers = [defaultCaregiver]
+  }
   const sections = [
     {
       title: 'Client Details',
@@ -13,16 +20,16 @@ export default function Preview({ form, caregivers, counties }) {
           value: values.firstName,
         },
         {
-          label: 'Last Name',
-          value: values.lastName,
-        },
-        {
           label: 'Middle Name',
           value: values.middleName,
         },
         {
+          label: 'Last Name',
+          value: values.lastName,
+        },
+        {
           label: 'Gender',
-          value: values.gender,
+          value: titleCase(values.gender),
         },
         {
           label: 'Age',
@@ -33,7 +40,7 @@ export default function Preview({ form, caregivers, counties }) {
           value: titleCase(values.identificationType?.replace(/_/g, ' ')),
         },
         {
-          label: 'ID Number',
+          label: 'Document Number',
           value: values.identificationNumber,
         },
       ],
@@ -41,11 +48,14 @@ export default function Preview({ form, caregivers, counties }) {
     {
       title: 'Caregiver Details',
       data: caregivers.map((caregiver, index) => {
-        const labels = Object.keys(caregiver)
+        const labels = ['caregiverType', 'caregiverName', 'phoneNumber']
         return labels.map((label) => {
           return {
             label: camelToTitle(label),
-            value: caregiver[label],
+            value:
+              label === 'phoneNumber' && caregiver[label]
+                ? `${caregiver.phoneCode}${caregiver[label]}`
+                : caregiver[label],
           }
         })
       }),
@@ -55,7 +65,7 @@ export default function Preview({ form, caregivers, counties }) {
       title: 'Administrative Area',
       data: [
         {
-          label: 'Residence of child - County',
+          label: 'County of Residence',
           value: counties.find((county) => county.key === values.county)?.name,
         },
         {
@@ -79,7 +89,7 @@ export default function Preview({ form, caregivers, counties }) {
   ]
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6'>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6">
       {sections.map((section) => (
         <Descriptions
           key={section.title}
@@ -91,13 +101,21 @@ export default function Preview({ form, caregivers, counties }) {
           {section.data.map((item) => {
             if (Array.isArray(item)) {
               return item.map((subItem) => (
-                <Descriptions.Item key={subItem.label} label={subItem.label}>
+                <Descriptions.Item
+                  key={subItem.label}
+                  label={
+                    <b className="text-black font-semibold">{subItem.label}</b>
+                  }
+                >
                   {subItem.value}
                 </Descriptions.Item>
               ))
             }
             return (
-              <Descriptions.Item key={item.label} label={item.label}>
+              <Descriptions.Item
+                key={item.label}
+                label={<b className="text-black font-semibold">{item.label}</b>}
+              >
                 {item.value}
               </Descriptions.Item>
             )

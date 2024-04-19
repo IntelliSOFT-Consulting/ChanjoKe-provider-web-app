@@ -7,6 +7,11 @@ import { titleCase } from '../../utils/methods'
 export default function CaregiverDetails({ setCaregivers, caregivers }) {
   const [form] = Form.useForm()
 
+  const handleEdit = (record) => {
+    form.setFieldsValue(record)
+    setCaregivers(caregivers.filter((item) => item !== record))
+  }
+
   const columns = [
     {
       title: 'Caregiver Type',
@@ -33,15 +38,25 @@ export default function CaregiverDetails({ setCaregivers, caregivers }) {
       title: 'Action',
       key: 'action',
       render: (text, record) => (
-        <Button
-          type="link"
-          danger
-          onClick={() =>
-            setCaregivers(caregivers.filter((item) => item !== record))
-          }
-        >
-          Remove
-        </Button>
+        <div>
+          <Button
+            type="link"
+            className="px-0"
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
+          <Button
+            type="link"
+            className="px-0 ml-2"
+            danger
+            onClick={() =>
+              setCaregivers(caregivers.filter((item) => item !== record))
+            }
+          >
+            Remove
+          </Button>
+        </div>
       ),
     },
   ]

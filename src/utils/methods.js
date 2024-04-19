@@ -98,10 +98,17 @@ export const titleCase = (str) => {
   return str
     ?.toLowerCase()
     ?.split(' ')
-    ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    ?.map((word) =>
+      word
+        .split('-')
+        .map((subWord) => subWord.charAt(0)?.toUpperCase() + subWord.slice(1))
+        .join('-')
+    )
     .join(' ')
 }
 
 export const camelToTitle = (str) => {
-  return str?.replace(/([A-Z])/g, ' $1')?.replace(/^./, (str) => str.toUpperCase())
+  return str
+    ?.replace(/([A-Z])/g, ' $1')
+    ?.replace(/^./, (str) => str?.toUpperCase())
 }

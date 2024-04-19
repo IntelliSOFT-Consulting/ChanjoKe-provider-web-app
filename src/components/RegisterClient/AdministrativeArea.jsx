@@ -14,7 +14,7 @@ export default function AdministrativeArea({
       <h3 className="text-xl font-medium">Administrative Area</h3>
       <div className="grid mt-5 grid-cols-3 gap-10">
         <Form.Item
-          label="Select County"
+          label="County of Residence"
           name="county"
           rules={[{ required: true, message: 'Please select a county' }]}
         >
@@ -35,7 +35,7 @@ export default function AdministrativeArea({
         </Form.Item>
 
         <Form.Item
-          label="Select Subcounty"
+          label="Subcounty"
           name="subCounty"
           rules={[{ required: true, message: 'Please select a subcounty' }]}
         >

@@ -62,7 +62,8 @@ export default function PreloadDetails({
       return {
         caregiverType: caregiver.relationship[0].coding?.[0]?.display,
         caregiverName: caregiver.name?.text,
-        phoneNumber: `${caregiver.telecom[0].value?.slice(0, -9) || '+254'}${caregiver.telecom[0].value?.slice(-9)}`,
+        phoneCode: caregiver.telecom[0].value?.slice(0, -9) || '+254',
+        phoneNumber: caregiver.telecom[0].value?.slice(-9),
       }
     })
 
