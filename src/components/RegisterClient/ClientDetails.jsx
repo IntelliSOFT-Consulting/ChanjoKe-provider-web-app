@@ -1,5 +1,5 @@
 import LoadingArrows from '../../common/spinners/LoadingArrows'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import moment from 'moment'
 import dayjs from 'dayjs'
 import weekdays from 'dayjs/plugin/weekday'
@@ -14,7 +14,7 @@ import {
   Select,
   Alert,
 } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   calculateAges,
   generateDateOfBirth,
@@ -30,15 +30,16 @@ import useEncounter from '../../hooks/useEncounter'
 import useObservations from '../../hooks/useObservations'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import { countryCodes } from '../../data/countryCodes'
+import { useLocations } from '../../hooks/useLocation'
 import Preview from './Preview'
+import PreloadDetails from './PreloadDetails'
 
 dayjs.extend(weekdays)
 dayjs.extend(localeDate)
 
-export default function ClientDetails({ editClientDetails, setClientDetails }) {
+export default function ClientDetails() {
   const [isAdult, setIsAdult] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [idOptions, setIdOptions] = useState([])
   const [caregivers, setCaregivers] = useState([])
   const [isDocumentTypeSelected, setIsDocumentTypeSelected] = useState(false)
@@ -48,23 +49,45 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
   const [errors, setErrors] = useState(null)
 
   const [form] = Form.useForm()
+  const { clientID } = useParams()
 
   const { user } = useSelector((state) => state.userInfo)
+
+  useEffect(() => {
+    if (clientID) {
+      setIsDocumentTypeSelected(true)
+    }
+  }, [])
 
   const navigate = useNavigate()
 
   const { createPatient } = usePatient()
   const { createEncounter } = useEncounter()
   const { createObservation } = useObservations()
+  const {
+    counties,
+    subCounties,
+    wards,
+    handleCountyChange,
+    handleSubCountyChange,
+    handleWardChange,
 
-  // useEffect(() => {
-  //   if (editClientDetails) {
-  //     form.setFieldsValue(editClientDetails)
-  //   }
-  //   setLoading(false)
-  // }, [editClientDetails])
+  } = useLocations(form)
+  const { loading } = PreloadDetails({
+    form,
+    setCaregivers,
+    patientId: clientID,
+    setIdOptions,
+    setIsAdult,
+    counties,
+    subCounties,
+    wards,
+    handleCountyChange,
+    handleSubCountyChange,
+    handleWardChange,
 
-  // validate the form and set errors in case of any validation errors with the failing field error messages
+  })
+
   const validateForm = async () => {
     try {
       await form.validateFields()
@@ -91,20 +114,25 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
       return
     }
     values.caregivers = caregivers
+    values.countyName = counties?.find((county) => county.key === values.county)?.name
+    values.clientID = clientID
     const patient = await createPatient(values)
-    const encounter = await createEncounter(
-      patient.id,
-      user?.fhirPractitionerId,
-      user?.facility?.replace('Location/', '')
-    )
-    await createObservation(values, patient.id, encounter.id)
+
+    let encounter;
+    if (!clientID) {
+      encounter = await createEncounter(
+        patient.id,
+        user?.fhirPractitionerId,
+        user?.facility?.replace('Location/', '')
+      )
+    }
+    await createObservation(values, patient.id, encounter?.id)
 
     setSaving(false)
 
     setSuccess(true)
 
     const timeout = setTimeout(() => {
-      setClientDetails(patient)
       navigate(`/client-details/${patient.id}`)
     }, 1500)
 
@@ -155,7 +183,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           autoComplete="off"
           validateTrigger="onBlur"
           form={form}
-          initialValues={{ age: 0, phoneCode: '+254', ...editClientDetails }}
+          initialValues={{ age: 0, phoneCode: '+254' }}
         >
           <div className={currentStep === 1 ? 'block' : 'hidden'}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10">
@@ -432,15 +460,14 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 />
               </Form.Item>
 
-              <div className='md:col-span-3 w-full border-t my-4'/>
+              <div className="md:col-span-3 w-full border-t my-4" />
 
               <Form.Item
-
                 name="currentWeight"
                 size="large"
                 label="Current Weight"
                 rules={[]}
-                className='col-span-2'
+                className="col-span-2"
               >
                 <Input
                   placeholder="Current Weight"
@@ -471,16 +498,26 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           </div>
 
           <div className={currentStep === 3 ? 'block px-6' : 'hidden'}>
-            <AdministrativeArea form={form} capitalize={capitalize} />
+            <AdministrativeArea form={form} capitalize={capitalize}  counties={counties}
+            subCounties={subCounties}
+            wards={wards}
+            handleCountyChange={handleCountyChange}
+            handleSubCountyChange={handleSubCountyChange}
+            handleWardChange={handleWardChange} />
           </div>
 
           <div className={currentStep === 4 ? 'block px-6' : 'hidden'}>
-            <Preview form={form} errors={errors} caregivers={caregivers} />
+            <Preview
+              form={form}
+              errors={errors}
+              caregivers={caregivers}
+              counties={counties}
+            />
           </div>
 
           {errors && (
             <Alert
-              className='mt-6'
+              className="mt-6"
               message="Please provide the following information:"
               description={titleCase(errors)}
               type="error"

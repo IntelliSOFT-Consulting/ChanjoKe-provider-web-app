@@ -60,13 +60,19 @@ export default function usePatient() {
       address: [
         {
           use: 'home',
-          line: [data.estateOrHouseNo],
+          line: [
+            data.countyName,
+            data.subCounty,
+            data.ward,
+            data.townCenter,
+            data.estateOrHouseNo,
+          ]?.filter(Boolean),
           type: 'both',
           district: data.county,
           subdistrict: data.subCounty,
           township: data.ward,
           city: data.townCenter,
-          text: `${data.estateOrHouseNo}, ${data.townCenter}, ${data.ward}, ${data.subCounty}, ${data.county}`,
+          text: [data.estateOrHouseNo, data.townCenter, data.ward, data.subCounty, data.county]?.filter(Boolean).join(', '),
         },
       ],
       contact: data.caregivers.map((caregiver) => {
@@ -99,6 +105,16 @@ export default function usePatient() {
         }
       }),
     }
+
+    if (data.clientID) {
+      patientResource.id = data.clientID
+
+      return await put(
+        `${fhirEndpoint}/Patient/${data.clientID}`,
+        patientResource
+      )
+    }
+
     return await post(`${fhirEndpoint}/Patient`, patientResource)
   }
 

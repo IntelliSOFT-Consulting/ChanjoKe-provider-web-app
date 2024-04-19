@@ -1,16 +1,14 @@
-import { useLocations } from '../../hooks/useLocation'
 import { Form, Input, Select } from 'antd'
 
-export default function AdministrativeArea({ form, capitalize }) {
-  const {
-    counties,
-    subCounties,
-    wards,
-    handleCountyChange,
-    handleSubCountyChange,
-    handleWardChange,
-  } = useLocations(form)
-
+export default function AdministrativeArea({
+  capitalize,
+  counties,
+  subCounties,
+  wards,
+  handleCountyChange,
+  handleSubCountyChange,
+  handleWardChange,
+}) {
   return (
     <>
       <h3 className="text-xl font-medium">Administrative Area</h3>
@@ -23,7 +21,7 @@ export default function AdministrativeArea({ form, capitalize }) {
           <Select
             placeholder="Select County"
             onChange={handleCountyChange}
-            options={counties.map((county) => ({
+            options={counties?.map((county) => ({
               value: county.key,
               label: county.name,
             }))}
@@ -44,7 +42,7 @@ export default function AdministrativeArea({ form, capitalize }) {
           <Select
             placeholder="Select Subcounty"
             onChange={handleSubCountyChange}
-            options={subCounties.map((subCounty) => ({
+            options={subCounties?.map((subCounty) => ({
               value: subCounty.key,
               label: subCounty.name,
             }))}
@@ -64,7 +62,7 @@ export default function AdministrativeArea({ form, capitalize }) {
         >
           <Select
             placeholder="Select a Ward"
-            options={wards.map((ward) => ({
+            options={wards?.map((ward) => ({
               value: ward.key,
               label: ward.name,
             }))}
