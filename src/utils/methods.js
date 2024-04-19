@@ -93,3 +93,15 @@ export const generateUniqueCode = (length) => {
     characters.charAt(Math.floor(Math.random() * characters.length))
   ).join('')
 }
+
+export const titleCase = (str) => {
+  return str
+    ?.toLowerCase()
+    ?.split(' ')
+    ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+export const camelToTitle = (str) => {
+  return str?.replace(/([A-Z])/g, ' $1')?.replace(/^./, (str) => str.toUpperCase())
+}

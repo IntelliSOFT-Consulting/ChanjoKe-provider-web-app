@@ -1,7 +1,7 @@
 import { useLocations } from '../../hooks/useLocation'
 import { Form, Input, Select } from 'antd'
 
-export default function AdministrativeArea({ form }) {
+export default function AdministrativeArea({ form, capitalize }) {
   const {
     counties,
     subCounties,
@@ -27,7 +27,7 @@ export default function AdministrativeArea({ form }) {
               value: county.key,
               label: county.name,
             }))}
-            size='large'
+            size="large"
             allowClear
             showSearch
             filterOption={(input, option) =>
@@ -48,7 +48,7 @@ export default function AdministrativeArea({ form }) {
               value: subCounty.key,
               label: subCounty.name,
             }))}
-            size='large'
+            size="large"
             allowClear
             showSearch
             filterOption={(input, option) =>
@@ -69,7 +69,7 @@ export default function AdministrativeArea({ form }) {
               label: ward.name,
             }))}
             onChange={handleWardChange}
-            size='large'
+            size="large"
             allowClear
             showSearch
             filterOption={(input, option) =>
@@ -79,11 +79,19 @@ export default function AdministrativeArea({ form }) {
         </Form.Item>
 
         <Form.Item name="townCenter" label="Town/Trading Center">
-          <Input size='large' placeholder="eg Elgeyo Marakwet Market" />
+          <Input
+            size="large"
+            placeholder="eg Elgeyo Marakwet Market"
+            onBlur={() => capitalize('townCenter')}
+          />
         </Form.Item>
 
         <Form.Item name="estateOrHouseNo" label="Estate & House Number/Village">
-          <Input size='large' placeholder="eg Jamii House, House Number 14" />
+          <Input
+            size="large"
+            placeholder="eg Jamii House, House Number 14"
+            onBlur={() => capitalize('estateOrHouseNo')}
+          />
         </Form.Item>
       </div>
     </>

@@ -17,6 +17,7 @@ export default function usePatient() {
               {
                 system: 'http://hl7.org/fhir/administrative-identifier',
                 code: data.identificationType?.toLowerCase(),
+                display: data.identificationType,
                 value: data.identificationType,
               },
             ],
@@ -51,7 +52,7 @@ export default function usePatient() {
       telecom: [
         {
           system: 'phone',
-          value: `${data.phoneCode}${data.phoneNumber}`,
+          value: data.phoneNumber ? `${data.phoneCode}${data.phoneNumber}` : '',
         },
       ],
       gender: data.gender,
@@ -68,7 +69,7 @@ export default function usePatient() {
           text: `${data.estateOrHouseNo}, ${data.townCenter}, ${data.ward}, ${data.subCounty}, ${data.county}`,
         },
       ],
-      contact: data.caregiver.map((caregiver) => {
+      contact: data.caregivers.map((caregiver) => {
         return {
           relationship: [
             {
@@ -90,7 +91,9 @@ export default function usePatient() {
           telecom: [
             {
               system: 'phone',
-              value: `${caregiver.phoneCode}${caregiver.phoneNumber}`,
+              value: caregiver.phoneNumber
+                ? `${caregiver.phoneCode}${caregiver.phoneNumber}`
+                : '',
             },
           ],
         }
