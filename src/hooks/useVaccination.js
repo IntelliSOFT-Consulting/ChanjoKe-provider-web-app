@@ -115,9 +115,8 @@ export default function useVaccination() {
     await post(fhirEndpoint, recommendations)
   }
 
-  const updateRecommendations = async (patient) => {
-    const recommendations = formatRecommendationsToFHIR(patient)
-    await put(fhirEndpoint, recommendations)
+  const updateRecommendations = async (recommendation) => {
+    await put(`${fhirEndpoint}/${recommendation.id}`, recommendation)
   }
 
   const getRecommendations = async (patient) => {
