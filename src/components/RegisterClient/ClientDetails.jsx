@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   calculateAges,
   generateDateOfBirth,
+  titleCase,
   writeAge,
 } from '../../utils/methods'
 import CaregiverDetails from './CareGiverDetails'
@@ -29,26 +30,18 @@ import useEncounter from '../../hooks/useEncounter'
 import useObservations from '../../hooks/useObservations'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import { countryCodes } from '../../data/countryCodes'
+import Preview from './Preview'
 
 dayjs.extend(weekdays)
 dayjs.extend(localeDate)
-
-function daysBetweenTodayAndDate(inputDate) {
-  const currentDate = new Date()
-  const targetDate = new Date(inputDate)
-  const timeDifference = targetDate - currentDate
-  const daysDifference = Math.ceil(
-    Math.abs(timeDifference) / (1000 * 60 * 60 * 24)
-  )
-
-  return daysDifference
-}
 
 export default function ClientDetails({ editClientDetails, setClientDetails }) {
   const [isAdult, setIsAdult] = useState(false)
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(false)
   const [idOptions, setIdOptions] = useState([])
+  const [caregivers, setCaregivers] = useState([])
+  const [isDocumentTypeSelected, setIsDocumentTypeSelected] = useState(false)
   const [estimatedAge, setEstimatedAge] = useState(true)
   const [currentStep, setCurrentStep] = useState(1)
   const [success, setSuccess] = useState(false)
@@ -92,6 +85,12 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
 
   const onFinish = async (values) => {
     setSaving(true)
+    if (caregivers.length === 0) {
+      setErrors('Please add at least one caregiver')
+      setSaving(false)
+      return
+    }
+    values.caregivers = caregivers
     const patient = await createPatient(values)
     const encounter = await createEncounter(
       patient.id,
@@ -127,17 +126,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
     setIdOptions(identificationsQualified)
   }
 
+  const capitalize = (name) => {
+    const value = form.getFieldValue(name)
+    if (value) form.setFieldValue(name, titleCase(value))
+  }
+
   return (
     <>
-      {errors && (
-        <Alert
-          message="Please provide the following information:"
-          description={errors}
-          type="error"
-          closable
-          onClose={() => setErrors(null)}
-        />
-      )}
       {currentStep === 1 && (
         <h3 className="text-xl font-medium mb-6">Client Details</h3>
       )}
@@ -160,17 +155,13 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           autoComplete="off"
           validateTrigger="onBlur"
           form={form}
-          initialValues={{ age: 0, ...editClientDetails }}
+          initialValues={{ age: 0, phoneCode: '+254', ...editClientDetails }}
         >
           <div className={currentStep === 1 ? 'block' : 'hidden'}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10">
               <Form.Item
                 name="firstName"
-                label={
-                  <div>
-                    <span className="font-bold">First Name</span>
-                  </div>
-                }
+                label="First Name"
                 rules={[
                   {
                     required: true,
@@ -181,33 +172,23 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 <Input
                   placeholder="First Name"
                   autoComplete="off"
-                  className="block w-full rounded-md py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400"
+                  onBlur={() => capitalize('firstName')}
+                  size="large"
                 />
               </Form.Item>
 
-              <Form.Item
-                name="middleName"
-                label={
-                  <div>
-                    <span className="font-bold">Middle Name</span>
-                  </div>
-                }
-                rules={[]}
-              >
+              <Form.Item name="middleName" label="Middle Name">
                 <Input
                   placeholder="Middle Name"
                   autoComplete="off"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                  onBlur={() => capitalize('middleName')}
+                  size="large"
                 />
               </Form.Item>
 
               <Form.Item
                 name="lastName"
-                label={
-                  <div>
-                    <span className="font-bold">Last Name</span>
-                  </div>
-                }
+                label="Last Name"
                 rules={[
                   {
                     required: true,
@@ -218,18 +199,15 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 <Input
                   placeholder="Last Name"
                   autoComplete="off"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                  onBlur={() => capitalize('lastName')}
+                  size="large"
                 />
               </Form.Item>
 
               <div>
                 <Form.Item
                   name="gender"
-                  label={
-                    <div>
-                      <span className="font-bold">Gender</span>
-                    </div>
-                  }
+                  label="Gender"
                   rules={[
                     {
                       required: true,
@@ -373,7 +351,6 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                     {
                       validator: (_, value) => {
                         if (value) {
-                          //   validate 9 digit phone number (no country code and numeric)
                           if (!/^\d{9}$/.test(value)) {
                             return Promise.reject('Invalid phone number')
                           }
@@ -391,13 +368,11 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                           style={{ width: 120 }}
                           showSearch
                           options={countryCodes}
-                          defaultValue={'+254'}
                           filterOption={(input, option) =>
                             option.label
                               .toLowerCase()
                               .indexOf(input.toLowerCase()) >= 0
                           }
-                          placeholder="Code"
                         />
                       </Form.Item>
                     }
@@ -415,10 +390,26 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 </Form.Item>
               )}
 
-              <Form.Item name="identificationType" label="Identification Type">
+              <Form.Item
+                name="identificationType"
+                label="Identification Type"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select identification type',
+                  },
+                ]}
+              >
                 <Select
                   size="large"
                   disabled={idOptions.length === 0}
+                  onChange={(value) => {
+                    if (value) {
+                      setIsDocumentTypeSelected(true)
+                    } else {
+                      setIsDocumentTypeSelected(false)
+                    }
+                  }}
                   options={idOptions}
                 />
               </Form.Item>
@@ -429,22 +420,27 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 rules={[
                   {
                     required: true,
-                    message: 'Please input identifier',
+                    message: 'Please input identifier number',
                   },
                 ]}
               >
                 <Input
+                  disabled={!isDocumentTypeSelected || idOptions.length === 0}
                   placeholder="Document Identification Number"
                   autoComplete="off"
                   className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
                 />
               </Form.Item>
 
+              <div className='md:col-span-3 w-full border-t my-4'/>
+
               <Form.Item
+
                 name="currentWeight"
                 size="large"
                 label="Current Weight"
                 rules={[]}
+                className='col-span-2'
               >
                 <Input
                   placeholder="Current Weight"
@@ -468,12 +464,30 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
           </div>
 
           <div className={currentStep === 2 ? 'block px-6' : 'hidden'}>
-            <CaregiverDetails form={form} />
+            <CaregiverDetails
+              caregivers={caregivers}
+              setCaregivers={setCaregivers}
+            />
           </div>
 
           <div className={currentStep === 3 ? 'block px-6' : 'hidden'}>
-            <AdministrativeArea form={form} />
+            <AdministrativeArea form={form} capitalize={capitalize} />
           </div>
+
+          <div className={currentStep === 4 ? 'block px-6' : 'hidden'}>
+            <Preview form={form} errors={errors} caregivers={caregivers} />
+          </div>
+
+          {errors && (
+            <Alert
+              className='mt-6'
+              message="Please provide the following information:"
+              description={titleCase(errors)}
+              type="error"
+              closable
+              onClose={() => setErrors(null)}
+            />
+          )}
 
           <div className="px-4 py-4 sm:px-6 flex justify-end">
             {currentStep > 1 && (
@@ -484,7 +498,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 Back
               </Button>
             )}
-            {currentStep === 3 && (
+            {currentStep === 4 && (
               <Button
                 type="primary"
                 // htmlType="submit"
@@ -495,7 +509,7 @@ export default function ClientDetails({ editClientDetails, setClientDetails }) {
                 Submit
               </Button>
             )}
-            {currentStep < 3 && (
+            {currentStep < 4 && (
               <Button
                 type="primary"
                 onClick={() => setCurrentStep(currentStep + 1)}
