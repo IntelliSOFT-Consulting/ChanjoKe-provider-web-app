@@ -4,8 +4,7 @@ import { countryCodes } from '../../data/countryCodes'
 import Table from '../DataTable'
 import { titleCase } from '../../utils/methods'
 
-export default function CaregiverDetails({ setCaregivers, caregivers }) {
-  const [form] = Form.useForm()
+export default function CaregiverDetails({ setCaregivers, caregivers, form, setDraftCaregiver }) {
 
   const handleEdit = (record) => {
     form.setFieldsValue(record)
@@ -64,7 +63,6 @@ export default function CaregiverDetails({ setCaregivers, caregivers }) {
   return (
     <div>
       <h3 className="text-xl font-medium mb-6">Caregiver Details</h3>
-
       <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
         <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           <Form.Item
@@ -83,6 +81,7 @@ export default function CaregiverDetails({ setCaregivers, caregivers }) {
               options={caregiverTypes}
               showSearch
               searchable
+              allowClear
             />
           </Form.Item>
 
@@ -154,6 +153,7 @@ export default function CaregiverDetails({ setCaregivers, caregivers }) {
                 .then((values) => {
                   setCaregivers([...caregivers, values])
                   form.resetFields()
+                  setDraftCaregiver(false)
                 })
                 .catch((errorInfo) => {
                   console.log('Failed:', errorInfo)
