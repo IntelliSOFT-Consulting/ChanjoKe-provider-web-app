@@ -13,6 +13,7 @@ import {
   Radio,
   Select,
   Alert,
+  Tooltip,
 } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
@@ -45,11 +46,15 @@ export default function ClientDetails() {
   const [caregivers, setCaregivers] = useState([])
   const [isDocumentTypeSelected, setIsDocumentTypeSelected] = useState(false)
   const [estimatedAge, setEstimatedAge] = useState(true)
+  const [draftCaregiver, setDraftCaregiver] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [success, setSuccess] = useState(false)
   const [errors, setErrors] = useState(null)
 
   const [form] = Form.useForm()
+
+  const [caregiverForm] = Form.useForm()
+
   const { clientID } = useParams()
 
   const { user } = useSelector((state) => state.userInfo)
@@ -498,6 +503,8 @@ export default function ClientDetails() {
             <CaregiverDetails
               caregivers={caregivers}
               setCaregivers={setCaregivers}
+              form={caregiverForm}
+              setDraftCaregiver={setDraftCaregiver}
             />
           </div>
 
@@ -555,12 +562,33 @@ export default function ClientDetails() {
               </Button>
             )}
             {currentStep < 4 && (
-              <Button
-                type="primary"
-                onClick={() => setCurrentStep(currentStep + 1)}
+              <Tooltip
+                title={
+                  draftCaregiver
+                    ? 'Please add the draft caregiver details to proceed.'
+                    : ''
+                }
               >
-                {currentStep === 3 ? 'Preview' : 'Next'}
-              </Button>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    if (currentStep === 2) {
+                      const caregiverData = caregiverForm.getFieldsValue()
+                      delete caregiverData['phoneCode']
+                      const caregiverValues = Object.values(caregiverData)
+                      const isEmpty = caregiverValues.every((value) => !value)
+                      if (!isEmpty) {
+                        setDraftCaregiver(true)
+                        return
+                      }
+                      setDraftCaregiver(false)
+                    }
+                    setCurrentStep(currentStep + 1)
+                  }}
+                >
+                  {currentStep === 3 ? 'Preview' : 'Next'}
+                </Button>
+              </Tooltip>
             )}
           </div>
         </Form>
