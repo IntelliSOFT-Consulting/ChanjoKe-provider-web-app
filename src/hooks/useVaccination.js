@@ -39,9 +39,6 @@ export default function useVaccination() {
         reference: `Patient/${patient.id}`,
       },
       date: moment().format('YYYY-MM-DD'),
-      authority: {
-        reference: user?.facility,
-      },
       recommendation: recommendations.map((recommendation) => {
         let dueDays =
           getAgeInUnits(patient.birthDate, 'days') +
@@ -54,26 +51,25 @@ export default function useVaccination() {
           recommendation.dependencyPeriod
         ) {
           const dependentVaccine = recommendations.find(
-            (vaccine) => vaccine.code === recommendation.dependentVaccine
+            (vaccine) => vaccine.vaccineCode === recommendation.dependentVaccine
           )
           const dependentVaccineDueDate =
             getAgeInUnits(patient.birthDate, 'days') +
-            dependentVaccine.adminRange.start
+            dependentVaccine?.adminRange?.start
           dueDays = dependentVaccineDueDate + recommendation.dependencyPeriod
           dueDate = moment(patient.birthDate)
             .add(dueDays, 'days')
             .format('YYYY-MM-DD')
         }
-
         return {
-          date: moment().format('YYYY-MM-DD'),
           vaccineCode: {
             coding: [
               {
-                code: recommendation.vaccineName,
+                code: recommendation.nhddCode,
                 display: recommendation.vaccineCode,
               },
             ],
+            text: recommendation.vaccineCode,
           },
           targetDisease: [
             {
@@ -83,6 +79,7 @@ export default function useVaccination() {
                   display: recommendation.diseaseTarget,
                 },
               ],
+              text: recommendation.diseaseTarget,
             },
           ],
           forecastStatus: {
@@ -106,11 +103,8 @@ export default function useVaccination() {
               value: dueDate,
             },
           ],
-          seriesDoses: recommendations.filter(
-            (item) =>
-              item.vaccineCode.slice(0, -1) ===
-              recommendation.vaccineCode.slice(0, -1)
-          ),
+          series: recommendation.category,
+          description: recommendation.description,
         }
       }),
     }

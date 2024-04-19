@@ -33,6 +33,7 @@ import { countryCodes } from '../../data/countryCodes'
 import { useLocations } from '../../hooks/useLocation'
 import Preview from './Preview'
 import PreloadDetails from './PreloadDetails'
+import useVaccination from '../../hooks/useVaccination'
 
 dayjs.extend(weekdays)
 dayjs.extend(localeDate)
@@ -71,7 +72,6 @@ export default function ClientDetails() {
     handleCountyChange,
     handleSubCountyChange,
     handleWardChange,
-
   } = useLocations(form)
   const { loading } = PreloadDetails({
     form,
@@ -85,8 +85,9 @@ export default function ClientDetails() {
     handleCountyChange,
     handleSubCountyChange,
     handleWardChange,
-
   })
+
+  const { createRecommendations } = useVaccination()
 
   const validateForm = async () => {
     try {
@@ -114,17 +115,21 @@ export default function ClientDetails() {
       return
     }
     values.caregivers = caregivers
-    values.countyName = counties?.find((county) => county.key === values.county)?.name
+    values.countyName = counties?.find(
+      (county) => county.key === values.county
+    )?.name
     values.clientID = clientID
     const patient = await createPatient(values)
 
-    let encounter;
+    let encounter
     if (!clientID) {
       encounter = await createEncounter(
         patient.id,
         user?.fhirPractitionerId,
         user?.facility?.replace('Location/', '')
       )
+
+      await createRecommendations(patient)
     }
     await createObservation(values, patient.id, encounter?.id)
 
@@ -498,12 +503,16 @@ export default function ClientDetails() {
           </div>
 
           <div className={currentStep === 3 ? 'block px-6' : 'hidden'}>
-            <AdministrativeArea form={form} capitalize={capitalize}  counties={counties}
-            subCounties={subCounties}
-            wards={wards}
-            handleCountyChange={handleCountyChange}
-            handleSubCountyChange={handleSubCountyChange}
-            handleWardChange={handleWardChange} />
+            <AdministrativeArea
+              form={form}
+              capitalize={capitalize}
+              counties={counties}
+              subCounties={subCounties}
+              wards={wards}
+              handleCountyChange={handleCountyChange}
+              handleSubCountyChange={handleSubCountyChange}
+              handleWardChange={handleWardChange}
+            />
           </div>
 
           <div className={currentStep === 4 ? 'block px-6' : 'hidden'}>
