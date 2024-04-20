@@ -6,7 +6,7 @@ const defaultCaregiver = {
   caregiverName: '',
   phoneNumber: '',
 }
-export default function Preview({ form, caregivers, counties }) {
+export default function Preview({ form, caregivers, counties, caregiverType }) {
   const values = form.getFieldsValue()
   if (caregivers?.length === 0) {
     caregivers = [defaultCaregiver]
@@ -46,12 +46,12 @@ export default function Preview({ form, caregivers, counties }) {
       ],
     },
     {
-      title: 'Caregiver Details',
+      title: `${caregiverType()} Details`,
       data: caregivers.map((caregiver, index) => {
         const labels = ['caregiverType', 'caregiverName', 'phoneNumber']
         return labels.map((label) => {
           return {
-            label: camelToTitle(label),
+            label: camelToTitle(label)?.replace('Caregiver', caregiverType()),
             value:
               label === 'phoneNumber' && caregiver[label]
                 ? `${caregiver.phoneCode}${caregiver[label]}`

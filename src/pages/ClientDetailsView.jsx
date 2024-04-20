@@ -1,9 +1,9 @@
 import SelectDialog from '../common/dialog/SelectDialog'
 import BaseTabs from '../common/tabs/BaseTabs'
-import SearchTable from '../common/tables/SearchTable'
+import Table from '../components/DataTable'
 import { useEffect, useState } from 'react'
 import useGet from '../api/useGet'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import calculateAge from '../utils/calculateAge'
 import LoadingArrows from '../common/spinners/LoadingArrows'
 import classifyUserByAge from '../components/ClientDetailsView/classifyUserByAge'
@@ -21,11 +21,9 @@ export default function ClientDetailsView() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { data, loading, error } = useGet(`Patient/${clientID}`)
-  const {
-    data: immunizationData,
-    loading: immunizationLoading,
-    error: immunizationE,
-  } = useGet(`Immunization?patient=Patient/${clientID}`)
+  const { data: immunizationData } = useGet(
+    `Immunization?patient=Patient/${clientID}`
+  )
   const { data: immunizationRecommendation } = useGet(
     `ImmunizationRecommendation?patient=Patient/${clientID}`
   )
@@ -50,9 +48,11 @@ export default function ClientDetailsView() {
     setDialogOpen(false)
   }
 
+  console.log('clientDetails', patientData)
+
   const stats = [
     {
-      name: `${patientData?.name?.[0]?.family || ''} ${patientData?.name?.[0]?.given[1] || ''} ${patientData?.name?.[0]?.given[0] || ''}`,
+      name: `${patientData?.name?.[0]?.given?.join(' ')} ${patientData?.name?.[0]?.family || ''}`,
       systemID: `${systemGenID || ''}`,
       dob: moment(patientData?.birthDate).format('Do MMM YYYY'),
       age: calculateAge(patientData?.birthDate),
@@ -63,11 +63,11 @@ export default function ClientDetailsView() {
   ]
 
   const tHeaders = [
-    { title: 'Name', class: '', key: 'name' },
-    { title: 'System ID', class: '', key: 'systemID' },
-    { title: 'D.O.B', class: '', key: 'dob' },
-    { title: 'Age', class: '', key: 'age' },
-    { title: 'Gender', class: '', key: 'gender' },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: 'System ID', dataIndex: 'systemID', key: 'systemID' },
+    { title: 'D.O.B', dataIndex: 'dob', key: 'dob' },
+    { title: 'Age', dataIndex: 'age', key: 'age' },
+    { title: 'Gender', dataIndex: 'gender', key: 'gender' },
   ]
 
   return (
@@ -106,7 +106,7 @@ export default function ClientDetailsView() {
           </div>
         </div>
 
-        <div className="container px-4 py-2 sm:p-3">
+        <div className="container px-3 py-3">
           <div className="overflow-auto">
             {!patientData?.name && (
               <div className="my-10 mx-auto flex justify-center">
@@ -114,7 +114,12 @@ export default function ClientDetailsView() {
               </div>
             )}
             {patientData?.name && (
-              <SearchTable headers={tHeaders} data={stats} />
+              <Table
+                columns={tHeaders}
+                dataSource={stats}
+                pagination={false}
+                size="small"
+              />
             )}
           </div>
         </div>
