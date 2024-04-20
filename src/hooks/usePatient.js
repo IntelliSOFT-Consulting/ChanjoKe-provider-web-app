@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { generateUniqueCode } from '../utils/methods'
 
 const fhirEndpoint = '/hapi/fhir'
 
 export default function usePatient() {
+  const [patient, setPatient] = useState(null)
   const { get, post, put } = useApiRequest()
 
   const createPatient = async (data) => {
@@ -72,7 +74,15 @@ export default function usePatient() {
           subdistrict: data.subCounty,
           township: data.ward,
           city: data.townCenter,
-          text: [data.estateOrHouseNo, data.townCenter, data.ward, data.subCounty, data.county]?.filter(Boolean).join(', '),
+          text: [
+            data.estateOrHouseNo,
+            data.townCenter,
+            data.ward,
+            data.subCounty,
+            data.county,
+          ]
+            ?.filter(Boolean)
+            .join(', '),
         },
       ],
       contact: data.caregivers.map((caregiver) => {
@@ -120,7 +130,9 @@ export default function usePatient() {
 
   const getPatient = async (patientId) => {
     try {
-      return await get(`${fhirEndpoint}/Patient/${patientId}`)
+      const response = await get(`${fhirEndpoint}/Patient/${patientId}`)
+      setPatient(response)
+      return response
     } catch (error) {
       return error
     }
@@ -147,5 +159,5 @@ export default function usePatient() {
     }
   }
 
-  return { createPatient, getPatient, savePatient, updatePatient }
+  return { createPatient, getPatient, savePatient, updatePatient, patient }
 }

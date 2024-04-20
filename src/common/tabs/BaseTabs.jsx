@@ -3,8 +3,6 @@ import NonRoutineVaccines from '../../components/ClientDetailsView/NonRoutineVac
 import RoutineVaccines from '../../components/ClientDetailsView/RoutineVaccines'
 import VaccineAppointments from '../../components/ClientDetailsView/VaccineAppointments'
 import Referrals from '../../components/ClientDetailsView/Referrals'
-import { useSelector } from 'react-redux'
-import { calculateAges } from '../../utils/methods'
 
 const tabs = [
   {
@@ -27,21 +25,22 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function BaseTabs(props) {
+export default function BaseTabs({
+  patientData,
+  patientDetails,
+  userCategory,
+}) {
   const [currentTab, setCurrentTab] = useState('routineVaccines')
 
-  const currentPatient = useSelector((state) => state.currentPatient)
-
   useEffect(() => {
-    if (currentPatient) {
-      const age = calculateAges(currentPatient.birthDate)
-      if (age.years >= 18) {
+    if (patientDetails) {
+      if (patientDetails?.ages?.years >= 18) {
         setCurrentTab('nonRoutineVaccines')
       } else {
         setCurrentTab('routineVaccines')
       }
     }
-  }, [currentPatient])
+  }, [patientDetails])
 
   const handleTabChange = (tabId) => {
     setCurrentTab(tabId)
@@ -91,27 +90,25 @@ export default function BaseTabs(props) {
       {/* Content based on the selected tab */}
       {currentTab === 'routineVaccines' && (
         <RoutineVaccines
-          userCategory={props.userCategory}
-          patientData={props.patientData}
+          userCategory={userCategory}
+          patientData={patientData}
+          patientDetails={patientDetails}
         />
       )}
       {currentTab === 'nonRoutineVaccines' && (
         <NonRoutineVaccines
-          userCategory={props.userCategory}
-          patientData={props.patientData}
+          userCategory={userCategory}
+          patientData={patientData}
         />
       )}
       {currentTab === 'appointments' && (
         <VaccineAppointments
-          userCategory={props.userCategory}
-          patientData={props.patientData}
+          userCategory={userCategory}
+          patientData={patientData}
         />
       )}
       {currentTab === 'referrals' && (
-        <Referrals
-          userCategory={props.userCategory}
-          patientData={props.patientData}
-        />
+        <Referrals userCategory={userCategory} patientData={patientData} />
       )}
     </div>
   )

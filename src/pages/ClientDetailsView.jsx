@@ -4,23 +4,21 @@ import Table from '../components/DataTable'
 import { useEffect, useState } from 'react'
 import useGet from '../api/useGet'
 import { useNavigate, useParams } from 'react-router-dom'
-import calculateAge from '../utils/calculateAge'
 import LoadingArrows from '../common/spinners/LoadingArrows'
-import classifyUserByAge from '../components/ClientDetailsView/classifyUserByAge'
 import { useDispatch } from 'react-redux'
 import { setCurrentPatient } from '../redux/actions/patientActions'
-import moment from 'moment'
+import usePatient from '../hooks/usePatient'
+import { formatClientDetails } from '../components/ClientDetailsView/clientDetailsController'
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [patientData, setPatientData] = useState({})
-  const [clientCategory, setClientCategory] = useState('')
-  const [systemGenID, setSystemGenID] = useState('')
+  const [patientData, setPatientData] = useState(null)
 
   const { clientID } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { data, loading, error } = useGet(`Patient/${clientID}`)
+
+  const { getPatient, patient } = usePatient()
   const { data: immunizationData } = useGet(
     `Immunization?patient=Patient/${clientID}`
   )
@@ -29,38 +27,19 @@ export default function ClientDetailsView() {
   )
 
   useEffect(() => {
-    setPatientData(data)
-    dispatch(setCurrentPatient(data))
-    if (data?.identifier && Array.isArray(data?.identifier)) {
-      const systemGenerated = data?.identifier.filter((id) =>
-        id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED' ? id?.value : ''
-      )
-      setSystemGenID(systemGenerated?.[0]?.value)
-    }
+    getPatient(clientID)
+  }, [clientID])
 
-    if (patientData?.birthDate) {
-      const category = classifyUserByAge(patientData?.birthDate)
-      setClientCategory(category)
+  useEffect(() => {
+    if (patient) {
+      dispatch(setCurrentPatient(patient))
+      setPatientData(formatClientDetails(patient))
     }
-  }, [data, patientData, immunizationData, immunizationRecommendation])
+  }, [patient, immunizationData, immunizationRecommendation])
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false)
   }
-
-  console.log('clientDetails', patientData)
-
-  const stats = [
-    {
-      name: `${patientData?.name?.[0]?.given?.join(' ')} ${patientData?.name?.[0]?.family || ''}`,
-      systemID: `${systemGenID || ''}`,
-      dob: moment(patientData?.birthDate).format('Do MMM YYYY'),
-      age: calculateAge(patientData?.birthDate),
-      gender: patientData?.gender?.replace(/\b\w/g, (char) =>
-        char.toUpperCase()
-      ),
-    },
-  ]
 
   const tHeaders = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
@@ -78,7 +57,7 @@ export default function ClientDetailsView() {
         description="Select Record to update"
         btnOne={{
           text: 'Client Record',
-          url: `/update-client-history/${patientData?.id}`,
+          url: `/update-client-history/${patient?.id}`,
         }}
         btnTwo={{
           text: 'Vaccine Details',
@@ -92,7 +71,7 @@ export default function ClientDetailsView() {
           <div className="text-3xl">Client Details</div>
           <div className="right-0">
             <button
-              onClick={() => navigate(`/client-records/${patientData?.id}`)}
+              onClick={() => navigate(`/client-records/${patient?.id}`)}
               className="ml-4 flex-shrink-0 rounded-md border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
             >
               View Client Details
@@ -108,16 +87,16 @@ export default function ClientDetailsView() {
 
         <div className="container px-3 py-3">
           <div className="overflow-auto">
-            {!patientData?.name && (
+            {!patientData ? (
               <div className="my-10 mx-auto flex justify-center">
                 <LoadingArrows />
               </div>
-            )}
-            {patientData?.name && (
+            ) : (
               <Table
                 columns={tHeaders}
-                dataSource={stats}
+                dataSource={patientData ? [patientData] : []}
                 pagination={false}
+                loading={!patientData}
                 size="small"
               />
             )}
@@ -127,9 +106,10 @@ export default function ClientDetailsView() {
 
       <div className="mt-4">
         <BaseTabs
-          userCategory={clientCategory}
-          userID={patientData?.id}
-          patientData={patientData}
+          userCategory={patientData?.clientCategory}
+          userID={patient?.id}
+          patientData={patient}
+          patientDetails={patientData}
         />
       </div>
     </>
