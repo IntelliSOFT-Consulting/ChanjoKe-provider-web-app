@@ -18,12 +18,18 @@ import { createImmunizationRecommendation } from './DataWrapper'
 import useAefi from '../../hooks/useAefi'
 import dayjs from 'dayjs'
 
-export default function RoutineVaccines({ userCategory, patientData }) {
+export default function RoutineVaccines({
+  userCategory,
+  patientData,
+  patientDetails,
+}) {
   const [mappedVaccines, setMappedVaccines] = useState([])
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
+
+  console.log(patientDetails)
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
@@ -101,7 +107,10 @@ export default function RoutineVaccines({ userCategory, patientData }) {
         }
       })
 
-      const immunizationRecommendation = createImmunizationRecommendation(mapped, patientData)
+      const immunizationRecommendation = createImmunizationRecommendation(
+        mapped,
+        patientData
+      )
 
       console.log({ immunizationRecommendation, patientData })
     }
@@ -109,7 +118,6 @@ export default function RoutineVaccines({ userCategory, patientData }) {
   }, [patientData])
 
   useEffect(() => {
-
     const vaccData = data?.entry?.map((vaccine) => {
       return {
         vaccineName: vaccine?.resource?.vaccineCode?.text,
@@ -128,7 +136,7 @@ export default function RoutineVaccines({ userCategory, patientData }) {
       }
     })
 
-    const element = document.getElementById(userCategory)
+    const element = document.getElementById(patientDetails?.clientCategory)
 
     if (Array.isArray(vaccData) && vaccData) {
       const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
@@ -395,8 +403,11 @@ export default function RoutineVaccines({ userCategory, patientData }) {
                 <Disclosure
                   as="div"
                   key={category.category}
-                  defaultOpen={category.category === userCategory}
-                  id={`${userCategory}`}
+                  defaultOpen={
+                    formatCardTitle(category.category) ===
+                    patientDetails.clientCategory
+                  }
+                  id={formatCardTitle(category.category)}
                   className="pt-2"
                 >
                   {({ open }) => {
