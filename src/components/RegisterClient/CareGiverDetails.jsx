@@ -4,21 +4,28 @@ import { countryCodes } from '../../data/countryCodes'
 import Table from '../DataTable'
 import { titleCase } from '../../utils/methods'
 
-export default function CaregiverDetails({ setCaregivers, caregivers, form, setDraftCaregiver }) {
-
+export default function CaregiverDetails({
+  setCaregivers,
+  caregivers,
+  form,
+  caregiverType,
+  setDraftCaregiver,
+}) {
   const handleEdit = (record) => {
     form.setFieldsValue(record)
     setCaregivers(caregivers.filter((item) => item !== record))
   }
 
+
+
   const columns = [
     {
-      title: 'Caregiver Type',
+      title: `${caregiverType()} Type`,
       dataIndex: 'caregiverType',
       key: 'caregiverType',
     },
     {
-      title: 'Caregiver Name',
+      title: `${caregiverType()} Name`,
       dataIndex: 'caregiverName',
       key: 'caregiverName',
     },
@@ -62,22 +69,24 @@ export default function CaregiverDetails({ setCaregivers, caregivers, form, setD
 
   return (
     <div>
-      <h3 className="text-xl font-medium mb-6">Caregiver Details</h3>
+      <h3 className="text-xl font-medium mb-6">
+        {`${caregiverType()} Details`}
+      </h3>
       <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
         <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
           <Form.Item
             name="caregiverType"
-            label="Caregiver Type"
+            label={`${caregiverType()} Type`}
             rules={[
               {
                 required: true,
-                message: 'Please input the caregiver type',
+                message: `Please select the ${caregiverType()} type`,
               },
             ]}
           >
             <Select
               size="large"
-              placeholder="Select Caregiver Type"
+              placeholder={`Select ${caregiverType()} Type`}
               options={caregiverTypes}
               showSearch
               searchable
@@ -87,11 +96,11 @@ export default function CaregiverDetails({ setCaregivers, caregivers, form, setD
 
           <Form.Item
             name="caregiverName"
-            label="Caregiver Name"
+            label={`${caregiverType()} Name`}
             rules={[
               {
                 required: true,
-                message: 'Please input the caregiver name',
+                message: `Please input the ${caregiverType()} name`
               },
             ]}
           >
@@ -160,7 +169,7 @@ export default function CaregiverDetails({ setCaregivers, caregivers, form, setD
                 })
             }}
           >
-            Add Caregiver
+            {`Add ${caregiverType()}`}
           </Button>
         </Form.Item>
       </Form>

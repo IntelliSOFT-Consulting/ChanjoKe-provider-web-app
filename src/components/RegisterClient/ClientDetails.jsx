@@ -154,6 +154,8 @@ export default function ClientDetails() {
     const birthDate = generateDateOfBirth({ years, months, weeks })
     form.setFieldValue('dateOfBirth', dayjs(birthDate))
 
+    form.setFieldValue('age', writeAge({ years, months, weeks }))
+
     setIsAdult(years >= 18)
 
     const identificationsQualified = identificationOptions.filter(
@@ -166,6 +168,13 @@ export default function ClientDetails() {
   const capitalize = (name) => {
     const value = form.getFieldValue(name)
     if (value) form.setFieldValue(name, titleCase(value))
+  }
+
+  const caregiverType = () => {
+    if (form.getFieldValue('years') >= 18) {
+      return 'Next of Kin'
+    }
+    return 'Caregiver'
   }
 
   return (
@@ -269,116 +278,114 @@ export default function ClientDetails() {
                 </Form.Item>
               </div>
 
-              {estimatedAge ? (
-                <>
-                  <Form.Item
-                    name="dateOfBirth"
-                    label="Date of Birth"
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Please input date of birth',
-                      },
-                    ]}
-                  >
-                    <DatePicker
-                      disabledDate={(current) =>
-                        current && current >= moment().endOf('day')
-                      }
-                      format="DD-MM-YYYY"
-                      onChange={(e) => {
-                        if (!e) return
-                        const estimate = calculateAges(new Date(e.toDate()))
+              <Form.Item
+                name="dateOfBirth"
+                label="Date of Birth"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input date of birth',
+                  },
+                ]}
+                hidden={!estimatedAge}
+              >
+                <DatePicker
+                  disabledDate={(current) =>
+                    current && current >= moment().endOf('day')
+                  }
+                  format="DD-MM-YYYY"
+                  onChange={(e) => {
+                    if (!e) return
+                    const estimate = calculateAges(new Date(e.toDate()))
 
-                        const ages = ['years', 'months', 'weeks', 'days']
-                        ages.forEach((age) => {
-                          form.setFieldValue(age, estimate[age])
-                        })
-                        form.setFieldValue('age', writeAge(estimate))
+                    const ages = ['years', 'months', 'weeks', 'days']
+                    ages.forEach((age) => {
+                      form.setFieldValue(age, estimate[age])
+                    })
+                    form.setFieldValue('age', writeAge(estimate))
 
-                        const identificationsQualified =
-                          identificationOptions.filter(
-                            (option) =>
-                              estimate.years >= option.minAge &&
-                              estimate.years <= option.maxAge
-                          )
+                    const identificationsQualified =
+                      identificationOptions.filter(
+                        (option) =>
+                          estimate.years >= option.minAge &&
+                          estimate.years <= option.maxAge
+                      )
 
-                        setIdOptions(identificationsQualified)
+                    setIdOptions(identificationsQualified)
 
-                        setIsAdult(estimate.years >= 18)
-                      }}
-                      className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                    />
-                  </Form.Item>
+                    setIsAdult(estimate.years >= 18)
+                  }}
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
 
-                  <Form.Item
-                    label="Age"
-                    name="age"
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Please input age',
-                      },
-                    ]}
-                  >
-                    <Input
-                      placeholder="Age"
-                      disabled={true}
-                      className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                    />
-                  </Form.Item>
-                </>
-              ) : (
-                <>
-                  <div className="gutter-row grid grid-cols-3 gap-4 mt-7">
-                    <Form.Item name="years" label="Years">
-                      <InputNumber
-                        size="large"
-                        placeholder="Years"
-                        max={99}
-                        min={0}
-                        onChange={calculateDob}
-                        className="w-full"
-                      />
-                    </Form.Item>
-                    <Form.Item name="months" label="Months">
-                      <InputNumber
-                        size="large"
-                        placeholder="Months"
-                        min={0}
-                        onChange={calculateDob}
-                        className="w-full"
-                      />
-                    </Form.Item>
-                    <Form.Item name="weeks" label="Weeks">
-                      <InputNumber
-                        size="large"
-                        placeholder="Weeks"
-                        min={0}
-                        className="w-full"
-                        onChange={calculateDob}
-                      />
-                    </Form.Item>
+              <Form.Item
+                label="Age"
+                name="age"
+                hidden={!estimatedAge}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input age',
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Age"
+                  disabled={true}
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
+
+              <div
+                className={`gutter-row grid-cols-3 gap-4 mt-7 ${
+                  !estimatedAge ? 'grid' : 'hidden'
+                }`}
+              >
+                <Form.Item name="years" label="Years">
+                  <InputNumber
+                    size="large"
+                    placeholder="Years"
+                    max={99}
+                    min={0}
+                    onChange={calculateDob}
+                    className="w-full"
+                  />
+                </Form.Item>
+                <Form.Item name="months" label="Months">
+                  <InputNumber
+                    size="large"
+                    placeholder="Months"
+                    min={0}
+                    onChange={calculateDob}
+                    className="w-full"
+                  />
+                </Form.Item>
+                <Form.Item name="weeks" label="Weeks">
+                  <InputNumber
+                    size="large"
+                    placeholder="Weeks"
+                    min={0}
+                    className="w-full"
+                    onChange={calculateDob}
+                  />
+                </Form.Item>
+              </div>
+
+              <Form.Item
+                name="dateOfBirth"
+                label={
+                  <div>
+                    <span className="font-bold">Estimated Date of Birth</span>
                   </div>
-
-                  <Form.Item
-                    name="dateOfBirth"
-                    label={
-                      <div>
-                        <span className="font-bold">
-                          Estimated Date of Birth
-                        </span>
-                      </div>
-                    }
-                  >
-                    <DatePicker
-                      disabled={true}
-                      format="DD-MM-YYYY"
-                      className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                    />
-                  </Form.Item>
-                </>
-              )}
+                }
+              >
+                <DatePicker
+                  disabled={true}
+                  format="DD-MM-YYYY"
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
 
               {isAdult && (
                 <Form.Item
@@ -505,6 +512,7 @@ export default function ClientDetails() {
               setCaregivers={setCaregivers}
               form={caregiverForm}
               setDraftCaregiver={setDraftCaregiver}
+              caregiverType={caregiverType}
             />
           </div>
 
@@ -527,6 +535,7 @@ export default function ClientDetails() {
               errors={errors}
               caregivers={caregivers}
               counties={counties}
+              caregiverType={caregiverType}
             />
           </div>
 

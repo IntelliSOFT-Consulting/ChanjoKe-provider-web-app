@@ -51,8 +51,8 @@ export default function ClientRecords() {
 
     const clientDetails = {
       'First Name': data?.name?.[0]?.given[0],
-      'Last Name': data?.name?.[0]?.family,
       'Middle Name': data?.name?.[0]?.given[1],
+      'Last Name': data?.name?.[0]?.family,
       Gender: titleCase(data?.gender),
       'Date of Birth': moment(data?.birthDate).format('DD-MM-YYYY'),
       'Identification Type': convertCamelCaseString(identificationType),
