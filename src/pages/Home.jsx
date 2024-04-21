@@ -99,7 +99,7 @@ export default function Home() {
       <br />
 
       <div>
-        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-4 p-6 rounded-lg shadow-xl border bg-white">
+        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-2 gap-5 sm:grid-cols-4 p-6 rounded-lg shadow-xl border bg-white">
           {stats.map((item) => (
             <Link
               to={item.href}
