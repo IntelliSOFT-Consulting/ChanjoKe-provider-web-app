@@ -40,7 +40,6 @@ export const classifyUserByAge = (birthDate) => {
   return categories[mapping]
 }
 
-
 export const formatClientDetails = (patientResource) => {
   const systemId = patientResource.identifier.find(
     (id) => id?.type?.coding?.[0]?.display === 'SYSTEM_GENERATED'
@@ -49,7 +48,9 @@ export const formatClientDetails = (patientResource) => {
   const ages = calculateAges(patientResource.birthDate)
 
   return {
-    name: `${patientResource?.name?.[0]?.given?.join(' ')} ${patientResource?.name?.[0]?.family || ''}`,
+    name: `${patientResource?.name?.[0]?.given?.join(' ')} ${
+      patientResource?.name?.[0]?.family || ''
+    }`,
     systemID: `${systemId || ''}`,
     dob: moment(patientResource?.birthDate).format('Do MMM YYYY'),
     age: writeAge(ages),
@@ -58,4 +59,67 @@ export const formatClientDetails = (patientResource) => {
     systemId,
     clientCategory,
   }
+}
+
+export const formatRecommendationsToObject = (recommendation) => ({
+  vaccine: recommendation.vaccineCode?.[0]?.text,
+  doseNumber: recommendation?.doseNumberPositiveInt,
+  dueDate: recommendation.dateCriterion?.[0]?.value ? moment(recommendation.dateCriterion?.[0]?.value) : null,
+  administeredDate: recommendation.administeredDate
+    ? moment(recommendation.administeredDate)
+    : null,
+  disease: recommendation.targetDisease?.text,
+  status:
+    recommendation.status ||
+    recommendation.forecastStatus?.coding?.[0]?.display,
+})
+
+export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
+  const categories = {
+    routine: {
+      at_birth: [],
+      '6_weeks': [],
+      '10_weeks': [],
+      '14_weeks': [],
+      '6_months': [],
+      '7_months': [],
+      '9_months': [],
+      '12_months': [],
+      '18_months': [],
+      '24_months': [],
+      '10-14_years': [],
+    },
+    non_routine: {
+      'Covid_19': [],
+      'Tetanus': [],
+      'Yellow_fever': [],
+      'Rabies': [],
+      'Influenza': [],
+    },
+  }
+
+  recommendation.forEach((recommendation) => {
+    const getVaccine = immunizations?.find(
+      (immunization) =>
+        immunization.vaccineCode?.coding?.[0]?.code ===
+        recommendation.vaccineCode?.[0]?.coding?.[0]?.display
+    )
+
+    if (getVaccine) {
+      recommendation.status = getVaccine.status
+      recommendation.administeredDate = getVaccine.occurrenceDateTime
+    }
+
+    if (recommendation.description === 'routine') {
+      categories.routine[recommendation.series?.toLowerCase()]?.push(
+        formatRecommendationsToObject(recommendation)
+      )
+    } else {
+      categories.non_routine[recommendation.series]?.push(
+        formatRecommendationsToObject(recommendation)
+      )
+    }
+  })
+
+  return categories
 }

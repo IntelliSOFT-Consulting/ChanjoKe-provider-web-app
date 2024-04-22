@@ -599,6 +599,7 @@ export const routineVaccines = [
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '10-14_years',
+    description: 'routine',
     adminRange: {
       start: 3650,
       end: 3650,

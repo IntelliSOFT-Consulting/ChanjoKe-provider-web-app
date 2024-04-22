@@ -29,6 +29,10 @@ export default function BaseTabs({
   patientData,
   patientDetails,
   userCategory,
+  routineVaccines,
+  nonRoutineVaccines,
+  recommendations,
+  immunizations
 }) {
   const [currentTab, setCurrentTab] = useState('routineVaccines')
 
@@ -93,18 +97,26 @@ export default function BaseTabs({
           userCategory={userCategory}
           patientData={patientData}
           patientDetails={patientDetails}
+          routineVaccines={routineVaccines}
+          recommendations={recommendations}
+          immunizations={immunizations}
         />
       )}
       {currentTab === 'nonRoutineVaccines' && (
         <NonRoutineVaccines
           userCategory={userCategory}
           patientData={patientData}
+          patientDetails={patientDetails}
+          nonRoutineVaccines={nonRoutineVaccines}
+          recommendations={recommendations}
+          immunizations={immunizations}
         />
       )}
       {currentTab === 'appointments' && (
         <VaccineAppointments
           userCategory={userCategory}
           patientData={patientData}
+          patientDetails={patientDetails}
         />
       )}
       {currentTab === 'referrals' && (

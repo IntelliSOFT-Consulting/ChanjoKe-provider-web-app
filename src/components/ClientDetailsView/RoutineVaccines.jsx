@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import { routineVaccines } from '../../data/vaccineData'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import { useEffect, useState } from 'react'
@@ -9,7 +8,7 @@ import moment from 'moment'
 import { useApiRequest } from '../../api/useApiRequest'
 import Loader from '../../common/spinners/LoadingArrows'
 import Table from '../DataTable'
-import { Badge, Button, Checkbox, Tag } from 'antd'
+import { Badge, Button, Checkbox, Tag, Tooltip } from 'antd'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
@@ -18,18 +17,31 @@ import { createImmunizationRecommendation } from './DataWrapper'
 import useAefi from '../../hooks/useAefi'
 import dayjs from 'dayjs'
 
+const categories = [
+  'at_birth',
+  '6_weeks',
+  '10_weeks',
+  '14_weeks',
+  '6_months',
+  '7_months',
+  '9_months',
+  '12_months',
+  '18_months',
+  '24_months',
+  '10-14_years',
+]
+
 export default function RoutineVaccines({
   userCategory,
   patientData,
   patientDetails,
+  routineVaccines,
 }) {
   const [mappedVaccines, setMappedVaccines] = useState([])
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
-
-  console.log(patientDetails)
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
@@ -42,7 +54,7 @@ export default function RoutineVaccines({
   const { getAefis, loading: loadingAefis } = useAefi()
 
   function mergeVaccines(localVaccines, apiVaccines) {
-    if (Array.isArray(apiVaccines) && apiVaccines.length) {
+    if (Array.isArray(apiVaccines) && apiVaccines?.length) {
       const updatedVaccines = localVaccines.map((localVaccine) => {
         const matchingApiVaccine = apiVaccines.find(
           (apiVaccine) =>
@@ -63,8 +75,8 @@ export default function RoutineVaccines({
 
   function formatCardTitle(input) {
     return input
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      ?.split('_')
+      ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
   }
 
@@ -81,68 +93,13 @@ export default function RoutineVaccines({
       dispatch(setCurrentPatient(patientData))
       fetchPatientImmunization()
       getAefis()
-
-      const mapped = routineVaccines.map((vaccine) => {
-        // const dependentVaccine = allVaccines?.find(
-        //   (vaccine) =>
-        //     _record?.dependentVaccine ===
-        //     vaccine?.vaccineCode?.coding?.[0]?.code
-        // )
-        const today = moment()
-        const userAgeInDays = today.diff(patientData?.birthDate, 'days') + 1
-        const dueDate = vaccine.dueDate(patientData?.birthDate)
-
-        // console.log({
-        //   vaccine: vaccine.vaccineName,
-        //   code: vaccine.vaccineCode,
-        //   birthDate: patientData?.birthDate,
-        //   vaccineDueDate: vaccine.dueDate(patientData?.birthDate)
-        // })
-
-        if (userAgeInDays > vaccine.adminRange.end) {
-          // user is too old for vaccine
-        } else if (userAgeInDays < vaccine.adminRange.end) {
-          // user has not yet reached the age limit for vaccine
-          return { ...vaccine, vaccineDueDate: dueDate, forecastStatus: 'due' }
-        }
-      })
-
-      const immunizationRecommendation = createImmunizationRecommendation(
-        mapped,
-        patientData
-      )
-
-      console.log({ immunizationRecommendation, patientData })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientData])
 
   useEffect(() => {
-    const vaccData = data?.entry?.map((vaccine) => {
-      return {
-        vaccineName: vaccine?.resource?.vaccineCode?.text,
-        vaccineCode: vaccine?.resource?.vaccineCode?.coding?.[0]?.code,
-        diseaseTarget:
-          vaccine?.resource?.protocolApplied?.[0]?.targetDisease?.[0]?.text,
-        status:
-          vaccine?.resource?.status === 'completed'
-            ? 'Administered'
-            : 'Not Administered',
-        dateAdministered: moment(vaccine?.resource?.occurenceDateTime).format(
-          'DD-MM-YYYY'
-        ),
-        dueDate: '-',
-        doseNumber: vaccine?.resource?.doseQuantity?.value,
-      }
-    })
-
     const element = document.getElementById(patientDetails?.clientCategory)
 
-    if (Array.isArray(vaccData) && vaccData) {
-      const mergedVax = mergeVaccines(routineVaccines, data?.entry || [])
-
-      setMappedVaccines(mapVaccinesByCategory(mergedVax))
-
+    if (routineVaccines) {
       if (element) {
         element.scrollIntoView({
           behavior: 'smooth',
@@ -156,39 +113,8 @@ export default function RoutineVaccines({
           block: 'start',
         })
       }
-      setMappedVaccines(mapVaccinesByCategory(routineVaccines))
     }
   }, [data?.entry, loading])
-
-  function mapVaccinesByCategory(vaccines) {
-    const categoriesMap = {}
-
-    if (Array.isArray(vaccines) && vaccines.length > 0) {
-      vaccines.forEach((vaccine) => {
-        const { category, ...rest } = vaccine
-
-        if (!categoriesMap[category]) {
-          categoriesMap[category] = []
-        }
-
-        rest.actions = [
-          { title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' },
-        ]
-
-        categoriesMap[category].push(rest)
-      })
-
-      const categoriesArray = Object.entries(categoriesMap).map(
-        ([category, vaccines]) => ({
-          category,
-          status: 'pending',
-          vaccines,
-        })
-      )
-
-      return categoriesArray
-    }
-  }
 
   function handleCheckBox(onActionBtn, item) {
     const vaccineExists = vaccinesToAdminister.find(
@@ -198,7 +124,7 @@ export default function RoutineVaccines({
       setVaccinesToAdminister([...vaccinesToAdminister, item])
     }
     if (vaccineExists) {
-      const withoutDeletedVaccine = vaccinesToAdminister.filter(
+      const withoutDeletedVaccine = vaccinesToAdminister?.filter(
         (vaccine) => vaccine.vaccineName !== item.vaccineName
       )
       setVaccinesToAdminister(withoutDeletedVaccine)
@@ -230,9 +156,6 @@ export default function RoutineVaccines({
     },
   ]
 
-  const allVaccines = mappedVaccines
-    ?.map((category) => category.vaccines)
-    ?.flat(Infinity)
   const columns = [
     {
       title: '',
@@ -240,37 +163,34 @@ export default function RoutineVaccines({
       key: 'vaccineName',
       render: (text, record) => {
         const completed = record.status === 'completed'
+        const locked = lockVaccine(record.dueDate, patientData.birthDate)
         return (
-          <Checkbox
-            name={record.vaccineName}
-            value={record.vaccineName}
-            defaultChecked={completed}
-            className="tooltip"
-            disabled={
-              completed ||
-              lockVaccine(record?.adminRange?.start, patientData.birthDate)
+          <Tooltip
+            title={
+              locked
+                ? 'Not yet eligible for this vaccine'
+                : completed
+                ? 'Vaccine already administered'
+                : ''
             }
-            onChange={() => handleCheckBox('administer', record)}
+            color="#163c94"
           >
-            {(lockVaccine(record?.adminRange?.start, patientData.birthDate) ||
-              completed) && (
-              <span className="tooltipright">
-                {lockVaccine(record?.adminRange?.start, patientData.birthDate)
-                  ? 'This client is not currently eligible for this vaccine'
-                  : completed
-                    ? 'Vaccine already administered'
-                    : 'Vaccine not administered'}
-              </span>
-            )}
-          </Checkbox>
+            <Checkbox
+              name={record.vaccineName}
+              value={record.vaccineName}
+              defaultChecked={completed}
+              disabled={completed || locked}
+              onChange={() => handleCheckBox('administer', record)}
+            />
+          </Tooltip>
         )
       },
       width: '5%',
     },
     {
       title: 'Vaccine',
-      dataIndex: 'vaccineName',
-      key: 'vaccineName',
+      dataIndex: 'vaccine',
+      key: 'vaccine',
     },
     {
       title: 'Dose Number',
@@ -281,31 +201,13 @@ export default function RoutineVaccines({
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: (text, _record) => {
-        if (_record?.education) {
-          return moment(_record?.education?.[0]?.presentationDate).format(
-            'DD-MM-YYYY'
-          )
-        } else {
-          const dependentVaccine = allVaccines?.find(
-            (vaccine) =>
-              _record?.dependentVaccine ===
-              vaccine?.vaccineCode?.coding?.[0]?.code
-          )
-          return text(patientData?.birthDate, dependentVaccine)
-        }
-      },
+      render: (text, _record) => (text ? text.format('DD-MM-YYYY') : '-'),
     },
     {
       title: 'Date Administered',
-      dataIndex: 'occurrenceDateTime',
-      key: 'occurrenceDateTime',
-      render: (text, _record) => {
-        if (_record?.status !== 'completed') {
-          return '-'
-        }
-        return text ? moment(text).format('DD-MM-YYYY') : '-'
-      },
+      dataIndex: 'administeredDate',
+      key: 'administeredDate',
+      render: (text, _record) => (text ? text.format('DD-MM-YYYY') : '-'),
     },
     {
       title: 'Status',
@@ -324,23 +226,23 @@ export default function RoutineVaccines({
               text === 'completed'
                 ? 'green'
                 : text === 'not-done'
-                  ? 'red'
-                  : missed && text !== 'entered-in-error'
-                    ? 'red'
-                    : text === 'entered-in-error'
-                      ? 'yellow'
-                      : 'gray'
+                ? 'red'
+                : missed && text !== 'entered-in-error'
+                ? 'red'
+                : text === 'entered-in-error'
+                ? 'yellow'
+                : 'gray'
             }
           >
             {text === 'completed'
               ? 'Administered'
               : text === 'not-done'
-                ? 'Not Administered'
-                : text === 'entered-in-error'
-                  ? 'Contraindicated'
-                  : missed && text !== 'entered-in-error'
-                    ? 'Missed'
-                    : ''}
+              ? 'Not Administered'
+              : text === 'entered-in-error'
+              ? 'Contraindicated'
+              : missed && text !== 'entered-in-error'
+              ? 'Missed'
+              : 'Upcoming'}
           </Tag>
         )
       },
@@ -385,121 +287,140 @@ export default function RoutineVaccines({
                 dispatch(setSelectedVaccines(vaccinesToAdminister))
                 setSharedData(vaccinesToAdminister)
               }}
-              disabled={vaccinesToAdminister.length > 0 ? false : true}
+              disabled={vaccinesToAdminister?.length > 0 ? false : true}
               className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
             >
-              Administer Vaccine ( {vaccinesToAdminister.length} )
+              Administer Vaccine ( {vaccinesToAdminister?.length} )
             </button>
           </div>
         </div>
 
         {userCategory && !loading && !loadingAefis ? (
-          mappedVaccines.map((category) => (
-            <dl
-              key={category.category}
-              className="mt-10 space-y-6 divide-y divide-gray-900/10"
-            >
-              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-6 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
-                <Disclosure
-                  as="div"
-                  key={category.category}
-                  defaultOpen={
-                    formatCardTitle(category.category) ===
-                    patientDetails.clientCategory
-                  }
-                  id={formatCardTitle(category.category)}
-                  className="pt-2"
+          categories.map(
+            (category) =>
+              routineVaccines[category]?.length > 0 && (
+                <dl
+                  key={category}
+                  className="mt-10 space-y-6 divide-y divide-gray-900/10"
                 >
-                  {({ open }) => {
-                    const administered = category.vaccines.filter(
-                      (vaccine) => vaccine.status === 'completed'
-                    )
-                    const someAdministered =
-                      category.vaccines.filter(
-                        (vaccine) =>
-                          vaccine.status !== 'complete' ||
-                          vaccine.status === 'not-done'
-                      )?.length > 0 && administered.length > 0
-                    const allAdministered =
-                      category.vaccines.filter(
-                        (vaccine) => vaccine.status === 'completed'
-                      )?.length === category.vaccines.length
-                    const allNotAdministered =
-                      category.vaccines.filter(
-                        (vaccine) => vaccine.status !== 'completed'
-                      )?.length === category.vaccines.length
+                  <div className="overflow-hidden rounded-lg bg-gray-100 px-4 pb-6 pt-5 mt-5 shadow sm:px-6 sm:pt-6">
+                    <Disclosure
+                      as="div"
+                      key={category}
+                      defaultOpen={
+                        formatCardTitle(category) ===
+                        patientDetails.clientCategory
+                      }
+                      id={formatCardTitle(category)}
+                      className="pt-2"
+                    >
+                      {({ open }) => {
+                        const categoryvaccines = routineVaccines[category]
+                        const administered = categoryvaccines?.filter(
+                          (vaccine) => vaccine.status === 'completed'
+                        )
+                        const someAdministered =
+                          categoryvaccines?.filter(
+                            (vaccine) =>
+                              vaccine.status !== 'complete' ||
+                              vaccine.status === 'not-done'
+                          )?.length > 0 && administered?.length > 0
+                        const allAdministered =
+                          categoryvaccines?.filter(
+                            (vaccine) => vaccine.status === 'completed'
+                          )?.length === categoryvaccines?.length
+                        const allNotAdministered =
+                          categoryvaccines?.filter(
+                            (vaccine) => vaccine.status !== 'completed'
+                          )?.length === categoryvaccines?.length
 
-                    return (
-                      <>
-                        <dt>
-                          <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
-                            <div className="flex w-full justify-between px-10">
-                              <span>
-                                <span className="flex items-center">
-                                  {formatCardTitle(category.category)}
-                                  {/*Colour coding - dark grey (not administered), Green (administered), amber (some vaccines not administered), red (missed)*/}
-                                  <Badge
-                                    className="ml-2 vaccination-status"
-                                    size="large"
-                                    color={
-                                      allAdministered
-                                        ? 'green'
-                                        : someAdministered
-                                          ? '#faad14'
-                                          : allNotAdministered
-                                            ? 'red'
+                        const allUpcoming =
+                          categoryvaccines?.filter((vaccine) => {
+                            const today = new Date()
+                            const dueDate = new Date(
+                              vaccine.dueDate?.format('YYYY-MM-DD')
+                            )
+                            return (
+                              today < dueDate && vaccine.status !== 'completed'
+                            )
+                          })?.length === categoryvaccines?.length
+
+                        return (
+                          <>
+                            <dt>
+                              <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
+                                <div className="flex w-full justify-between px-10">
+                                  <span>
+                                    <span className="flex items-center">
+                                      {formatCardTitle(category)}
+                                      {/*Colour coding - dark grey (not administered), Green (administered), amber (some vaccines not administered), red (missed)*/}
+                                      <Badge
+                                        className="ml-2 vaccination-status"
+                                        size="large"
+                                        color={
+                                          allAdministered
+                                            ? 'green'
+                                            : someAdministered
+                                            ? '#faad14'
+                                            : allNotAdministered
+                                            ? allUpcoming
+                                              ? 'gray'
+                                              : 'red'
                                             : 'gray'
-                                    }
-                                  />
-                                </span>
-                              </span>
-                              <span>
-                                {open ? (
-                                  <Button
-                                    to="/aefi-report"
-                                    className="text-[#163C94]"
-                                    disabled={allNotAdministered}
-                                    onClick={() => {
-                                      dispatch(
-                                        setSelectedVaccines(administered)
-                                      )
-                                      setSharedData({ vaccinesToAdminister })
-                                      navigate('/aefi-report')
-                                    }}
-                                    type="link"
-                                  >
-                                    AEFIs
-                                  </Button>
-                                ) : (
-                                  <PlusSmallIcon
-                                    className="h-6 w-6"
-                                    aria-hidden="true"
-                                  />
-                                )}
-                              </span>
-                            </div>
-                          </Disclosure.Button>
-                        </dt>
-                        <Disclosure.Panel
-                          as="dd"
-                          className="mt-2 pr-12 overflow-x-auto"
-                          open={category.category === userCategory}
-                        >
-                          <Table
-                            columns={columns}
-                            dataSource={category.vaccines}
-                            // data={category.vaccines}
-                            pagination={false}
-                            size="small"
-                          />
-                        </Disclosure.Panel>
-                      </>
-                    )
-                  }}
-                </Disclosure>
-              </div>
-            </dl>
-          ))
+                                        }
+                                      />
+                                    </span>
+                                  </span>
+                                  <span>
+                                    {open ? (
+                                      <Button
+                                        to="/aefi-report"
+                                        className="text-[#163C94]"
+                                        disabled={allNotAdministered}
+                                        onClick={() => {
+                                          dispatch(
+                                            setSelectedVaccines(administered)
+                                          )
+                                          setSharedData({
+                                            vaccinesToAdminister,
+                                          })
+                                          navigate('/aefi-report')
+                                        }}
+                                        type="link"
+                                      >
+                                        AEFIs
+                                      </Button>
+                                    ) : (
+                                      <PlusSmallIcon
+                                        className="h-6 w-6"
+                                        aria-hidden="true"
+                                      />
+                                    )}
+                                  </span>
+                                </div>
+                              </Disclosure.Button>
+                            </dt>
+                            <Disclosure.Panel
+                              as="dd"
+                              className="mt-2 pr-12 overflow-x-auto"
+                              open={category.category === userCategory}
+                            >
+                              <Table
+                                columns={columns}
+                                dataSource={routineVaccines[category]}
+                                // data={category.vaccines}
+                                pagination={false}
+                                size="small"
+                              />
+                            </Disclosure.Panel>
+                          </>
+                        )
+                      }}
+                    </Disclosure>
+                  </div>
+                </dl>
+              )
+          )
         ) : (
           <div className="my-10 mx-auto flex justify-center">
             <Loader />

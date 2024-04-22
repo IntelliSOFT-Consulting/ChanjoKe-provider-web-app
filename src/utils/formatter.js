@@ -6,7 +6,7 @@ export const convertLocations = (bundle) => {
       name: toTitleCase(location.resource.name),
       parent: location.resource.partOf.reference?.split('/')[1],
     }
-  })
+  })?.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export const toTitleCase = (str) => {
