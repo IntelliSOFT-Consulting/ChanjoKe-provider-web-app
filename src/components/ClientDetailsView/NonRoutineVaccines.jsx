@@ -1,4 +1,3 @@
-import { nonRoutineVaccines } from '../../data/vaccineData'
 import { useState, useEffect } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
@@ -13,9 +12,16 @@ import { useDispatch } from 'react-redux'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import { message } from 'antd'
 
-export default function NonRoutineVaccines({ userCategory, userID, patientData}) {
-
-  const [mappedVaccines, setMappedVaccines] = useState(() => mapVaccinesByCategory(nonRoutineVaccines));
+export default function NonRoutineVaccines({
+  userCategory,
+  userID,
+  patientData,
+  nonRoutineVaccines,
+  patientDetails,
+}) {
+  const [mappedVaccines, setMappedVaccines] = useState(() =>
+    mapVaccinesByCategory(nonRoutineVaccines)
+  )
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
@@ -50,22 +56,24 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
   function formatCardTitle(input) {
     return input
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
   }
 
   useEffect(() => {
     const fetchPatientImmunization = async () => {
-      const response = await get(`/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`);
-      setData(response);
+      const response = await get(
+        `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
+      )
+      setData(response)
       setLoading(false)
     }
-  
+
     if (patientData?.id) {
-      fetchPatientImmunization();
+      fetchPatientImmunization()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientData])
 
   useEffect(() => {
     const vaccData = data?.entry?.map((vaccine) => {
@@ -90,7 +98,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
       const mergedVax = mergeVaccines(nonRoutineVaccines, data?.entry || [])
 
       setMappedVaccines(mapVaccinesByCategory(mergedVax))
-    }  else {
+    } else {
       setMappedVaccines(mapVaccinesByCategory(nonRoutineVaccines))
     }
   }, [data?.entry])
@@ -106,7 +114,9 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
           categoriesMap[category] = []
         }
 
-        rest.actions = [{ title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }]
+        rest.actions = [
+          { title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' },
+        ]
 
         categoriesMap[category].push(rest)
       })
@@ -139,8 +149,8 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
   }
 
   const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
+    setDialogOpen(false)
+  }
 
   const administerVaccineBtns = [
     {
@@ -163,15 +173,29 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
     },
   ]
 
-  const allVaccines = mappedVaccines
-    ?.map((category) => category.vaccines)
-    ?.flat(Infinity)
+  /*
+{
+      'Covid_19': [],
+      'Tetanus': [],
+      'Yellow_fever': [],
+      'Rabies': [],
+      'Influenza': [],
+    },
+  */
+
+  const sections = [
+    'Covid_19',
+    'Tetanus',
+    'Yellow_fever',
+    'Rabies',
+    'Influenza',
+  ]
 
   const columns = [
     {
       title: '',
-      dataIndex: 'vaccineName',
-      key: 'vaccineName',
+      dataIndex: 'vaccine',
+      key: 'vaccine',
       render: (text, record) => {
         const completed = record.status === 'completed'
         const notDone = record.status === 'not-done'
@@ -181,28 +205,17 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
             value={record.vaccineName}
             defaultChecked={completed}
             className="tooltip"
-            disabled={
-              completed || notDone ||
-              lockVaccine(6574.5, patientData.birthDate)
-            }
+            disabled={completed || notDone}
             onChange={() => handleCheckBox('administer', record)}
-          >
-            { (lockVaccine(6574.5, patientData.birthDate) || notDone || completed) && <span className='tooltipright'>
-            { lockVaccine(6574.5, patientData.birthDate)
-              ? 'This client is not currently eligible for this vaccine'
-              : completed
-              ? 'Vaccine already administered'
-              : 'Vaccine not administered'}
-            </span> }
-          </Checkbox>
+          />
         )
       },
       width: '5%',
     },
     {
       title: 'Vaccine',
-      dataIndex: 'vaccineName',
-      key: 'vaccineName',
+      dataIndex: 'vaccine',
+      key: 'vaccine',
     },
     {
       title: 'Dose Number',
@@ -213,29 +226,13 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: (text, _record) => {
-        if (_record?.education) {
-          return moment(_record?.education?.[0]?.presentationDate).format('DD-MM-YYYY')
-        } else {
-          const dependentVaccine = allVaccines?.find(
-            (vaccine) =>
-              _record?.dependentVaccine ===
-              vaccine?.vaccineCode?.coding?.[0]?.code
-          )
-          return `${moment(patientData?.birthDate).format('DD MMM YYYY')}`
-        }
-      },
+      render: (text, _record) => (text ? text?.format('DD-MM-YYYY') : '-'),
     },
     {
       title: 'Date Administered',
       dataIndex: 'occurrenceDateTime',
       key: 'occurrenceDateTime',
-      render: (text, _record) => {
-        if (_record?.status !== 'completed') {
-          return '-'
-        }
-        return text ? moment(text).format('DD MMM YYYY') : '-'
-      },
+      render: (text, _record) => (text ? text?.format('DD-MM-YYYY') : '-'),
     },
     {
       title: 'Status',
@@ -248,8 +245,28 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
           record?.adminRange?.end
         )
         return (
-          <Tag color={text === 'completed' ? 'green' : text === 'not-done' ? 'red' : (missed && text !== 'entered-in-error') ? 'red' : text === 'entered-in-error' ? 'yellow' : 'gray'}>
-            { text === 'completed' ? 'Administered' : text === 'not-done' ? 'Not Administered': text === 'entered-in-error' ? 'Contraindicated': (missed && text !== 'entered-in-error') ? 'Missed': '' }
+          <Tag
+            color={
+              text === 'completed'
+                ? 'green'
+                : text === 'not-done'
+                ? 'red'
+                : missed && text !== 'entered-in-error'
+                ? 'red'
+                : text === 'entered-in-error'
+                ? 'yellow'
+                : 'gray'
+            }
+          >
+            {text === 'completed'
+              ? 'Administered'
+              : text === 'not-done'
+              ? 'Not Administered'
+              : text === 'entered-in-error'
+              ? 'Contraindicated'
+              : missed && text !== 'entered-in-error'
+              ? 'Missed'
+              : ''}
           </Tag>
         )
       },
@@ -275,65 +292,74 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
 
   return (
     <>
-    <OptionsDialog
-      open={isDialogOpen}
-      buttons={administerVaccineBtns}
-      onClose={handleDialogClose}
+      <OptionsDialog
+        open={isDialogOpen}
+        buttons={administerVaccineBtns}
+        onClose={handleDialogClose}
       />
-    <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
-      <div className="flex justify-between">
-        <div>
-          <p>Vaccination Schedule</p>
-          <small>Please click on the checkbox to select which vaccine to administer</small>
+      <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
+        <div className="flex justify-between">
+          <div>
+            <p>Vaccination Schedule</p>
+            <small>
+              Please click on the checkbox to select which vaccine to administer
+            </small>
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                setDialogOpen(true)
+                setSharedData(vaccinesToAdminister)
+              }}
+              disabled={vaccinesToAdminister.length > 0 ? false : true}
+              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+            >
+              Administer Vaccine ( {vaccinesToAdminister.length} )
+            </button>
+          </div>
         </div>
-        <div>
-          <button
-            onClick={() => {
-              setDialogOpen(true)
-              setSharedData(vaccinesToAdminister)
-            }}
-            disabled={vaccinesToAdminister.length > 0 ? false : true}
-            className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
-            Administer Vaccine ( {vaccinesToAdminister.length} )
-          </button>
-        </div>
-      </div>
 
-      {mappedVaccines.map((category => (
-        <dl key={category.category} className="mt-5 space-y-6 divide-y divide-gray-900/10">
-          <div className="overflow-hidden rounded-lg bg-gray-100 pb-6 pt-5 mt-5 shadow sm:px-6">
-          <Disclosure
+        {sections.map((category) => {
+          const sectionVaccines = nonRoutineVaccines[category]
+          return (
+            <dl
+              key={category}
+              className="mt-5 space-y-6 divide-y divide-gray-900/10"
+            >
+              <div className="overflow-hidden rounded-lg bg-gray-100 pb-6 pt-5 mt-5 shadow sm:px-6">
+                <Disclosure
                   as="div"
-                  key={category.category}
-                  defaultOpen={
-                    category.category === userCategory ? true : false
-                  }
+                  key={category}
+                  defaultOpen={category === patientDetails?.clientCategory}
                   className="pt-2"
                 >
                   {({ open }) => {
-                    const administered = category.vaccines.filter(
+                    const administered = sectionVaccines.filter(
                       (vaccine) => vaccine.status === 'completed'
                     )
-                    const contraindicated = category.vaccines.filter(
+                    const contraindicated = sectionVaccines.filter(
                       (vaccine) => vaccine.status === 'entered-in-error'
                     )
                     const someAdministered =
-                      category.vaccines.filter(
-                        (vaccine) => vaccine.status !== 'complete' || vaccine.status === 'not-done' || vaccine.status === 'entered-in-error'
-                      )?.length > 0 && (administered.length > 0 || contraindicated.length > 0)
-                    const allAdministered =
-                      category.vaccines.filter(
-                        (vaccine) => vaccine.status === 'completed'
-                      )?.length === category.vaccines.length
-                    const allNotAdministered =
-                      category.vaccines.filter(
+                      sectionVaccines.filter(
                         (vaccine) =>
-                          vaccine.status !== 'completed' && ''
-                          // !lockVaccine(
-                          //   vaccine?.adminRange?.start,
-                          //   patientData.birthDate
-                          // )
-                      )?.length === category.vaccines.length 
+                          vaccine.status !== 'complete' ||
+                          vaccine.status === 'not-done' ||
+                          vaccine.status === 'entered-in-error'
+                      )?.length > 0 &&
+                      (administered.length > 0 || contraindicated.length > 0)
+                    const allAdministered =
+                      sectionVaccines.filter(
+                        (vaccine) => vaccine.status === 'completed'
+                      )?.length === sectionVaccines.length
+                    const allNotAdministered =
+                      sectionVaccines.filter(
+                        (vaccine) => vaccine.status !== 'completed' && ''
+                        // !lockVaccine(
+                        //   vaccine?.adminRange?.start,
+                        //   patientData.birthDate
+                        // )
+                      )?.length === sectionVaccines.length
 
                     return (
                       <>
@@ -342,7 +368,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                             <div className="flex w-full justify-between px-10">
                               <span>
                                 <span className="flex items-center">
-                                  {formatCardTitle(category.category)}
+                                  {formatCardTitle(category)}
                                   {/*Colour coding - dark grey (not administered), Green (administered), amber (some vaccines not administered), red (missed)*/}
                                   <Badge
                                     className="ml-2 vaccination-status"
@@ -351,10 +377,10 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                                       allAdministered
                                         ? 'green'
                                         : someAdministered
-                                          ? '#faad14'
-                                          : allNotAdministered
-                                            ? 'red'
-                                            : 'gray'
+                                        ? '#faad14'
+                                        : allNotAdministered
+                                        ? 'red'
+                                        : 'gray'
                                     }
                                   />
                                 </span>
@@ -390,7 +416,7 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                         >
                           <Table
                             columns={columns}
-                            dataSource={category.vaccines}
+                            dataSource={sectionVaccines}
                             pagination={false}
                             size="small"
                           />
@@ -399,11 +425,11 @@ export default function NonRoutineVaccines({ userCategory, userID, patientData})
                     )
                   }}
                 </Disclosure>
-          </div>
-        </dl>
-      )))}
-
-    </div>
+              </div>
+            </dl>
+          )
+        })}
+      </div>
     </>
-  ) 
+  )
 }

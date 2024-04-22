@@ -8,34 +8,58 @@ import LoadingArrows from '../common/spinners/LoadingArrows'
 import { useDispatch } from 'react-redux'
 import { setCurrentPatient } from '../redux/actions/patientActions'
 import usePatient from '../hooks/usePatient'
-import { formatClientDetails } from '../components/ClientDetailsView/clientDetailsController'
+import {
+  formatClientDetails,
+  formatRecommendationsToObject,
+  groupVaccinesByCategory,
+} from '../components/ClientDetailsView/clientDetailsController'
+import useVaccination from '../hooks/useVaccination'
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [patientData, setPatientData] = useState(null)
+  const [routineVaccines, setRoutineVaccines] = useState([])
+  const [nonRoutineVaccines, setNonRoutineVaccines] = useState([])
 
   const { clientID } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const { getPatient, patient } = usePatient()
-  const { data: immunizationData } = useGet(
-    `Immunization?patient=Patient/${clientID}`
-  )
-  const { data: immunizationRecommendation } = useGet(
-    `ImmunizationRecommendation?patient=Patient/${clientID}`
-  )
+  const {
+    getRecommendations,
+    getImmunizations,
+    immunizations,
+    recommendations,
+  } = useVaccination()
+ 
+
 
   useEffect(() => {
     getPatient(clientID)
+    getRecommendations(clientID)
+    getImmunizations(clientID)
   }, [clientID])
+
+  console.log('nonRoutineVaccines', nonRoutineVaccines)
 
   useEffect(() => {
     if (patient) {
       dispatch(setCurrentPatient(patient))
       setPatientData(formatClientDetails(patient))
     }
-  }, [patient, immunizationData, immunizationRecommendation])
+  }, [patient])
+
+  useEffect(() => {
+    if (recommendations) {
+      const groupedVaccines = groupVaccinesByCategory(
+        recommendations?.recommendation,
+        immunizations
+      )
+      setRoutineVaccines(groupedVaccines.routine)
+      setNonRoutineVaccines(groupedVaccines.non_routine)
+    }
+  }, [immunizations, recommendations])
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false)
@@ -110,6 +134,10 @@ export default function ClientDetailsView() {
           userID={patient?.id}
           patientData={patient}
           patientDetails={patientData}
+          routineVaccines={routineVaccines}
+          nonRoutineVaccines={nonRoutineVaccines}
+          recommendations={recommendations}
+          immunizations={immunizations}
         />
       </div>
     </>

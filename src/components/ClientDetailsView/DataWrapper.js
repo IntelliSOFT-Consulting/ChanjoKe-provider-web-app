@@ -51,8 +51,6 @@ const createVaccineImmunization = (data, patientID, status) => {
 
 const recommendation = (recommendation) => {
 
-    console.log({ recommendation })
-
     if (!recommendation) {
 
     } else {
