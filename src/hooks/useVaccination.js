@@ -15,16 +15,22 @@ export default function useVaccination() {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const filterVaccinationRecommendations = (patient) => {
+  const filterVaccinationRecommendations = (patient, recommendation) => {
     const patientAge = getAgeInUnits(patient.birthDate, 'days')
 
     const filterVaccines = (vaccines) =>
-      vaccines.filter(({ adminRange, constraints }) => {
+      vaccines.filter(({ adminRange, constraints, nhddCode }) => {
         const eligibleByAge = patientAge <= adminRange.end
         const eligibleByGender = constraints?.gender
           ? patient.gender !== constraints.gender
           : true
-        return eligibleByAge && eligibleByGender
+
+        const isVaccineInSchedule = recommendation?.recommendation?.find(
+          (recommendation) =>
+            recommendation.vaccineCode?.[0]?.coding?.[0]?.code === nhddCode
+        )
+
+        return (eligibleByAge && eligibleByGender) || isVaccineInSchedule
       })
 
     return [
@@ -33,11 +39,15 @@ export default function useVaccination() {
     ]
   }
 
-  const formatRecommendationsToFHIR = (patient) => {
-    const recommendations = filterVaccinationRecommendations(patient)
+  const formatRecommendationsToFHIR = (patient, recommendation) => {
+    const recommendations = filterVaccinationRecommendations(
+      patient,
+      recommendation
+    )
 
     return {
       resourceType: 'ImmunizationRecommendation',
+      id: recommendation?.id,
       patient: {
         reference: `Patient/${patient.id}`,
       },
@@ -118,9 +128,19 @@ export default function useVaccination() {
     }
   }
 
-  const createRecommendations = async (patient) => {
+  const createRecommendations = async (patient, strategy = 'create') => {
+    if (strategy === 'update') {
+      const currentRecommendations = await getRecommendations(patient.id)
+      const recommendations = formatRecommendationsToFHIR(
+        patient,
+        currentRecommendations
+      )
+
+      return await updateRecommendations(recommendations)
+    }
+
     const recommendations = formatRecommendationsToFHIR(patient)
-    await post(recommendationsEndpoint, recommendations)
+    return await post(recommendationsEndpoint, recommendations)
   }
 
   const updateRecommendations = async (recommendation) => {

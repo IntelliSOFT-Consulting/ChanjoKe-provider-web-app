@@ -1,21 +1,20 @@
-import { useNavigate } from 'react-router-dom'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { useEffect, useState } from 'react'
-import OptionsDialog from '../../common/dialog/OptionsDialog'
-import { useSharedState } from '../../shared/sharedState'
-import moment from 'moment'
-import { useApiRequest } from '../../api/useApiRequest'
-import Loader from '../../common/spinners/LoadingArrows'
-import Table from '../DataTable'
 import { Badge, Button, Checkbox, Tag, Tooltip } from 'antd'
-import { datePassed, lockVaccine } from '../../utils/validate'
-import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
-import { setCurrentPatient } from '../../redux/actions/patientActions'
-import { useDispatch, useSelector } from 'react-redux'
-import { createImmunizationRecommendation } from './DataWrapper'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { useApiRequest } from '../../api/useApiRequest'
+import OptionsDialog from '../../common/dialog/OptionsDialog'
+import Loader from '../../common/spinners/LoadingArrows'
 import useAefi from '../../hooks/useAefi'
-import dayjs from 'dayjs'
+import { setCurrentPatient } from '../../redux/actions/patientActions'
+import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
+import { useSharedState } from '../../shared/sharedState'
+import { formatCardTitle } from '../../utils/methods'
+import { datePassed, lockVaccine } from '../../utils/validate'
+import Table from '../DataTable'
+import { colorCodeVaccines } from './vaccineController'
 
 const categories = [
   'at_birth',
@@ -37,13 +36,10 @@ export default function RoutineVaccines({
   patientDetails,
   routineVaccines,
 }) {
-  const [mappedVaccines, setMappedVaccines] = useState([])
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
-
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   const { setSharedData } = useSharedState()
   const { get } = useApiRequest()
@@ -52,33 +48,6 @@ export default function RoutineVaccines({
   const dispatch = useDispatch()
 
   const { getAefis, loading: loadingAefis } = useAefi()
-
-  function mergeVaccines(localVaccines, apiVaccines) {
-    if (Array.isArray(apiVaccines) && apiVaccines?.length) {
-      const updatedVaccines = localVaccines.map((localVaccine) => {
-        const matchingApiVaccine = apiVaccines.find(
-          (apiVaccine) =>
-            apiVaccine?.resource?.vaccineCode?.text ===
-            localVaccine?.vaccineName
-        )
-
-        return matchingApiVaccine
-          ? { ...localVaccine, ...matchingApiVaccine.resource }
-          : localVaccine
-      })
-
-      return updatedVaccines
-    } else {
-      return localVaccines
-    }
-  }
-
-  function formatCardTitle(input) {
-    return input
-      ?.split('_')
-      ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  }
 
   const fetchPatientImmunization = async () => {
     const response = await get(
@@ -116,16 +85,16 @@ export default function RoutineVaccines({
     }
   }, [data?.entry, loading])
 
-  function handleCheckBox(onActionBtn, item) {
+  function handleCheckBox(item) {
     const vaccineExists = vaccinesToAdminister.find(
-      (vaccine) => vaccine.vaccineName === item.vaccineName
+      (vaccine) => vaccine.vaccine === item.vaccine
     )
     if (vaccineExists === undefined) {
       setVaccinesToAdminister([...vaccinesToAdminister, item])
     }
     if (vaccineExists) {
       const withoutDeletedVaccine = vaccinesToAdminister?.filter(
-        (vaccine) => vaccine.vaccineName !== item.vaccineName
+        (vaccine) => vaccine.vaccine !== item.vaccine
       )
       setVaccinesToAdminister(withoutDeletedVaccine)
     }
@@ -138,19 +107,19 @@ export default function RoutineVaccines({
   const administerVaccineBtns = [
     {
       btnText: 'Administer Vaccine',
-      url: '/administer-vaccine',
+      url: `/administer-vaccine/${patientData?.id}`,
       bgClass: 'bg-[#4E8D6E] text-white',
       textClass: 'text-center',
     },
     {
       btnText: 'Contraindicate',
-      url: '/add-contraindication',
+      url: `/add-contraindication/${patientData?.id}`,
       bgClass: 'bg-[#5370B0] text-white',
       textClass: 'text-center',
     },
     {
       btnText: 'Not Administered',
-      url: '/not-administered',
+      url: `/not-administered/${patientData?.id}`,
       bgClass: 'outline outline-[#5370B0] text-[#5370B0]',
       textClass: 'text-center',
     },
@@ -161,7 +130,7 @@ export default function RoutineVaccines({
       title: '',
       dataIndex: 'vaccineName',
       key: 'vaccineName',
-      render: (text, record) => {
+      render: (_text, record) => {
         const completed = record.status === 'completed'
         const locked = lockVaccine(record.dueDate, patientData.birthDate)
         return (
@@ -180,7 +149,7 @@ export default function RoutineVaccines({
               value={record.vaccineName}
               defaultChecked={completed}
               disabled={completed || locked}
-              onChange={() => handleCheckBox('administer', record)}
+              onChange={() => handleCheckBox(record)}
             />
           </Tooltip>
         )
@@ -319,32 +288,8 @@ export default function RoutineVaccines({
                         const administered = categoryvaccines?.filter(
                           (vaccine) => vaccine.status === 'completed'
                         )
-                        const someAdministered =
-                          categoryvaccines?.filter(
-                            (vaccine) =>
-                              vaccine.status !== 'complete' ||
-                              vaccine.status === 'not-done'
-                          )?.length > 0 && administered?.length > 0
-                        const allAdministered =
-                          categoryvaccines?.filter(
-                            (vaccine) => vaccine.status === 'completed'
-                          )?.length === categoryvaccines?.length
-                        const allNotAdministered =
-                          categoryvaccines?.filter(
-                            (vaccine) => vaccine.status !== 'completed'
-                          )?.length === categoryvaccines?.length
 
-                        const allUpcoming =
-                          categoryvaccines?.filter((vaccine) => {
-                            const today = new Date()
-                            const dueDate = new Date(
-                              vaccine.dueDate?.format('YYYY-MM-DD')
-                            )
-                            return (
-                              today < dueDate && vaccine.status !== 'completed'
-                            )
-                          })?.length === categoryvaccines?.length
-
+                        const color = colorCodeVaccines(categoryvaccines)
                         return (
                           <>
                             <dt>
@@ -353,21 +298,11 @@ export default function RoutineVaccines({
                                   <span>
                                     <span className="flex items-center">
                                       {formatCardTitle(category)}
-                                      {/*Colour coding - dark grey (not administered), Green (administered), amber (some vaccines not administered), red (missed)*/}
+
                                       <Badge
                                         className="ml-2 vaccination-status"
                                         size="large"
-                                        color={
-                                          allAdministered
-                                            ? 'green'
-                                            : someAdministered
-                                            ? '#faad14'
-                                            : allNotAdministered
-                                            ? allUpcoming
-                                              ? 'gray'
-                                              : 'red'
-                                            : 'gray'
-                                        }
+                                        color={color}
                                       />
                                     </span>
                                   </span>
@@ -376,7 +311,9 @@ export default function RoutineVaccines({
                                       <Button
                                         to="/aefi-report"
                                         className="text-[#163C94]"
-                                        disabled={allNotAdministered}
+                                        disabled={['gray', 'red'].includes(
+                                          color
+                                        )}
                                         onClick={() => {
                                           dispatch(
                                             setSelectedVaccines(administered)

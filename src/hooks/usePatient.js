@@ -59,6 +59,7 @@ export default function usePatient() {
       ],
       gender: data.gender,
       birthDate: data.dateOfBirth,
+      multipleBirthBoolean: data.estimatedAge === false,
       address: [
         {
           use: 'home',

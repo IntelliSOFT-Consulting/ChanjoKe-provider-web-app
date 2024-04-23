@@ -41,8 +41,6 @@ export default function ClientDetailsView() {
     getImmunizations(clientID)
   }, [clientID])
 
-  console.log('nonRoutineVaccines', nonRoutineVaccines)
-
   useEffect(() => {
     if (patient) {
       dispatch(setCurrentPatient(patient))
