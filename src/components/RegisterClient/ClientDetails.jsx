@@ -90,6 +90,7 @@ export default function ClientDetails() {
     handleCountyChange,
     handleSubCountyChange,
     handleWardChange,
+    setEstimatedAge,
   })
 
   const { createRecommendations } = useVaccination()
@@ -136,6 +137,7 @@ export default function ClientDetails() {
 
       await createRecommendations(patient)
     }
+    await createRecommendations(patient, 'update')
     await createObservation(values, patient.id, encounter?.id)
 
     setSaving(false)

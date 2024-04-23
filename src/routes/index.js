@@ -157,15 +157,15 @@ const router = createBrowserRouter([
         element: <UpdateClientHistory />,
       },
       {
-        path: '/administer-vaccine',
+        path: '/administer-vaccine/:clientID',
         element: <BatchNumbers />,
       },
       {
-        path: '/add-contraindication',
+        path: '/add-contraindication/:clientID',
         element: <Contraindications />,
       },
       {
-        path: '/not-administered',
+        path: '/not-administered/:clientID',
         element: <NotAdministered />,
       },
       {

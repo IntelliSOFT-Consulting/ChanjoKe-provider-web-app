@@ -61,18 +61,29 @@ export const formatClientDetails = (patientResource) => {
   }
 }
 
-export const formatRecommendationsToObject = (recommendation) => ({
-  vaccine: recommendation.vaccineCode?.[0]?.text,
-  doseNumber: recommendation?.doseNumberPositiveInt,
-  dueDate: recommendation.dateCriterion?.[0]?.value ? moment(recommendation.dateCriterion?.[0]?.value) : null,
-  administeredDate: recommendation.administeredDate
-    ? moment(recommendation.administeredDate)
-    : null,
-  disease: recommendation.targetDisease?.text,
-  status:
-    recommendation.status ||
-    recommendation.forecastStatus?.coding?.[0]?.display,
-})
+export const formatRecommendationsToObject = (recommendation) => {
+  const earliestDate = recommendation.dateCriterion?.find(
+    (date) => date.code?.coding?.[0]?.code === 'Earliest-date-to-administer'
+  )?.value
+  const latestDate = recommendation.dateCriterion?.find(
+    (date) => date.code?.coding?.[0]?.code === 'Latest-date-to-administer'
+  )?.value
+  return {
+    vaccine: recommendation.vaccineCode?.[0]?.text,
+    doseNumber: recommendation?.doseNumberPositiveInt,
+    dueDate: earliestDate ? moment(earliestDate) : null,
+    lastDate: latestDate ? moment(latestDate) : null,
+    administeredDate: recommendation.administeredDate
+      ? moment(recommendation.administeredDate)
+      : null,
+    disease: recommendation.targetDisease?.text,
+    status:
+      recommendation.status ||
+      recommendation.forecastStatus?.coding?.[0]?.display,
+    vaccineId: recommendation.vaccineCode?.[0]?.coding?.[0]?.display,
+    nhddCode: recommendation.vaccineCode?.[0]?.coding?.[0]?.code,
+  }
+}
 
 export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
   const categories = {
@@ -90,11 +101,11 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
       '10-14_years': [],
     },
     non_routine: {
-      'Covid_19': [],
-      'Tetanus': [],
-      'Yellow_fever': [],
-      'Rabies': [],
-      'Influenza': [],
+      Covid_19: [],
+      Tetanus: [],
+      Yellow_fever: [],
+      Rabies: [],
+      Influenza: [],
     },
   }
 

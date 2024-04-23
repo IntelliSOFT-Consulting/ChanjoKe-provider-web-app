@@ -1,139 +1,32 @@
-import { useState, useEffect } from 'react'
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import Table from '../DataTable'
+import { Badge, Button, Checkbox, Tag } from 'antd'
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import { useSharedState } from '../../shared/sharedState'
-import { Badge, Button, Checkbox, Tag } from 'antd'
-import moment from 'moment'
-import { useApiRequest } from '../../api/useApiRequest'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { datePassed, lockVaccine } from '../../utils/validate'
-import { message } from 'antd'
+import { formatCardTitle } from '../../utils/methods'
+import { datePassed } from '../../utils/validate'
+import Table from '../DataTable'
+import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
+import { colorCodeVaccines, isQualified } from './vaccineController'
 
 export default function NonRoutineVaccines({
   userCategory,
-  userID,
   patientData,
   nonRoutineVaccines,
   patientDetails,
 }) {
-  const [mappedVaccines, setMappedVaccines] = useState(() =>
-    mapVaccinesByCategory(nonRoutineVaccines)
-  )
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
 
   const { setSharedData } = useSharedState()
-  const { get } = useApiRequest()
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
 
-  function mergeVaccines(localVaccines, apiVaccines) {
-    if (Array.isArray(apiVaccines) && apiVaccines.length) {
-      const updatedVaccines = localVaccines.map((localVaccine) => {
-        const matchingApiVaccine = apiVaccines.find(
-          (apiVaccine) =>
-            apiVaccine?.resource?.vaccineCode?.text ===
-            localVaccine?.vaccineName
-        )
-
-        return matchingApiVaccine
-          ? { ...localVaccine, ...matchingApiVaccine.resource }
-          : localVaccine
-      })
-
-      return updatedVaccines
-    } else {
-      return localVaccines
-    }
-  }
-
-  function formatCardTitle(input) {
-    return input
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  }
-
-  useEffect(() => {
-    const fetchPatientImmunization = async () => {
-      const response = await get(
-        `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
-      )
-      setData(response)
-      setLoading(false)
-    }
-
-    if (patientData?.id) {
-      fetchPatientImmunization()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientData])
-
-  useEffect(() => {
-    const vaccData = data?.entry?.map((vaccine) => {
-      return {
-        vaccineName: vaccine?.resource?.vaccineCode?.text,
-        vaccineCode: vaccine?.resource?.vaccineCode?.coding?.[0]?.code,
-        diseaseTarget:
-          vaccine?.resource?.protocolApplied?.[0]?.targetDisease?.[0]?.text,
-        status:
-          vaccine?.resource?.status === 'completed'
-            ? 'Administered'
-            : 'Not Administered',
-        dateAdministered: moment(vaccine?.resource?.occurenceDateTime).format(
-          'DD-MM-YYYY'
-        ),
-        dueDate: '-',
-        doseNumber: vaccine?.resource?.doseQuantity?.value,
-      }
-    })
-
-    if (Array.isArray(vaccData) && vaccData) {
-      const mergedVax = mergeVaccines(nonRoutineVaccines, data?.entry || [])
-
-      setMappedVaccines(mapVaccinesByCategory(mergedVax))
-    } else {
-      setMappedVaccines(mapVaccinesByCategory(nonRoutineVaccines))
-    }
-  }, [data?.entry])
-
-  function mapVaccinesByCategory(vaccines) {
-    const categoriesMap = {}
-
-    if (Array.isArray(vaccines) && vaccines.length > 0) {
-      vaccines.forEach((vaccine) => {
-        const { category, ...rest } = vaccine
-
-        if (!categoriesMap[category]) {
-          categoriesMap[category] = []
-        }
-
-        rest.actions = [
-          { title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' },
-        ]
-
-        categoriesMap[category].push(rest)
-      })
-
-      const categoriesArray = Object.entries(categoriesMap).map(
-        ([category, vaccines]) => ({
-          category,
-          status: 'pending',
-          vaccines,
-        })
-      )
-
-      return categoriesArray
-    }
-  }
-
-  function handleCheckBox(onActionBtn, item) {
+  function handleCheckBox(item) {
     const vaccineExists = vaccinesToAdminister.find(
       (vaccine) => vaccine.vaccineName === item.vaccineName
     )
@@ -141,7 +34,7 @@ export default function NonRoutineVaccines({
       setVaccinesToAdminister([...vaccinesToAdminister, item])
     }
     if (vaccineExists) {
-      const withoutDeletedVaccine = vaccinesToAdminister.filter(
+      const withoutDeletedVaccine = vaccinesToAdminister?.filter(
         (vaccine) => vaccine.vaccineName !== item.vaccineName
       )
       setVaccinesToAdminister(withoutDeletedVaccine)
@@ -155,33 +48,23 @@ export default function NonRoutineVaccines({
   const administerVaccineBtns = [
     {
       btnText: 'Administer Vaccine',
-      url: '/administer-vaccine',
+      url: `/administer-vaccine/${patientData?.id}`,
       bgClass: 'bg-[#4E8D6E] text-white',
       textClass: 'text-center',
     },
     {
       btnText: 'Contraindicate',
-      url: '/add-contraindication',
+      url: `/add-contraindication/${patientData?.id}`,
       bgClass: 'bg-[#5370B0] text-white',
       textClass: 'text-center',
     },
     {
       btnText: 'Not Administered',
-      url: '/not-administered',
+      url: `/not-administered/${patientData?.id}`,
       bgClass: 'outline outline-[#5370B0] text-[#5370B0]',
       textClass: 'text-center',
     },
   ]
-
-  /*
-{
-      'Covid_19': [],
-      'Tetanus': [],
-      'Yellow_fever': [],
-      'Rabies': [],
-      'Influenza': [],
-    },
-  */
 
   const sections = [
     'Covid_19',
@@ -196,17 +79,19 @@ export default function NonRoutineVaccines({
       title: '',
       dataIndex: 'vaccine',
       key: 'vaccine',
-      render: (text, record) => {
+      render: (_text, record) => {
         const completed = record.status === 'completed'
-        const notDone = record.status === 'not-done'
+
+        const allVaccines = Object.values(nonRoutineVaccines).flat()
+
         return (
           <Checkbox
             name={record.vaccineName}
             value={record.vaccineName}
             defaultChecked={completed}
             className="tooltip"
-            disabled={completed || notDone}
-            onChange={() => handleCheckBox('administer', record)}
+            disabled={!isQualified(allVaccines, record)}
+            onChange={() => handleCheckBox(record)}
           />
         )
       },
@@ -311,10 +196,10 @@ export default function NonRoutineVaccines({
                 setDialogOpen(true)
                 setSharedData(vaccinesToAdminister)
               }}
-              disabled={vaccinesToAdminister.length > 0 ? false : true}
+              disabled={vaccinesToAdminister?.length > 0 ? false : true}
               className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
             >
-              Administer Vaccine ( {vaccinesToAdminister.length} )
+              Administer Vaccine ( {vaccinesToAdminister?.length} )
             </button>
           </div>
         </div>
@@ -334,33 +219,10 @@ export default function NonRoutineVaccines({
                   className="pt-2"
                 >
                   {({ open }) => {
-                    const administered = sectionVaccines.filter(
-                      (vaccine) => vaccine.status === 'completed'
+                    const color = colorCodeVaccines(sectionVaccines)
+                    const administered = sectionVaccines?.filter(
+                      (item) => item.status === 'completed'
                     )
-                    const contraindicated = sectionVaccines.filter(
-                      (vaccine) => vaccine.status === 'entered-in-error'
-                    )
-                    const someAdministered =
-                      sectionVaccines.filter(
-                        (vaccine) =>
-                          vaccine.status !== 'complete' ||
-                          vaccine.status === 'not-done' ||
-                          vaccine.status === 'entered-in-error'
-                      )?.length > 0 &&
-                      (administered.length > 0 || contraindicated.length > 0)
-                    const allAdministered =
-                      sectionVaccines.filter(
-                        (vaccine) => vaccine.status === 'completed'
-                      )?.length === sectionVaccines.length
-                    const allNotAdministered =
-                      sectionVaccines.filter(
-                        (vaccine) => vaccine.status !== 'completed' && ''
-                        // !lockVaccine(
-                        //   vaccine?.adminRange?.start,
-                        //   patientData.birthDate
-                        // )
-                      )?.length === sectionVaccines.length
-
                     return (
                       <>
                         <dt>
@@ -369,19 +231,10 @@ export default function NonRoutineVaccines({
                               <span>
                                 <span className="flex items-center">
                                   {formatCardTitle(category)}
-                                  {/*Colour coding - dark grey (not administered), Green (administered), amber (some vaccines not administered), red (missed)*/}
                                   <Badge
                                     className="ml-2 vaccination-status"
                                     size="large"
-                                    color={
-                                      allAdministered
-                                        ? 'green'
-                                        : someAdministered
-                                        ? '#faad14'
-                                        : allNotAdministered
-                                        ? 'red'
-                                        : 'gray'
-                                    }
+                                    color={color}
                                   />
                                 </span>
                               </span>
@@ -390,9 +243,11 @@ export default function NonRoutineVaccines({
                                   <Button
                                     to="/aefi-report"
                                     className="text-[#163C94]"
-                                    disabled={!someAdministered}
+                                    disabled={['gray', 'red'].includes(color)}
                                     onClick={() => {
-                                      setSharedData({ vaccinesToAdminister })
+                                      dispatch(
+                                        setSelectedVaccines(administered)
+                                      )
                                       navigate('/aefi-report')
                                     }}
                                     type="link"

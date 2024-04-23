@@ -5,13 +5,6 @@ import { calculateAges, writeAge } from '../../utils/methods'
 import dayjs from 'dayjs'
 import { identificationOptions } from '../../data/options/clientDetails'
 
-/*
- * This component is responsible for fetching patient details
- * and the first observation for the patient
- * @param {string} patientId - the patient id
- * Formats the patient information to be displayed in the form
- * @param {object} form - the antd form object
- */
 export default function PreloadDetails({
   patientId,
   form,
@@ -19,11 +12,10 @@ export default function PreloadDetails({
   setIdOptions,
   setIsAdult,
   counties,
-  subCounties,
-  wards,
   handleCountyChange,
   handleSubCountyChange,
   handleWardChange,
+  setEstimatedAge,
 }) {
   const [patient, setPatient] = useState(null)
   const [observation, setObservation] = useState(null)
@@ -58,6 +50,7 @@ export default function PreloadDetails({
     const ward = patient.address[0]?.line?.[2]
     const townCenter = patient.address[0]?.line?.[3]
     const estateOrHouseNo = patient.address[0]?.line?.[4]
+    const estimatedAge = patient.multipleBirthBoolean === true
     const caregivers = patient.contact.map((caregiver) => {
       return {
         caregiverType: caregiver.relationship[0].coding?.[0]?.display,
@@ -75,6 +68,7 @@ export default function PreloadDetails({
     )
 
     setIdOptions(identificationsQualified)
+    setEstimatedAge(estimatedAge)
 
     setIsAdult(ages.years >= 18)
 
@@ -105,6 +99,7 @@ export default function PreloadDetails({
       years: ages.years,
       months: ages.months,
       weeks: ages.weeks,
+      estimatedAge,
     })
 
     if (counties?.length) {

@@ -112,3 +112,10 @@ export const camelToTitle = (str) => {
     ?.replace(/([A-Z])/g, ' $1')
     ?.replace(/^./, (str) => str?.toUpperCase())
 }
+
+export const formatCardTitle = (input) => {
+  return input
+    ?.split('_')
+    ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
