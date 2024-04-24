@@ -24,7 +24,7 @@ export const routineVaccines = [
     status: 'upcoming',
     category: 'at_birth',
     description: 'routine',
-    adminRange: { start: 0, end: 1825, unit: 'days' },
+    adminRange: { start: 0, end: 14, unit: 'days' },
     dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
@@ -293,7 +293,7 @@ export const routineVaccines = [
     vaccineCode: 'IMPO-IPV I',
     nhddCode: '3549',
     diseaseTarget: 'Polio',
-    doseNumber: '3',
+    doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
@@ -590,6 +590,9 @@ export const routineVaccines = [
       return date.format('DD-MM-YYYY')
     },
   },
+]
+
+export const nonRoutineVaccines = [
   {
     vaccineName: 'HPV Vaccine 1',
     vaccineCode: 'IMHPV-1',
@@ -598,8 +601,8 @@ export const routineVaccines = [
     doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
-    category: '10-14_years',
-    description: 'routine',
+    category: 'HPV',
+    description: 'non-routine',
     adminRange: {
       start: 3650,
       end: 3650,
@@ -618,8 +621,8 @@ export const routineVaccines = [
     doseNumber: '2',
     occurrenceDateTime: '',
     status: 'upcoming',
-    category: '10-14_years',
-    description: 'routine',
+    category: 'HPV',
+    description: 'non-routine',
     adminRange: {
       start: 3650,
       end: 3650,
@@ -638,9 +641,6 @@ export const routineVaccines = [
       return date.format('DD-MM-YYYY')
     },
   },
-]
-
-export const nonRoutineVaccines = [
   {
     vaccineName: 'AstraZeneca',
     vaccineCode: 'IMCOV-ASTR-1',

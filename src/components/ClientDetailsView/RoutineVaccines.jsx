@@ -10,25 +10,10 @@ import Loader from '../../common/spinners/LoadingArrows'
 import useAefi from '../../hooks/useAefi'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
 import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
-import { useSharedState } from '../../shared/sharedState'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import { colorCodeVaccines } from './vaccineController'
-
-const categories = [
-  'at_birth',
-  '6_weeks',
-  '10_weeks',
-  '14_weeks',
-  '6_months',
-  '7_months',
-  '9_months',
-  '12_months',
-  '18_months',
-  '24_months',
-  '10-14_years',
-]
 
 export default function RoutineVaccines({
   userCategory,
@@ -41,13 +26,16 @@ export default function RoutineVaccines({
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const { setSharedData } = useSharedState()
   const { get } = useApiRequest()
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
 
   const { getAefis, loading: loadingAefis } = useAefi()
+
+  const categories = routineVaccines
+    ? [...new Set(Object.keys(routineVaccines))]
+    : []
 
   const fetchPatientImmunization = async () => {
     const response = await get(
@@ -104,6 +92,7 @@ export default function RoutineVaccines({
     setDialogOpen(false)
   }
 
+
   const administerVaccineBtns = [
     {
       btnText: 'Administer Vaccine',
@@ -114,13 +103,13 @@ export default function RoutineVaccines({
     {
       btnText: 'Contraindicate',
       url: `/add-contraindication/${patientData?.id}`,
-      bgClass: 'bg-[#5370B0] text-white',
+      bgClass: 'bg-[#163C94] text-white',
       textClass: 'text-center',
     },
     {
       btnText: 'Not Administered',
       url: `/not-administered/${patientData?.id}`,
-      bgClass: 'outline outline-[#5370B0] text-[#5370B0]',
+      bgClass: 'outline outline-[#163C94] text-[#163C94]',
       textClass: 'text-center',
     },
   ]
@@ -250,17 +239,17 @@ export default function RoutineVaccines({
             </small>
           </div>
           <div>
-            <button
+            <Button
+              type="primary"
               onClick={() => {
                 setDialogOpen(true)
                 dispatch(setSelectedVaccines(vaccinesToAdminister))
-                setSharedData(vaccinesToAdminister)
               }}
               disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+              className=""
             >
               Administer Vaccine ( {vaccinesToAdminister?.length} )
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -318,9 +307,6 @@ export default function RoutineVaccines({
                                           dispatch(
                                             setSelectedVaccines(administered)
                                           )
-                                          setSharedData({
-                                            vaccinesToAdminister,
-                                          })
                                           navigate('/aefi-report')
                                         }}
                                         type="link"
@@ -345,7 +331,6 @@ export default function RoutineVaccines({
                               <Table
                                 columns={columns}
                                 dataSource={routineVaccines[category]}
-                                // data={category.vaccines}
                                 pagination={false}
                                 size="small"
                               />

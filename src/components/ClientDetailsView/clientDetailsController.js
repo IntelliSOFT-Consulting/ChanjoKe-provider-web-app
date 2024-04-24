@@ -3,41 +3,17 @@ import { calculateAges, titleCase, writeAge } from '../../utils/methods'
 
 export const classifyUserByAge = (birthDate) => {
   const ageInDays = moment().diff(moment(birthDate), 'days')
-  const ageCategories = {
-    at_birth: [0, 14],
-    sixWeeks: [15, 42],
-    tenWeeks: [43, 70],
-    sixMonths: [71, 182],
-    sevenMonths: [183, 213],
-    nineMonths: [214, 274],
-    twelveMonths: [275, 365],
-    eighteenMonths: [366, 548],
-    twentyFourMonths: [549, 730],
-    tenToFourteenYears: [730, 5110],
-    not_applicable: [5110, Infinity],
-  }
-
-  const categories = {
-    at_birth: 'At Birth',
-    sixWeeks: '6 Weeks',
-    tenWeeks: '10 Weeks',
-    sixMonths: '6 Months',
-    sevenMonths: '7 Months',
-    nineMonths: '9 Months',
-    twelveMonths: '12 Months',
-    eighteenMonths: '18 Months',
-    twentyFourMonths: '24 Months',
-    tenToFourteenYears: '10-14 Years',
-    not_applicable: 'Not Applicable',
-  }
-
-  const mapping = Object.keys(ageCategories).find(
-    (category) =>
-      ageInDays >= ageCategories[category][0] &&
-      ageInDays <= ageCategories[category][1]
-  )
-
-  return categories[mapping]
+  if (ageInDays <= 14) return 'At Birth'
+  if (ageInDays <= 42) return '6 Weeks'
+  if (ageInDays <= 70) return '10 Weeks'
+  if (ageInDays <= 182) return '6 Months'
+  if (ageInDays <= 213) return '7 Months'
+  if (ageInDays <= 274) return '9 Months'
+  if (ageInDays <= 365) return '12 Months'
+  if (ageInDays <= 548) return '18 Months'
+  if (ageInDays <= 730) return '24 Months'
+  if (ageInDays <= 5110) return '10-14 Years'
+  return 'Not Applicable'
 }
 
 export const formatClientDetails = (patientResource) => {
@@ -62,57 +38,70 @@ export const formatClientDetails = (patientResource) => {
 }
 
 export const formatRecommendationsToObject = (recommendation) => {
-  const earliestDate = recommendation.dateCriterion?.find(
+  const {
+    dateCriterion,
+    vaccineCode,
+    doseNumberPositiveInt,
+    administeredDate,
+    targetDisease,
+    status,
+    forecastStatus,
+  } = recommendation
+
+  const dependent = recommendation.seriesDosesString?.split(',')
+
+
+  const earliestDate = dateCriterion?.find(
     (date) => date.code?.coding?.[0]?.code === 'Earliest-date-to-administer'
   )?.value
-  const latestDate = recommendation.dateCriterion?.find(
+  const latestDate = dateCriterion?.find(
     (date) => date.code?.coding?.[0]?.code === 'Latest-date-to-administer'
   )?.value
+  const vaccine = vaccineCode?.[0]?.text
+  const dueDate = earliestDate ? moment(earliestDate) : null
+  const lastDate = latestDate ? moment(latestDate) : null
+  const disease = targetDisease?.text
+  const displayStatus = status || forecastStatus?.coding?.[0]?.display
+  const vaccineId = vaccineCode?.[0]?.coding?.[0]?.display
+  const nhddCode = vaccineCode?.[0]?.coding?.[0]?.code
+  const dependentVaccine = dependent?.[0]
+  const dependencyPeriod = dependent?.[1] ? parseInt(dependent?.[1]) : null
+
   return {
-    vaccine: recommendation.vaccineCode?.[0]?.text,
-    doseNumber: recommendation?.doseNumberPositiveInt,
-    dueDate: earliestDate ? moment(earliestDate) : null,
-    lastDate: latestDate ? moment(latestDate) : null,
-    administeredDate: recommendation.administeredDate
-      ? moment(recommendation.administeredDate)
-      : null,
-    disease: recommendation.targetDisease?.text,
-    status:
-      recommendation.status ||
-      recommendation.forecastStatus?.coding?.[0]?.display,
-    vaccineId: recommendation.vaccineCode?.[0]?.coding?.[0]?.display,
-    nhddCode: recommendation.vaccineCode?.[0]?.coding?.[0]?.code,
+    vaccine,
+    doseNumber: doseNumberPositiveInt,
+    dueDate,
+    lastDate,
+    administeredDate: administeredDate ? moment(administeredDate) : null,
+    disease,
+    status: displayStatus,
+    vaccineId,
+    nhddCode,
+    dependentVaccine,
+    dependencyPeriod,
   }
 }
 
 export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
   const categories = {
-    routine: {
-      at_birth: [],
-      '6_weeks': [],
-      '10_weeks': [],
-      '14_weeks': [],
-      '6_months': [],
-      '7_months': [],
-      '9_months': [],
-      '12_months': [],
-      '18_months': [],
-      '24_months': [],
-      '10-14_years': [],
-    },
-    non_routine: {
-      Covid_19: [],
-      Tetanus: [],
-      Yellow_fever: [],
-      Rabies: [],
-      Influenza: [],
-    },
+    routine: {},
+    non_routine: {},
   }
 
+
+  const routineCategories = new Set()
+  const nonRoutineCategories = new Set()
+
   recommendation.forEach((recommendation) => {
+    const categoryType =
+      recommendation.description === 'routine'
+        ? routineCategories
+        : nonRoutineCategories
+    categoryType.add(recommendation.series)
+
     const getVaccine = immunizations?.find(
       (immunization) =>
-        immunization.vaccineCode?.coding?.[0]?.code ===
+        immunization.vaccineCode?.coding?.[0]?.display ===
         recommendation.vaccineCode?.[0]?.coding?.[0]?.display
     )
 
@@ -121,15 +110,14 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
       recommendation.administeredDate = getVaccine.occurrenceDateTime
     }
 
-    if (recommendation.description === 'routine') {
-      categories.routine[recommendation.series?.toLowerCase()]?.push(
-        formatRecommendationsToObject(recommendation)
-      )
-    } else {
-      categories.non_routine[recommendation.series]?.push(
-        formatRecommendationsToObject(recommendation)
-      )
-    }
+    const category =
+      categories[
+        recommendation.description === 'routine' ? 'routine' : 'non_routine'
+      ]
+    category[recommendation.series] = category[recommendation.series] || []
+    category[recommendation.series].push(
+      formatRecommendationsToObject(recommendation)
+    )
   })
 
   return categories

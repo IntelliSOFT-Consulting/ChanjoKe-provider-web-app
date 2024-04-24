@@ -5,12 +5,12 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
-import { useSharedState } from '../../shared/sharedState'
+import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed } from '../../utils/validate'
 import Table from '../DataTable'
-import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { colorCodeVaccines, isQualified } from './vaccineController'
+import { routineVaccines } from '../../data/vaccineData'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -21,7 +21,6 @@ export default function NonRoutineVaccines({
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const { setSharedData } = useSharedState()
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
@@ -55,24 +54,22 @@ export default function NonRoutineVaccines({
     {
       btnText: 'Contraindicate',
       url: `/add-contraindication/${patientData?.id}`,
-      bgClass: 'bg-[#5370B0] text-white',
+      bgClass: 'bg-[#163C94] text-white',
       textClass: 'text-center',
     },
     {
       btnText: 'Not Administered',
       url: `/not-administered/${patientData?.id}`,
-      bgClass: 'outline outline-[#5370B0] text-[#5370B0]',
+      bgClass: 'outline outline-[#163C94] text-[#163C94]',
       textClass: 'text-center',
     },
   ]
 
-  const sections = [
-    'Covid_19',
-    'Tetanus',
-    'Yellow_fever',
-    'Rabies',
-    'Influenza',
-  ]
+  const sections = nonRoutineVaccines
+    ? [...new Set(Object.keys(nonRoutineVaccines))]
+    : []
+
+  const allVaccines = Object.values(nonRoutineVaccines).flat()
 
   const columns = [
     {
@@ -81,8 +78,6 @@ export default function NonRoutineVaccines({
       key: 'vaccine',
       render: (_text, record) => {
         const completed = record.status === 'completed'
-
-        const allVaccines = Object.values(nonRoutineVaccines).flat()
 
         return (
           <Checkbox
@@ -111,13 +106,24 @@ export default function NonRoutineVaccines({
       title: 'Due Date',
       dataIndex: 'dueDate',
       key: 'dueDate',
-      render: (text, _record) => (text ? text?.format('DD-MM-YYYY') : '-'),
+      render: (text, record) => {
+        const hasCompletedSeries = allVaccines?.find(
+          (vaccine) =>
+            vaccine.nhddCode === record.nhddCode &&
+            vaccine.status === 'completed'
+        )
+
+        if (text && record?.doseNumber > 1 && hasCompletedSeries) {
+          return text?.format('DD-MM-YYYY')
+        }
+        return '-'
+      },
     },
     {
       title: 'Date Administered',
-      dataIndex: 'occurrenceDateTime',
-      key: 'occurrenceDateTime',
-      render: (text, _record) => (text ? text?.format('DD-MM-YYYY') : '-'),
+      dataIndex: 'administeredDate',
+      key: 'administeredDate',
+      render: (text, _record) => (text ? text.format('DD-MM-YYYY') : '-'),
     },
     {
       title: 'Status',
@@ -191,16 +197,17 @@ export default function NonRoutineVaccines({
             </small>
           </div>
           <div>
-            <button
+            <Button
+              type="primary"
               onClick={() => {
                 setDialogOpen(true)
-                setSharedData(vaccinesToAdminister)
+                dispatch(setSelectedVaccines(vaccinesToAdminister))
               }}
               disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+              className="ml-4"
             >
               Administer Vaccine ( {vaccinesToAdminister?.length} )
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -219,7 +226,7 @@ export default function NonRoutineVaccines({
                   className="pt-2"
                 >
                   {({ open }) => {
-                    const color = colorCodeVaccines(sectionVaccines)
+                    const color = colorCodeVaccines(sectionVaccines, false)
                     const administered = sectionVaccines?.filter(
                       (item) => item.status === 'completed'
                     )

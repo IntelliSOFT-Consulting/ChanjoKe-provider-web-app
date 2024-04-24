@@ -1,4 +1,4 @@
-import ChanjoKE from '../assets/login bg.png'
+import OpenCHANJO from '../assets/login bg.png'
 import MOHLogo from '../assets/moh-logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button, Form, Input, Select } from 'antd'
@@ -43,12 +43,12 @@ export default function Login() {
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
       <nav className="hidden md:block">
-        <img src={ChanjoKE} className="h-screen" alt="Chanjo KE Jumbo" />
+        <img src={OpenCHANJO} className="h-screen" alt="Chanjo KE Jumbo" />
       </nav>
 
       <div>
         <div className="md:collapse flex flex-wrap text-center px-4 sm:flex-nowrap sm:px-6 lg:px-8 bg-[#163C94] text-white shadow py-4">
-          ChanjoKE
+          OpenCHANJO
         </div>
 
         <div className="mx-auto flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-32">
