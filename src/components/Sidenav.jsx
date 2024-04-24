@@ -1,9 +1,6 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, Disclosure } from '@headlessui/react'
-import {
-  Bars3Icon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom'
 import ProfileDropdown from './ProfileDropdown'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
@@ -33,8 +30,8 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const SidebarItem = ({ item , onItemClick }) => {
-  const IconComponent = iconComponents[item.icon];
+const SidebarItem = ({ item, onItemClick }) => {
+  const IconComponent = iconComponents[item.icon]
 
   return (
     <Link
@@ -45,11 +42,19 @@ const SidebarItem = ({ item , onItemClick }) => {
         'flex rounded-md py-2 pr-2 pl-5 text-normal leading-6 font-normal my-5'
       )}
     >
-      {IconComponent && <span className='mr-2'><IconComponent width='24' height='24' fillColor={item.current ? '#163C94' : '#000000'} /></span>}
+      {IconComponent && (
+        <span className="mr-2">
+          <IconComponent
+            width="24"
+            height="24"
+            fillColor={item.current ? '#163C94' : '#000000'}
+          />
+        </span>
+      )}
       {item.name}
     </Link>
-  );
-};
+  )
+}
 
 export default function Sidenav() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -62,31 +67,63 @@ export default function Sidenav() {
       icon: '',
       children: [
         { name: 'Add User', href: '/admin-users' },
-        { name: 'Add Facility', href: '/admin-add-facility'}
-      ]},
-    { name: 'Vaccination Reports', current: false, href: '/reports', icon: 'vaccinationReportLogo' },
+        { name: 'Add Facility', href: '/admin-add-facility' },
+      ],
+    },
+    {
+      name: 'Vaccination Reports',
+      current: false,
+      href: '/reports',
+      icon: 'vaccinationReportLogo',
+    },
     { name: 'Search Client', href: '/search/searchClient', icon: 'searchLogo' },
-    { name: 'Register Client', href: '/register-client', icon: 'registerClientLogo' },
-    { name: 'Update Client History', href: '/search/updateClient', icon: 'updateClientLogo' },
-    { name: 'Administer Vaccine', href: '/search/administerVaccine', icon: 'administerVaccineLogo' },
-    { name: 'Appointments', href: '/search/appointments', icon: 'appointmentLogo' },
+    {
+      name: 'Register Client',
+      href: '/register-client',
+      icon: 'registerClientLogo',
+    },
+    {
+      name: 'Update Client History',
+      href: '/search/updateClient',
+      icon: 'updateClientLogo',
+    },
+    {
+      name: 'Administer Vaccine',
+      href: '/search/administerVaccine',
+      icon: 'administerVaccineLogo',
+    },
+    {
+      name: 'Appointments',
+      href: '/search/appointments',
+      icon: 'appointmentLogo',
+    },
     { name: 'AEFI', href: '/search/aefi', icon: 'aefiLogo' },
-    { name: 'Defaulter Tracing', href: '/defaulter-tracing', icon: 'defaulterTracingLogo' },
+    {
+      name: 'Defaulter Tracing',
+      href: '/defaulter-tracing',
+      icon: 'defaulterTracingLogo',
+    },
     {
       name: 'Stock Management',
       href: '/stock-management',
       icon: '',
       children: [
         { name: 'Receive Stock', href: '/stock-management/receive-stock' },
-        { name: 'Issue Stock', href: '/stock-management/issue-stock'},
-        { name: 'Stock Count', href: '/stock-management/stock-count'},
-        { name: 'Positive Adjustment', href: '/stock-management/positive-adjustment'},
-        { name: 'Negative Adjustment', href: '/stock-management/negative-adjustment'},
-        { name: 'VVM Status Change', href: '/stock-management/vvm-status'},
-        { name: 'New Order', href: '/stock-management/new-order'},
-        { name: 'Received Orders', href: '/stock-management/received-orders'},
-        { name: 'Sent Orders', href: '/stock-management/sent-orders'},
-        { name: 'Ledger', href: '/stock-management/ledger'},
+        { name: 'Issue Stock', href: '/stock-management/issue-stock' },
+        { name: 'Stock Count', href: '/stock-management/stock-count' },
+        {
+          name: 'Positive Adjustment',
+          href: '/stock-management/positive-adjustment',
+        },
+        {
+          name: 'Negative Adjustment',
+          href: '/stock-management/negative-adjustment',
+        },
+        { name: 'VVM Status Change', href: '/stock-management/vvm-status' },
+        { name: 'New Order', href: '/stock-management/new-order' },
+        { name: 'Received Orders', href: '/stock-management/received-orders' },
+        { name: 'Sent Orders', href: '/stock-management/sent-orders' },
+        { name: 'Ledger', href: '/stock-management/ledger' },
       ],
     },
   ])
@@ -95,17 +132,20 @@ export default function Sidenav() {
     const updatedNavigation = navigation.map((item) => ({
       ...item,
       current: item.href === clickedItem.href,
-    }));
+    }))
 
     setNavigation(updatedNavigation)
-
-  };
+  }
 
   return (
     <>
       <div>
         <Transition.Root show={sidebarOpen} as={Fragment}>
-          <Dialog as="div" className="relative z-10 lg:hidden" onClose={setSidebarOpen}>
+          <Dialog
+            as="div"
+            className="relative z-10 lg:hidden"
+            onClose={setSidebarOpen}
+          >
             <Transition.Child
               as={Fragment}
               enter="transition-opacity ease-linear duration-300"
@@ -136,55 +176,85 @@ export default function Sidenav() {
                     enterTo="opacity-100"
                     leave="ease-in-out duration-300"
                     leaveFrom="opacity-100"
-                    leaveTo="opacity-0">
+                    leaveTo="opacity-0"
+                  >
                     <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                      <button type="button" className="-m-2.5 p-2.5" onClick={() => setSidebarOpen(false)}>
+                      <button
+                        type="button"
+                        className="-m-2.5 p-2.5"
+                        onClick={() => setSidebarOpen(false)}
+                      >
                         <span className="sr-only">Close sidebar</span>
-                        <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                        <XMarkIcon
+                          className="h-6 w-6 text-white"
+                          aria-hidden="true"
+                        />
                       </button>
                     </div>
                   </Transition.Child>
                   {/* Sidebar component, swap this element with another sidebar if you like */}
                   <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white pb-2">
                     <div className="grid grid-cols-8 h-28 shrink-0 auto-cols-fr items-center">
-                    <div className="bg-[#163C94] col-span-7 h-full text-white text-4xl text-center pt-8">ChanjoKE</div>
-                    <div className="grid grid-cols-3 gap-1 h-full bg-white">
-                      <div className="basis-1/4 bg-black"></div>
-                      <div className="basis-1/4 bg-[#BB0100]"></div>
-                      <div className="basis-1/2 bg-[#286208]"></div>
+                      <div className="bg-[#163C94] col-span-7 h-full text-white text-4xl text-center pt-8">
+                        OpenCHANJO
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 h-full bg-white">
+                        <div className="basis-1/4 bg-black"></div>
+                        <div className="basis-1/4 bg-[#BB0100]"></div>
+                        <div className="basis-1/2 bg-[#286208]"></div>
+                      </div>
                     </div>
-                  </div>
                     <nav className="flex flex-1 flex-col px-6">
-
                       <ul role="list" className="-mx-2 space-y-1">
                         {navigation.map((item) => (
                           <li key={item.name}>
                             {!item.children ? (
-                              <SidebarItem onItemClick={handleItemClick} item={item} width='24' height='24' />
+                              <SidebarItem
+                                onItemClick={handleItemClick}
+                                item={item}
+                                width="24"
+                                height="24"
+                              />
                             ) : (
                               <Disclosure as="div">
                                 {({ open }) => (
                                   <>
                                     <Disclosure.Button
-                                      onClick={() => { navigate(item?.href)}}
+                                      onClick={() => {
+                                        navigate(item?.href)
+                                      }}
                                       className={classNames(
-                                        item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
+                                        item.current
+                                          ? 'bg-gray-50'
+                                          : 'hover:bg-gray-50',
                                         'flex items-center w-full text-left rounded-md p-2 gap-x-3 text-sm leading-6  text-gray-700'
                                       )}
                                     >
                                       <ChevronRightIcon
                                         className={classNames(
-                                          open ? 'rotate-90 text-gray-500' : 'text-gray-400',
+                                          open
+                                            ? 'rotate-90 text-gray-500'
+                                            : 'text-gray-400',
                                           'h-5 w-5 shrink-0'
                                         )}
                                         aria-hidden="true"
                                       />
-                                      <div className='text-xl font-normal'>{item.name}</div>
+                                      <div className="text-xl font-normal">
+                                        {item.name}
+                                      </div>
                                     </Disclosure.Button>
-                                    <Disclosure.Panel as="ul" className="mt-1 px-2">
+                                    <Disclosure.Panel
+                                      as="ul"
+                                      className="mt-1 px-2"
+                                    >
                                       {item.children.map((subItem) => (
                                         <li key={subItem.name}>
-                                          <SidebarItem onItemClick={handleItemClick} item={subItem} width='24' height='24' />
+                                          <SidebarItem
+                                            onItemClick={handleItemClick}
+                                            item={subItem}
+                                            width="24"
+                                            height="24"
+                                          />
                                         </li>
                                       ))}
                                     </Disclosure.Panel>
@@ -208,7 +278,9 @@ export default function Sidenav() {
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white">
             <div className="grid grid-cols-8 h-28 shrink-0 auto-cols-fr items-center">
-              <div className="bg-[#163C94] col-span-7 h-full text-white text-4xl text-center pt-8">ChanjoKE</div>
+              <div className="bg-[#163C94] col-span-7 h-full text-white text-4xl text-center pt-8">
+                OpenCHANJO
+              </div>
               <div className="grid grid-cols-3 gap-1 h-full bg-white">
                 <div className="basis-1/4 bg-black"></div>
                 <div className="basis-1/4 bg-[#BB0100]"></div>
@@ -220,31 +292,49 @@ export default function Sidenav() {
                 {navigation.map((item) => (
                   <li key={item.name}>
                     {!item.children ? (
-                      <SidebarItem onItemClick={handleItemClick} item={item} width='24' height='24' />
+                      <SidebarItem
+                        onItemClick={handleItemClick}
+                        item={item}
+                        width="24"
+                        height="24"
+                      />
                     ) : (
                       <Disclosure as="div">
                         {({ open }) => (
                           <>
                             <Disclosure.Button
-                              onClick={() => { navigate(item?.href)}}
+                              onClick={() => {
+                                navigate(item?.href)
+                              }}
                               className={classNames(
-                                item.current ? 'bg-gray-50' : 'hover:bg-gray-50',
+                                item.current
+                                  ? 'bg-gray-50'
+                                  : 'hover:bg-gray-50',
                                 'flex items-center w-full text-left rounded-md p-2 gap-x-3 leading-6 text-gray-700'
                               )}
                             >
                               <ChevronRightIcon
                                 className={classNames(
-                                  open ? 'rotate-90 text-gray-500' : 'text-gray-400',
+                                  open
+                                    ? 'rotate-90 text-gray-500'
+                                    : 'text-gray-400',
                                   'h-5 w-5 shrink-0 ml-2'
                                 )}
                                 aria-hidden="true"
                               />
-                              <div className='text-normal font-normal'>{item.name}</div>
+                              <div className="text-normal font-normal">
+                                {item.name}
+                              </div>
                             </Disclosure.Button>
                             <Disclosure.Panel as="ul" className="mt-1 px-2">
                               {item.children.map((subItem) => (
                                 <li key={subItem.name}>
-                                  <SidebarItem onItemClick={handleItemClick} item={subItem} width='24' height='24' />
+                                  <SidebarItem
+                                    onItemClick={handleItemClick}
+                                    item={subItem}
+                                    width="24"
+                                    height="24"
+                                  />
                                 </li>
                               ))}
                             </Disclosure.Panel>
@@ -260,12 +350,18 @@ export default function Sidenav() {
         </div>
 
         <div className="sticky top-0 z-10 flex items-center gap-x-6 bg-white px-4 py-4 shadow-sm sm:px-6 lg:hidden">
-          <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <button
+            type="button"
+            className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
             <span className="sr-only">Open sidebar</span>
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </button>
-          <div className="flex-1 text-sm font-semibold leading-6 text-gray-900">ChanjoKE</div>
-          
+          <div className="flex-1 text-sm font-semibold leading-6 text-gray-900">
+            OpenCHANJO
+          </div>
+
           <ProfileDropdown />
         </div>
       </div>

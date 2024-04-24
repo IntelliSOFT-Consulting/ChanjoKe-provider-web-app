@@ -30,43 +30,38 @@ export const isQualified = (vaccinesSchedule, vaccine) => {
   return isEligibleForVaccine(vaccine)
 }
 
-export const colorCodeVaccines = (vaccines) => {
-  const statuses = vaccines?.reduce(
-    (acc, vaccine) => {
-      const isAfter = vaccine.dueDate.isAfter(moment())
-      const isBeforeAndNotCompleted =
-        vaccine.dueDate.isBefore(moment()) &&
-        vaccine.lastDate.isBefore(moment()) &&
-        (vaccine.status !== 'completed' ||
-          vaccine.status !== 'entered-in-error')
-      const isCompleted = vaccine.status === 'completed'
-
-      return {
-        upcoming: acc.upcoming && isAfter,
-        missed: acc.missed && isBeforeAndNotCompleted,
-        allAdministered: acc.allAdministered && isCompleted,
-        someAdministered: acc.someAdministered || isCompleted,
-      }
-    },
-    {
-      upcoming: true,
-      missed: true,
-      allAdministered: true,
-      someAdministered: false,
-    }
+export const colorCodeVaccines = (vaccines, routine = true) => {
+  const allUpcoming = vaccines.every(
+    (vaccine) =>
+      vaccine.status === 'Due' &&
+      moment(vaccine.dueDate?.format('YYYY-MM-DD')).isAfter(moment())
   )
 
-  if (statuses?.allAdministered) {
+  const allAdministered = vaccines.every(
+    (vaccine) => vaccine.status === 'completed'
+  )
+
+  const someAdministered = vaccines.some(
+    (vaccine) => vaccine.status === 'completed'
+  )
+
+  const late =
+    vaccines.every((vaccine) => vaccine.status === 'Due') &&
+    vaccines.some((vaccine) =>
+      moment(vaccine.dueDate?.format('YYYY-MM-DD')).isBefore(moment())
+    )
+
+  if (allAdministered) {
     return 'green'
   }
-  if (statuses?.upcoming) {
+  if (allUpcoming) {
     return 'gray'
   }
-  if (statuses?.missed) {
+  if (late && routine) {
     return 'red'
   }
-  if (statuses?.someAdministered) {
-    return 'amber'
+  if (someAdministered) {
+    return 'orange'
   }
 
   return 'gray'

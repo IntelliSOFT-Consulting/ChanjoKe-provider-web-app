@@ -34,7 +34,7 @@ import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
 import SentOrders from '../components/StockManagement/SentOrders'
 import Ledger from '../components/StockManagement/Ledger'
 import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
-import BatchNumbers from '../components/AdministerVaccines/BatchNumbers'
+import Administer from '../components/AdministerVaccines/Administer'
 import Contraindications from '../components/AdministerVaccines/Contraindications'
 import NotAdministered from '../components/AdministerVaccines/NotAdministered'
 import VaccinationDetails from '../pages/VaccinationDetails'
@@ -158,7 +158,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/administer-vaccine/:clientID',
-        element: <BatchNumbers />,
+        element: <Administer />,
       },
       {
         path: '/add-contraindication/:clientID',

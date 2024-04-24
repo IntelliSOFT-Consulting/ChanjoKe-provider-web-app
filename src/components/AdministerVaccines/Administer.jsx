@@ -1,20 +1,26 @@
-import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
-import { useApiRequest } from '../../api/useApiRequest'
-import { useSelector } from 'react-redux'
-import { Form, Input, Select } from 'antd'
-import useObservations from '../../hooks/useObservations'
+import { Form, Input, Select, Button } from 'antd'
 import moment from 'moment'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import useObservations from '../../hooks/useObservations'
+import useVaccination from '../../hooks/useVaccination'
+import {
+  createImmunizationResource,
+  getBodyWeight,
+  updateVaccineDueDates,
+} from './administerController'
 
-export default function BatchNumbers() {
+export default function Administer() {
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const { post } = useApiRequest()
+  const [loading, setLoading] = useState(false)
 
   const [form] = Form.useForm()
 
   const currentPatient = useSelector((state) => state.currentPatient)
+
+  const { user } = useSelector((state) => state.userInfo)
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
@@ -22,51 +28,68 @@ export default function BatchNumbers() {
 
   const navigate = useNavigate()
 
+  const { clientID } = useParams()
+
+  const { createImmunization, getRecommendations, updateRecommendations } =
+    useVaccination()
+
   const getWeight = async () => {
-    const observation = await getLatestObservation(currentPatient.id)
+    const observation = await getLatestObservation(clientID)
     const today = moment().format('YYYY-MM-DD')
     const observationDate =
       observation?.resource?.meta?.lastUpdated?.split('T')[0]
 
     if (observation && observationDate === today) {
-      const weight = observation?.resource?.code?.text
+      const weight = getBodyWeight(observation?.resource)
 
-      form.setFieldValue('currentWeight', weight)
+      form.setFieldsValue(weight)
     }
   }
 
   useEffect(() => {
     if (!selectedVaccines || selectedVaccines?.length === 0) {
-      navigate(-1)
+      navigate(`/client-details/${clientID}`)
     } else {
       getWeight()
     }
   }, [selectedVaccines])
 
-  const handleFormSubmit = async () => {
-    if (Array.isArray(selectedVaccines) && selectedVaccines.length > 0) {
-      const data = selectedVaccines.map((immunization) => {
-        return createVaccineImmunization(
-          immunization,
-          currentPatient.id,
-          'completed'
-        )
+  const handleFormSubmit = async (values) => {
+    setLoading(true)
+    const selected = selectedVaccines.map((vaccine, index) => {
+      vaccine.batchNumber = values.vaccines[index].batchNumber
+      vaccine.status = 'completed'
+
+      return vaccine
+    })
+
+    const vaccineResources = createImmunizationResource(
+      values,
+      selected,
+      currentPatient,
+      user
+    )
+
+    const recommendation = await getRecommendations(clientID)
+
+    const responses = await Promise.all(
+      vaccineResources.map(async (resource) => {
+        return await createImmunization(resource)
       })
+    )
 
-      const responses = await Promise.all(
-        data?.map(async (administerVaccine) => {
-          return await post('/hapi/fhir/Immunization', administerVaccine)
-        })
-      )
+    await updateRecommendations(
+      updateVaccineDueDates(recommendation, selectedVaccines)
+    )
 
-      if (responses) {
-        setDialogOpen(true)
-        const time = setTimeout(() => {
-          setDialogOpen(false)
-          navigate(-1)
-        }, 2000)
-        return () => clearTimeout(time)
-      }
+    if (responses) {
+      setLoading(false)
+      setDialogOpen(true)
+      const time = setTimeout(() => {
+        setDialogOpen(false)
+        window.location.reload()
+      }, 1500)
+      return () => clearTimeout(time)
     }
   }
 
@@ -106,7 +129,7 @@ export default function BatchNumbers() {
                           style={{ width: 70 }}
                           size="large"
                         >
-                          <Select.Option value="Kg">Kg</Select.Option>
+                          <Select.Option value="kg">Kg</Select.Option>
                           <Select.Option value="g">g</Select.Option>
                         </Select>
                       </Form.Item>
@@ -162,9 +185,7 @@ export default function BatchNumbers() {
                           >
                             <Input
                               size="large"
-                              placeholder={
-                                selectedVaccines[index].diseaseTarget
-                              }
+                              placeholder={selectedVaccines[index].disease}
                               disabled
                             />
                           </Form.Item>
@@ -178,18 +199,21 @@ export default function BatchNumbers() {
           </Form>
         )}
         <div className="px-4 py-4 sm:px-6 flex justify-end">
-          <button
+          <Button
             onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="ml-4  outline outline-[#163C94] text-sm font-semibold text-[#163C94]"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => form.submit()}
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            loading={loading}
+            disabled={loading}
+            type="primary"
+            className="ml-4 btn-success text-sm font-semibold"
           >
             Administer
-          </button>
+          </Button>
         </div>
       </div>
     </>

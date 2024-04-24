@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { routineVaccines, nonRoutineVaccines } from '../data/vaccineData'
-import { useApiRequest } from '../api/useApiRequest'
-import { getAgeInUnits, titleCase } from '../utils/methods'
 import moment from 'moment'
+import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useApiRequest } from '../api/useApiRequest'
+import { nonRoutineVaccines, routineVaccines } from '../data/vaccineData'
+import { formatCardTitle, getAgeInUnits } from '../utils/methods'
 
 const recommendationsEndpoint = '/hapi/fhir/ImmunizationRecommendation'
 const immunizationsEndpoint = '/hapi/fhir/Immunization'
@@ -13,13 +13,11 @@ export default function useVaccination() {
   const [recommendations, setRecommendations] = useState(null)
   const [immunizations, setImmunizations] = useState(null)
 
-  const { user } = useSelector((state) => state.userInfo)
-
   const filterVaccinationRecommendations = (patient, recommendation) => {
     const patientAge = getAgeInUnits(patient.birthDate, 'days')
 
     const filterVaccines = (vaccines) =>
-      vaccines.filter(({ adminRange, constraints, nhddCode }) => {
+      vaccines.filter(({ adminRange, constraints, nhddCode, description }) => {
         const eligibleByAge = patientAge <= adminRange.end
         const eligibleByGender = constraints?.gender
           ? patient.gender !== constraints.gender
@@ -30,7 +28,11 @@ export default function useVaccination() {
             recommendation.vaccineCode?.[0]?.coding?.[0]?.code === nhddCode
         )
 
-        return (eligibleByAge && eligibleByGender) || isVaccineInSchedule
+        return (
+          (eligibleByAge && eligibleByGender) ||
+          isVaccineInSchedule ||
+          description === 'non-routine'
+        )
       })
 
     return [
@@ -120,9 +122,12 @@ export default function useVaccination() {
               value: latestDate.format('YYYY-MM-DD'),
             },
           ],
-          series: titleCase(recommendation.category),
+          series: formatCardTitle(recommendation.category),
           description: recommendation.description,
           doseNumberPositiveInt: recommendation.doseNumber,
+          seriesDosesString: recommendation.dependentVaccine
+            ? `${recommendation.dependentVaccine},${recommendation.dependencyPeriod}`
+            : null,
         }
       }),
     }
@@ -168,46 +173,8 @@ export default function useVaccination() {
     return resources
   }
 
-  const createImmunization = async (values, patient) => {
-    const immunization = {
-      resourceType: 'Immunization',
-      status: values.status,
-      statusReason: {
-        coding: [
-          {
-            code: values.notVaccinatedReason,
-            display: values.notVaccinatedReason,
-          },
-        ],
-        text: values.notVaccinatedReason,
-      },
-      occurrenceDateTime: new Date().toISOString(),
-      recorded: moment().format('YYYY-MM-DD'),
-      vaccineCode: values.vaccine.vaccineCode,
-
-      description: values.description,
-      doseQuantity: {
-        value: values.doseQuantity,
-        unit: values.doseUnit,
-        system: 'http://unitsofmeasure.org',
-      },
-      patient: {
-        reference: `Patient/${patient.id}`,
-      },
-      performer: [
-        {
-          actor: {
-            reference: `Practitioner/${user.id}`,
-          },
-        },
-      ],
-      location: {
-        reference: user.facility,
-      },
-      lotNumber: values.lotNumber,
-    }
-
-    await post(immunizationsEndpoint, immunization)
+  const createImmunization = async (immunization) => {
+    return await post(immunizationsEndpoint, immunization)
   }
 
   const updateImmunization = async (immunization) => {

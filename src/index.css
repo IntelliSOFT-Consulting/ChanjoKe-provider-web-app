@@ -149,3 +149,17 @@ code {
   display: inline-flex !important; /* Ensures radio buttons remain inline */
   margin-right: 8px; /* Add some spacing between radio buttons */
 }
+
+.btn-success {
+  background-color: #0B7114 !important;
+  border-color: #0B7114 !important;
+  outline-color: #0B7114 !important;
+  color: #fff !important;
+}
+
+.btn-success:hover {
+  background-color: #0B7114 !important;
+  border-color: #0B7114 !important;
+  outline-color: #0B7114 !important;
+  color: #fff !important;
+}
