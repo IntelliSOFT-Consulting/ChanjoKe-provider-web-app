@@ -10,29 +10,10 @@ export const getBodyWeight = (observation) => {
   }
 }
 
-/*
-The vaccines array looks like this:
-[
-    {
-    "vaccine": "OPV II",
-    "doseNumber": 2,
-    "dueDate": "2014-07-01T21:00:00.000Z",
-    "lastDate": "2019-04-21T21:00:00.000Z",
-    "administeredDate": "2024-04-24T08:39:21.297Z",
-    "disease": "Polio",
-    "status": "completed",
-    "vaccineId": "IMPO-OPV-II",
-    "nhddCode": "54379",
-    "dependentVaccine": "IMPO-OPV-I",
-    "dependencyPeriod": 28
-}
-  ]
-*/
 export const createImmunizationResource = (values, vaccines, patient, user) => {
   return vaccines.map((vaccine) => {
     const resource = {
       resourceType: 'Immunization',
-      status: 'completed',
       occurrenceDateTime: new Date().toISOString(),
       recorded: new Date().toISOString(),
       status: vaccine.status,
@@ -83,12 +64,6 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
   })
 }
 
-/* 
-Edit dependent vaccines due dates from the ImmunizationRecommendation based on the selected vaccines
-- All the dependent vaccines have the same nhddCode as the selected vaccine, look for the vaccines with that code in the ImmunizationRecommendation resource.
-- Update the due date of the dependent vaccine with the due date of the selected vaccine + the dependency period. This period information is available in vaccine.seriesDosesString (e.g. "OPV-I,28").
-- This should be done recursively for all the dependent vaccines.
-*/
 
 const formatVaccines = (vaccines) => {
   return vaccines.map((vaccine) => {
@@ -114,7 +89,7 @@ const formatVaccines = (vaccines) => {
   });
 };
 
-export const updateVaccineDueDates = (recommendation, selectedVaccines) => {
+export const updateVaccineDueDates = (recommendation, selectedVaccines, nextDate=null) => {
   const recommendations = recommendation?.recommendation || [];
 
   selectedVaccines.forEach((selectedVaccine) => {
@@ -123,14 +98,42 @@ export const updateVaccineDueDates = (recommendation, selectedVaccines) => {
         recommendation.vaccineCode[0].coding[0].display === selectedVaccine.vaccineId
     );
 
+    const currentVaccineIndex = recommendations.findIndex(
+      (recommendation) =>
+        recommendation.vaccineCode[0].coding[0].display === selectedVaccine.vaccineId
+    );
+
     if (currentVaccine) {
+
+
+      if(nextDate) {
+        const currentEarliestDate = moment(currentVaccine.dateCriterion.find(
+          (date) => date.code.coding[0].code === 'Earliest-date-to-administer'
+        ).value);
+
+        const currentLatestDate = moment(currentVaccine.dateCriterion.find(
+          (date) => date.code.coding[0].code === 'Latest-date-to-administer'
+        ).value);
+
+        const difference = currentLatestDate.diff(currentEarliestDate, 'days');
+
+        const nextEarliestDate = moment(nextDate).format('YYYY-MM-DD');
+        const nextLatestDate = moment(nextEarliestDate).add(difference, 'days').format('YYYY-MM-DD');
+
+        recommendations[currentVaccineIndex].dateCriterion = [
+          { code: { coding: [{ code: 'Earliest-date-to-administer', display: 'Earliest-date-to-administer' }] }, value: nextEarliestDate },
+          { code: { coding: [{ code: 'Latest-date-to-administer', display: 'Latest-date-to-administer' }] }, value: nextLatestDate }
+        ]
+      }
+
       const dependentVaccines = recommendations.filter((recommendation) =>
         recommendation.vaccineCode[0].coding[0].code === selectedVaccine.nhddCode &&
         recommendation.doseNumberPositiveInt > selectedVaccine.doseNumber
       ).sort((a, b) => a.doseNumberPositiveInt - b.doseNumberPositiveInt);
 
       const formatted = formatVaccines(dependentVaccines);
-      let startDate = moment();
+
+      let startDate = nextDate ? moment(nextDate) : moment();
 
       formatted.forEach((dependentVaccine) => {
         const difference = moment(dependentVaccine.latestDate).diff(

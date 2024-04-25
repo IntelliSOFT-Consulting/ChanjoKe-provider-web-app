@@ -1,80 +1,89 @@
+import { DatePicker, Form, Input, Select } from 'antd'
 import moment from 'moment'
-import FormState from '../../utils/formState'
-import { useSharedState } from '../../shared/sharedState'
-import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
-import { useApiRequest } from '../../api/useApiRequest'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import { DatePicker, Input, Select, Form } from 'antd'
+import useVaccination from '../../hooks/useVaccination'
+import { useSharedState } from '../../shared/sharedState'
+import {
+  createImmunizationResource,
+  updateVaccineDueDates,
+} from './administerController'
 
 export default function Contraindications() {
-  const navigate = useNavigate()
-  const [vaccines, setVaccines] = useState([])
-  const [vaccinesToSelect, setVaccinesToSelect] = useState([])
-  const { sharedData } = useSharedState()
+  const [loading, setLoading] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
+
+  const navigate = useNavigate()
+
+  const { sharedData } = useSharedState()
+
+  const { clientID } = useParams()
+
   const currentPatient = useSelector((state) => state.currentPatient)
-  const { put } = useApiRequest()
+
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+
+  const { user } = useSelector((state) => state.userInfo)
+
+  const { createImmunization, getRecommendations, updateRecommendations } =
+    useVaccination()
 
   const [form] = Form.useForm()
 
   useEffect(() => {
-    const vaccinesToSelect = sharedData.map((vaccine) => ({
-      label: vaccine.vaccineName,
-      value: vaccine.vaccineName,
-    }))
-
-    if (vaccinesToSelect.length === 0) {
-      navigate(-1)
+    if (!selectedVaccines?.length) {
+      navigate(`/client-details/${clientID}`)
     }
-    setVaccinesToSelect(vaccinesToSelect)
-    setVaccines(sharedData)
   }, [sharedData])
 
   function handleDialogClose() {
     setDialogOpen(false)
   }
 
-
   const handleFormSubmit = async (values) => {
-    const selectedVaccines = vaccines.filter((vaccine) =>
-      values.vaccinesToContraindicate.includes(vaccine.vaccineName)
+    setLoading(true)
+    const selected = selectedVaccines
+      .filter((vaccine) =>
+        values.vaccinesToContraindicate.includes(vaccine.vaccineId)
+      )
+      ?.map((vaccine) => ({
+        ...vaccine,
+        status: 'entered-in-error',
+      }))
+
+    values.notVaccinatedReason = values.contraindicationDetails
+
+    const vaccineResources = createImmunizationResource(
+      values,
+      selected,
+      currentPatient,
+      user
     )
 
-
-
-    const data = selectedVaccines.map((immunization) => {
-      immunization.contraindicationDetails = values.contraindicationDetails
-      immunization.education = [
-        {
-          presentationDate: values.nextVaccinationDate.format('YYYY-MM-DD'),
-        },
-      ]
-      return createVaccineImmunization(
-        immunization,
-        currentPatient.id,
-        'entered-in-error'
-      )
-    })
+    const recommendation = await getRecommendations(clientID)
 
     const responses = await Promise.all(
-      data?.map(async (administerVaccine, index) => {
-        const vaccineId = selectedVaccines[index].id
-        return await put(`/hapi/fhir/Immunization/${vaccineId}`, {
-          ...administerVaccine,
-          id: vaccineId,
-        })
+      vaccineResources.map(async (resource) => {
+        return await createImmunization(resource)
       })
+    )
+
+    await updateRecommendations(
+      updateVaccineDueDates(
+        recommendation,
+        selected,
+        values.nextVaccinationDate?.format('YYYY-MM-DD')
+      )
     )
 
     if (responses) {
       setDialogOpen(true)
       const time = setTimeout(() => {
         setDialogOpen(false)
-        navigate(`/client-details/${currentPatient.id}`)
-      }, 2000)
+        window.location.reload()
+      }, 1500)
       return () => clearTimeout(time)
     }
   }
@@ -92,15 +101,15 @@ export default function Contraindications() {
           Contraindications
         </div>
         <div className="px-4 py-5 sm:p-6">
-          {vaccines.length > 0 && (
+          {selectedVaccines?.length > 0 && (
             <Form
               onFinish={handleFormSubmit}
               form={form}
               layout="vertical"
               className="grid grid-cols-2 gap-36 px-6 gap-10"
               initialValues={{
-                vaccinesToContraindicate: vaccinesToSelect.map(
-                  (vaccine) => vaccine.value
+                vaccinesToContraindicate: selectedVaccines?.map(
+                  (vaccine) => vaccine.vaccineId
                 ),
               }}
             >
@@ -112,20 +121,17 @@ export default function Contraindications() {
                     { required: true, message: 'Please select a vaccine' },
                     {
                       validator: (_, value) => {
-                        //   if vaccine status is "entered-in-error" and education.presentationDate is less than today, then show error "This vaccine is already contraindicated, the next due date is XX".
-                        const selectedVaccines = vaccines.filter((vaccine) =>
-                          value.includes(vaccine.vaccineName)
+                        const selected = selectedVaccines.filter((vaccine) =>
+                          value?.includes(vaccine.vaccineId)
                         )
 
-                        const contraindicatedVaccines = selectedVaccines.filter(
+                        const contraindicatedVaccines = selected.filter(
                           (vaccine) =>
                             vaccine.status === 'entered-in-error' &&
-                            moment(
-                              vaccine.education?.[0]?.presentationDate
-                            ).isAfter(moment())
+                            moment(vaccine.dueDate).isAfter(moment())
                         )
 
-                        if (contraindicatedVaccines.length > 0) {
+                        if (contraindicatedVaccines?.length > 0) {
                           const vaccineNames = contraindicatedVaccines
                             .map((vaccine) => vaccine.vaccineName)
                             ?.join(', ')
@@ -150,7 +156,10 @@ export default function Contraindications() {
                     mode="tags"
                     placeholder="Select vaccines to contraindicate"
                     style={{ width: '100%' }}
-                    options={vaccinesToSelect}
+                    options={selectedVaccines?.map((vaccine) => ({
+                      label: vaccine.vaccineName,
+                      value: vaccine.vaccineId,
+                    }))}
                     size="large"
                   />
                 </Form.Item>
