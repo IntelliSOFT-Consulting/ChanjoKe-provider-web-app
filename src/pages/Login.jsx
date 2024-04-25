@@ -1,14 +1,13 @@
-import OpenCHANJO from '../assets/login-bg.jpeg'
-import MOHLogo from '../assets/moh-logo.png'
-import { Link, useNavigate } from 'react-router-dom'
+import { LockOutlined, UserOutlined } from '@ant-design/icons'
+import { MapPinIcon } from '@heroicons/react/24/outline'
 import { Button, Form, Input, Select } from 'antd'
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useApiRequest } from '../api/useApiRequest'
-import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { login } from '../redux/actions/userActions'
 import { createUseStyles } from 'react-jss'
-import { MapPinIcon } from '@heroicons/react/24/outline'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import { useApiRequest } from '../api/useApiRequest'
+import MOHLogo from '../assets/moh-logo.png'
+import { login } from '../redux/actions/userActions'
 
 const useStyles = createUseStyles({
   selector: {
@@ -20,7 +19,6 @@ const useStyles = createUseStyles({
 
 export default function Login() {
   const navigate = useNavigate()
-  const { post } = useApiRequest()
   const dispatch = useDispatch()
 
   const classes = useStyles()
@@ -42,19 +40,7 @@ export default function Login() {
 
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
-      <div
-        className="hidden md:block md:h-screen w-full"
-        style={{
-          backgroundImage: `url(${OpenCHANJO})`,
-          backgroundSize: '70%',
-          backgroundPosition: 'left',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          // backgroundPositionX: 'left',
-        }}
-      >
-        <img src={OpenCHANJO} className="h-screen" alt="Chanjo KE Jumbo" />
-      </div>
+      <div className="hidden md:block md:h-screen w-full login-bg" />
 
       <div>
         <div className="md:collapse flex flex-wrap text-center px-4 sm:flex-nowrap sm:px-6 lg:px-8 bg-[#163C94] text-white shadow py-4">

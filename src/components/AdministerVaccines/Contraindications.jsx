@@ -24,7 +24,7 @@ export default function Contraindications() {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const { createImmunization, getRecommendations, updateRecommendations } =
+  const { createImmunization, updateImmunization, getRecommendations, updateRecommendations } =
     useVaccination()
 
   const [form] = Form.useForm()
@@ -63,6 +63,9 @@ export default function Contraindications() {
 
     const responses = await Promise.all(
       vaccineResources.map(async (resource) => {
+        if (resource.id) {
+          return await updateImmunization(resource)
+        }
         return await createImmunization(resource)
       })
     )

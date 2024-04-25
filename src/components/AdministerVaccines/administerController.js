@@ -60,6 +60,12 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
       }
     }
 
+
+    if(vaccine.id) {
+      resource.id = vaccine.id;
+    }
+    
+
     return resource
   })
 }

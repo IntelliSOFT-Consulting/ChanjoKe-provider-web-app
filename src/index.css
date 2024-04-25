@@ -3,11 +3,7 @@
 @tailwind utilities;
 
 .material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 100,
-    'GRAD' 0,
-    'opsz' 20;
+  font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 20;
 }
 
 input {
@@ -38,7 +34,6 @@ code {
   font-weight: 600;
   font-size: 14px;
 }
-
 
 .ant-btn-primary {
   background-color: #163c94 !important;
@@ -151,15 +146,22 @@ code {
 }
 
 .btn-success {
-  background-color: #0B7114 !important;
-  border-color: #0B7114 !important;
-  outline-color: #0B7114 !important;
+  background-color: #0b7114 !important;
+  border-color: #0b7114 !important;
+  outline-color: #0b7114 !important;
   color: #fff !important;
 }
 
 .btn-success:hover {
-  background-color: #0B7114 !important;
-  border-color: #0B7114 !important;
-  outline-color: #0B7114 !important;
+  background-color: #0b7114 !important;
+  border-color: #0b7114 !important;
+  outline-color: #0b7114 !important;
   color: #fff !important;
+}
+
+.login-bg {
+  background-image: url(./assets/login-bg.png);
+  background-size: 100% 100%;
+  background-position: left;
+  background-repeat: no-repeat;
 }
