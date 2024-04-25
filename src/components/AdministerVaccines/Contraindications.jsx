@@ -1,11 +1,10 @@
-import { DatePicker, Form, Input, Select } from 'antd'
+import { DatePicker, Form, Input, Select, Button } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useVaccination from '../../hooks/useVaccination'
-import { useSharedState } from '../../shared/sharedState'
 import {
   createImmunizationResource,
   updateVaccineDueDates,
@@ -16,8 +15,6 @@ export default function Contraindications() {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
   const navigate = useNavigate()
-
-  const { sharedData } = useSharedState()
 
   const { clientID } = useParams()
 
@@ -36,7 +33,7 @@ export default function Contraindications() {
     if (!selectedVaccines?.length) {
       navigate(`/client-details/${clientID}`)
     }
-  }, [sharedData])
+  }, [selectedVaccines])
 
   function handleDialogClose() {
     setDialogOpen(false)
@@ -80,6 +77,7 @@ export default function Contraindications() {
 
     if (responses) {
       setDialogOpen(true)
+      setLoading(false)
       const time = setTimeout(() => {
         setDialogOpen(false)
         window.location.reload()
@@ -133,7 +131,7 @@ export default function Contraindications() {
 
                         if (contraindicatedVaccines?.length > 0) {
                           const vaccineNames = contraindicatedVaccines
-                            .map((vaccine) => vaccine.vaccineName)
+                            .map((vaccine) => vaccine.vaccine)
                             ?.join(', ')
 
                           const nextDueDates = contraindicatedVaccines
@@ -208,20 +206,23 @@ export default function Contraindications() {
           )}
         </div>
         <div className="px-4 py-4 sm:px-6 flex justify-end">
-          <button
-            onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          <Button
+            onClick={() => window.location.reload()}
+            className="ml-4  outline outline-[#163C94] text-sm font-semibold text-[#163C94]"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               form.submit()
             }}
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            type="primary"
+            className="ml-4 btn-success text-sm font-semibold"
+            loading={loading}
+            disabled={loading}
           >
             Contraindicate
-          </button>
+          </Button>
         </div>
       </div>
     </>
