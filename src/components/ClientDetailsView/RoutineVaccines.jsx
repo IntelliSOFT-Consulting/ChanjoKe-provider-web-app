@@ -92,9 +92,6 @@ export default function RoutineVaccines({
     setDialogOpen(false)
   }
 
-  console.log('routineVaccines', routineVaccines)
-
-
   const administerVaccineBtns = [
     {
       btnText: 'Administer Vaccine',
@@ -139,7 +136,11 @@ export default function RoutineVaccines({
               name={record.vaccine}
               value={record.vaccine}
               defaultChecked={completed}
-              disabled={completed || (locked && !['not-done', 'entered-in-error'].includes(record.status))}
+              disabled={
+                completed ||
+                (locked &&
+                  !['not-done', 'entered-in-error'].includes(record.status))
+              }
               onChange={() => handleCheckBox(record)}
             />
           </Tooltip>
