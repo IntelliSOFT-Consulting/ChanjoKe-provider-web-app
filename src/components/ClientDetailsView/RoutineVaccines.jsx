@@ -117,8 +117,8 @@ export default function RoutineVaccines({
   const columns = [
     {
       title: '',
-      dataIndex: 'vaccineName',
-      key: 'vaccineName',
+      dataIndex: 'vaccine',
+      key: 'vaccine',
       render: (_text, record) => {
         const completed = record.status === 'completed'
         const locked = lockVaccine(record.dueDate, patientData.birthDate)
@@ -134,10 +134,10 @@ export default function RoutineVaccines({
             color="#163c94"
           >
             <Checkbox
-              name={record.vaccineName}
-              value={record.vaccineName}
+              name={record.vaccine}
+              value={record.vaccine}
               defaultChecked={completed}
-              disabled={completed || locked}
+              disabled={completed || (locked && !['not-done', 'entered-in-error'].includes(record.status))}
               onChange={() => handleCheckBox(record)}
             />
           </Tooltip>
