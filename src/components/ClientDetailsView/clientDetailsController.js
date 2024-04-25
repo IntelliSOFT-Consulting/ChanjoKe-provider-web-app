@@ -79,6 +79,7 @@ export const formatRecommendationsToObject = (recommendation) => {
     nhddCode,
     dependentVaccine,
     dependencyPeriod,
+    id: recommendation.id,
   }
 }
 
@@ -106,6 +107,7 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
     )
 
     if (getVaccine) {
+      recommendation.id = getVaccine.id
       recommendation.status = getVaccine.status
       recommendation.administeredDate = getVaccine.occurrenceDateTime
     }
