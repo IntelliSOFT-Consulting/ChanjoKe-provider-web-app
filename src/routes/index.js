@@ -137,7 +137,7 @@ const router = createBrowserRouter([
       },
       { path: '/profile', element: <Profile /> },
       {
-        path: '/aefi-report',
+        path: '/aefi-report/:clientID',
         element: <CreateAEFI />,
       },
       {

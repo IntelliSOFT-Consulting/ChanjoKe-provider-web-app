@@ -22,7 +22,7 @@ export default function useAefi() {
     return {
       resourceType: 'AdverseEvent',
       subject: {
-        reference: `Patient/${currentPatient?.id || clientID}`,
+        reference: `Patient/${clientID || currentPatient?.id}`,
       },
       recorder: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
@@ -114,7 +114,9 @@ export default function useAefi() {
     setLoading(true)
     try {
       const data = await get(
-        `/hapi/fhir/AdverseEvent?subject=Patient/${patientId || currentPatient?.id || clientID}`
+        `/hapi/fhir/AdverseEvent?subject=Patient/${
+          patientId || currentPatient?.id || clientID
+        }`
       )
       setAefis(data.entry)
     } catch (error) {

@@ -255,7 +255,7 @@ export default function NonRoutineVaccines({
                                       dispatch(
                                         setSelectedVaccines(administered)
                                       )
-                                      navigate('/aefi-report')
+                                      navigate(`/aefi-report/${patientData?.id}`)
                                     }}
                                     type="link"
                                   >

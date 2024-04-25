@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react'
-import { Alert, Checkbox, DatePicker, Form, Input, Select, Radio } from 'antd'
-import { useNavigate } from 'react-router-dom'
-import { useSharedState } from '../../shared/sharedState'
-import { useSelector } from 'react-redux'
-import useAefi from '../../hooks/useAefi'
-import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import { Alert, Checkbox, DatePicker, Form, Input, Radio, Select } from 'antd'
 import moment from 'moment'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import useAefi from '../../hooks/useAefi'
 
 export default function CreateAEFI() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -15,6 +14,8 @@ export default function CreateAEFI() {
   const [isSpecimenCollected, setIsSpecimenCollected] = useState(false)
 
   const currentPatient = useSelector((state) => state.currentPatient)
+
+  const { clientID } = useParams()
 
   const { submitAefi } = useAefi()
 
@@ -50,14 +51,11 @@ export default function CreateAEFI() {
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
-  const { sharedData, setSharedData } = useSharedState()
-
-  const { user } = useSelector((state) => state.userInfo)
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   useEffect(() => {
-    if (!selectedVaccines?.length || !user) {
-      navigate(-1)
+    if (!selectedVaccines?.length) {
+      navigate(`/client-details/${clientID}`)
     }
   }, [])
 
