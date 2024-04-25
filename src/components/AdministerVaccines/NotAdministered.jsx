@@ -1,36 +1,38 @@
+import { Button, DatePicker, Form, Select } from 'antd'
 import moment from 'moment'
-import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { useSharedState } from '../../shared/sharedState'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { createVaccineImmunization } from '../ClientDetailsView/DataWrapper'
-import { useNavigate } from 'react-router-dom'
-import { useApiRequest } from '../../api/useApiRequest'
-import { DatePicker, Form, Select } from 'antd'
+import { useNavigate, useParams } from 'react-router-dom'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import {
+  createImmunizationResource,
+  updateVaccineDueDates,
+} from './administerController'
+import useVaccination from '../../hooks/useVaccination'
 
 export default function NotAdministered() {
+  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate()
-  const { sharedData } = useSharedState()
-  const [form] = Form.useForm()
 
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [vaccines, setVaccines] = useState([])
-  const [vaccinesToSelect, setVaccinesToSelect] = useState([])
 
-  useEffect(() => {
-    const vaccinesToSelect = sharedData.map((vaccine) => ({
-      label: vaccine.vaccineName,
-      value: vaccine.vaccineName,
-    }))
-    if (vaccinesToSelect.length === 0) {
-      navigate(-1)
-    }
-    setVaccinesToSelect(vaccinesToSelect)
-    setVaccines(sharedData)
-  }, [sharedData])
+  const { createImmunization, getRecommendations, updateRecommendations } =
+    useVaccination()
+
+  const [form] = Form.useForm()
 
   const currentPatient = useSelector((state) => state.currentPatient)
-  const { put } = useApiRequest()
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const { user } = useSelector((state) => state.userInfo)
+
+  const { clientID } = useParams()
+
+  useEffect(() => {
+    if (!selectedVaccines?.length) {
+      navigate(`/client-details/${clientID}`)
+    }
+  }, [selectedVaccines])
 
   const fhirReasons = [
     { label: 'Immunity', value: 'IMMUNE' },
@@ -44,45 +46,53 @@ export default function NotAdministered() {
   ]
 
   function handleDialogClose() {
-    navigate(-1)
+    navigate(`/client-details/${clientID}`)
     setDialogOpen(false)
   }
 
   const handleFormSubmit = async (values) => {
-    const selectedVaccines = vaccines.filter((vaccine) =>
-      values.vaccinesToContraindicate.includes(vaccine.vaccineName)
+    setLoading(true)
+    const selected = selectedVaccines
+      .filter((vaccine) =>
+        values.vaccinesToContraindicate.includes(vaccine.vaccineId)
+      )
+      ?.map((vaccine) => ({
+        ...vaccine,
+        status: 'not-done',
+      }))
+
+    values.notVaccinatedReason = values.notVaccinatedReason
+
+    const vaccineResources = createImmunizationResource(
+      values,
+      selected,
+      currentPatient,
+      user
     )
 
-    const data = selectedVaccines.map((immunization) => {
-      immunization.contraindicationDetails = values.contraindicationDetails
-      immunization.education = [
-        {
-          presentationDate: values.nextVaccinationDate.format('YYYY-MM-DD'),
-        },
-      ]
-      return createVaccineImmunization(
-        immunization,
-        currentPatient.id,
-        'not-done'
-      )
-    })
+    const recommendation = await getRecommendations(clientID)
 
     const responses = await Promise.all(
-      data?.map(async (administerVaccine, index) => {
-        const vaccineId = selectedVaccines[index].id
-        return await put(`/hapi/fhir/Immunization/${vaccineId}`, {
-          ...administerVaccine,
-          id: vaccineId,
-        })
+      vaccineResources.map(async (resource) => {
+        return await createImmunization(resource)
       })
+    )
+
+    await updateRecommendations(
+      updateVaccineDueDates(
+        recommendation,
+        selected,
+        values.nextVaccinationDate?.format('YYYY-MM-DD')
+      )
     )
 
     if (responses) {
       setDialogOpen(true)
+      setLoading(false)
       const time = setTimeout(() => {
         setDialogOpen(false)
-        navigate(`/client-details/${currentPatient.id}`)
-      }, 2000)
+        window.location.reload()
+      }, 1500)
       return () => clearTimeout(time)
     }
   }
@@ -100,14 +110,14 @@ export default function NotAdministered() {
           Not Administered
         </div>
         <div className="px-4 py-5 sm:p-6">
-          {vaccines.length > 0 && (
+          {selectedVaccines?.length > 0 && (
             <Form
               layout="vertical"
               onFinish={handleFormSubmit}
               form={form}
               initialValues={{
-                vaccinesToContraindicate: vaccinesToSelect.map(
-                  (vaccine) => vaccine.value
+                vaccinesToContraindicate: selectedVaccines?.map(
+                  (vaccine) => vaccine.vaccineId
                 ),
               }}
               className="grid grid-cols-2 gap-36 px-6 gap-10"
@@ -120,8 +130,8 @@ export default function NotAdministered() {
                     { required: true, message: 'Please select a vaccine' },
                     {
                       validator: (_, value) => {
-                        const selected = vaccines.filter((vaccine) =>
-                          value.includes(vaccine.vaccineName)
+                        const selected = selectedVaccines?.filter((vaccine) =>
+                          value.includes(vaccine.vaccineId)
                         )
 
                         const notDone = selected.filter(
@@ -129,7 +139,7 @@ export default function NotAdministered() {
                         )
                         if (notDone.length > 0) {
                           const vaccineNames = notDone
-                            .map((item) => item.vaccineName)
+                            .map((item) => item.vaccine)
                             .join(', ')
                           return Promise.reject(
                             `${vaccineNames} already marked as not administered`
@@ -144,7 +154,10 @@ export default function NotAdministered() {
                   <Select
                     mode="multiple"
                     placeholder="Select a vaccine"
-                    options={vaccinesToSelect}
+                    options={selectedVaccines?.map((vaccine) => ({
+                      label: vaccine.vaccine,
+                      value: vaccine.vaccineId,
+                    }))}
                     showSearch
                     size="large"
                   />
@@ -193,20 +206,22 @@ export default function NotAdministered() {
           )}
         </div>
         <div className="px-4 py-4 sm:px-6 flex justify-end">
-          <button
-            onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          <Button
+            onClick={() => window.location.reload()}
+            className="ml-4 outline outline-[#163C94] text-sm font-semibold text-[#163C94]"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               form.submit()
             }}
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#4e8d6e] outline-[#4e8d6e] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#4e8d6e] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="ml-4 btn-success text-sm font-semibold"
+            loading={loading}
+            disabled={loading}
           >
             Submit
-          </button>
+          </Button>
         </div>
       </div>
     </>

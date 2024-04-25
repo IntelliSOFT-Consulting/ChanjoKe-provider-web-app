@@ -58,7 +58,7 @@ export const routineVaccines = [
     vaccineCode: 'IMPCV10-1',
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
-    doseNumber: '2',
+    doseNumber: '1',
     occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
