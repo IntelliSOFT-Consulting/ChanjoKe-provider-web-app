@@ -30,7 +30,7 @@ export default function Administer() {
 
   const { clientID } = useParams()
 
-  const { createImmunization, getRecommendations, updateRecommendations } =
+  const { createImmunization, updateImmunization, getRecommendations, updateRecommendations } =
     useVaccination()
 
   const getWeight = async () => {
@@ -74,6 +74,7 @@ export default function Administer() {
 
     const responses = await Promise.all(
       vaccineResources.map(async (resource) => {
+        if (resource.id) return await updateImmunization(resource)
         return await createImmunization(resource)
       })
     )
@@ -156,6 +157,12 @@ export default function Administer() {
                           <Form.Item
                             name={[field.name, 'batchNumber']}
                             label="Batch Number"
+                            rules={[
+                              {
+                                required: true,
+                                message: 'Please select batch number',
+                              },
+                            ]}
                           >
                             <Select
                               placeholder={
