@@ -4,9 +4,10 @@ import { deconstructPatientData } from '../components/RegisterClient/DataWrapper
 import SelectDialog from '../common/dialog/SelectDialog'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
-import { DatePicker, Form, Input } from 'antd'
+import { DatePicker, Form, Input, Button } from 'antd'
 import usePaginatedQuery from '../hooks/usePaginatedQuery'
 import { useApiRequest } from '../api/useApiRequest'
+import { PlusOutlined } from '@ant-design/icons'
 
 export default function SearchInterface(props) {
   const [title, setTitle] = useState('Search')
@@ -184,7 +185,7 @@ export default function SearchInterface(props) {
             onFinish={(values) => {
               handleSearch(0, values.searchInput)
             }}
-            autoComplete='off'
+            autoComplete="off"
           >
             <div className="col-span-4">
               <Form.Item name="searchInput">
@@ -230,15 +231,16 @@ export default function SearchInterface(props) {
               locale={{
                 emptyText: (
                   <div className="flex flex-col items-center justify-center">
-                    <p className="text-gray-400 text-sm mt-2">
+                    <p className="text-gray-400 text-sm my-2">
                       Client not found!
                     </p>
-                    <button
-                      onClick={() => navigate('/register-client/_')}
-                      className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+                    <Button
+                      type="primary"
+                      onClick={() => navigate('/register-client')}
+                      icon={<PlusOutlined />}
                     >
                       Register new client
-                    </button>
+                    </Button>
                   </div>
                 ),
               }}

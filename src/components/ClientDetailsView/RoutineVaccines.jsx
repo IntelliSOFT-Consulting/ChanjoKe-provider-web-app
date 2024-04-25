@@ -310,7 +310,7 @@ export default function RoutineVaccines({
                                           dispatch(
                                             setSelectedVaccines(administered)
                                           )
-                                          navigate('/aefi-report')
+                                          navigate(`/aefi-report/${patientData?.id}`)
                                         }}
                                         type="link"
                                       >
