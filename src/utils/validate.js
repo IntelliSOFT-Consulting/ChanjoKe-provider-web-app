@@ -49,16 +49,16 @@ export default function validate(currentField, fieldValue, validationRules) {
   }
 }
 
-export const lockVaccine = (dueDate, dob) => {
+export const lockVaccine = (dueDate, lastDate) => {
   const today = new Date()
-  const birthDate = new Date(dob)
+
   const dueDay = new Date(dueDate?.format('YYYY-MM-DD'))
-  return today < dueDay && today > birthDate
+  const last = new Date(lastDate?.format('YYYY-MM-DD'))
+  return today < dueDay || today > last
 }
 
-export const datePassed = (status, dob, endPeriod) => {
+export const datePassed = (status, dueDate) => {
   const today = moment()
-  const birthDate = moment(dob)
-  const diff = today.diff(birthDate, 'days')
-  return status !== 'completed' && diff > endPeriod
+  const passed = moment(dueDate).add(14, 'days').isBefore(today)
+  return status !== 'completed' && passed
 }

@@ -1,6 +1,6 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { Badge, Button, Checkbox, Tag } from 'antd'
+import { Badge, Button, Checkbox, Tag, FloatButton } from 'antd'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -9,8 +9,7 @@ import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed } from '../../utils/validate'
 import Table from '../DataTable'
-import { colorCodeVaccines, isQualified } from './vaccineController'
-import { routineVaccines } from '../../data/vaccineData'
+import { colorCodeVaccines, isQualified, outGrown } from './vaccineController'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -81,11 +80,13 @@ export default function NonRoutineVaccines({
 
         return (
           <Checkbox
-            name={record.vaccineName}
-            value={record.vaccineName}
+            name={record.vaccine}
+            value={record.vaccine}
             defaultChecked={completed}
             className="tooltip"
-            disabled={!isQualified(allVaccines, record)}
+            disabled={
+              !isQualified(allVaccines, record) || outGrown(record?.lastDate)
+            }
             onChange={() => handleCheckBox(record)}
           />
         )
@@ -123,17 +124,19 @@ export default function NonRoutineVaccines({
       title: 'Date Administered',
       dataIndex: 'administeredDate',
       key: 'administeredDate',
-      render: (text, _record) => (text ? text.format('DD-MM-YYYY') : '-'),
+      render: (text, record) =>
+        text && record.status === 'completed' ? text.format('DD-MM-YYYY') : '-',
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => {
-        const missed = datePassed(
-          text,
-          patientData?.birthDate,
-          record?.adminRange?.end
+        const missed = datePassed(text, record?.dueDate?.format('YYYY-MM-DD'))
+        const hasCompletedSeries = allVaccines?.find(
+          (vaccine) =>
+            vaccine.nhddCode === record.nhddCode &&
+            vaccine.status === 'completed'
         )
         return (
           <Tag
@@ -142,7 +145,7 @@ export default function NonRoutineVaccines({
                 ? 'green'
                 : text === 'not-done'
                 ? 'red'
-                : missed && text !== 'entered-in-error'
+                : missed && text !== 'entered-in-error' && hasCompletedSeries
                 ? 'red'
                 : text === 'entered-in-error'
                 ? 'yellow'
@@ -155,7 +158,7 @@ export default function NonRoutineVaccines({
               ? 'Not Administered'
               : text === 'entered-in-error'
               ? 'Contraindicated'
-              : missed && text !== 'entered-in-error'
+              : missed && text !== 'entered-in-error' && hasCompletedSeries
               ? 'Missed'
               : ''}
           </Tag>
@@ -168,7 +171,7 @@ export default function NonRoutineVaccines({
       key: 'actions',
       render: (text, record) => (
         <Button
-          disabled={record?.id && record.status !== 'not-done' ? false : true}
+          disabled={!record?.id || record.status === 'not-done'}
           onClick={() => {
             navigate(`/view-vaccination/${record?.id}`)
           }}
@@ -197,17 +200,19 @@ export default function NonRoutineVaccines({
             </small>
           </div>
           <div>
-            <Button
+            <FloatButton
               type="primary"
               onClick={() => {
                 setDialogOpen(true)
                 dispatch(setSelectedVaccines(vaccinesToAdminister))
               }}
               disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className="ml-4"
-            >
-              Administer Vaccine ( {vaccinesToAdminister?.length} )
-            </Button>
+              className={`w-fit ${vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''}`}
+              description={
+                <span className="px-2 font-semibold">{`Administer Vaccine ( ${vaccinesToAdminister?.length} )`}</span>
+              }
+              shape="square"
+            />
           </div>
         </div>
 
@@ -255,7 +260,9 @@ export default function NonRoutineVaccines({
                                       dispatch(
                                         setSelectedVaccines(administered)
                                       )
-                                      navigate(`/aefi-report/${patientData?.id}`)
+                                      navigate(
+                                        `/aefi-report/${patientData?.id}`
+                                      )
                                     }}
                                     type="link"
                                   >

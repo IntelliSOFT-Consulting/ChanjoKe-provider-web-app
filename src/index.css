@@ -42,6 +42,19 @@ code {
   box-shadow: none !important;
 }
 
+.btn-disabled {
+  background-color: #44464b !important;
+  border-color: #9398a2 !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
+}
+
+.btn-disabled .ant-float-btn-body {
+  background-color: #747f9a !important;
+  border-color: #747f9a !important;
+  color: #fff !important;
+}
+
 .ant-modal-title {
   border-bottom: 1px solid #f0f0f0 !important;
 }

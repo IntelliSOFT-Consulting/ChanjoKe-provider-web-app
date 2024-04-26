@@ -48,7 +48,7 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
       lotNumber: vaccine.batchNumber,
     }
 
-    if (vaccine.status === 'not-done') {
+    if (vaccine.status !== 'completed') {
       resource.statusReason = {
         coding: [
           {

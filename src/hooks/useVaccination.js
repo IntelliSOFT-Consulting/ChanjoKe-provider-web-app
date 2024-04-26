@@ -12,6 +12,7 @@ export default function useVaccination() {
   const { post, get, put } = useApiRequest()
   const [recommendations, setRecommendations] = useState(null)
   const [immunizations, setImmunizations] = useState(null)
+  const [immunization, setImmunization] = useState(null)
 
   const filterVaccinationRecommendations = (patient, recommendation) => {
     const patientAge = getAgeInUnits(patient.birthDate, 'days')
@@ -173,6 +174,12 @@ export default function useVaccination() {
     return resources
   }
 
+  const getImmunization = async (immunizationId) => {
+    const response = await get(`${immunizationsEndpoint}/${immunizationId}`)
+    setImmunization(response)
+    return response
+  }
+
   const createImmunization = async (immunization) => {
     return await post(immunizationsEndpoint, immunization)
   }
@@ -187,8 +194,10 @@ export default function useVaccination() {
     getRecommendations,
     getImmunizations,
     createImmunization,
+    getImmunization,
     updateImmunization,
     recommendations,
     immunizations,
+    immunization,
   }
 }
