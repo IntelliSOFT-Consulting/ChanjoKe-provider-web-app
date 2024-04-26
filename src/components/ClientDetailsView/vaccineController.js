@@ -25,9 +25,15 @@ export const isQualified = (vaccinesSchedule, vaccine) => {
       : item.nhddCode === vaccine.nhddCode
   )
 
+  const isSameDoseCompleted = vaccineSeries?.some(
+    (item) =>
+      item.doseNumber === vaccine.doseNumber && item.status === 'completed'
+  )
+
   if (vaccine.doseNumber > 1) {
     return (
       isEligibleForVaccine(vaccine) &&
+      !isSameDoseCompleted &&
       receivedDose(vaccineSeries, vaccine.doseNumber - 1)
     )
   }
@@ -54,9 +60,11 @@ export const colorCodeVaccines = (vaccines, routine = true) => {
   )
 
   const late =
-    vaccines.every((vaccine) => vaccine.status === 'Due') &&
+    vaccines.every((vaccine) => vaccine.status !== 'completed') &&
     vaccines.some((vaccine) =>
-      moment(vaccine.dueDate?.format('YYYY-MM-DD')).isBefore(moment())
+      moment(vaccine.dueDate?.format('YYYY-MM-DD'))
+        .add(14, 'days')
+        .isBefore(moment())
     )
 
   if (allAdministered) {
@@ -73,4 +81,10 @@ export const colorCodeVaccines = (vaccines, routine = true) => {
   }
 
   return 'gray'
+}
+
+export const outGrown = (lastDate) => {
+  const today = moment()
+  const last = moment(lastDate)
+  return today.isAfter(last)
 }

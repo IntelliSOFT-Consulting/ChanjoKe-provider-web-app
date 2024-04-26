@@ -9,18 +9,21 @@ import { calculateAges, getAgeAtDose } from '../utils/methods'
 import usePatient from '../hooks/usePatient'
 import useAefi from '../hooks/useAefi'
 import dayjs from 'dayjs'
+import LoadingArrows from '../common/spinners/LoadingArrows'
+import useVaccination from '../hooks/useVaccination'
 
 export default function VaccinationDetails() {
   const [patientInfo, setPatientInfo] = useState(null)
   const [doseInfo, setDoseInfo] = useState([])
-  const [aefiInfo, setAefiInfo] = useState(null)
   const [clientInfo, setClientInfo] = useState([])
   const [vaccinationAEFIs, setVaccinationAEFIs] = useState([])
-  const [vaccinationDetails, setVaccinationDetails] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const { get } = useApiRequest()
   const { getPatient } = usePatient()
   const { getVaccineAefis } = useAefi()
+
+  const { getImmunization, immunization } = useVaccination()
 
   const navigate = useNavigate()
   const { vaccinationID } = useParams()
@@ -42,43 +45,44 @@ export default function VaccinationDetails() {
   const fetchAefiInfo = async () => {
     const response = await getVaccineAefis(patientInfo.id, vaccinationID)
     setVaccinationAEFIs(formatAefis(response))
+    setLoading(false)
   }
 
   useEffect(() => {
-    if (vaccinationDetails !== null) {
-      fetchPatientInfo(vaccinationDetails?.patient?.reference?.split('/')[1])
-      const timeFromLastDose = calculateAges(
-        vaccinationDetails?.occurrenceDateTime
-      )
+    getImmunization(vaccinationID)
+  }, [])
+
+  useEffect(() => {
+    if (immunization) {
+      fetchPatientInfo(immunization?.patient?.reference?.split('/')[1])
+      const timeFromLastDose = calculateAges(immunization?.occurrenceDateTime)
       setDoseInfo(
         ConvertObjectToArray({
-          'Dose administered':
-            vaccinationDetails?.doseQuantity?.value.toString(),
-          'Date of last dose': dayjs(
-            vaccinationDetails?.occurrenceDateTime
-          ).format('Do MMM YYYY'),
+          'Dose administered': immunization?.doseQuantity?.value.toString(),
+          'Date of last dose': dayjs(immunization?.occurrenceDateTime).format(
+            'Do MMM YYYY'
+          ),
           'Days since last dose': timeFromLastDose.days.toString(),
           'Months since last dose': timeFromLastDose.months.toString(),
         })
       )
     }
-  }, [vaccinationDetails])
+  }, [immunization])
 
   useEffect(() => {
     if (patientInfo) {
       fetchAefiInfo(patientInfo.id)
-      const timeFromLastDose = calculateAges(
-        vaccinationDetails?.occurrenceDateTime
-      )
+
+      const timeFromLastDose = calculateAges(immunization?.occurrenceDateTime)
       setClientInfo(
         ConvertObjectToArray({
           'Years since last dose': timeFromLastDose.years.toString(),
           'Age at last dose': getAgeAtDose(
             patientInfo?.birthDate,
-            vaccinationDetails?.occurrenceDateTime
+            immunization?.occurrenceDateTime
           ),
           'Client has completed vaccine primary series':
-            vaccinationDetails?.status === 'completed' ? 'YES' : 'NO',
+            immunization?.status === 'completed' ? 'YES' : 'NO',
         })
       )
     }
@@ -101,7 +105,6 @@ export default function VaccinationDetails() {
       key: 'actions',
       render: (text, record) => (
         <Button
-          disabled={true}
           onClick={() => {}}
           type="link"
           className="font-bold text=[#173C94]"
@@ -113,9 +116,6 @@ export default function VaccinationDetails() {
   ]
 
   const fetchVaccinationDetails = async () => {
-    const response = await get(`/hapi/fhir/Immunization/${vaccinationID}`)
-    setVaccinationDetails(response)
-
     const vaccinationaefiresponses = await get(
       `/hapi/fhir/Observation?part-of=Immunization/${vaccinationID}`
     )
@@ -156,62 +156,70 @@ export default function VaccinationDetails() {
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
-        <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 rounded-lg px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
-          <div className="text-2xl font-semibold py-5">
-            {vaccinationDetails?.protocolApplied?.[0]?.targetDisease?.[0]
-              ?.text || 'Target Disease: '}
+        {loading ? (
+          <div className="flex items-center justify-center h-96">
+            <LoadingArrows />
           </div>
-          <Link
-            to={`/view-contraindication/${vaccinationDetails?.id}`}
-            className="ml-auto flex items-center gap-x-1 rounded-md bg-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Contraindications
-          </Link>
-        </div>
+        ) : (
+          <>
+            <div className="flex w-full justify-between bg-[#f9fafb00] items-center gap-6 rounded-lg px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
+              <div className="text-2xl font-semibold py-5">
+                {immunization?.[0]?.targetDisease?.[0]?.text ||
+                  'Target Disease: '}
+              </div>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/view-contraindication/${immunization?.id}`)
+                }
+              >
+                Contraindications
+              </Button>
+            </div>
 
-        <div className="px-10 text-2xl font-semibold bg-gray-200 py-5 sm:px-10">
-          {vaccinationDetails?.vaccineCode?.text} (
-          {vaccinationDetails?.vaccineCode?.coding?.[0]?.code})
-        </div>
+            <div className="px-10 text-2xl font-semibold bg-gray-200 py-5 sm:px-10">
+              {immunization?.vaccineCode?.text}
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mx-7 px-10 py-10">
-          <div>
-            <BaseTable data={doseInfo} />
-          </div>
-          <div>
-            <BaseTable data={clientInfo} />
-          </div>
-        </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mx-7 px-10 py-10">
+              <div>
+                <BaseTable data={doseInfo} />
+              </div>
+              <div>
+                <BaseTable data={clientInfo} />
+              </div>
+            </div>
 
-        <div className="px-10 text-1xl font-semibold bg-gray-200 py-5 sm:px-10">
-          AEFI
-        </div>
+            <div className="px-10 text-1xl font-semibold bg-gray-200 py-5 sm:px-10">
+              AEFI
+            </div>
 
-        <div className="px-10 py-5">
-          {!vaccinationAEFIs?.length && (
-            <>
-              <div className="text-center">No AEFIs recorded</div>
-            </>
-          )}
-          {vaccinationAEFIs?.length > 0 && (
-            <Table
-              dataSource={vaccinationAEFIs}
-              columns={columns}
-              size="small"
-              showHeader={false}
-              pagination={false}
-            />
-          )}
-        </div>
+            <div className="px-10 py-5">
+              {!vaccinationAEFIs?.length && (
+                <>
+                  <div className="text-center">No AEFIs recorded</div>
+                </>
+              )}
+              {vaccinationAEFIs?.length > 0 && (
+                <Table
+                  dataSource={vaccinationAEFIs}
+                  columns={columns}
+                  size="small"
+                  pagination={false}
+                />
+              )}
+            </div>
 
-        <div className="px-4 py-4 sm:px-6 flex justify-end">
-          <button
-            onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94"
-          >
-            Back
-          </button>
-        </div>
+            <div className="px-4 py-4 sm:px-6 flex justify-end">
+              <button
+                onClick={() => navigate(-1)}
+                className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94"
+              >
+                Back
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </>
   )

@@ -1,6 +1,6 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { Badge, Button, Checkbox, Tag, Tooltip } from 'antd'
+import { Badge, Button, Checkbox, Tag, Tooltip, FloatButton } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -120,7 +120,7 @@ export default function RoutineVaccines({
       key: 'vaccine',
       render: (_text, record) => {
         const completed = record.status === 'completed'
-        const locked = lockVaccine(record.dueDate, patientData.birthDate)
+        const locked = lockVaccine(record.dueDate, record.lastDate)
         return (
           <Tooltip
             title={
@@ -168,18 +168,15 @@ export default function RoutineVaccines({
       title: 'Date Administered',
       dataIndex: 'administeredDate',
       key: 'administeredDate',
-      render: (text, _record) => (text ? text.format('DD-MM-YYYY') : '-'),
+      render: (text, record) =>
+        text && record.status === 'completed' ? text.format('DD-MM-YYYY') : '-',
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => {
-        const missed = datePassed(
-          text,
-          patientData?.birthDate,
-          record?.adminRange?.end
-        )
+        const missed = datePassed(text, record?.dueDate?.format('YYYY-MM-DD'))
 
         return (
           <Tag
@@ -214,7 +211,7 @@ export default function RoutineVaccines({
       key: 'actions',
       render: (text, record) => (
         <Button
-          disabled={record?.id ? false : true}
+          disabled={!record?.id || record.status === 'not-done'}
           onClick={() => {
             navigate(`/view-vaccination/${record?.id}`)
           }}
@@ -242,17 +239,19 @@ export default function RoutineVaccines({
             </small>
           </div>
           <div>
-            <Button
+            <FloatButton
               type="primary"
               onClick={() => {
                 setDialogOpen(true)
                 dispatch(setSelectedVaccines(vaccinesToAdminister))
               }}
               disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className=""
-            >
-              Administer Vaccine ( {vaccinesToAdminister?.length} )
-            </Button>
+              className={`w-fit ${vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''}`}
+              description={
+                <span className="px-2 font-semibold">{`Administer Vaccine ( ${vaccinesToAdminister?.length} )`}</span>
+              }
+              shape="square"
+            />
           </div>
         </div>
 
@@ -310,7 +309,9 @@ export default function RoutineVaccines({
                                           dispatch(
                                             setSelectedVaccines(administered)
                                           )
-                                          navigate(`/aefi-report/${patientData?.id}`)
+                                          navigate(
+                                            `/aefi-report/${patientData?.id}`
+                                          )
                                         }}
                                         type="link"
                                       >

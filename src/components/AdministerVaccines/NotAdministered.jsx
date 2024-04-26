@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Select } from 'antd'
+import { Button, DatePicker, Form, Select, Popconfirm } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -17,8 +17,12 @@ export default function NotAdministered() {
 
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const { createImmunization, updateImmunization, getRecommendations, updateRecommendations } =
-    useVaccination()
+  const {
+    createImmunization,
+    updateImmunization,
+    getRecommendations,
+    updateRecommendations,
+  } = useVaccination()
 
   const [form] = Form.useForm()
 
@@ -74,7 +78,7 @@ export default function NotAdministered() {
 
     const responses = await Promise.all(
       vaccineResources.map(async (resource) => {
-        if(resource.id) return await updateImmunization(resource)
+        if (resource.id) return await updateImmunization(resource)
         return await createImmunization(resource)
       })
     )
@@ -213,16 +217,22 @@ export default function NotAdministered() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => {
+          <Popconfirm
+            title="Are you sure you want to submit?"
+            onConfirm={() => {
               form.submit()
             }}
-            className="ml-4 btn-success text-sm font-semibold"
-            loading={loading}
-            disabled={loading}
+            okText="Yes"
+            cancelText="No"
           >
-            Submit
-          </Button>
+            <Button
+              className="ml-4 btn-success text-sm font-semibold"
+              loading={loading}
+              disabled={loading}
+            >
+              Submit
+            </Button>
+          </Popconfirm>
         </div>
       </div>
     </>
