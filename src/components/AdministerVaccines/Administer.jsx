@@ -217,7 +217,7 @@ export default function Administer() {
             Cancel
           </Button>
           <Popconfirm
-            title="Are you sure you want to cancel?"
+            title="Are you sure you want to administer?"
             onConfirm={() => form.submit()}
             okText="Yes"
             cancelText="No"

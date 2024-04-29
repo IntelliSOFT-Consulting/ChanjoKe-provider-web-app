@@ -50,7 +50,6 @@ export const formatRecommendationsToObject = (recommendation) => {
 
   const dependent = recommendation.seriesDosesString?.split(',')
 
-
   const earliestDate = dateCriterion?.find(
     (date) => date.code?.coding?.[0]?.code === 'Earliest-date-to-administer'
   )?.value
@@ -80,6 +79,7 @@ export const formatRecommendationsToObject = (recommendation) => {
     dependentVaccine,
     dependencyPeriod,
     id: recommendation.id,
+    statusReason: recommendation.statusReason,
   }
 }
 
@@ -88,7 +88,6 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
     routine: {},
     non_routine: {},
   }
-
 
   const routineCategories = new Set()
   const nonRoutineCategories = new Set()
@@ -110,6 +109,7 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
       recommendation.id = getVaccine.id
       recommendation.status = getVaccine.status
       recommendation.administeredDate = getVaccine.occurrenceDateTime
+      recommendation.statusReason = getVaccine.statusReason
     }
 
     const category =

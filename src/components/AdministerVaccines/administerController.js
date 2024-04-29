@@ -63,6 +63,9 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
 
     if(vaccine.id) {
       resource.id = vaccine.id;
+      if(vaccine.status === 'completed' && vaccine.statusReason) {
+        resource.statusReason = vaccine.statusReason;
+      }
     }
     
 

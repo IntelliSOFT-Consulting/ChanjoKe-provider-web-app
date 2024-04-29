@@ -119,7 +119,7 @@ export default function SearchInterface(props) {
       setTitle('Search')
     }
     if (props.searchType === 'updateClient') {
-      setTitle('Update Client History')
+      setTitle('Update Vaccine History')
     }
     if (props.searchType === 'administerVaccine') {
       setTitle('Administer Vaccine')

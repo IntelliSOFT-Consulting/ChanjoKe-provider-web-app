@@ -83,7 +83,7 @@ export default function Sidenav() {
       icon: 'registerClientLogo',
     },
     {
-      name: 'Update Client History',
+      name: 'Update Vaccine History',
       href: '/search/updateClient',
       icon: 'updateClientLogo',
     },
