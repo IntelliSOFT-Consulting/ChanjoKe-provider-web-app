@@ -41,6 +41,7 @@ import VaccinationDetails from '../pages/VaccinationDetails'
 import ContraindicationDetails from '../pages/ContraindicationDetails'
 import ReferralDetails from '../pages/ReferralDetails'
 import NewAppointment from '../components/ClientDetailsView/NewAppointment'
+import AEFIDetails from '../components/AEFI/AEFIDetails'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -139,6 +140,10 @@ const router = createBrowserRouter([
       {
         path: '/aefi-report/:clientID',
         element: <CreateAEFI />,
+      },
+      {
+        path: '/aefi-details/:vaccinationID',
+        element: <AEFIDetails />,
       },
       {
         path: '/client-details/:clientID',

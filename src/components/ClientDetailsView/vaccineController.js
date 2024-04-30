@@ -14,8 +14,6 @@ const receivedDose = (vaccinesSchedule, doseNumber) => {
   const given = vaccinesSchedule.find(
     (item) => item.doseNumber === doseNumber && item.status === 'completed'
   )
-
-  // lock ALL SAME dose numbers if one is completed
 }
 
 export const isQualified = (vaccinesSchedule, vaccine) => {
@@ -37,9 +35,6 @@ export const isQualified = (vaccinesSchedule, vaccine) => {
       receivedDose(vaccineSeries, vaccine.doseNumber - 1)
     )
   }
-  // if (vaccineSeries.length > 0 && vaccine.doseNumber === 1) {
-  //   return isEligibleForVaccine(vaccine) && receivedDose(vaccineSeries, 1)
-  // }
 
   return isEligibleForVaccine(vaccine)
 }

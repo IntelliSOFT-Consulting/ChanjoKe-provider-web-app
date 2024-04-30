@@ -1,13 +1,24 @@
-import { Alert, Checkbox, DatePicker, Form, Input, Radio, Select } from 'antd'
+import {
+  Alert,
+  Checkbox,
+  DatePicker,
+  Form,
+  Input,
+  Radio,
+  Select,
+  Button,
+} from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useAefi from '../../hooks/useAefi'
+import AEFIPreview from './AEFIPreview'
 
 export default function CreateAEFI() {
   const [currentStep, setCurrentStep] = useState(1)
+  const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [errors, setErrors] = useState([])
   const [isTreatmentGiven, setIsTreatmentGiven] = useState(false)
@@ -53,6 +64,12 @@ export default function CreateAEFI() {
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
+  const earliestDueDate = selectedVaccines?.reduce((acc, vaccine) => {
+    const dueDate = moment(vaccine.dueDate)
+    if (acc === null) return dueDate
+    return dueDate.isBefore(acc) ? dueDate?.format('YYYY-MM-DD') : acc
+  }, null)
+
   useEffect(() => {
     if (!selectedVaccines?.length) {
       navigate(`/client-details/${clientID}`)
@@ -60,15 +77,17 @@ export default function CreateAEFI() {
   }, [])
 
   const onFinish = async (values) => {
-    if (currentStep === 1) {
-      setCurrentStep(2)
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1)
       return
     }
+    setLoading(true)
 
     await submitAefi(values)
     setShowModal(true)
     const timer = setTimeout(() => {
       setShowModal(false)
+      setLoading(false)
       navigate(`/client-details/${currentPatient.id}`)
     }, 1500)
 
@@ -125,7 +144,9 @@ export default function CreateAEFI() {
             onFinish={onFinish}
           >
             <div
-              className={`grid mt-5 grid-cols-2 gap-10 ${currentStep === 2 ? 'hidden' : 'block'}`}
+              className={`grid mt-5 grid-cols-2 gap-10 ${
+                currentStep !== 1 ? 'hidden' : 'block'
+              }`}
             >
               <Form.Item
                 className="col-span-2"
@@ -193,7 +214,10 @@ export default function CreateAEFI() {
                     style={{ width: '100%' }}
                     placeholder="Onset of event"
                     disabledDate={(current) => {
-                      return current && current > moment().endOf('day')
+                      return (
+                        (current && current > moment().endOf('day')) ||
+                        current.isBefore(earliestDueDate)
+                      )
                     }}
                   />
                 </Form.Item>
@@ -214,7 +238,9 @@ export default function CreateAEFI() {
             </div>
 
             <div
-              className={`mt-5 px-6 grid-cols-1 md:grid-cols-2 gap-x-10 ${currentStep === 1 ? 'hidden' : 'grid'}`}
+              className={`mt-5 px-6 grid-cols-1 md:grid-cols-2 gap-x-10 ${
+                currentStep !== 2 ? 'hidden' : 'grid'
+              }`}
               gutter={16}
             >
               <Form.Item name="actionTaken" label="Action taken">
@@ -279,29 +305,38 @@ export default function CreateAEFI() {
                 </Form.Item>
               </div>
             </div>
+
+            {currentStep === 3 && <AEFIPreview form={form} />}
           </Form>
 
           <div className="px-4 py-4 sm:px-6 flex justify-end">
-            {currentStep === 2 && (
-              <button
-                onClick={() => setCurrentStep(1)}
-                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            {currentStep <= 3 && currentStep > 1 && (
+              <Button
+                onClick={() => setCurrentStep(currentStep - 1)}
+                className="ml-4 outline outline-[#163C94] text-sm font-semibold text-[#163C94]"
               >
                 Back
-              </button>
+              </Button>
             )}
-            <button
+            <Button
+              type="primary"
+              loading={loading}
+              disabled={loading}
               onClick={() => {
-                if (currentStep === 1) {
-                  setCurrentStep(2)
+                if (currentStep < 3) {
+                  setCurrentStep(currentStep + 1)
                   return
                 }
                 validateForm()
               }}
-              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+              className="ml-4 "
             >
-              {currentStep === 1 ? 'Next' : 'Submit'}
-            </button>
+              {currentStep === 1
+                ? 'Next'
+                : currentStep === 2
+                ? 'Preview'
+                : 'Submit'}
+            </Button>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import { Badge, Button, Checkbox, Tag, Tooltip, FloatButton } from 'antd'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useApiRequest } from '../../api/useApiRequest'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
@@ -14,6 +14,8 @@ import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import { colorCodeVaccines } from './vaccineController'
+import dayjs from 'dayjs'
+import SelectDialog from '../../common/dialog/SelectDialog'
 
 export default function RoutineVaccines({
   userCategory,
@@ -22,6 +24,7 @@ export default function RoutineVaccines({
   routineVaccines,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
+  const [selectAefi, setSelectAefi] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -30,6 +33,8 @@ export default function RoutineVaccines({
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
+
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   const { getAefis, loading: loadingAefis } = useAefi()
 
@@ -113,6 +118,33 @@ export default function RoutineVaccines({
     },
   ]
 
+  const statusMessage = (record, locked = false) => {
+    const missed = datePassed(
+      record.status,
+      record?.dueDate?.format('YYYY-MM-DD')
+    )
+    switch (record?.status) {
+      case 'completed':
+        return 'Vaccine already administered'
+      case 'not-done':
+        return `Vaccine not administered because of ${
+          record.statusReason?.coding?.[0]?.display
+        } until ${record.dueDate.format('DD-MM-YYYY')}`
+      case 'entered-in-error':
+        return `Vaccine contraindicated, to be administered on ${record.dueDate.format(
+          'DD-MM-YYYY'
+        )}`
+      case 'Due':
+        return locked && record.dueDate?.isAfter(dayjs())
+          ? 'Vaccination date not yet due'
+          : missed && locked
+          ? 'Vaccine missed'
+          : ''
+      default:
+        return ''
+    }
+  }
+
   const columns = [
     {
       title: '',
@@ -121,17 +153,9 @@ export default function RoutineVaccines({
       render: (_text, record) => {
         const completed = record.status === 'completed'
         const locked = lockVaccine(record.dueDate, record.lastDate)
+
         return (
-          <Tooltip
-            title={
-              locked
-                ? 'Not yet eligible for this vaccine'
-                : completed
-                ? 'Vaccine already administered'
-                : ''
-            }
-            color="#163c94"
-          >
+          <Tooltip title={statusMessage(record, locked)} color="#163c94">
             <Checkbox
               name={record.vaccine}
               value={record.vaccine}
@@ -211,7 +235,7 @@ export default function RoutineVaccines({
       key: 'actions',
       render: (text, record) => (
         <Button
-          disabled={!record?.id || record.status === 'not-done'}
+          disabled={record.status === 'Due'}
           onClick={() => {
             navigate(`/view-vaccination/${record?.id}`)
           }}
@@ -246,7 +270,9 @@ export default function RoutineVaccines({
                 dispatch(setSelectedVaccines(vaccinesToAdminister))
               }}
               disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className={`w-fit ${vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''}`}
+              className={`w-fit ${
+                vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''
+              }`}
               description={
                 <span className="px-2 font-semibold">{`Administer Vaccine ( ${vaccinesToAdminister?.length} )`}</span>
               }
@@ -309,9 +335,7 @@ export default function RoutineVaccines({
                                           dispatch(
                                             setSelectedVaccines(administered)
                                           )
-                                          navigate(
-                                            `/aefi-report/${patientData?.id}`
-                                          )
+                                          setSelectAefi(true)
                                         }}
                                         type="link"
                                       >
@@ -352,6 +376,20 @@ export default function RoutineVaccines({
             <Loader />
           </div>
         )}
+        <SelectDialog
+          open={selectAefi}
+          onClose={setSelectAefi}
+          title="Select AEFI"
+          description="Please select an action"
+          btnTwo={{
+            text: 'View AEFIs',
+            url: `/aefi-details/${selectedVaccines?.[0]?.id}`,
+          }}
+          btnOne={{
+            text: 'Report AEFI',
+            url: `/aefi-report/${selectedVaccines?.[0]?.id}`,
+          }}
+        />
       </div>
     </>
   )
