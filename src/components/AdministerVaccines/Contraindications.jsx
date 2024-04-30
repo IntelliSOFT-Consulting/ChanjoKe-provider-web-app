@@ -1,4 +1,4 @@
-import { DatePicker, Form, Input, Select, Button } from 'antd'
+import { DatePicker, Form, Input, Select, Button, Popconfirm } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -215,10 +215,15 @@ export default function Contraindications() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => {
+          <Popconfirm
+            title="Are you sure you want to contraindicate the selected vaccines?"
+            onConfirm={() => {
               form.submit()
             }}
+            okText="Yes"
+            cancelText="No"
+          >
+          <Button
             type="primary"
             className="ml-4 btn-success text-sm font-semibold"
             loading={loading}
@@ -226,6 +231,7 @@ export default function Contraindications() {
           >
             Contraindicate
           </Button>
+          </Popconfirm>
         </div>
       </div>
     </>

@@ -21,6 +21,12 @@ export default function useAefi() {
   const createPayload = (values) => {
     return {
       resourceType: 'AdverseEvent',
+      identifier: [
+        {
+          system: 'https://www.hl7.org/fhir/adverseevent-definitions.html',
+          value: values.aefiReportType,
+        },
+      ],
       subject: {
         reference: `Patient/${clientID || currentPatient?.id}`,
       },
@@ -76,6 +82,7 @@ export default function useAefi() {
               'http://terminology.hl7.org/CodeSystem/adverse-event-outcome',
           },
         ],
+        text: values.aefiOutcome,
       },
       suspectEntity: [
         ...(selectedVaccines?.map((vaccine) => {

@@ -1,50 +1,28 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import BaseTable from '../common/tables/BaseTable'
-import Table from '../components/DataTable'
-import { Button } from 'antd'
-import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
-import { useEffect, useState } from 'react'
-import { useApiRequest } from '../api/useApiRequest'
-import { calculateAges, getAgeAtDose } from '../utils/methods'
-import usePatient from '../hooks/usePatient'
-import useAefi from '../hooks/useAefi'
+import { Button, Descriptions } from 'antd'
 import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import LoadingArrows from '../common/spinners/LoadingArrows'
+import AEFIDetails from '../components/AEFI/AEFIDetails'
+import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
+import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
+import { calculateAges, getAgeAtDose } from '../utils/methods'
 
 export default function VaccinationDetails() {
   const [patientInfo, setPatientInfo] = useState(null)
-  const [doseInfo, setDoseInfo] = useState([])
-  const [clientInfo, setClientInfo] = useState([])
-  const [vaccinationAEFIs, setVaccinationAEFIs] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const { get } = useApiRequest()
   const { getPatient } = usePatient()
-  const { getVaccineAefis } = useAefi()
 
   const { getImmunization, immunization } = useVaccination()
 
   const navigate = useNavigate()
   const { vaccinationID } = useParams()
 
-  const formatAefis = (aefis) => {
-    return aefis?.map((aefi) => {
-      return {
-        symptomName: aefi?.resource?.event?.coding?.[0]?.display,
-        occurenceDate: dayjs(aefi?.resource?.detected).format('DD-MM-YYYY'),
-      }
-    })
-  }
-
   const fetchPatientInfo = async (patientId) => {
     const response = await getPatient(patientId)
     setPatientInfo(response)
-  }
-
-  const fetchAefiInfo = async () => {
-    const response = await getVaccineAefis(patientInfo.id, vaccinationID)
-    setVaccinationAEFIs(formatAefis(response))
     setLoading(false)
   }
 
@@ -55,103 +33,8 @@ export default function VaccinationDetails() {
   useEffect(() => {
     if (immunization) {
       fetchPatientInfo(immunization?.patient?.reference?.split('/')[1])
-      const timeFromLastDose = calculateAges(immunization?.occurrenceDateTime)
-      setDoseInfo(
-        ConvertObjectToArray({
-          'Dose administered': immunization?.doseQuantity?.value.toString(),
-          'Date of last dose': dayjs(immunization?.occurrenceDateTime).format(
-            'Do MMM YYYY'
-          ),
-          'Days since last dose': timeFromLastDose.days.toString(),
-          'Months since last dose': timeFromLastDose.months.toString(),
-        })
-      )
     }
   }, [immunization])
-
-  useEffect(() => {
-    if (patientInfo) {
-      fetchAefiInfo(patientInfo.id)
-
-      const timeFromLastDose = calculateAges(immunization?.occurrenceDateTime)
-      setClientInfo(
-        ConvertObjectToArray({
-          'Years since last dose': timeFromLastDose.years.toString(),
-          'Age at last dose': getAgeAtDose(
-            patientInfo?.birthDate,
-            immunization?.occurrenceDateTime
-          ),
-          'Client has completed vaccine primary series':
-            immunization?.status === 'completed' ? 'YES' : 'NO',
-        })
-      )
-    }
-  }, [patientInfo])
-
-  const columns = [
-    {
-      title: 'AEFI Type',
-      dataIndex: 'symptomName',
-      key: 'symptomName',
-    },
-    {
-      title: 'Date Reported',
-      dataIndex: 'occurenceDate',
-      key: 'occurenceDate',
-    },
-    {
-      title: 'Actions',
-      dataIndex: 'actions',
-      key: 'actions',
-      render: (text, record) => (
-        <Button
-          onClick={() => {}}
-          type="link"
-          className="font-bold text=[#173C94]"
-        >
-          View
-        </Button>
-      ),
-    },
-  ]
-
-  const fetchVaccinationDetails = async () => {
-    const vaccinationaefiresponses = await get(
-      `/hapi/fhir/Observation?part-of=Immunization/${vaccinationID}`
-    )
-
-    if (
-      Array.isArray(vaccinationaefiresponses) &&
-      vaccinationaefiresponses.length
-    ) {
-      const type = vaccinationaefiresponses?.entry.find(
-        (item) => item?.resource?.code?.text === 'Type of AEFI'
-      )
-      const date = vaccinationaefiresponses?.entry.find(
-        (item) => item?.resource?.code?.text === 'Onset of event'
-      )
-
-      setVaccinationAEFIs([
-        {
-          symptomName:
-            type?.resource?.valueCodeableConcept?.coding?.[0]?.display,
-          occurenceDate: dayjs(
-            date?.resource?.valueCodeableConcept?.coding?.[0]?.display
-          ).format('Do MMM YYYY'),
-          actions: [
-            { title: 'edit', url: '#' },
-            { title: 'view', url: '#' },
-          ],
-        },
-      ])
-    }
-  }
-
-  useEffect(() => {
-    fetchVaccinationDetails()
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <>
@@ -181,13 +64,45 @@ export default function VaccinationDetails() {
               {immunization?.vaccineCode?.text}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mx-7 px-10 py-10">
-              <div>
-                <BaseTable data={doseInfo} />
-              </div>
-              <div>
-                <BaseTable data={clientInfo} />
-              </div>
+            <div className="px-10 py-2">
+              <Descriptions
+                title="Vaccination Details"
+                bordered
+                column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2, xxl: 2 }}
+                labelStyle={{ fontWeight: 'bold', color: 'black' }}
+                size="small"
+                contentStyle={{ color: 'black' }}
+                style={{
+                  borderRadius: '0px',
+                }}
+              >
+                <Descriptions.Item label="Dose administered">
+                  {immunization?.doseQuantity?.value}
+                </Descriptions.Item>
+                <Descriptions.Item label="Date of last dose">
+                  {dayjs(immunization?.occurrenceDateTime).format(
+                    'Do MMM YYYY'
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Days since last dose">
+                  {calculateAges(immunization?.occurrenceDateTime).days}
+                </Descriptions.Item>
+                <Descriptions.Item label="Months since last dose">
+                  {calculateAges(immunization?.occurrenceDateTime).months}
+                </Descriptions.Item>
+                <Descriptions.Item label="Years since last dose">
+                  {calculateAges(immunization?.occurrenceDateTime).years}
+                </Descriptions.Item>
+                <Descriptions.Item label="Age at last dose">
+                  {getAgeAtDose(
+                    patientInfo?.birthDate,
+                    immunization?.occurrenceDateTime
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Client has completed vaccine primary series">
+                  {immunization?.status === 'completed' ? 'Yes' : 'No'}
+                </Descriptions.Item>
+              </Descriptions>
             </div>
 
             <div className="px-10 text-1xl font-semibold bg-gray-200 py-5 sm:px-10">
@@ -195,19 +110,7 @@ export default function VaccinationDetails() {
             </div>
 
             <div className="px-10 py-5">
-              {!vaccinationAEFIs?.length && (
-                <>
-                  <div className="text-center">No AEFIs recorded</div>
-                </>
-              )}
-              {vaccinationAEFIs?.length > 0 && (
-                <Table
-                  dataSource={vaccinationAEFIs}
-                  columns={columns}
-                  size="small"
-                  pagination={false}
-                />
-              )}
+              <AEFIDetails patientInfo={patientInfo} />
             </div>
 
             <div className="px-4 py-4 sm:px-6 flex justify-end">

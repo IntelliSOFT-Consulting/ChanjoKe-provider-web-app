@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select } from 'antd'
+import { Button, Form, Input, Select, Popconfirm } from 'antd'
 import { caregiverTypes } from '../../data/options/clientDetails'
 import { countryCodes } from '../../data/countryCodes'
 import Table from '../DataTable'
@@ -15,8 +15,6 @@ export default function CaregiverDetails({
     form.setFieldsValue(record)
     setCaregivers(caregivers.filter((item) => item !== record))
   }
-
-
 
   const columns = [
     {
@@ -52,16 +50,22 @@ export default function CaregiverDetails({
           >
             Edit
           </Button>
-          <Button
-            type="link"
-            className="px-0 ml-2"
-            danger
-            onClick={() =>
+          <Popconfirm
+            title={
+              <span>
+                Are you sure you want to remove <b>{record.caregiverName}</b>?
+              </span>
+            }
+            onConfirm={() =>
               setCaregivers(caregivers.filter((item) => item !== record))
             }
+            okText="Yes"
+            cancelText="No"
           >
-            Remove
-          </Button>
+            <Button type="link" className="px-0 ml-2" danger>
+              Remove
+            </Button>
+          </Popconfirm>
         </div>
       ),
     },
@@ -100,7 +104,7 @@ export default function CaregiverDetails({
             rules={[
               {
                 required: true,
-                message: `Please input the ${caregiverType()} name`
+                message: `Please input the ${caregiverType()} name`,
               },
             ]}
           >

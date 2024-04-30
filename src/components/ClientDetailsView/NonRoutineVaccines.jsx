@@ -2,7 +2,7 @@ import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import { Badge, Button, Checkbox, Tag, FloatButton } from 'antd'
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
@@ -10,6 +10,7 @@ import { formatCardTitle } from '../../utils/methods'
 import { datePassed } from '../../utils/validate'
 import Table from '../DataTable'
 import { colorCodeVaccines, isQualified, outGrown } from './vaccineController'
+import SelectDialog from '../../common/dialog/SelectDialog'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -19,8 +20,10 @@ export default function NonRoutineVaccines({
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [selectAefi, setSelectAefi] = useState(false)
 
   const navigate = useNavigate()
+  const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   const dispatch = useDispatch()
 
@@ -207,7 +210,9 @@ export default function NonRoutineVaccines({
                 dispatch(setSelectedVaccines(vaccinesToAdminister))
               }}
               disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className={`w-fit ${vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''}`}
+              className={`w-fit ${
+                vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''
+              }`}
               description={
                 <span className="px-2 font-semibold">{`Administer Vaccine ( ${vaccinesToAdminister?.length} )`}</span>
               }
@@ -260,9 +265,7 @@ export default function NonRoutineVaccines({
                                       dispatch(
                                         setSelectedVaccines(administered)
                                       )
-                                      navigate(
-                                        `/aefi-report/${patientData?.id}`
-                                      )
+                                      setSelectAefi(true)
                                     }}
                                     type="link"
                                   >
@@ -298,6 +301,20 @@ export default function NonRoutineVaccines({
             </dl>
           )
         })}
+        <SelectDialog
+          open={selectAefi}
+          onClose={setSelectAefi}
+          title="Select AEFI"
+          description="Please select an action"
+          btnTwo={{
+            text: 'View AEFIs',
+            url: `/aefi-details/${selectedVaccines?.[0]?.id}`,
+          }}
+          btnOne={{
+            text: 'Report AEFI',
+            url: `/aefi-report/${selectedVaccines?.[0]?.id}`,
+          }}
+        />
       </div>
     </>
   )

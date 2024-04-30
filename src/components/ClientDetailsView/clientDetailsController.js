@@ -78,8 +78,8 @@ export const formatRecommendationsToObject = (recommendation) => {
     nhddCode,
     dependentVaccine,
     dependencyPeriod,
-    id: recommendation.id,
     statusReason: recommendation.statusReason,
+    id: recommendation.id,
   }
 }
 
@@ -99,17 +99,23 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
         : nonRoutineCategories
     categoryType.add(recommendation.series)
 
-    const getVaccine = immunizations?.find(
+    const filterVaccines = immunizations?.filter(
       (immunization) =>
         immunization.vaccineCode?.coding?.[0]?.display ===
         recommendation.vaccineCode?.[0]?.coding?.[0]?.display
     )
+    const getVaccine = filterVaccines?.reduce((acc, vaccine) => {
+      if (!acc) return vaccine
+      return moment(vaccine.occurrenceDateTime).isAfter(acc.occurrenceDateTime)
+        ? vaccine
+        : acc
+    }, null)
 
     if (getVaccine) {
-      recommendation.id = getVaccine.id
       recommendation.status = getVaccine.status
       recommendation.administeredDate = getVaccine.occurrenceDateTime
       recommendation.statusReason = getVaccine.statusReason
+      recommendation.id = getVaccine.id
     }
 
     const category =

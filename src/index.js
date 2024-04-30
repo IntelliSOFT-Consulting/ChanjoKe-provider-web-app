@@ -15,7 +15,7 @@ const useStyles = createUseStyles({
     '.ant-card-body': {
       padding: '0px !important',
     },
-    '.ant-tabs-nav-list':{
+    '.ant-tabs-nav-list': {
       width: '100%',
     },
     '.ant-tabs-tab': {
@@ -40,8 +40,27 @@ const useStyles = createUseStyles({
     '.ant-picker-cell-selected': {
       '& div': {
         backgroundColor: '#163C94 !important',
-      }
-    }
+      },
+    },
+    '.ant-descriptions-view': {
+      borderRadius: '0px !important',
+    },
+    '.ant-modal-content': {
+      padding: '0px !important',
+      '& .ant-modal-header': {
+        backgroundColor: '#163C94 !important',
+        '& .ant-modal-title': {
+          color: 'white !important',
+          padding: '1rem !important',
+        },
+      },
+      '& .ant-modal-close-x': {
+        color: 'white !important',
+      },
+      '& .ant-modal-body, .ant-modal-footer': {
+        padding: '10px !important',
+      },
+    },
   },
 })
 
@@ -53,6 +72,9 @@ const defaultData = {
   },
   Input: {
     colorPrimary: '#163C94',
+  },
+  Descriptions: {
+    borderRadius: '0px',
   },
 }
 
@@ -105,6 +127,9 @@ const App = () => {
               DatePicker: {
                 colorPrimary: defaultData.DatePicker?.colorPrimary,
                 algorithm: defaultData.DatePicker?.algorithm,
+              },
+              Descriptions: {
+                borderRadius: 0,
               },
             },
           }}
