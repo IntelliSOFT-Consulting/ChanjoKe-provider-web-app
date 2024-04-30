@@ -1,10 +1,5 @@
-import LoadingArrows from '../../common/spinners/LoadingArrows'
-import { useState, useEffect } from 'react'
-import moment from 'moment'
-import dayjs from 'dayjs'
-import weekdays from 'dayjs/plugin/weekday'
-import localeDate from 'dayjs/plugin/localeData'
 import {
+  Alert,
   Button,
   DatePicker,
   Form,
@@ -12,29 +7,33 @@ import {
   InputNumber,
   Radio,
   Select,
-  Alert,
   Tooltip,
 } from 'antd'
+import dayjs from 'dayjs'
+import localeDate from 'dayjs/plugin/localeData'
+import weekdays from 'dayjs/plugin/weekday'
+import moment from 'moment'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import LoadingArrows from '../../common/spinners/LoadingArrows'
+import { countryCodes } from '../../data/countryCodes'
+import { identificationOptions } from '../../data/options/clientDetails'
+import useEncounter from '../../hooks/useEncounter'
+import { useLocations } from '../../hooks/useLocation'
+import usePatient from '../../hooks/usePatient'
+import useVaccination from '../../hooks/useVaccination'
 import {
   calculateAges,
   generateDateOfBirth,
   titleCase,
   writeAge,
 } from '../../utils/methods'
-import CaregiverDetails from './CareGiverDetails'
 import AdministrativeArea from './AdministrativeArea'
-import { identificationOptions } from '../../data/options/clientDetails'
-import { useSelector } from 'react-redux'
-import usePatient from '../../hooks/usePatient'
-import useEncounter from '../../hooks/useEncounter'
-import useObservations from '../../hooks/useObservations'
-import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { countryCodes } from '../../data/countryCodes'
-import { useLocations } from '../../hooks/useLocation'
-import Preview from './Preview'
+import CaregiverDetails from './CareGiverDetails'
 import PreloadDetails from './PreloadDetails'
-import useVaccination from '../../hooks/useVaccination'
+import Preview from './Preview'
 
 dayjs.extend(weekdays)
 dayjs.extend(localeDate)
@@ -69,7 +68,6 @@ export default function ClientDetails() {
 
   const { createPatient } = usePatient()
   const { createEncounter } = useEncounter()
-  const { createObservation } = useObservations()
   const {
     counties,
     subCounties,
@@ -138,7 +136,6 @@ export default function ClientDetails() {
       await createRecommendations(patient)
     }
     await createRecommendations(patient, 'update')
-    await createObservation(values, patient.id, encounter?.id)
 
     setSaving(false)
 
@@ -475,34 +472,6 @@ export default function ClientDetails() {
                   placeholder="Document Identification Number"
                   autoComplete="off"
                   className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                />
-              </Form.Item>
-
-              <div className="md:col-span-3 w-full border-t my-4" />
-
-              <Form.Item
-                name="currentWeight"
-                size="large"
-                label="Current Weight"
-                rules={[]}
-                className="col-span-2"
-              >
-                <Input
-                  placeholder="Current Weight"
-                  autoComplete="off"
-                  className="rounded"
-                  size="large"
-                  addonAfter={
-                    <Form.Item
-                      name="weightMetric"
-                      className="mb-0 block rounded-md"
-                    >
-                      <Select style={{ width: 100 }} defaultValue={'Kg'}>
-                        <Select.Option value="kg">Kilograms</Select.Option>
-                        <Select.Option value="g">Grams</Select.Option>
-                      </Select>
-                    </Form.Item>
-                  }
                 />
               </Form.Item>
             </div>

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react'
-import usePatient from '../../hooks/usePatient'
-import useObservations from '../../hooks/useObservations'
-import { calculateAges, writeAge } from '../../utils/methods'
 import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import { identificationOptions } from '../../data/options/clientDetails'
+import usePatient from '../../hooks/usePatient'
+import { calculateAges, writeAge } from '../../utils/methods'
 
 export default function PreloadDetails({
   patientId,
@@ -18,21 +17,13 @@ export default function PreloadDetails({
   setEstimatedAge,
 }) {
   const [patient, setPatient] = useState(null)
-  const [observation, setObservation] = useState(null)
   const [loading, setLoading] = useState(false)
   const { getPatient } = usePatient()
-  const { getFirstObservation } = useObservations()
 
   const fetchPatient = async () => {
     setLoading(true)
     const patient = await getPatient(patientId)
     setPatient(patient)
-  }
-
-  const fetchObservations = async () => {
-    setLoading(true)
-    const observation = await getFirstObservation(patientId)
-    setObservation(observation)
   }
 
   const formatPatient = async () => {
@@ -74,9 +65,6 @@ export default function PreloadDetails({
 
     setCaregivers(caregivers)
 
-    const weightMetric = observation.valueQuantity?.unit || 'kg'
-    const currentWeight = observation.valueQuantity?.value
-
     await form.setFieldsValue({
       firstName,
       middleName,
@@ -93,8 +81,6 @@ export default function PreloadDetails({
       townCenter,
       estateOrHouseNo,
       caregivers,
-      currentWeight,
-      weightMetric,
       age,
       years: ages.years,
       months: ages.months,
@@ -114,15 +100,14 @@ export default function PreloadDetails({
   useEffect(() => {
     if (!patientId) return
     fetchPatient()
-    fetchObservations()
   }, [patientId])
 
   useEffect(() => {
-    if (patient && observation) {
+    if (patient) {
       formatPatient()
       setLoading(false)
     }
-  }, [patient, observation])
+  }, [patient])
 
   return { loading }
 }

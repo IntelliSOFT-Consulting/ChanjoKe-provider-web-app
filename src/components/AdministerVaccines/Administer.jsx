@@ -14,6 +14,7 @@ import {
 
 export default function Administer() {
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [nextVaccines, setNextVaccines] = useState({})
   const [loading, setLoading] = useState(false)
 
   const [form] = Form.useForm()
@@ -23,12 +24,30 @@ export default function Administer() {
   const { user } = useSelector((state) => state.userInfo)
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const vaccineSchedules = useSelector((state) => state.vaccineSchedules)
 
   const { getLatestObservation } = useObservations()
 
   const navigate = useNavigate()
 
   const { clientID } = useParams()
+
+  const findNextVaccines = () => {
+    const keys = Object.keys(vaccineSchedules)
+
+    const vaccineGroup = keys.find((group) =>
+      vaccineSchedules[group].some(
+        (vaccine) => vaccine.vaccine === selectedVaccines[0].vaccine
+      )
+    )
+
+    const indexOfKey = keys.indexOf(vaccineGroup)
+
+    setNextVaccines({
+      nextGroup: keys[indexOfKey + 1],
+      nextScheduleDate: vaccineSchedules[keys[indexOfKey + 1]]?.[0]?.dueDate,
+    })
+  }
 
   const {
     createImmunization,
@@ -55,6 +74,7 @@ export default function Administer() {
       navigate(`/client-details/${clientID}`)
     } else {
       getWeight()
+      findNextVaccines()
     }
   }, [selectedVaccines])
 
@@ -90,11 +110,6 @@ export default function Administer() {
     if (responses) {
       setLoading(false)
       setDialogOpen(true)
-      const time = setTimeout(() => {
-        setDialogOpen(false)
-        window.location.reload()
-      }, 1500)
-      return () => clearTimeout(time)
     }
   }
 
@@ -102,8 +117,23 @@ export default function Administer() {
     <>
       <ConfirmDialog
         open={isDialogOpen}
-        description="The vaccine has been successfully administered"
-        onClose={() => navigate(-1)}
+        description={
+          <div className='font-normal'>
+            <p>The vaccines have been successfully administered!</p>
+            <div className='mt-2'>
+              <p className="font-semibold text-primary">Next Vaccine Appointment:</p>
+              <p>
+                <span className="font-semibold mr-2 text-primary">Due Date:</span>
+                {nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}
+              </p>
+              <p>
+                <span className="font-semibold mr-2 text-primary">Interval:</span>
+                {nextVaccines?.nextGroup}
+              </p>
+            </div>
+          </div>
+        }
+        onClose={() => window.location.reload()}
       />
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">

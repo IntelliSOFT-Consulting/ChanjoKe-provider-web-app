@@ -12,6 +12,7 @@ import Table from '../components/DataTable'
 import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
 import { setCurrentPatient } from '../redux/actions/patientActions'
+import { setVaccineSchedules } from '../redux/actions/vaccineActions'
 import { Button } from 'antd'
 
 export default function ClientDetailsView() {
@@ -55,6 +56,7 @@ export default function ClientDetailsView() {
       )
       setRoutineVaccines(groupedVaccines.routine)
       setNonRoutineVaccines(groupedVaccines.non_routine)
+      dispatch(setVaccineSchedules(groupedVaccines.routine))
     }
   }, [immunizations, recommendations])
 
