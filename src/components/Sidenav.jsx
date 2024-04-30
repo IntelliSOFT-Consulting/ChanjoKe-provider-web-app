@@ -135,7 +135,9 @@ export default function Sidenav() {
     }))
 
     setNavigation(updatedNavigation)
-  }
+    setSidebarOpen(false)
+
+  };
 
   return (
     <>
