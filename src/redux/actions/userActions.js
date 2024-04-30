@@ -62,7 +62,7 @@ export const login = (values) => async (dispatch) => {
         },
       })
 
-      const user = { ...response?.data?.user, ...auth }
+      const user = { ...response?.data?.user, ...auth, location: values.location }
       dispatch({
         type: GET_USER_SUCCESS,
         payload: user,

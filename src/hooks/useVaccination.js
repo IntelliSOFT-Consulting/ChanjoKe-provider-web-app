@@ -14,6 +14,8 @@ export default function useVaccination() {
   const [immunizations, setImmunizations] = useState(null)
   const [immunization, setImmunization] = useState(null)
 
+  const { user } = useSelector((state) => state.userInfo)
+
   const filterVaccinationRecommendations = (patient, recommendation) => {
     const patientAge = getAgeInUnits(patient.birthDate, 'days')
 
@@ -163,9 +165,11 @@ export default function useVaccination() {
     return resource
   }
 
-  const getImmunizations = async (patientId, param='') => {
+  const getImmunizations = async (patientId, param = '') => {
     const responses = await get(
-      `${immunizationsEndpoint}?patient=Patient/${patientId}${param ? `&${param}` : ''}`
+      `${immunizationsEndpoint}?patient=Patient/${patientId}${
+        param ? `&${param}` : ''
+      }`
     )
 
     const resources = responses?.entry?.map((entry) => entry.resource)

@@ -25,10 +25,10 @@ export default function Login() {
 
   const { user, loading, error } = useSelector((state) => state.userInfo)
 
-  const [locations, setLocations] = useState([
-    { name: 'Outreach', value: 'outreach' },
-    { name: 'Facility', value: 'facility' },
-  ])
+  const locations = [
+    { label: 'Outreach', value: 'Outreach' },
+    { label: 'Facility', value: 'Facility' },
+  ]
 
   const onFinish = async (values) => {
     dispatch(login(values))
@@ -132,13 +132,8 @@ export default function Login() {
                     placeholder="Location"
                     className={classes.selector}
                     allowClear
-                  >
-                    {locations.map((option) => (
-                      <Select.Option value={option.value}>
-                        {option.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
+                    options={locations}
+                  />
                 </Form.Item>
               </div>
 
