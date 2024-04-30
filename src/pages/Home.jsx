@@ -70,36 +70,36 @@ export default function Home() {
           Today's Statistics
         </h3>
         <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-3 mx-auto max-w-7xl">
-          {statsTwo.map((item) => (
-            <div
-              key={item.id}
-              className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
-            >
-              <h1 className="font-bold text-center text-2xl">{item.name}</h1>
+            {statsTwo.map((item) => (
+              <div
+                key={item.id}
+                className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6"
+              >
+                <h1 className="font-bold text-center text-2xl">{item.name}</h1>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <img
-                    className="h-24 ml-5 mt-6 mb-5"
-                    src={item.icon}
-                    alt={item.name}
-                  />
-                </div>
-                <div>
-                  <div className="text-7xl text-[#163C94] font-bold mt-10">
-                    {item.stat}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <img
+                      className="h-24 ml-5 mt-6 mb-5"
+                      src={item.icon}
+                      alt={item.name}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-7xl text-[#163C94] font-bold mt-10">
+                      {item.stat}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </dl>
       </div>
 
       <br />
 
       <div>
-        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid grid-cols-2 gap-5 sm:grid-cols-4 p-6 rounded-lg shadow-xl border bg-white">
+        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-4 p-6 rounded-lg shadow-xl border bg-white">
           {stats.map((item) => (
             <Link
               to={item.href}

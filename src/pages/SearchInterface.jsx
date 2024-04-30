@@ -152,12 +152,12 @@ export default function SearchInterface(props) {
         onClose={handleDialogClose}
       />
 
-      <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
-        <div className="px-4 text-2xl font-semibold py-5 sm:px-6">{title}</div>
-        <div className="px-4 py-5 sm:p-6">
+      <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
+        <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">{title}</div>
+        <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
           {props.searchType === 'referrals' && (
             <Form layout="vertical" colon={true}>
-              <div className="grid grid-cols-2 mx-10">
+              <div className="grid grid-cols-2 mb:mx-10">
                 <div>
                   <div className="grid grid-cols-2 gap-4">
                     <Form.Item label="Start Date">
@@ -181,7 +181,7 @@ export default function SearchInterface(props) {
             </Form>
           )}
           <Form
-            className="grid grid-cols-5 gap-x-4 mx-10 mb-0"
+            className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 mx-2 sm:mx-10 mb-0"
             onFinish={(values) => {
               handleSearch(0, values.searchInput)
             }}
@@ -214,7 +214,7 @@ export default function SearchInterface(props) {
 
           {error && <div className="my-10 text-center">{error}</div>}
 
-          <div className="px-10 my-6">
+          <div className="hidden sm:block sm:px-10 my-6">
             <Table
               columns={columns}
               dataSource={results}
@@ -246,7 +246,31 @@ export default function SearchInterface(props) {
               }}
             />
           </div>
-        </div>
+
+          <div className="sm:hidden mt-5">
+            {results.map((result) => (
+              <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
+                {console.log({ result })}
+                <div className="py-5 pr-6 col-span-4">
+                  <div className="text-sm pl-5 leading-6 text-gray-900">{result.clientName}</div>
+                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">ID: <span className='font-bold'>{result.idNumber}</span></div>
+                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">{result.phoneNumber}</div>
+                </div>
+                <div className="py-5 max-w-auto right-5">
+                  <div className="flex">
+                    <a
+                      href={`/client-details/${result.id}`}
+                      className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500"
+                    >
+                      View
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          </div>
       </div>
     </>
   )
