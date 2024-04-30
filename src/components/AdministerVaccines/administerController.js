@@ -57,6 +57,11 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
         reference: user.facility,
       },
       lotNumber: vaccine.batchNumber,
+      note: [
+        {
+          text: user?.location
+        }
+      ]
     }
 
     if (vaccine.status !== 'completed') {
