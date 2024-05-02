@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useObservations from '../../hooks/useObservations'
 import useVaccination from '../../hooks/useVaccination'
+import useEncounter from '../../hooks/useEncounter'
 import {
   createImmunizationResource,
   getBodyWeight,
@@ -26,7 +27,7 @@ export default function Administer() {
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
   const vaccineSchedules = useSelector((state) => state.vaccineSchedules)
 
-  const { getLatestObservation } = useObservations()
+  const { getLatestObservation, createObservation } = useObservations()
 
   const navigate = useNavigate()
 
@@ -55,6 +56,8 @@ export default function Administer() {
     getRecommendations,
     updateRecommendations,
   } = useVaccination()
+
+  const { createEncounter } = useEncounter()
 
   const getWeight = async () => {
     const observation = await getLatestObservation(clientID)
@@ -107,6 +110,10 @@ export default function Administer() {
       updateVaccineDueDates(recommendation, selectedVaccines)
     )
 
+    const encounter = await createEncounter(clientID, user?.fhirPractitionerId, user?.facility?.split('/')[1])
+
+    await createObservation(values, clientID, encounter?.id)
+
     if (responses) {
       setLoading(false)
       setDialogOpen(true)
@@ -158,9 +165,9 @@ export default function Administer() {
                     placeholder="Current Weight"
                     size="large"
                     addonAfter={
-                      <Form.Item name="weightUnit">
+                      <Form.Item name="weightMetric">
                         <Select
-                          defaultValue="Kg"
+                          defaultValue="kg"
                           style={{ width: 70 }}
                           size="large"
                         >

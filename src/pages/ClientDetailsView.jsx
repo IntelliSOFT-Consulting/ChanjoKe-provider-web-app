@@ -8,19 +8,23 @@ import LoadingArrows from '../common/spinners/LoadingArrows'
 import BaseTabs from '../common/tabs/BaseTabs'
 import {
   formatClientDetails,
+  formatWeightData,
   groupVaccinesByCategory,
 } from '../components/ClientDetailsView/clientDetailsController'
 import Table from '../components/DataTable'
 import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
+import useObservations from '../hooks/useObservations'
 import { setCurrentPatient } from '../redux/actions/patientActions'
 import { setVaccineSchedules } from '../redux/actions/vaccineActions'
+import WeightChart from '../components/ClientDetailsView/WeightChart'
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [patientData, setPatientData] = useState(null)
   const [routineVaccines, setRoutineVaccines] = useState([])
   const [nonRoutineVaccines, setNonRoutineVaccines] = useState([])
+  const [observationsData, setObservationsData] = useState([])
 
   const { clientID } = useParams()
   const navigate = useNavigate()
@@ -34,10 +38,13 @@ export default function ClientDetailsView() {
     recommendations,
   } = useVaccination()
 
+  const { getObservations, observations } = useObservations()
+
   useEffect(() => {
     getPatient(clientID)
     getRecommendations(clientID)
     getImmunizations(clientID)
+    getObservations(clientID)
   }, [clientID])
 
   useEffect(() => {
@@ -46,6 +53,12 @@ export default function ClientDetailsView() {
       setPatientData(formatClientDetails(patient))
     }
   }, [patient])
+
+  useEffect(() => {
+    if (observations) {
+      setObservationsData(formatWeightData(observations, patient?.birthDate))
+    }
+  }, [observations])
 
   useEffect(() => {
     if (recommendations) {
@@ -141,6 +154,10 @@ export default function ClientDetailsView() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <WeightChart weights={observationsData} />
       </div>
 
       <div className="mt-4">

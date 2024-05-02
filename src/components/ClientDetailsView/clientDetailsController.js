@@ -142,3 +142,38 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
 
   return categories
 }
+
+export const formatWeightData = (observations, birthDate) => {
+  const dob = moment(birthDate)
+
+  const weightData = observations
+    .filter((observation) =>
+      observation?.code?.coding?.[0]?.display?.toLowerCase()?.includes('weight')
+    )
+    .sort((a, b) => moment(a.effectiveDateTime) - moment(b.effectiveDateTime))
+
+  const lastDate = moment(
+    weightData?.[weightData.length - 1]?.effectiveDateTime
+  )
+
+  const days = lastDate.diff(dob, 'days')
+  const period =
+    days > 7 && days < 30
+      ? 'weeks'
+      : days > 30 && days < 365
+      ? 'months'
+      : days > 365
+      ? 'years'
+      : 'days'
+
+  const formatted = weightData.map((observation) => {
+    const date = moment(observation.effectiveDateTime)
+    const age = date.diff(dob, period)
+
+    const weight = observation.valueQuantity.value
+
+    return [age, weight]
+  })
+
+  return [[period, 'Weight (Kg)'], [0,0], ...formatted]
+}
