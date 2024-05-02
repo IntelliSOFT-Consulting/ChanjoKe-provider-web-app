@@ -39,12 +39,13 @@ export default function CaregiverDetails({
       title: 'Phone Number',
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
-      render: (text, record) => (
-        <span>
-          {record.phoneCode}
-          {text}
-        </span>
-      ),
+      render: (text, record) =>
+        text ? (
+          <span>
+            {record.phoneCode}
+            {text}
+          </span>
+        ) : null,
     },
     {
       title: 'Action',

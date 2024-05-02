@@ -23,6 +23,17 @@ export const formatClientDetails = (patientResource) => {
   const clientCategory = classifyUserByAge(patientResource.birthDate)
   const ages = calculateAges(patientResource.birthDate)
 
+  const otherIdentifiers = patientResource.identifier.filter(
+    (id) =>
+      !id?.type?.coding?.[0]?.display?.toLowerCase().includes('system') &&
+      !id?.type?.coding?.[0]?.display?.toLowerCase().includes('caregiver')
+  )
+  const isNotificationOnly =
+    otherIdentifiers?.length === 1 &&
+    otherIdentifiers?.[0]?.type?.coding?.[0]?.display
+      ?.toLowerCase()
+      ?.includes('notification')
+
   return {
     name: `${patientResource?.name?.[0]?.given?.join(' ')} ${
       patientResource?.name?.[0]?.family || ''
@@ -34,6 +45,7 @@ export const formatClientDetails = (patientResource) => {
     ages,
     systemId,
     clientCategory,
+    hasNotificationOnly: isNotificationOnly,
   }
 }
 

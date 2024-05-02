@@ -1,3 +1,5 @@
+import { WarningTwoTone } from '@ant-design/icons'
+import { Button } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -6,14 +8,13 @@ import LoadingArrows from '../common/spinners/LoadingArrows'
 import BaseTabs from '../common/tabs/BaseTabs'
 import {
   formatClientDetails,
-  groupVaccinesByCategory
+  groupVaccinesByCategory,
 } from '../components/ClientDetailsView/clientDetailsController'
 import Table from '../components/DataTable'
 import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
 import { setCurrentPatient } from '../redux/actions/patientActions'
 import { setVaccineSchedules } from '../redux/actions/vaccineActions'
-import { Button } from 'antd'
 
 export default function ClientDetailsView() {
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -32,8 +33,6 @@ export default function ClientDetailsView() {
     immunizations,
     recommendations,
   } = useVaccination()
- 
-
 
   useEffect(() => {
     getPatient(clientID)
@@ -100,7 +99,7 @@ export default function ClientDetailsView() {
               View Client Details
             </Button>
             <Button
-            type='primary'
+              type="primary"
               onClick={() => setDialogOpen(true)}
               className="ml-4 font-semibold"
             >
@@ -116,13 +115,29 @@ export default function ClientDetailsView() {
                 <LoadingArrows />
               </div>
             ) : (
-              <Table
-                columns={tHeaders}
-                dataSource={patientData ? [patientData] : []}
-                pagination={false}
-                loading={!patientData}
-                size="small"
-              />
+              <div className="flex w-full">
+                <Table
+                  columns={tHeaders}
+                  dataSource={patientData ? [patientData] : []}
+                  pagination={false}
+                  loading={!patientData}
+                  size="small"
+                  className="w-full"
+                />
+                {patientData?.hasNotificationOnly && (
+                  <div className="flex flex-col items-center bg-pink py-2 px-4 rounded-md ml-0 md:ml-2 h-full my-0 max-w-full md:max-w-xs ">
+                    <WarningTwoTone
+                      twoToneColor="red"
+                      classID="text-black text-6xl"
+                    />
+                    <div className="ml-2 text-sm">
+                      This client is registered using a{' '}
+                      <b>Birth Notification Number</b>, Please update to their
+                      <b>Birth Certificate</b>.
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
