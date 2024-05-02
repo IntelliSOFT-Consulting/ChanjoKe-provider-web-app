@@ -12,7 +12,7 @@ export default function AdministrativeArea({
   return (
     <>
       <h3 className="text-xl font-medium">Administrative Area</h3>
-      <div className="grid mt-5 grid-cols-3 gap-10">
+      <div className="md:grid mt-5 md:grid-cols-3 gap-10">
         <Form.Item
           label="County of Residence"
           name="county"

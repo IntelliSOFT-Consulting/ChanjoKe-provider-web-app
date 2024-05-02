@@ -96,6 +96,7 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
           title={section.title}
           bordered
           column={1}
+          className='mt-5'
           size="small"
         >
           {section.data.map((item) => {
