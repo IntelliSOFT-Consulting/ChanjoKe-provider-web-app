@@ -74,7 +74,7 @@ export default function useObservations() {
       const response = await get(
         `${fhirApi}/Observation?patient=Patient/${patientId}`
       )
-      setObservations(response.entry)
+      setObservations(response.entry?.map((entry) => entry.resource))
       setLoading(false)
     } catch (error) {
       setError(error)
