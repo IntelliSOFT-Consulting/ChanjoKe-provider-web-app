@@ -313,9 +313,7 @@ export default function ClientDetails() {
                 />
               </Form.Item>
 
-              <div className="col-span-1 md:col-span-2 lg:col-span-3 my-4">
-                <h3 className="text-lg font-medium mb-6">Age Details</h3>
-              </div>
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 my-4" />
 
               <Form.Item
                 name="vaccineType"
