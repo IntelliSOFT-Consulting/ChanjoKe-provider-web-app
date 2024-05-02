@@ -49,6 +49,7 @@ export default function ClientDetails() {
   const [currentStep, setCurrentStep] = useState(1)
   const [success, setSuccess] = useState(false)
   const [errors, setErrors] = useState(null)
+  const [clientType, setClientType] = useState(null)
 
   const [form] = Form.useForm()
 
@@ -142,7 +143,9 @@ export default function ClientDetails() {
     setSuccess(true)
 
     const timeout = setTimeout(() => {
-      navigate(`/client-details/${patient.id}`)
+      const param =
+        clientType === 'Non-Routine' || values.years >= 5 ? 'non-routine' : ''
+      navigate(`/client-details/${patient.id}${param ? `?type=${param}` : ''}`)
     }, 1500)
 
     return () => clearTimeout(timeout)
@@ -174,6 +177,10 @@ export default function ClientDetails() {
       return 'Next of Kin'
     }
     return 'Caregiver'
+  }
+
+  const handleClientType = (e) => {
+    setClientType(e.target.value)
   }
 
   return (
@@ -249,24 +256,82 @@ export default function ClientDetails() {
                 />
               </Form.Item>
 
-              <div>
-                <Form.Item
-                  name="gender"
-                  label="Gender"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please select gender',
-                    },
-                  ]}
-                >
-                  <Radio.Group>
-                    <Radio value="male">Male</Radio>
-                    <Radio value="female">Female</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </div>
-              <div>
+              <Form.Item
+                name="gender"
+                label="Gender"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select gender',
+                  },
+                ]}
+              >
+                <Radio.Group>
+                  <Radio value="male">Male</Radio>
+                  <Radio value="female">Female</Radio>
+                </Radio.Group>
+              </Form.Item>
+
+              <Form.Item
+                name="identificationType"
+                label="Identification Type"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select identification type',
+                  },
+                ]}
+              >
+                <Select
+                  size="large"
+                  onChange={(value) => {
+                    if (value) {
+                      setIsDocumentTypeSelected(true)
+                    } else {
+                      setIsDocumentTypeSelected(false)
+                    }
+                  }}
+                  options={identificationOptions}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="identificationNumber"
+                label="Identification Number"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input identifier number',
+                  },
+                ]}
+              >
+                <Input
+                  disabled={!isDocumentTypeSelected}
+                  placeholder="Document Identification Number"
+                  autoComplete="off"
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
+
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 my-4" />
+
+              <Form.Item
+                name="vaccineType"
+                label="Vaccination Category"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select vaccination category',
+                  },
+                ]}
+              >
+                <Radio.Group onChange={handleClientType}>
+                  <Radio value="Routine">Routine</Radio>
+                  <Radio value="Non-Routine">Non-Routine</Radio>
+                </Radio.Group>
+              </Form.Item>
+
+              {clientType === 'Non-Routine' && (
                 <Form.Item name="estimatedAge" label="Age Input Method">
                   <Radio.Group
                     onChange={(e) => setEstimatedAge(e.target.value)}
@@ -275,7 +340,7 @@ export default function ClientDetails() {
                     <Radio value={false}>Estimated</Radio>
                   </Radio.Group>
                 </Form.Item>
-              </div>
+              )}
 
               <Form.Item
                 name="dateOfBirth"
@@ -337,7 +402,7 @@ export default function ClientDetails() {
               </Form.Item>
 
               <div
-                className={`gutter-row grid-cols-3 gap-4 mt-7 ${
+                className={`gutter-row grid-cols-3 gap-4 mt-0 ${
                   !estimatedAge ? 'grid' : 'hidden'
                 }`}
               >
@@ -432,48 +497,6 @@ export default function ClientDetails() {
                   />
                 </Form.Item>
               )}
-
-              <Form.Item
-                name="identificationType"
-                label="Identification Type"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select identification type',
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  disabled={idOptions.length === 0}
-                  onChange={(value) => {
-                    if (value) {
-                      setIsDocumentTypeSelected(true)
-                    } else {
-                      setIsDocumentTypeSelected(false)
-                    }
-                  }}
-                  options={idOptions}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="identificationNumber"
-                label="Identification Number"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please input identifier number',
-                  },
-                ]}
-              >
-                <Input
-                  disabled={!isDocumentTypeSelected || idOptions.length === 0}
-                  placeholder="Document Identification Number"
-                  autoComplete="off"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                />
-              </Form.Item>
             </div>
           </div>
 

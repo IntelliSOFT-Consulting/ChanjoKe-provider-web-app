@@ -32,13 +32,14 @@ export default function BaseTabs({
   routineVaccines,
   nonRoutineVaccines,
   recommendations,
-  immunizations
+  immunizations,
+  queryParams,
 }) {
   const [currentTab, setCurrentTab] = useState('routineVaccines')
 
   useEffect(() => {
     if (patientDetails) {
-      if (patientDetails?.ages?.years >= 18) {
+      if (patientDetails?.ages?.years >= 18 || queryParams === 'non-routine') {
         setCurrentTab('nonRoutineVaccines')
       } else {
         setCurrentTab('routineVaccines')
