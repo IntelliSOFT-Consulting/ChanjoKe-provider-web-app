@@ -198,9 +198,9 @@ function deconstructPatientData(data, searchType) {
 
     return {
         id: data?.resource?.id,
-        clientName: `${data?.resource?.name?.[0]?.family ?? ""} ${data?.resource?.name?.[0]?.given[0] ?? ""} ${data?.resource?.name?.[0]?.given[1] ?? ""}`,
+        clientName: `${data?.resource?.name?.[0]?.given?.join(' ')} ${data?.resource?.name?.[0]?.family}`,
         idNumber: organizeData(data?.resource?.identifier).NATIONAL_ID || organizeData(data?.resource?.identifier).BIRTH_CERTIFICATE || organizeData(data?.resource?.identifier).NEMIS_NUMBER || organizeData(data?.resource?.identifier).PASSPORT,
-        phoneNumber: `${data?.resource?.contact?.[0]?.telecom?.[0]?.value} (${data?.resource?.contact?.[0]?.relationship?.[0]?.text})`,
+        phoneNumber: data?.resource?.contact?.[0]?.telecom?.[0]?.value ? `${data?.resource?.contact?.[0]?.telecom?.[0]?.value} (${data?.resource?.contact?.[0]?.relationship?.[0]?.text})` : '-',
         actions,
     }
 }
