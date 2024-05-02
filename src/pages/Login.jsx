@@ -1,11 +1,9 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { MapPinIcon } from '@heroicons/react/24/outline'
 import { Button, Form, Input, Select } from 'antd'
-import { useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { useApiRequest } from '../api/useApiRequest'
 import MOHLogo from '../assets/moh-logo.png'
 import { login } from '../redux/actions/userActions'
 
@@ -23,7 +21,7 @@ export default function Login() {
 
   const classes = useStyles()
 
-  const { user, loading, error } = useSelector((state) => state.userInfo)
+  const { user, loading } = useSelector((state) => state.userInfo)
 
   const locations = [
     { label: 'Outreach', value: 'Outreach' },

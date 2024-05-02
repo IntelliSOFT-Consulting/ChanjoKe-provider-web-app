@@ -1,12 +1,10 @@
-import OpenCHANJO from '../assets/login bg.png'
-import MOHLogo from '../assets/moh-logo.png'
-import { useNavigate } from 'react-router-dom'
-import { Form, Input } from 'antd'
+import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
+import { Form, Input, message } from 'antd'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useApiRequest } from '../api/useApiRequest'
-import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons'
+import MOHLogo from '../assets/moh-logo.png'
 import LoadingIcon from '../common/icons/loadingIcon'
-import { message } from 'antd'
 
 export default function ForgotPassword() {
   const [loading, setLoading] = useState(false)
@@ -49,9 +47,7 @@ export default function ForgotPassword() {
   }
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
-      <nav className="hidden md:block">
-        <img src={OpenCHANJO} className="h-screen" alt="Chanjo KE Jumbo" />
-      </nav>
+       <div className="hidden md:block md:h-screen w-full login-bg" />
 
       <div>
         <div className="md:collapse flex flex-wrap text-center px-4 sm:flex-nowrap sm:px-6 lg:px-8 bg-[#163C94] text-white shadow py-4">
@@ -75,7 +71,7 @@ export default function ForgotPassword() {
                 onFinish={onFinish}
                 autoComplete="off"
                 layout="vertical"
-                className="mt-20 w-full max-w-64 px-40"
+                className="mt-20 w-full max-w-64 px-16 flex flex-col"
               >
                 <Form.Item
                   name="idNumber"
