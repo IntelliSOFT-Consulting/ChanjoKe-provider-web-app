@@ -1,4 +1,4 @@
-import { Button, Form, Input, Select, Popconfirm } from 'antd'
+import { Button, Form, Input, Select, Popconfirm, InputNumber } from 'antd'
 import { caregiverTypes } from '../../data/options/clientDetails'
 import { countryCodes } from '../../data/countryCodes'
 import Table from '../DataTable'
@@ -18,7 +18,10 @@ export default function CaregiverDetails({
 
   const columns = [
     {
-      title: `${caregiverType()} Type`,
+      title:
+        caregiverType() === 'Caregiver'
+          ? `${caregiverType()} Type`
+          : `Relationship with ${caregiverType()}`,
       dataIndex: 'caregiverType',
       key: 'caregiverType',
     },
@@ -26,6 +29,11 @@ export default function CaregiverDetails({
       title: `${caregiverType()} Name`,
       dataIndex: 'caregiverName',
       key: 'caregiverName',
+    },
+    {
+      title: `${caregiverType()} ID Number`,
+      dataIndex: 'caregiverID',
+      key: 'caregiverID',
     },
     {
       title: 'Phone Number',
@@ -77,10 +85,14 @@ export default function CaregiverDetails({
         {`${caregiverType()} Details`}
       </h3>
       <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
-        <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
           <Form.Item
             name="caregiverType"
-            label={`${caregiverType()} Type`}
+            label={
+              caregiverType() === 'Caregiver'
+                ? `${caregiverType()} Type`
+                : `Relationship with ${caregiverType()}`
+            }
             rules={[
               {
                 required: true,
@@ -116,6 +128,25 @@ export default function CaregiverDetails({
                 const name = form.getFieldValue('caregiverName')
                 form.setFieldValue('caregiverName', titleCase(name))
               }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="caregiverID"
+            label={`${caregiverType()} ID Number`}
+            rules={[
+              {
+                required: true,
+                message: `Please input the ${caregiverType()} ID number`,
+              },
+            ]}
+          >
+            <InputNumber
+              placeholder="eg 12345678"
+              autoComplete="off"
+              size="large"
+              className="w-full"
+              controls={false}
             />
           </Form.Item>
 

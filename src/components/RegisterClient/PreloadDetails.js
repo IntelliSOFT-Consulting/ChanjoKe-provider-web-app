@@ -42,12 +42,17 @@ export default function PreloadDetails({
     const townCenter = patient.address[0]?.line?.[3]
     const estateOrHouseNo = patient.address[0]?.line?.[4]
     const estimatedAge = patient.multipleBirthBoolean === true
-    const caregivers = patient.contact.map((caregiver) => {
+    const caregiverIds =
+      patient.caregiver?.filter(
+        (item) => item.type?.coding?.[0]?.code === 'CAREGIVER_ID'
+      ) || []
+    const caregivers = patient.contact.map((caregiver, index) => {
       return {
         caregiverType: caregiver.relationship[0].coding?.[0]?.display,
         caregiverName: caregiver.name?.text,
         phoneCode: caregiver.telecom[0].value?.slice(0, -9) || '+254',
         phoneNumber: caregiver.telecom[0].value?.slice(-9),
+        caregiverID: caregiverIds?.[index]?.value,
       }
     })
 

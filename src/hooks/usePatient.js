@@ -42,6 +42,21 @@ export default function usePatient() {
           system: 'identification',
           value: generateUniqueCode(8),
         },
+        ...data.caregivers.map((caregiver) => ({
+          type: {
+            coding: [
+              {
+                system: 'http://hl7.org/fhir/administrative-identifier',
+                code: 'CAREGIVER_ID',
+                display: 'CAREGIVER_ID',
+                value: 'CAREGIVER_ID',
+              },
+            ],
+            text: caregiver.caregiverID,
+          },
+          system: 'identification',
+          value: caregiver.caregiverID,
+        })),
       ],
       active: true,
       name: [
