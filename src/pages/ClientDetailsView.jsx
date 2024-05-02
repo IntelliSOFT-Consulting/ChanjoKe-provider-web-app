@@ -30,6 +30,8 @@ export default function ClientDetailsView() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+  const queryParams = window.location.search?.split('=')?.[1]
+
   const { getPatient, patient } = usePatient()
   const {
     getRecommendations,
@@ -163,6 +165,7 @@ export default function ClientDetailsView() {
       <div className="mt-4">
         <BaseTabs
           userCategory={patientData?.clientCategory}
+          queryParams={queryParams}
           userID={patient?.id}
           patientData={patient}
           patientDetails={patientData}
