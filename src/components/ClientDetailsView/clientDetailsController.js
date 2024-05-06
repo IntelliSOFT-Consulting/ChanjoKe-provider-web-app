@@ -3,16 +3,16 @@ import { calculateAges, titleCase, writeAge } from '../../utils/methods'
 
 export const classifyUserByAge = (birthDate) => {
   const ageInDays = moment().diff(moment(birthDate), 'days')
-  if (ageInDays <= 14) return 'At Birth'
-  if (ageInDays <= 42) return '6 Weeks'
-  if (ageInDays <= 70) return '10 Weeks'
-  if (ageInDays <= 182) return '6 Months'
-  if (ageInDays <= 213) return '7 Months'
-  if (ageInDays <= 274) return '9 Months'
-  if (ageInDays <= 365) return '12 Months'
-  if (ageInDays <= 548) return '18 Months'
-  if (ageInDays <= 730) return '24 Months'
-  if (ageInDays <= 5110) return '10-14 Years'
+  if (ageInDays < 42 ) return 'At Birth'
+  if (ageInDays >= 42 ) return '6 Weeks'
+  if (ageInDays >= 70) return '10 Weeks'
+  if (ageInDays >= 182) return '6 Months'
+  if (ageInDays >= 213) return '7 Months'
+  if (ageInDays >= 274) return '9 Months'
+  if (ageInDays >= 365) return '12 Months'
+  if (ageInDays >= 548) return '18 Months'
+  if (ageInDays >= 730) return '24 Months'
+  if (ageInDays >= 5110) return '10-14 Years'
   return 'Not Applicable'
 }
 
