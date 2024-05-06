@@ -84,7 +84,7 @@ export default function AdministrativeArea({
           />
         </Form.Item>
 
-        <Form.Item name="estateOrHouseNo" label="Estate & House Number/Village">
+        <Form.Item name="estateOrHouseNo" label="Estate & House Number/Village/Landmark">
           <Input
             size="large"
             placeholder="eg Jamii House, House Number 14"
