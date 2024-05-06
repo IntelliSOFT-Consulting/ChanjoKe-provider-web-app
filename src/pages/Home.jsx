@@ -7,6 +7,7 @@ import ReferralIcon from '../assets/note-add.svg'
 import AppointmentIcon from '../assets/appointments.svg'
 import StockManagementIcon from '../assets/stock-management.svg'
 import { Link } from 'react-router-dom'
+import useVaccination from '../hooks/useVaccination'
 
 const stats = [
   { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient' },
@@ -39,7 +40,7 @@ const statsTwo = [
   {
     id: 1,
     name: 'Appointments',
-    stat: '125',
+    stat: '0',
     icon: AppointmentIcon,
     change: '',
     changeType: 'increase',
@@ -47,7 +48,7 @@ const statsTwo = [
   {
     id: 2,
     name: 'Referrals',
-    stat: '125',
+    stat: '0',
     icon: ReferralIcon,
     change: '',
     changeType: 'increase',

@@ -37,7 +37,7 @@ export const routineVaccines = [
     status: 'upcoming',
     category: '6_weeks',
     description: 'routine',
-    adminRange: { start: 42, end: 42, unit: 'days' },
+    adminRange: { start: 42, end: 1825, unit: 'days' },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
@@ -83,10 +83,6 @@ export const routineVaccines = [
     adminRange: {
       start: 42,
       end: 365,
-    },
-    constraints: {
-      gender: 'Female',
-      HIVStatus: 'Positive',
     },
     dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
