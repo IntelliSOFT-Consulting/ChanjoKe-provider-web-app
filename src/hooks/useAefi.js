@@ -28,7 +28,7 @@ export default function useAefi() {
         },
       ],
       subject: {
-        reference: `Patient/${clientID || currentPatient?.id}`,
+        reference: `Patient/${currentPatient?.id}`,
       },
       recorder: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,

@@ -14,8 +14,6 @@ export default function useVaccination() {
   const [immunizations, setImmunizations] = useState(null)
   const [immunization, setImmunization] = useState(null)
 
-  const { user } = useSelector((state) => state.userInfo)
-
   const filterVaccinationRecommendations = (patient, recommendation) => {
     const patientAge = getAgeInUnits(patient.birthDate, 'days')
 
@@ -23,7 +21,7 @@ export default function useVaccination() {
       vaccines.filter(({ adminRange, constraints, nhddCode, description }) => {
         const eligibleByAge = patientAge <= adminRange.end
         const eligibleByGender = constraints?.gender
-          ? patient.gender !== constraints.gender
+          ? patient.gender?.toLowerCase() !== constraints.gender?.toLowerCase()
           : true
 
         const isVaccineInSchedule = recommendation?.recommendation?.find(
@@ -32,9 +30,7 @@ export default function useVaccination() {
         )
 
         return (
-          (eligibleByAge && eligibleByGender) ||
-          isVaccineInSchedule ||
-          description === 'non-routine'
+          (eligibleByAge || isVaccineInSchedule || description === 'non-routine') && eligibleByGender
         )
       })
 

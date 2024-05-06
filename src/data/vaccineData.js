@@ -605,7 +605,7 @@ export const nonRoutineVaccines = [
     description: 'non-routine',
     adminRange: {
       start: 3650,
-      end: 3650,
+      end: 5110,
       unit: 'days',
     },
     constraints: {
@@ -625,11 +625,14 @@ export const nonRoutineVaccines = [
     description: 'non-routine',
     adminRange: {
       start: 3650,
-      end: 3650,
+      end: 5110,
       unit: 'days',
     },
+    constraints: {
+      gender: 'Male',
+    },
     dependentVaccine: 'IMHPV-1',
-    dependencyPeriod: 180,
+    dependencyPeriod: 182,
     dueDate: (dob, hpv1) => {
       const date =
         hpv1?.status === 'completed'
