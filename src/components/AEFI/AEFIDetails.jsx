@@ -126,20 +126,26 @@ export default function AEFIDetails({ patientInfo }) {
             borderRadius: '0px',
           }}
         >
-          <Descriptions.Item label="Report Type">
+          <Descriptions.Item label="Type of AEFI Report">
             {aefiSelected?.reportType}
           </Descriptions.Item>
           <Descriptions.Item label="AEFI Type">
             {aefiSelected?.symptomName}
           </Descriptions.Item>
-          <Descriptions.Item label="Date Reported">
+          <Descriptions.Item label="Onset of event">
             {aefiSelected?.occurenceDate}
           </Descriptions.Item>
-          <Descriptions.Item label="Outcome">
-            {aefiSelected?.outcome}
-          </Descriptions.Item>
-          <Descriptions.Item label="Details">
+          <Descriptions.Item label="Brief details on the AEFI">
             {aefiSelected?.details}
+          </Descriptions.Item>
+          <Descriptions.Item label="Past Medical History">
+            {aefiSelected?.pastMedicalHistory}
+          </Descriptions.Item>
+          <Descriptions.Item label="Action Taken">
+            {aefiSelected?.action}
+          </Descriptions.Item>
+          <Descriptions.Item label="AEFI Outcome">
+            {aefiSelected?.outcome}
           </Descriptions.Item>
         </Descriptions>
       </Modal>
