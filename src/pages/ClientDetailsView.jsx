@@ -147,7 +147,7 @@ export default function ClientDetailsView() {
                     />
                     <div className="ml-2 text-sm">
                       This client is registered using a{' '}
-                      <b>Birth Notification Number</b>, Please update to their
+                      <b>Birth Notification Number</b>, Please update to their{" "}
                       <b>Birth Certificate</b>.
                     </div>
                   </div>
