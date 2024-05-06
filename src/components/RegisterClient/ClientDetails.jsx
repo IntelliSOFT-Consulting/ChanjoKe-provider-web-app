@@ -210,7 +210,7 @@ export default function ClientDetails() {
           initialValues={{ age: 0, phoneCode: '+254' }}
         >
           <div className={currentStep === 1 ? 'block' : 'hidden'}>
-            <div className="block md:grid md:grid-cols-3 gap-x-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10">
               <Form.Item
                 name="firstName"
                 label="First Name"
@@ -436,20 +436,22 @@ export default function ClientDetails() {
                 </Form.Item>
               </div>
 
-              <Form.Item
-                name="dateOfBirth"
-                label={
-                  <div>
-                    <span className="font-bold">Estimated Date of Birth</span>
-                  </div>
-                }
-              >
-                <DatePicker
-                  disabled={true}
-                  format="DD-MM-YYYY"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                />
-              </Form.Item>
+              {!estimatedAge &&
+                <Form.Item
+                  name="dateOfBirth"
+                  label={
+                    <div>
+                      <span className="font-bold">Estimated Date of Birth</span>
+                    </div>
+                  }
+                >
+                  <DatePicker
+                    disabled={true}
+                    format="DD-MM-YYYY"
+                    className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                  />
+                </Form.Item>
+              }
 
               {isAdult && (
                 <Form.Item
@@ -497,90 +499,10 @@ export default function ClientDetails() {
                   />
                 </Form.Item>
               )}
-
-              <Form.Item
-                name="identificationType"
-                label="Identification Type"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select identification type',
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  disabled={idOptions.length === 0}
-                  onChange={(value) => {
-                    if (value) {
-                      setIsDocumentTypeSelected(true)
-                    } else {
-                      setIsDocumentTypeSelected(false)
-                    }
-                  }}
-                  options={idOptions}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="identificationNumber"
-                label="Identification Number"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please input identifier number',
-                  },
-                ]}
-              >
-                <Input
-                  disabled={!isDocumentTypeSelected || idOptions.length === 0}
-                  placeholder="Document Identification Number"
-                  autoComplete="off"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                />
-              </Form.Item>
-
-              
-            </div>
-
-            <div className="block md:grid md:grid-cols-3 gap-x-10">
-              <div>
-                <Form.Item
-                  name="currentWeight"
-                  size="large"
-                  label="Current Weight"
-                  rules={[]}
-                  className="w-46"
-                >
-                  <Input
-                    placeholder="Current Weight"
-                    autoComplete="off"
-                    className="rounded w-46"
-                    size="large"
-                    addonAfter={
-                      <Form.Item
-                        name="weightMetric"
-                        className="mb-0 block rounded-md"
-                      >
-                        <Select style={{ width: 100 }} defaultValue={'Kg'}>
-                          <Select.Option value="kg">Kilograms</Select.Option>
-                          <Select.Option value="g">Grams</Select.Option>
-                        </Select>
-                      </Form.Item>
-                    }
-                  />
-                </Form.Item>
-              </div>
-
-                
-
-              <div></div>
-              <div></div>
-
             </div>
           </div>
 
-          <div className={currentStep === 2 ? 'block md:px-6' : 'hidden'}>
+          <div className={currentStep === 2 ? 'block px-6' : 'hidden'}>
             <CaregiverDetails
               caregivers={caregivers}
               setCaregivers={setCaregivers}
@@ -590,7 +512,7 @@ export default function ClientDetails() {
             />
           </div>
 
-          <div className={currentStep === 3 ? 'block md:px-6' : 'hidden'}>
+          <div className={currentStep === 3 ? 'block px-6' : 'hidden'}>
             <AdministrativeArea
               form={form}
               capitalize={capitalize}
@@ -603,7 +525,7 @@ export default function ClientDetails() {
             />
           </div>
 
-          <div className={currentStep === 4 ? 'block md:px-6' : 'hidden'}>
+          <div className={currentStep === 4 ? 'block px-6' : 'hidden'}>
             <Preview
               form={form}
               errors={errors}

@@ -174,6 +174,17 @@ export default function useVaccination() {
     return resources
   }
 
+  const getFacilityImmunizations = async (facilityId) => {
+    const responses = await get(
+      `${immunizationsEndpoint}?location=${facilityId}`
+    )
+
+    const resources = responses?.entry?.map((entry) => entry.resource)
+
+    setImmunizations(resources)
+    return resources
+  }
+
   const getImmunization = async (immunizationId) => {
     const response = await get(`${immunizationsEndpoint}/${immunizationId}`)
     setImmunization(response)
@@ -199,5 +210,6 @@ export default function useVaccination() {
     recommendations,
     immunizations,
     immunization,
+    getFacilityImmunizations,
   }
 }

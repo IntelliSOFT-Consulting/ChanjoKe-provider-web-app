@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import SearchIcon from '../assets/search.svg'
 import RegisterClientIcon from '../assets/register-client.svg'
 import UpdateClientHistoryIcon from '../assets/update-client-history.svg'
@@ -7,6 +8,9 @@ import ReferralIcon from '../assets/note-add.svg'
 import AppointmentIcon from '../assets/appointments.svg'
 import StockManagementIcon from '../assets/stock-management.svg'
 import { Link } from 'react-router-dom'
+import useVaccination from '../hooks/useVaccination'
+import { useSelector } from 'react-redux'
+import LoadingArrows from '../common/spinners/LoadingArrows'
 
 const stats = [
   { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient' },
@@ -39,7 +43,7 @@ const statsTwo = [
   {
     id: 1,
     name: 'Appointments',
-    stat: '125',
+    stat: '0',
     icon: AppointmentIcon,
     change: '',
     changeType: 'increase',
@@ -47,7 +51,7 @@ const statsTwo = [
   {
     id: 2,
     name: 'Referrals',
-    stat: '125',
+    stat: '0',
     icon: ReferralIcon,
     change: '',
     changeType: 'increase',
@@ -63,13 +67,28 @@ const statsTwo = [
 ]
 
 export default function Home() {
+  const { user } = useSelector((state) => state.userInfo)
+
+  const { getFacilityImmunizations, immunizations } = useVaccination()
+
+  useEffect(() => {
+    getFacilityImmunizations(user?.facility)
+  }, [user?.facility])
+
+  const totalVaccines = immunizations?.length || 0
+
   return (
     <>
-      <div>
-        <h3 className="mt-5 text-[#163C94] text-2xl mx-auto max-w-7xl">
-          Today's Statistics
-        </h3>
-        <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-3 mx-auto max-w-7xl">
+      {!immunizations ? (
+        <div className="flex justify-center items-center h-[80vh]">
+          <LoadingArrows />
+        </div>
+      ) : (
+        <div>
+          <h3 className="mt-5 text-[#163C94] text-2xl mx-auto max-w-7xl">
+            Today's Statistics
+          </h3>
+          <dl className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3 lg:grid-cols-3 mx-auto max-w-7xl">
             {statsTwo.map((item) => (
               <div
                 key={item.id}
@@ -87,14 +106,17 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="text-7xl text-[#163C94] font-bold mt-10">
-                      {item.stat}
+                      {item.name === 'Vaccines Administered'
+                        ? totalVaccines
+                        : item.stat}
                     </div>
                   </div>
                 </div>
               </div>
             ))}
-        </dl>
-      </div>
+          </dl>
+        </div>
+      )}
 
       <br />
 
