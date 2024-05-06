@@ -97,8 +97,6 @@ export default function RoutineVaccines({
     setDialogOpen(false)
   }
 
-  console.log('Patient Data:', patientDetails)
-
   const administerVaccineBtns = [
     {
       btnText: 'Administer Vaccine',
