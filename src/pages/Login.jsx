@@ -45,8 +45,8 @@ export default function Login() {
           OpenCHANJO
         </div>
 
-        <div className="mx-auto flex flex-col w-full max-w-7xl px-4 sm:px-6 lg:px-8 mt-32">
-          <div className="mx-auto max-w-3xl px-10 w-full">
+        <div className="mx-auto flex flex-col w-full px-4 sm:px-6 lg:px-8 mt-32">
+          <div className="mx-auto  px-10 w-full">
             <img
               className="h-24 mx-auto"
               src={MOHLogo}
@@ -61,7 +61,7 @@ export default function Login() {
               onFinish={onFinish}
               autoComplete="off"
               layout="vertical"
-              className="mt-20 w-full max-w-64 px-16 flex flex-col"
+              className="mt-20 w-full px-16 flex flex-col"
             >
               <Form.Item
                 name="idNumber"
