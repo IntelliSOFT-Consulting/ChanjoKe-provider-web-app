@@ -98,7 +98,7 @@ export default function ClientDetailsView() {
         }}
         btnTwo={{
           text: 'Vaccine Details',
-          url: '/update-vaccine-history',
+          url: `/update-vaccine-history/${patient?.id}`,
         }}
         onClose={handleDialogClose}
       />

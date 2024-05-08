@@ -247,6 +247,8 @@ export default function RoutineVaccines({
       ),
     },
   ]
+
+  console.log('clientCategory', patientDetails?.clientCategory)
   return (
     <>
       <OptionsDialog
