@@ -14,7 +14,7 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
   return vaccines.map((vaccine) => {
     const resource = {
       resourceType: 'Immunization',
-      occurrenceDateTime: new Date().toISOString(),
+      occurrenceDateTime: values.occurrence || new Date().toISOString(),
       recorded: new Date().toISOString(),
       status: vaccine.status,
       vaccineCode: {

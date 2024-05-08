@@ -147,7 +147,7 @@ export default function SearchInterface(props) {
         }}
         btnTwo={{
           text: 'Vaccine Details',
-          url: '/update-vaccine-history',
+          url: `/update-vaccine-history/${selectedItem.id}`,
         }}
         onClose={handleDialogClose}
       />

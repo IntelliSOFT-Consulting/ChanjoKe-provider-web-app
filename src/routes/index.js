@@ -154,7 +154,7 @@ const router = createBrowserRouter([
         element: <ClientRecords />,
       },
       {
-        path: '/update-vaccine-history',
+        path: '/update-vaccine-history/:clientID',
         element: <UpdateVaccineHistory />,
       },
       {

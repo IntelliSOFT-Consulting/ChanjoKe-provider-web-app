@@ -1,19 +1,25 @@
 import moment from 'moment'
 import { calculateAges, titleCase, writeAge } from '../../utils/methods'
 
-export const classifyUserByAge = (birthDate) => {
+const classifyUserByAge = (birthDate) => {
   const ageInDays = moment().diff(moment(birthDate), 'days')
-  if (ageInDays < 42 ) return 'At Birth'
-  if (ageInDays >= 42 ) return '6 Weeks'
-  if (ageInDays >= 70) return '10 Weeks'
-  if (ageInDays >= 182) return '6 Months'
-  if (ageInDays >= 213) return '7 Months'
-  if (ageInDays >= 274) return '9 Months'
-  if (ageInDays >= 365) return '12 Months'
-  if (ageInDays >= 548) return '18 Months'
-  if (ageInDays >= 730) return '24 Months'
-  if (ageInDays >= 5110) return '10-14 Years'
-  return 'Not Applicable'
+  const ageCategories = [
+    { name: 'At Birth', start: 0, end: 42 },
+    { name: '6 Weeks', start: 42, end: 70 },
+    { name: '10 Weeks', start: 70, end: 182 },
+    { name: '6 Months', start: 182, end: 213 },
+    { name: '7 Months', start: 213, end: 274 },
+    { name: '9 Months', start: 274, end: 365 },
+    { name: '12 Months', start: 365, end: 548 },
+    { name: '18 Months', start: 548, end: 730 },
+    { name: '24 Months', start: 730, end: Infinity },
+  ]
+
+  return (
+    ageCategories.find(
+      ({ start, end }) => ageInDays >= start && ageInDays < end
+    )?.name || 'Not Applicable'
+  )
 }
 
 export const formatClientDetails = (patientResource) => {
@@ -161,10 +167,10 @@ export const formatWeightData = (observations, birthDate) => {
     days > 7 && days < 30
       ? 'weeks'
       : days > 30 && days < 365
-      ? 'months'
-      : days > 365
-      ? 'years'
-      : 'days'
+        ? 'months'
+        : days > 365
+          ? 'years'
+          : 'days'
 
   const formatted = weightData.map((observation) => {
     const date = moment(observation.effectiveDateTime)
@@ -175,5 +181,5 @@ export const formatWeightData = (observations, birthDate) => {
     return [age, weight]
   })
 
-  return [[period, 'Weight (Kg)'], [0,0], ...formatted]
+  return [[period, 'Weight (Kg)'], [0, 0], ...formatted]
 }
