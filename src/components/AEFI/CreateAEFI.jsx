@@ -64,11 +64,15 @@ export default function CreateAEFI() {
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
+  console.log(selectedVaccines)
+
   const earliestDueDate = selectedVaccines?.reduce((acc, vaccine) => {
-    const dueDate = moment(vaccine.dueDate)
-    if (acc === null) return dueDate
-    return dueDate.isBefore(acc) ? dueDate?.format('YYYY-MM-DD') : acc
+    const administeredDate = vaccine.administeredDate
+    if (acc === null) return administeredDate
+    return administeredDate.isSameOrBefore(acc) ? administeredDate?.format('YYYY-MM-DD') : acc
   }, null)
+
+  console.log(earliestDueDate)
 
   useEffect(() => {
     if (!selectedVaccines?.length) {
@@ -216,6 +220,7 @@ export default function CreateAEFI() {
                     disabledDate={(current) => {
                       return (
                         (current && current > moment().endOf('day')) ||
+                        //   include the earliest due date
                         current.isBefore(earliestDueDate)
                       )
                     }}
