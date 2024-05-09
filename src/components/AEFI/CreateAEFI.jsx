@@ -64,15 +64,11 @@ export default function CreateAEFI() {
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
-  console.log(selectedVaccines)
-
   const earliestDueDate = selectedVaccines?.reduce((acc, vaccine) => {
     const administeredDate = vaccine.administeredDate
     if (acc === null) return administeredDate
     return administeredDate.isSameOrBefore(acc) ? administeredDate?.format('YYYY-MM-DD') : acc
   }, null)
-
-  console.log(earliestDueDate)
 
   useEffect(() => {
     if (!selectedVaccines?.length) {
