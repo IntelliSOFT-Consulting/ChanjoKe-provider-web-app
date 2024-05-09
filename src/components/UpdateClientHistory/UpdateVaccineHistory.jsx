@@ -136,6 +136,10 @@ export default function UpdateVaccineHistory() {
                     })}
                     allowClear
                     size="large"
+                    showSearch
+                    filterOption={(input, option) =>{
+                      return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }}
                   />
                 </Form.Item>
 
