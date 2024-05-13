@@ -1,10 +1,11 @@
-import { Col, Row, DatePicker, Form, Select } from 'antd'
+import { Col, Row, DatePicker, Form, Select, Spin } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useApiRequest } from '../../api/useApiRequest'
 import dayjs from 'dayjs'
 import { lockVaccine } from '../../utils/validate'
-import { createAppointment, createVaccinationAppointment } from './DataWrapper'
+import {  createVaccinationAppointment } from './DataWrapper'
+import { LoadingOutlined } from '@ant-design/icons'
 
 export default function NewAppointment() {
 
@@ -46,7 +47,10 @@ export default function NewAppointment() {
   const [vaccinesAppointments, setVaccineAppointments] = useState([])
   const [recommendationID, setRecommendationID] = useState('')
 
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+
   const fetchPatientImmunization = async () => {
+    setLoadingRecommendations(true)
     const response = await get(
       `/hapi/fhir/ImmunizationRecommendation?patient=Patient/${userID}`
     )
@@ -62,6 +66,9 @@ export default function NewAppointment() {
         }
       }).filter(vaccine => vaccine !== undefined);
       setAppointmentList(canMakeAppointment)
+      setLoadingRecommendations(false)
+    } else {
+      setLoadingRecommendations(false)
     }
   }
 
@@ -87,6 +94,10 @@ export default function NewAppointment() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const handleErrors = (values) => {
+    console.log({ values })
+  }
   
 
   const onFinish = (values) => {
@@ -94,10 +105,8 @@ export default function NewAppointment() {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
       createNewAppointment(vaccineData)
 
-      navigate(`/client-details/${userID}`)
+      navigate(`/client-details/${userID}/appointments`)
     })
-    // setSharedData({ ...sharedData, aefiDetails: values })
-    // navigate('/')
   };
 
   return (
@@ -111,45 +120,65 @@ export default function NewAppointment() {
         <div className="px-4 py-5 sm:p-6">
 
         <div className="card bg-gray-200 container rounded">
-          <Form layout='vertical'>
-          <div className="grid grid-cols-2 gap-4 px-8 py-5">
-            <div>
+          <Form layout='vertical' form={form}>
+  
+              <div className="grid grid-cols-2 gap-4 px-8 py-5">
+                <div>
 
-              <Col className="gutter-row" span={12}>
-                <Form.Item
-                  name="addvaccines"
-                  label={
-                    <div>
-                      <span className="font-bold">Add vaccines</span>
-                    </div>
-                  }>
-                  <Select
-                    size='large'
-                    onChange={(e) => {
-                      const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
-                      setVaccineAppointments([...vaccinesAppointments, vaccine ])
+                  <Col className="gutter-row" span={12}>
+                    <Form.Item
+                      name="addvaccines"
+                      label={
+                        <div>
+                          <span className="font-bold">Add vaccines</span>
+                        </div>
+                      }>
 
-                      const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
-                      setAppointmentList(vaccines)
-                    }}>
-                    {vaccinesToAppoint.map((option) => (
-                      <Select.Option
-                        value={option?.vaccineCode?.[0]?.text}>
-                        {option?.vaccineCode?.[0]?.text}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </div>
-            <div>
-            </div>
-          </div>
+                        {loadingRecommendations &&
+                            <><Spin
+                              indicator={
+                                <LoadingOutlined
+                                  style={{
+                                    fontSize: 24,
+                                  }}
+                                  spin
+                                />
+                              }
+                            />
+                            <span className='ml-4'>Loading Eligible Vaccines</span>
+                            </>
+                          }
+
+                          {!loadingRecommendations && <Select
+                        size='large'
+                        onChange={(e) => {
+                          const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+                          setVaccineAppointments([...vaccinesAppointments, vaccine ])
+
+                          const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+                          setAppointmentList(vaccines)
+                        }}>
+                        {vaccinesToAppoint.map((option) => (
+                          <Select.Option
+                            value={option?.vaccineCode?.[0]?.text}>
+                            {option?.vaccineCode?.[0]?.text}
+                          </Select.Option>
+                        ))}
+                      </Select>}
+                      
+                    </Form.Item>
+                  </Col>
+                </div>
+                <div>
+                </div>
+              </div>
+            
           </Form>
         </div>
 
         <Form
           onFinish={onFinish}
+          onFinishFailed={handleErrors}
           layout="vertical"
           form={form}
           autoComplete="off">

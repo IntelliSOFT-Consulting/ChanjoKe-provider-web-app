@@ -26,7 +26,7 @@ export default function ClientDetailsView() {
   const [nonRoutineVaccines, setNonRoutineVaccines] = useState([])
   const [observationsData, setObservationsData] = useState([])
 
-  const { clientID } = useParams()
+  const { clientID, activeTab } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -44,8 +44,11 @@ export default function ClientDetailsView() {
 
   useEffect(() => {
     getPatient(clientID)
-    getRecommendations(clientID)
+    if (activeTab !== 'appointments') {
+      getRecommendations(clientID)
     getImmunizations(clientID)
+    }
+    
     getObservations(clientID)
   }, [clientID])
 
@@ -172,6 +175,7 @@ export default function ClientDetailsView() {
           routineVaccines={routineVaccines}
           nonRoutineVaccines={nonRoutineVaccines}
           recommendations={recommendations}
+          activeTab={activeTab}
           immunizations={immunizations}
         />
       </div>

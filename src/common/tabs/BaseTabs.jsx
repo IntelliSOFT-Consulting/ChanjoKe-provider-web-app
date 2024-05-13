@@ -34,8 +34,9 @@ export default function BaseTabs({
   recommendations,
   immunizations,
   queryParams,
+  activeTab,
 }) {
-  const [currentTab, setCurrentTab] = useState('routineVaccines')
+  const [currentTab, setCurrentTab] = useState(activeTab || 'routineVaccines')
 
   useEffect(() => {
     if (patientDetails) {

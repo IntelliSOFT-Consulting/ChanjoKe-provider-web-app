@@ -74,7 +74,7 @@ export default function Administer() {
 
   useEffect(() => {
     if (!selectedVaccines || selectedVaccines?.length === 0) {
-      navigate(`/client-details/${clientID}`)
+      navigate(`/client-details/${clientID}/routineVaccines`)
     } else {
       getWeight()
       findNextVaccines()

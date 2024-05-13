@@ -72,7 +72,7 @@ export default function CreateAEFI() {
 
   useEffect(() => {
     if (!selectedVaccines?.length) {
-      navigate(`/client-details/${clientID}`)
+      navigate(`/client-details/${clientID}/routineVaccines`)
     }
   }, [])
 
@@ -88,7 +88,7 @@ export default function CreateAEFI() {
     const timer = setTimeout(() => {
       setShowModal(false)
       setLoading(false)
-      navigate(`/client-details/${currentPatient.id}`)
+      navigate(`/client-details/${currentPatient.id}/routineVaccines`)
     }, 1500)
 
     return () => clearTimeout(timer)
@@ -134,7 +134,7 @@ export default function CreateAEFI() {
           <ConfirmDialog
             open={showModal}
             description="AEFI has been successfully submitted"
-            onConfirm={() => navigate(`/client-details/${currentPatient.id}`)}
+            onConfirm={() => navigate(`/client-details/${currentPatient.id}/routineVaccines`)}
             onClose={() => setShowModal(false)}
           />
           <Form

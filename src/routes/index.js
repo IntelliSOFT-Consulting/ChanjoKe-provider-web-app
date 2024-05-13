@@ -146,7 +146,7 @@ const router = createBrowserRouter([
         element: <AEFIDetails />,
       },
       {
-        path: '/client-details/:clientID',
+        path: '/client-details/:clientID/:activeTab',
         element: <ClientDetailsView />,
       },
       {
