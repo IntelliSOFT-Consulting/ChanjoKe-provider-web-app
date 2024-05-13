@@ -50,6 +50,16 @@ export default function VaccinationDetails() {
                 {immunization?.[0]?.targetDisease?.[0]?.text ||
                   'Target Disease: '}
               </div>
+              <div className="flex">
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/view-not-administered/${immunization?.id}`)
+                }
+                className='mr-2'
+              >
+                Not Administered
+              </Button>
               <Button
                 type="primary"
                 onClick={() =>
@@ -58,6 +68,7 @@ export default function VaccinationDetails() {
               >
                 Contraindications
               </Button>
+              </div>
             </div>
 
             <div className="px-10 text-2xl font-semibold bg-gray-200 py-5 sm:px-10">
