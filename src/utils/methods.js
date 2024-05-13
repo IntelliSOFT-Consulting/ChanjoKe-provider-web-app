@@ -10,7 +10,8 @@ export const debounce = (func, delay) => {
 }
 
 export const getOffset = (page, pageSize = 12) => {
-  return page === 1 ? 0 : (page - 1) * pageSize
+  console.log('Page', page)
+  return Math.abs(page <= 1 ? 0 : (page - 1) * pageSize)
 }
 
 export const calculateAges = (date) => {
@@ -118,4 +119,11 @@ export const formatCardTitle = (input) => {
     ?.split('_')
     ?.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+export const passwordGenerator = (length) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
+  return Array.from({ length }, () =>
+    characters.charAt(Math.floor(Math.random() * characters.length))
+  ).join('')
 }

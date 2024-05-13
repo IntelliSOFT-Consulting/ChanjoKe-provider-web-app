@@ -16,7 +16,7 @@ import ForgotPassword from '../pages/ForgotPassword'
 import ClientDetailsView from '../pages/ClientDetailsView'
 import UpdateVaccineHistory from '../components/UpdateClientHistory/UpdateVaccineHistory'
 import FAQs from '../pages/FAQs'
-import User from '../components/AdminManagement/User'
+import Users from '../components/AdminManagement/Users'
 import ClientRecords from '../pages/ClientRecords'
 import Facility from '../components/AdminManagement/Facility'
 import AddUser from '../components/AdminManagement/AddUser'
@@ -73,7 +73,7 @@ const router = createBrowserRouter([
         path: '/search/:searchType',
         element: <SearchInterfaceWrapper />,
       },
-      { path: '/admin-users', element: <User /> },
+      { path: '/admin-users', element: <Users /> },
       {
         path: '/admin-facilities',
         element: <Facility />,
