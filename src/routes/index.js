@@ -186,6 +186,10 @@ const router = createBrowserRouter([
         element: <ContraindicationDetails />,
       },
       {
+        path: '/view-not-administered/:contraindicationID',
+        element: <ContraindicationDetails notAdministered={true} />,
+      },
+      {
         path: '/frequently-asked-questions',
         element: <FAQs />,
       },

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import useVaccination from '../hooks/useVaccination'
 import LoadingArrows from '../common/spinners/LoadingArrows'
 
-export default function ContraindicationDetails() {
+export default function ContraindicationDetails({ notAdministered }) {
   const [contraindicationInfo, setContraindicationInfo] = useState(null)
   const [contraindications, setContraindications] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -48,9 +48,10 @@ export default function ContraindicationDetails() {
   }
 
   const fetchContraindications = async (patientId) => {
+    const status = notAdministered ? 'not-done' : 'entered-in-error'
     const immunizations = await getImmunizations(
       patientId,
-      `status:not=completed&vaccine-code=${immunization.vaccineCode.coding[0].code}`
+      `status=${status}&vaccine-code=${immunization.vaccineCode.coding[0].code}`
     )
 
     if (immunizations?.length) {
@@ -111,7 +112,9 @@ export default function ContraindicationDetails() {
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
         <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
-          <div className="text-2xl font-semibold py-5">Contraindications</div>
+          <div className="text-2xl font-semibold py-5">
+            { notAdministered ? 'Not Administered' : 'Contraindications' }
+          </div>
         </div>
 
         {loading ? (
@@ -162,7 +165,9 @@ export default function ContraindicationDetails() {
             {contraindications?.length === 0 && (
               <div className="text-center  mx-7 px-10 py-10">
                 <p className="text-gray-500">
-                  No Contraindication Details Found
+                   {
+                      notAdministered ? 'No Unadministered Vaccines Recorded' : 'No Contraindications'
+                   }
                 </p>
               </div>
             )}
