@@ -1,7 +1,28 @@
 import dayjs from "dayjs"
+import moment from "moment";
 import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc);
+
+const createVaccinationAppointment = (data, patientID, recommendationID) => {
+    return {
+        "resourceType": "Appointment",
+        "status": "booked",
+        "description": `${data?.vaccineCode?.[0]?.text} vaccination`,
+        "supportingInformation": [
+          {
+            "reference": `Patient/${patientID}`
+          }
+        ],
+        "start": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+        "created": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+        // "basedOn": [
+        //   {
+        //     "reference": `ImmunizationRecommendation/${recommendationID}`
+        //   }
+        // ]
+      }
+}
 
 const createVaccineImmunization = (data, patientID, status) => {
   return {
@@ -142,5 +163,6 @@ const createAppointment = (data, patientID, status) => {
 export {
   createVaccineImmunization,
   createAppointment,
-  createImmunizationRecommendation
+  createImmunizationRecommendation,
+  createVaccinationAppointment,
 }
