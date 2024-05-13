@@ -34,7 +34,7 @@ export default function NotAdministered() {
 
   useEffect(() => {
     if (!selectedVaccines?.length) {
-      navigate(`/client-details/${clientID}`)
+      navigate(`/client-details/${clientID}/routineVaccines`)
     }
   }, [selectedVaccines])
 
@@ -50,7 +50,7 @@ export default function NotAdministered() {
   ]
 
   function handleDialogClose() {
-    navigate(`/client-details/${clientID}`)
+    navigate(`/client-details/${clientID}/routineVaccines`)
     setDialogOpen(false)
   }
 

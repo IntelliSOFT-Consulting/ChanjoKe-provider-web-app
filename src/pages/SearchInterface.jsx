@@ -53,7 +53,7 @@ export default function SearchInterface(props) {
       key: 'x',
       render: (_, record) => (
         <Link
-          to={`/client-details/${record.id}`}
+          to={`/client-details/${record.id}/${props.searchType === 'appointments' ? 'appointments' : 'routineVaccines'}`}
           className="text-[#163C94] font-semibold"
         >
           View
@@ -258,7 +258,7 @@ export default function SearchInterface(props) {
                 <div className="py-5 max-w-auto right-5">
                   <div className="flex">
                     <a
-                      href={`/client-details/${result.id}`}
+                      href={`/client-details/${result.id}/routineVaccines`}
                       className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500"
                     >
                       View

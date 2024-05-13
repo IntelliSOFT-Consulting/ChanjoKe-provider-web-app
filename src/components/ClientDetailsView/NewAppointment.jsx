@@ -94,7 +94,7 @@ export default function NewAppointment() {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
       createNewAppointment(vaccineData)
 
-      navigate(`/client-details/${userID}`)
+      navigate(`/client-details/${userID}/appointments`)
     })
     // setSharedData({ ...sharedData, aefiDetails: values })
     // navigate('/')

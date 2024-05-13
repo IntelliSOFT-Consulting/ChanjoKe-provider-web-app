@@ -31,7 +31,7 @@ export default function Contraindications() {
 
   useEffect(() => {
     if (!selectedVaccines?.length) {
-      navigate(`/client-details/${clientID}`)
+      navigate(`/client-details/${clientID}/routineVaccines`)
     }
   }, [selectedVaccines])
 
