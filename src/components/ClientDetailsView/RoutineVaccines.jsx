@@ -152,6 +152,7 @@ export default function RoutineVaccines({
       key: 'vaccine',
       render: (_text, record) => {
         const completed = record.status === 'completed'
+        console.log({ date: record.dueDate, ld: record.lastDate })
         const locked = lockVaccine(record.dueDate, record.lastDate)
 
         return (
