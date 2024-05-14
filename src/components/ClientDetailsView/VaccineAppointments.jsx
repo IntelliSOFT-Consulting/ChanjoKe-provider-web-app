@@ -1,5 +1,4 @@
 import SearchTable from '../../common/tables/SearchTable'
-import FormState from '../../utils/formState'
 import { useNavigate } from 'react-router-dom'
 import { Col, Row, Button, DatePicker, Spin } from 'antd'
 import { useEffect, useState } from 'react'
@@ -7,15 +6,11 @@ import { useApiRequest } from '../../api/useApiRequest'
 import { LoadingOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 
-export default function VaccineAppointments({ userCategory, patientData }) {
+export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
   const { get } = useApiRequest()
 
   const [appointments, setAppointments] = useState([])
   const [loadingAppointments, setLoadingAppointments] = useState(false)
-
-  const { formData, formErrors, handleChange} = FormState({
-    sortByDate: '',
-  })
 
   const fetchPatientImmunization = async () => {
     setLoadingAppointments(true)
@@ -25,8 +20,8 @@ export default function VaccineAppointments({ userCategory, patientData }) {
     if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
       const appointments = response?.entry.map((appointment) => ({
         appointments: appointment?.resource?.description,
-        scheduledDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY'),
-        appointmentDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY'),
+        scheduledDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
+        appointmentDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
         status: appointment?.resource?.status,
         actions: [
           { title: 'edit', url: '/' }
@@ -51,7 +46,7 @@ export default function VaccineAppointments({ userCategory, patientData }) {
 
   useEffect(() => {
     fetchPatientImmunization()
-  }, [])
+  }, [userCategory])
 
   return (
     

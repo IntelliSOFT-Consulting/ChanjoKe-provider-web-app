@@ -5,18 +5,8 @@ import VaccineAppointments from '../../components/ClientDetailsView/VaccineAppoi
 import Referrals from '../../components/ClientDetailsView/Referrals'
 
 const tabs = [
-  {
-    name: 'Routine Vaccines',
-    id: 'routineVaccines',
-    href: '#',
-    current: false,
-  },
-  {
-    name: 'Non Routine Vaccines',
-    id: 'nonRoutineVaccines',
-    href: '#',
-    current: false,
-  },
+  { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
+  { name: 'Non Routine Vaccines', id: 'nonRoutineVaccines', href: '#', current: false },
   { name: 'Appointments', id: 'appointments', href: '#', current: false },
   { name: 'Referrals', id: 'referrals', href: '#', current: false },
 ]
@@ -40,8 +30,11 @@ export default function BaseTabs({
 
   useEffect(() => {
     if (patientDetails) {
+      console.log({ patientDetails, activeTab })
       if (patientDetails?.ages?.years >= 18 || queryParams === 'non-routine') {
         setCurrentTab('nonRoutineVaccines')
+      } if (activeTab === 'appointments') {
+        setCurrentTab('appointments')
       } else {
         setCurrentTab('routineVaccines')
       }

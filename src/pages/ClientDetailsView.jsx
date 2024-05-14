@@ -44,11 +44,8 @@ export default function ClientDetailsView() {
 
   useEffect(() => {
     getPatient(clientID)
-    if (activeTab !== 'appointments') {
-      getRecommendations(clientID)
+    getRecommendations(clientID)
     getImmunizations(clientID)
-    }
-    
     getObservations(clientID)
   }, [clientID])
 
