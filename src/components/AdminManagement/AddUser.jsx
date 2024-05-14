@@ -4,8 +4,12 @@ import { usePractitioner } from '../../hooks/usePractitioner'
 import { Button, Form, Input, InputNumber, Select } from 'antd'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
 
-export default function AddUser({ setVisible, visible, practitionerData, setPractitionerData }) {
-
+export default function AddUser({
+  setVisible,
+  visible,
+  practitionerData,
+  setPractitionerData,
+}) {
   const [defaultCounties, setDefaultCounties] = useState(null)
   const [defaultSubCounties, setDefaultSubCounties] = useState(null)
   const [defaultWards, setDefaultWards] = useState(null)
@@ -122,12 +126,21 @@ export default function AddUser({ setVisible, visible, practitionerData, setPrac
                         new Error('Phone number must be 10 digits')
                       )
                     }
+
                     return Promise.resolve()
                   },
                 },
               ]}
             >
-              <Input placeholder="07********" />
+              <Input
+                placeholder="07********"
+                onChange={(e) => {
+                  e.target.value = e.target.value
+                    .replace(/\D/g, '')
+                    .slice(0, 10)
+                  form.setFieldsValue({ phoneNumber: e.target.value })
+                }}
+              />
             </Form.Item>
 
             <Form.Item
