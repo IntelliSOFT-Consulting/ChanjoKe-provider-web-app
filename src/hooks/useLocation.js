@@ -17,7 +17,13 @@ export const useLocations = (form) => {
   }, [])
 
   const fetchLocations = async (partof) => {
-    const url = `${fhirRoute}?partof=${partof}&_count=50`
+    const url = `${fhirRoute}?partof=${partof}&_count=70`
+    const response = await get(url)
+    return convertLocations(response)
+  }
+
+  const getLocationByCode = async (code) => {
+    const url = `${fhirRoute}?_id=${code}`
     const response = await get(url)
     return convertLocations(response)
   }
@@ -67,6 +73,12 @@ export const useLocations = (form) => {
     subCounties,
     wards,
     facilities,
+    fetchLocations,
+    getLocationByCode,
+    fetchCounties,
+    fetchSubCounties,
+    fetchWards,
+    fetchFacilities,
     handleCountyChange,
     handleSubCountyChange,
     handleWardChange,
