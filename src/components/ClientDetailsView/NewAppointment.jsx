@@ -9,45 +9,17 @@ import { LoadingOutlined } from '@ant-design/icons'
 
 export default function NewAppointment() {
 
-  // function mapVaccinesByCategory(vaccines) {
-  //   const categoriesMap = {}
-
-  //   if (Array.isArray(vaccines) && vaccines.length > 0) {
-  //     vaccines.forEach((vaccine) => {
-  //       const { category, ...rest } = vaccine
-
-  //       if (!categoriesMap[category]) {
-  //         categoriesMap[category] = []
-  //       }
-
-  //       rest.actions = [{ title: 'view', url: '/view-vaccination/h894uijre09uf90fdskfd' }]
-
-  //       categoriesMap[category].push(rest)
-  //     })
-
-  //     const categoriesArray = Object.entries(categoriesMap).map(
-  //       ([category, vaccines]) => ({
-  //         category,
-  //         status: 'pending',
-  //         vaccines,
-  //       })
-  //     )
-
-  //     return categoriesArray
-  //   }
-  // }
-
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
   const { get, post } = useApiRequest()
 
-  const [patient, setPatient] = useState({})
   const [vaccinesToAppoint, setAppointmentList] = useState([])
   const [vaccinesAppointments, setVaccineAppointments] = useState([])
   const [recommendationID, setRecommendationID] = useState('')
 
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
+  const [loadingAppointment, setLoading] = useState(false)
 
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
@@ -55,7 +27,6 @@ export default function NewAppointment() {
       `/hapi/fhir/ImmunizationRecommendation?patient=Patient/${userID}`
     )
     setRecommendationID(response?.entry?.[0]?.resource?.id)
-    // const locked = lockVaccine(record.dueDate, record.lastDate)
     if (response.entry && Array.isArray(response.entry)) {
       const recommendation = response?.entry?.[0]?.resource?.recommendation
 
@@ -80,33 +51,21 @@ export default function NewAppointment() {
   }
 
   useEffect(() => {
-
-    async function getPatientData() {
-      const response = await get(`/hapi/fhir/Patient/${userID}`)
-      setPatient(response)
-    }
-
     fetchPatientImmunization()
-
-    if (userID) {
-      getPatientData()
-    }
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const handleErrors = (values) => {
-    console.log({ values })
-  }
   
-
-  const onFinish = (values) => {
-    vaccinesAppointments.forEach((vaccine) => {
+  const onFinish = async (values) => {
+    setLoading(true)
+    const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
-      createNewAppointment(vaccineData)
-
-      navigate(`/client-details/${userID}/appointments`)
+      await createNewAppointment(vaccineData)
     })
+
+    await Promise.all(appointmentPromises)
+    setLoading(false)
+
+    navigate(`/client-details/${userID}/appointments`)
   };
 
   return (
@@ -178,7 +137,6 @@ export default function NewAppointment() {
 
         <Form
           onFinish={onFinish}
-          onFinishFailed={handleErrors}
           layout="vertical"
           form={form}
           autoComplete="off">
@@ -209,6 +167,7 @@ export default function NewAppointment() {
 
             <Col className='gutter-row' span={10}>
               <Form.Item
+                name={`${vacc?.vaccineCode?.[0]?.text}`}
                  label={
                    <div>
                      <span className="font-bold">Appointment Date</span>
@@ -266,9 +225,10 @@ export default function NewAppointment() {
             </button>
             <button
               htmlType="submit"
-              className="ml-4 flex-shrink-0 rounded-md bg-[#163C94] border border-[#163C94] outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+              className='ml-4 outline outline-[#163C94] rounded-md px-5 py-2 bg-[#163C94] outline-2 text-white'>
+                {loadingAppointment && <><Spin indicator={ <LoadingOutlined style={{ fontSize: 24, color: 'white', marginRight: '8px' }} spin /> }/></>}
               Submit
-            </button>    
+            </button>
           </div>
 
           </Form>
