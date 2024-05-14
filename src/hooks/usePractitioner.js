@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { useSelector } from 'react-redux'
 import { debounce, getOffset, passwordGenerator } from '../utils/methods'
+import { useLocations } from './useLocation'
 
 const roleRoute = '/hapi/fhir/PractitionerRole'
 const practitionerRoute = '/hapi/fhir/Practitioner'
@@ -13,6 +14,8 @@ export const usePractitioner = ({ pageSize = 12 }) => {
   const [loading, setLoading] = useState(false)
 
   const { user } = useSelector((state) => state.userInfo)
+
+  const { fetchLocations, fetchCounties, getLocationByCode } = useLocations()
 
   const { get, post, put } = useApiRequest()
 
@@ -134,12 +137,41 @@ export const usePractitioner = ({ pageSize = 12 }) => {
     return response
   }
 
-  const formatPractitioner = (response) => {
+  const getLocations = async (wardCode) => {
+    const facilities = await fetchLocations(wardCode)
+    const wardData = await getLocationByCode(wardCode)
+    const wards = await fetchLocations(wardData[0]?.parent)
+
+    const subCountyData = await getLocationByCode(wards[0]?.parent)
+
+    const subCounties = await fetchLocations(subCountyData[0]?.parent)
+
+    const counties = await fetchCounties()
+
+    const ward = wardData[0]?.key
+    const subCounty = subCountyData[0]?.key
+    const county = subCountyData[0]?.parent
+    return {
+      counties,
+      subCounties,
+      wards,
+      facilities,
+      county,
+      subCounty,
+      ward,
+    }
+  }
+
+  const formatPractitioner = async (response) => {
     const practitioner = response?.entry?.find(
       (entry) => entry.resource.resourceType === 'Practitioner'
     )
     const practitionerRole = response?.entry?.find(
       (entry) => entry.resource.resourceType === 'PractitionerRole'
+    )
+
+    const location = response?.entry?.find(
+      (entry) => entry.resource.resourceType === 'Location'
     )
 
     const firstName = practitioner?.resource?.name[0]?.given?.join(' ')
@@ -150,10 +182,14 @@ export const usePractitioner = ({ pageSize = 12 }) => {
     const phoneNumber = practitioner?.resource?.telecom?.find(
       (telecom) => telecom.system === 'phone'
     )?.value
-    const idNumber = practitionerRole?.resource?.identifier?.[0]?.value
+    const idNumber = practitioner?.resource?.identifier?.[0]?.value
     const facility =
       practitionerRole?.resource?.location?.[0]?.reference.split('/')[1]
     const roleGroup = practitionerRole?.resource?.code?.[0]?.coding?.[0]?.code
+
+    const locationData = await getLocations(
+      location?.resource?.partOf?.reference?.split('/')[1]
+    )
 
     return {
       firstName,
@@ -165,15 +201,16 @@ export const usePractitioner = ({ pageSize = 12 }) => {
       roleGroup,
       practitionerRole: practitionerRole?.resource?.id,
       practitioner: practitioner?.resource?.id,
+      ...locationData,
     }
   }
 
   const getPractitioner = async (id) => {
     const response = await get(
-      `${roleRoute}?practitioner=${id}&_include=PractitionerRole:practitioner`
+      `${roleRoute}?practitioner=${id}&_include=PractitionerRole:practitioner&_include=PractitionerRole:location`
     )
 
-    const formattedPractitioner = formatPractitioner(response)
+    const formattedPractitioner = await formatPractitioner(response)
     return {
       formatted: formattedPractitioner,
       raw: response?.entry?.map((entry) => entry.resource),
@@ -230,7 +267,8 @@ export const usePractitioner = ({ pageSize = 12 }) => {
           {
             coding: [
               {
-                system: 'http://terminology.hl7.org/CodeSystem/practitioner-role',
+                system:
+                  'http://terminology.hl7.org/CodeSystem/practitioner-role',
                 code: values.roleGroup,
               },
             ],
@@ -250,7 +288,7 @@ export const usePractitioner = ({ pageSize = 12 }) => {
     return response
   }
 
-  const handleArchivePractitioner = async (id, active=false) => {
+  const handleArchivePractitioner = async (id, active = false) => {
     const practitionerData = await getPractitioner(id)
     const practitioner = practitionerData.raw.find(
       (entry) => entry.resourceType === 'Practitioner'
@@ -270,11 +308,13 @@ export const usePractitioner = ({ pageSize = 12 }) => {
     }
 
     await put(`${practitionerRoute}/${id}`, archivedPractitioner)
-    await put(`${roleRoute}/${practitionerData.formatted.practitionerRole}`, archivedPractitionerRole)
+    await put(
+      `${roleRoute}/${practitionerData.formatted.practitionerRole}`,
+      archivedPractitionerRole
+    )
 
     return true
   }
-
 
   return {
     practitioners,

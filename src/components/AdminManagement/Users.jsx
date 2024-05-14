@@ -11,6 +11,7 @@ export default function Users() {
   const [visible, setVisible] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [users, setUsers] = useState([])
+  const [practitionerData, setPractitionerData] = useState(null)
 
   const {
     fetchPractitioners,
@@ -71,7 +72,14 @@ export default function Users() {
       key: 'actions',
       render: (_text, record) => (
         <Space size="middle">
-          <Button type="link">Update</Button>
+          <Button
+            type="link"
+            onClick={() => {
+              setVisible(record)
+            }}
+          >
+            Update
+          </Button>
           <Popconfirm
             title={`Are you sure you want to ${
               activeTab === '1' ? 'archive' : 'unarchive'
@@ -183,11 +191,19 @@ export default function Users() {
       <Modal
         title="Add User"
         open={visible}
-        onCancel={() => setVisible(false)}
+        onCancel={() => {
+          setPractitionerData(null)
+          setVisible(false)
+        }}
         footer={null}
         width={800}
       >
-        <AddUser setVisible={setVisible} />
+        <AddUser
+          setVisible={setVisible}
+          visible={visible}
+          setPractitionerData={setPractitionerData}
+          practitionerData={practitionerData}
+        />
       </Modal>
     </Card>
   )
