@@ -122,7 +122,7 @@ export const usePractitioner = ({ pageSize = 12 }) => {
 
     if (response) {
       await handleCreatePractitionerRole(values, response)
-      await post('/provider/register', {
+      await post('/auth/provider/register', {
         idNumber: values.idNumber,
         password: passwordGenerator(8),
         email: values.email,
