@@ -72,8 +72,8 @@ jobs:
           script: |
             if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME }}; then
               echo "Check 1"
-              docker stop ${{ env.CONTAINER_NAME }}
-              docker rm ${{ env.CONTAINER_NAME }}
+              docker stop ${{ env.CONTAINER_NAME }} || true  # Stop the container (ignore errors if it doesn't exist)
+              docker rm ${{ env.CONTAINER_NAME }} || true    # Remove the container (ignore errors if it doesn't exist)
             fi
 
             # Login to Docker Hub
