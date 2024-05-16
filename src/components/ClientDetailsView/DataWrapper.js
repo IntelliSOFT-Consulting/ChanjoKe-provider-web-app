@@ -5,6 +5,13 @@ import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc);
 
 const createVaccinationAppointment = (data, patientID, recommendationID) => {
+    let dateToAdminister = ''
+    for (const item of data?.dateCriterion) {
+        if (item.code.coding.some(code => code.code === "Earliest-date-to-administer")) {
+            dateToAdminister = item.value;
+        }
+    }
+
     return {
         "resourceType": "Appointment",
         "status": "booked",
@@ -15,7 +22,7 @@ const createVaccinationAppointment = (data, patientID, recommendationID) => {
           }
         ],
         "start": moment(data?.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm:ssZ'),
-        "created": moment(data?.dateCriterion?.[0]?.value).format('YYYY-MM-DDTHH:mm:ssZ'),
+        "created": moment(dateToAdminister).format('YYYY-MM-DDTHH:mm:ssZ'),
         // "basedOn": [
         //   {
         //     "reference": `ImmunizationRecommendation/${recommendationID}`
