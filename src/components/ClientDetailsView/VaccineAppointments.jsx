@@ -20,8 +20,8 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
       const appointments = response?.entry.map((appointment) => ({
         appointments: appointment?.resource?.description,
-        scheduledDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
-        appointmentDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
+        scheduledDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
+        appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
         status: appointment?.resource?.status,
         actions: [
           { title: 'edit', url: '/' }

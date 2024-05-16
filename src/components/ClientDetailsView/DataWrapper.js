@@ -14,8 +14,8 @@ const createVaccinationAppointment = (data, patientID, recommendationID) => {
             "reference": `Patient/${patientID}`
           }
         ],
-        "start": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
-        "created": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+        "start": moment(data?.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm:ssZ'),
+        "created": moment(data?.dateCriterion?.[0]?.value).format('YYYY-MM-DDTHH:mm:ssZ'),
         // "basedOn": [
         //   {
         //     "reference": `ImmunizationRecommendation/${recommendationID}`
