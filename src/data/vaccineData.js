@@ -424,7 +424,7 @@ export const routineVaccines = [
     description: 'routine',
     adminRange: {
       start: 270,
-      end: 5475,
+      end: 1825,
       unit: 'days',
     },
     dueDate: (dob, _) => moment(dob).add(270, 'days').format('DD-MM-YYYY'),
@@ -675,7 +675,7 @@ export const routineVaccines = [
     description: 'routine',
     adminRange: {
       start: 540,
-      end: 5475,
+      end: 1825,
       unit: 'days',
     },
     dependentVaccine: 'IMMEAS-1',
