@@ -5,11 +5,17 @@ import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc);
 
 const createVaccinationAppointment = (data, patientID, recommendationID) => {
-    let dateToAdminister = ''
-    for (const item of data?.dateCriterion) {
-        if (item.code.coding.some(code => code.code === "Earliest-date-to-administer")) {
+    let dateToAdminister = '';
+
+    try {
+        const item = data?.dateCriterion?.find(item => 
+            item.code.coding.some(code => code.code === "Earliest-date-to-administer")
+        );
+        if (item) {
             dateToAdminister = item.value;
         }
+    } catch (error) {
+        return;
     }
 
     return {
