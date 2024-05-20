@@ -23,6 +23,11 @@ export default function NewAppointment() {
 
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
+
+    // const appointments = await get(
+    //   `/hapi/fhir/Appointment?supporting-info=Patient/${userID}`
+    // )
+
     const response = await get(
       `/hapi/fhir/ImmunizationRecommendation?patient=Patient/${userID}`
     )
