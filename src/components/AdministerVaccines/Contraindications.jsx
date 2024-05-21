@@ -24,8 +24,12 @@ export default function Contraindications() {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const { createImmunization, updateImmunization, getRecommendations, updateRecommendations } =
-    useVaccination()
+  const {
+    createImmunization,
+    updateImmunization,
+    getRecommendations,
+    updateRecommendations,
+  } = useVaccination()
 
   const [form] = Form.useForm()
 
@@ -47,10 +51,11 @@ export default function Contraindications() {
       )
       ?.map((vaccine) => ({
         ...vaccine,
-        status: 'entered-in-error',
+        status: 'not-done',
       }))
 
     values.notVaccinatedReason = values.contraindicationDetails
+    values.reasonCode = 'Contraindicated'
 
     const vaccineResources = createImmunizationResource(
       values,
@@ -223,14 +228,14 @@ export default function Contraindications() {
             okText="Yes"
             cancelText="No"
           >
-          <Button
-            type="primary"
-            className="ml-4 btn-success text-sm font-semibold"
-            loading={loading}
-            disabled={loading}
-          >
-            Contraindicate
-          </Button>
+            <Button
+              type="primary"
+              className="ml-4 btn-success text-sm font-semibold"
+              loading={loading}
+              disabled={loading}
+            >
+              Contraindicate
+            </Button>
           </Popconfirm>
         </div>
       </div>

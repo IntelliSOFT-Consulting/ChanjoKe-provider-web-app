@@ -272,47 +272,6 @@ export default function ClientDetails() {
                 </Radio.Group>
               </Form.Item>
 
-              <Form.Item
-                name="identificationType"
-                label="Identification Type"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please select identification type',
-                  },
-                ]}
-              >
-                <Select
-                  size="large"
-                  onChange={(value) => {
-                    if (value) {
-                      setIsDocumentTypeSelected(true)
-                    } else {
-                      setIsDocumentTypeSelected(false)
-                    }
-                  }}
-                  options={identificationOptions}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="identificationNumber"
-                label="Identification Number"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Please input identifier number',
-                  },
-                ]}
-              >
-                <Input
-                  disabled={!isDocumentTypeSelected}
-                  placeholder="Document Identification Number"
-                  autoComplete="off"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
-                />
-              </Form.Item>
-
               <div className="col-span-1 md:col-span-2 lg:col-span-3 my-4" />
 
               <Form.Item
@@ -436,7 +395,7 @@ export default function ClientDetails() {
                 </Form.Item>
               </div>
 
-              {!estimatedAge &&
+              {!estimatedAge && (
                 <Form.Item
                   name="dateOfBirth"
                   label={
@@ -451,7 +410,50 @@ export default function ClientDetails() {
                     className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
                   />
                 </Form.Item>
-              }
+              )}
+
+              <Form.Item
+                name="identificationType"
+                label="Identification Type"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select identification type',
+                  },
+                ]}
+              >
+                <Select
+                  disabled={!idOptions?.length}
+                  size="large"
+                  placeholder="Select Identification Type"
+                  onChange={(value) => {
+                    if (value) {
+                      setIsDocumentTypeSelected(true)
+                    } else {
+                      setIsDocumentTypeSelected(false)
+                    }
+                  }}
+                  options={idOptions}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="identificationNumber"
+                label="Identification Number"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input identifier number',
+                  },
+                ]}
+              >
+                <Input
+                  disabled={!isDocumentTypeSelected}
+                  placeholder="Document Identification Number"
+                  autoComplete="off"
+                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                />
+              </Form.Item>
 
               {isAdult && (
                 <Form.Item

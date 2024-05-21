@@ -30,7 +30,10 @@ export default function useVaccination() {
         )
 
         return (
-          (eligibleByAge || isVaccineInSchedule || description === 'non-routine') && eligibleByGender
+          (eligibleByAge ||
+            isVaccineInSchedule ||
+            description === 'non-routine') &&
+          eligibleByGender
         )
       })
 
@@ -161,9 +164,17 @@ export default function useVaccination() {
     return resource
   }
 
+  const searchRecommendations = async (params) => {
+    const response = await get(`${recommendationsEndpoint}?${params}`)
+    const resources = response?.entry?.map((entry) => entry.resource)
+
+    setRecommendations(resources)
+    return resources
+  }
+
   const getImmunizations = async (patientId, param = '') => {
     const responses = await get(
-      `${immunizationsEndpoint}?patient=Patient/${patientId}&_count=10000000${
+      `${immunizationsEndpoint}?patient=Patient/${patientId}&_count=10000000&status:not=entered-in-error${
         param ? `&${param}` : ''
       }`
     )
@@ -176,7 +187,7 @@ export default function useVaccination() {
 
   const getFacilityImmunizations = async (facilityId) => {
     const responses = await get(
-      `${immunizationsEndpoint}?location=${facilityId}&_count=10000000`
+      `${immunizationsEndpoint}?location=${facilityId}&_count=10000000&status:not=entered-in-error&count=100`
     )
 
     const resources = responses?.entry?.map((entry) => entry.resource)
@@ -188,6 +199,13 @@ export default function useVaccination() {
   const getImmunization = async (immunizationId) => {
     const response = await get(`${immunizationsEndpoint}/${immunizationId}`)
     setImmunization(response)
+    return response
+  }
+
+  const getPatientImmunizations = async (patientId) => {
+    const response = await get(
+      `${immunizationsEndpoint}?patient=Patient/${patientId}&status:not=entered-in-error`
+    )
     return response
   }
 
@@ -203,9 +221,11 @@ export default function useVaccination() {
     createRecommendations,
     updateRecommendations,
     getRecommendations,
+    searchRecommendations,
     getImmunizations,
     createImmunization,
     getImmunization,
+    getPatientImmunizations,
     updateImmunization,
     recommendations,
     immunizations,

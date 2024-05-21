@@ -6,7 +6,8 @@ const classifyUserByAge = (birthDate) => {
   const ageCategories = [
     { name: 'At Birth', start: 0, end: 42 },
     { name: '6 Weeks', start: 42, end: 70 },
-    { name: '10 Weeks', start: 70, end: 182 },
+    { name: '10 Weeks', start: 70, end: 98 },
+    { name: '14 Weeks', start: 98, end: 182 },
     { name: '6 Months', start: 182, end: 213 },
     { name: '7 Months', start: 213, end: 274 },
     { name: '9 Months', start: 274, end: 365 },
@@ -130,7 +131,8 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
     }, null)
 
     if (getVaccine) {
-      recommendation.status = getVaccine.status
+      const statusCode = getVaccine.reasonCode?.[0]?.text
+      recommendation.status = getVaccine.status === 'completed' ? 'completed' : statusCode
       recommendation.administeredDate = getVaccine.occurrenceDateTime
       recommendation.statusReason = getVaccine.statusReason
       recommendation.id = getVaccine.id

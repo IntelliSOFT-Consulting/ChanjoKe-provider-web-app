@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { generateUniqueCode } from '../utils/methods'
+import moment from 'moment'
 
 const fhirEndpoint = '/hapi/fhir'
 
@@ -27,6 +28,34 @@ export default function usePatient() {
           },
           system: 'identification',
           value: data.identificationNumber,
+        },
+        {
+          type: {
+            coding: [
+              {
+                system: 'estimated-age',
+                code: 'estimated_age',
+                display: 'Estimated Age',
+              },
+            ],
+            text: data.estimatedAge ? 'false' : 'true',
+          },
+          system: 'estimated-age',
+          value: data.estimatedAge ? 'false' : 'true',
+        },
+        {
+          type: {
+            coding: [
+              {
+                system: 'system-creation',
+                code: 'system_creation',
+                display: 'System Creation',
+              },
+            ],
+            text: moment().format('YYYY-MM-DD HH:mm:ss'),
+          },
+          system: 'system-creation',
+          value: moment().format('YYYY-MM-DD HH:mm:ss'),
         },
         {
           type: {
@@ -175,5 +204,21 @@ export default function usePatient() {
     }
   }
 
-  return { createPatient, getPatient, savePatient, updatePatient, patient }
+  const searchPatients = async (query) => {
+    try {
+      const response = await get(`${fhirEndpoint}/Patient?${query}`)
+      return response
+    } catch (error) {
+      return error
+    }
+  }
+
+  return {
+    createPatient,
+    getPatient,
+    savePatient,
+    updatePatient,
+    searchPatients,
+    patient,
+  }
 }
