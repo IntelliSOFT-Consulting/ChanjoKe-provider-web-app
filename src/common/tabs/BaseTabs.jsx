@@ -25,6 +25,7 @@ export default function BaseTabs({
   immunizations,
   queryParams,
   activeTab,
+  fetchData
 }) {
   const [currentTab, setCurrentTab] = useState(activeTab || 'routineVaccines')
 
@@ -95,6 +96,7 @@ export default function BaseTabs({
           routineVaccines={routineVaccines}
           recommendations={recommendations}
           immunizations={immunizations}
+          fetchData={fetchData}
         />
       )}
       {currentTab === 'nonRoutineVaccines' && (
@@ -105,6 +107,7 @@ export default function BaseTabs({
           nonRoutineVaccines={nonRoutineVaccines}
           recommendations={recommendations}
           immunizations={immunizations}
+          fetchData={fetchData}
         />
       )}
       {currentTab === 'appointments' && (

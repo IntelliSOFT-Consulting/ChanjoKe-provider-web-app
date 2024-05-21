@@ -42,11 +42,15 @@ export default function ClientDetailsView() {
 
   const { getObservations, observations } = useObservations()
 
-  useEffect(() => {
+  const fetchData = () => {
     getPatient(clientID)
     getRecommendations(clientID)
     getImmunizations(clientID)
     getObservations(clientID)
+  }
+
+  useEffect(() => {
+   fetchData()
   }, [clientID])
 
   useEffect(() => {
@@ -140,7 +144,7 @@ export default function ClientDetailsView() {
                   className="w-full"
                 />
                 {patientData?.hasNotificationOnly && (
-                  <div className="flex flex-col items-center bg-pink py-2 px-4 rounded-md ml-0 md:ml-2 h-full my-0 max-w-full md:max-w-xs ">
+                  <div className="flex items-center bg-pink py-2 px-4 rounded-md ml-0 md:ml-2 h-full my-0 max-w-full md:max-w-xs ">
                     <WarningTwoTone
                       twoToneColor="red"
                       classID="text-black text-6xl"
@@ -174,6 +178,7 @@ export default function ClientDetailsView() {
           recommendations={recommendations}
           activeTab={activeTab}
           immunizations={immunizations}
+          fetchData={fetchData}
         />
       </div>
     </>

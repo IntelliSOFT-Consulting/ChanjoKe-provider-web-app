@@ -131,7 +131,8 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
     }, null)
 
     if (getVaccine) {
-      recommendation.status = getVaccine.status
+      const statusCode = getVaccine.reasonCode?.[0]?.text
+      recommendation.status = getVaccine.status === 'completed' ? 'completed' : statusCode
       recommendation.administeredDate = getVaccine.occurrenceDateTime
       recommendation.statusReason = getVaccine.statusReason
       recommendation.id = getVaccine.id

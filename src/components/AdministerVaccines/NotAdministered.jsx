@@ -66,6 +66,7 @@ export default function NotAdministered() {
       }))
 
     values.notVaccinatedReason = values.notVaccinatedReason
+    values.reasonCode = 'Not Administered'
 
     const vaccineResources = createImmunizationResource(
       values,

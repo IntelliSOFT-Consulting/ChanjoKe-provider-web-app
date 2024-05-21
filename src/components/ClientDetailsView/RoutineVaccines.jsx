@@ -1,6 +1,14 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { Badge, Button, Checkbox, Tag, Tooltip, FloatButton } from 'antd'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Tag,
+  Tooltip,
+  FloatButton,
+  Popconfirm,
+} from 'antd'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -16,12 +24,14 @@ import Table from '../DataTable'
 import { colorCodeVaccines } from './vaccineController'
 import dayjs from 'dayjs'
 import SelectDialog from '../../common/dialog/SelectDialog'
+import useVaccination from '../../hooks/useVaccination'
 
 export default function RoutineVaccines({
   userCategory,
   patientData,
   patientDetails,
   routineVaccines,
+  fetchData,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [selectAefi, setSelectAefi] = useState(false)
@@ -29,10 +39,11 @@ export default function RoutineVaccines({
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const { get } = useApiRequest()
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
+
+  const { getPatientImmunizations, updateImmunization } = useVaccination()
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
@@ -43,11 +54,17 @@ export default function RoutineVaccines({
     : []
 
   const fetchPatientImmunization = async () => {
-    const response = await get(
-      `/hapi/fhir/Immunization?patient=Patient/${patientData?.id}`
-    )
+    const response = await getPatientImmunizations(patientData?.id)
     setData(response)
     setLoading(false)
+  }
+
+  const deleteImmunization = async (id) => {
+    const immunization = data?.entry?.find((entry) => entry.resource.id === id)
+
+    immunization.resource.status = 'entered-in-error'
+    await updateImmunization(immunization.resource)
+    fetchData()
   }
 
   useEffect(() => {
@@ -152,7 +169,6 @@ export default function RoutineVaccines({
       key: 'vaccine',
       render: (_text, record) => {
         const completed = record.status === 'completed'
-        console.log({ date: record.dueDate, ld: record.lastDate })
         const locked = lockVaccine(record.dueDate, record.lastDate)
 
         return (
@@ -164,7 +180,9 @@ export default function RoutineVaccines({
               disabled={
                 completed ||
                 (locked &&
-                  !['not-done', 'entered-in-error'].includes(record.status))
+                  !['Contraindicated', 'Not Administered'].includes(
+                    record.status
+                  ))
               }
               onChange={() => handleCheckBox(record)}
             />
@@ -202,26 +220,27 @@ export default function RoutineVaccines({
       key: 'status',
       render: (text, record) => {
         const missed = datePassed(text, record?.dueDate?.format('YYYY-MM-DD'))
-
         return (
           <Tag
             color={
               text === 'completed'
                 ? 'green'
-                : text === 'not-done'
+                : text === 'Not Administered'
                 ? 'red'
-                : missed && text !== 'entered-in-error'
+                : missed &&
+                  text !== 'Contraindicated' &&
+                  text !== 'Not Administered'
                 ? 'red'
-                : text === 'entered-in-error'
+                : text === 'Contraindicated'
                 ? 'yellow'
                 : 'gray'
             }
           >
             {text === 'completed'
               ? 'Administered'
-              : text === 'not-done'
+              : text === 'Not Administered'
               ? 'Not Administered'
-              : text === 'entered-in-error'
+              : text === 'Contraindicated'
               ? 'Contraindicated'
               : missed && text !== 'entered-in-error'
               ? 'Missed'
@@ -235,21 +254,34 @@ export default function RoutineVaccines({
       dataIndex: 'actions',
       key: 'actions',
       render: (text, record) => (
-        <Button
-          disabled={record.status === 'Due'}
-          onClick={() => {
-            navigate(`/view-vaccination/${record?.id}`)
-          }}
-          type="link"
-          className="font-bold text=[#173C94]"
-        >
-          View
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            disabled={record.status === 'Due'}
+            onClick={() => {
+              navigate(`/view-vaccination/${record?.id}`)
+            }}
+            type="link"
+            className="font-bold text=[#173C94]"
+          >
+            View
+          </Button>
+          {record.status === 'completed' && (
+            <Popconfirm
+              title="Are you sure you want to delete this record?"
+              onConfirm={() => deleteImmunization(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="link" danger>
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+        </div>
       ),
     },
   ]
 
-  console.log('clientCategory', patientDetails?.clientCategory)
   return (
     <>
       <OptionsDialog
