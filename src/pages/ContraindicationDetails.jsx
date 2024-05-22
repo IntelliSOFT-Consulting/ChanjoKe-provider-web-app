@@ -24,7 +24,9 @@ export default function ContraindicationDetails({ notAdministered }) {
   const formatContraindications = (immunizations) => {
     return immunizations?.map((immunization) => {
       const status =
-        immunization?.status === 'not-done' ? 'Not Done' : 'Contraindication'
+        immunization?.reasonCode?.[0]?.text === 'Not Administered'
+          ? 'Not Done'
+          : 'Contraindication'
       const disease = recommendations?.recommendation?.find(
         (vaccine) =>
           vaccine.vaccineCode?.[0]?.coding[0].display ===
@@ -48,14 +50,18 @@ export default function ContraindicationDetails({ notAdministered }) {
   }
 
   const fetchContraindications = async (patientId) => {
-    const status = notAdministered ? 'not-done' : 'entered-in-error'
     const immunizations = await getImmunizations(
       patientId,
-      `status=${status}&vaccine-code=${immunization.vaccineCode.coding[0].code}`
+      `status=not-done&vaccine-code=${immunization.vaccineCode.coding[0].code}`
     )
 
     if (immunizations?.length) {
-      setContraindications(formatContraindications(immunizations))
+      const filteredImmunizations = immunizations.filter((immunization) =>
+        notAdministered
+          ? immunization.reasonCode?.[0].text === 'Not Administered'
+          : immunization.reasonCode?.[0].text === 'Contraindicated'
+      )
+      setContraindications(formatContraindications(filteredImmunizations))
     } else {
       setContraindications([])
     }
@@ -80,40 +86,12 @@ export default function ContraindicationDetails({ notAdministered }) {
     }
   }, [recommendations])
 
-  useEffect(() => {
-    if (immunization?.status === 'entered-in-error' && recommendations) {
-      const reason = immunization?.statusReason?.text
-      const date = dayjs(immunization?.occurrenceDateTime).format('DD-MM-YYYY')
-      const nextVaccine = recommendations?.recommendation?.find(
-        (vaccine) =>
-          vaccine.vaccineCode?.[0]?.coding[0].display ===
-          immunization.vaccineCode?.coding?.[0]?.display
-      )
-
-      if (nextVaccine) {
-        const nextVaccineDate = dayjs(
-          nextVaccine.dateCriterion.find(
-            (date) => date.code.coding[0].code === 'Earliest-date-to-administer'
-          ).value
-        ).format('DD-MM-YYYY')
-
-        setContraindicationInfo({
-          vaccine: immunization.vaccineCode?.text,
-          date,
-          reason,
-          nextVaccine: nextVaccine.vaccineCode?.[0]?.text,
-          nextDueDate: nextVaccineDate,
-        })
-      }
-    }
-  }, [recommendations])
-
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
         <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
           <div className="text-2xl font-semibold py-5">
-            { notAdministered ? 'Not Administered' : 'Contraindications' }
+            {notAdministered ? 'Not Administered' : 'Contraindications'}
           </div>
         </div>
 
@@ -165,9 +143,9 @@ export default function ContraindicationDetails({ notAdministered }) {
             {contraindications?.length === 0 && (
               <div className="text-center  mx-7 px-10 py-10">
                 <p className="text-gray-500">
-                   {
-                      notAdministered ? 'No Unadministered Vaccines Recorded' : 'No Contraindications'
-                   }
+                  {notAdministered
+                    ? 'No Unadministered Vaccines Recorded'
+                    : 'No Contraindications'}
                 </p>
               </div>
             )}

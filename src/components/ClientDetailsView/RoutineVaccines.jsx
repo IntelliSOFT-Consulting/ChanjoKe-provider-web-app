@@ -32,18 +32,17 @@ export default function RoutineVaccines({
   patientDetails,
   routineVaccines,
   fetchData,
+  immunizations,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [selectAefi, setSelectAefi] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
 
   const navigate = useNavigate()
 
   const dispatch = useDispatch()
 
-  const { getPatientImmunizations, updateImmunization } = useVaccination()
+  const { updateImmunization } = useVaccination()
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
@@ -53,24 +52,17 @@ export default function RoutineVaccines({
     ? [...new Set(Object.keys(routineVaccines))]
     : []
 
-  const fetchPatientImmunization = async () => {
-    const response = await getPatientImmunizations(patientData?.id)
-    setData(response)
-    setLoading(false)
-  }
-
   const deleteImmunization = async (id) => {
-    const immunization = data?.entry?.find((entry) => entry.resource.id === id)
+    const immunization = immunizations?.find((entry) => entry.id === id)
 
-    immunization.resource.status = 'entered-in-error'
-    await updateImmunization(immunization.resource)
+    immunization.status = 'entered-in-error'
+    await updateImmunization(immunization)
     fetchData()
   }
 
   useEffect(() => {
     if (patientData?.id) {
       dispatch(setCurrentPatient(patientData))
-      fetchPatientImmunization()
       getAefis()
     }
   }, [patientData])
@@ -93,7 +85,7 @@ export default function RoutineVaccines({
         })
       }
     }
-  }, [data?.entry, loading])
+  }, [immunizations, routineVaccines, patientDetails])
 
   function handleCheckBox(item) {
     const vaccineExists = vaccinesToAdminister.find(
@@ -316,7 +308,7 @@ export default function RoutineVaccines({
           </div>
         </div>
 
-        {userCategory && !loading && !loadingAefis ? (
+        {userCategory && !loadingAefis ? (
           categories.map(
             (category) =>
               routineVaccines[category]?.length > 0 && (

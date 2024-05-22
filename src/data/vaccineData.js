@@ -30,7 +30,7 @@ export const routineVaccines = [
   {
     vaccineName: 'OPV I',
     vaccineCode: 'IMPO-OPV-I',
-    nhddCode: '54379',
+    nhddCode: '54377',
     diseaseTarget: 'Polio',
     doseNumber: '1',
     occurrenceDateTime: '',
@@ -89,7 +89,7 @@ export const routineVaccines = [
   {
     vaccineName: 'OPV II',
     vaccineCode: 'IMPO-OPV-II',
-    nhddCode: '54379',
+    nhddCode: '54377',
     diseaseTarget: 'Polio',
     doseNumber: '2',
     occurrenceDateTime: '',
@@ -202,7 +202,7 @@ export const routineVaccines = [
   {
     vaccineName: 'OPV III',
     vaccineCode: 'IMPO-OPV-III',
-    nhddCode: '54379',
+    nhddCode: '54377',
     diseaseTarget: 'Polio',
     doseNumber: '3',
     occurrenceDateTime: '',

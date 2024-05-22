@@ -145,7 +145,11 @@ export default function ClientDetails() {
     const timeout = setTimeout(() => {
       const param =
         clientType === 'Non-Routine' || values.years >= 5 ? 'non-routine' : ''
-      navigate(`/client-details/${patient.id}${param ? `?type=${param}` : ''}`)
+      navigate(
+        `/client-details/${patient.id}/routineVaccines${
+          param ? `?type=${param}` : ''
+        }`
+      )
     }, 1500)
 
     return () => clearTimeout(timeout)

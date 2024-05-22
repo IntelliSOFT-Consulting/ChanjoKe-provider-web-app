@@ -31,7 +31,6 @@ export default function BaseTabs({
 
   useEffect(() => {
     if (patientDetails) {
-      console.log({ patientDetails, activeTab })
       if (patientDetails?.ages?.years >= 18 || queryParams === 'non-routine') {
         setCurrentTab('nonRoutineVaccines')
       } if (activeTab === 'appointments') {
