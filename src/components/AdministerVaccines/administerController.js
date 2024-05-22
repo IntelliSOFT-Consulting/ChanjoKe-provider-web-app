@@ -78,7 +78,7 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
         {
           coding: [
             {
-              code: 'status-reason',
+              code: values.reasonCode,
               display: values.reasonCode,
             },
           ],

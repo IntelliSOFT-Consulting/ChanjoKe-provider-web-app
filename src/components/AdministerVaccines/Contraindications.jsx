@@ -68,9 +68,6 @@ export default function Contraindications() {
 
     const responses = await Promise.all(
       vaccineResources.map(async (resource) => {
-        if (resource.id) {
-          return await updateImmunization(resource)
-        }
         return await createImmunization(resource)
       })
     )
