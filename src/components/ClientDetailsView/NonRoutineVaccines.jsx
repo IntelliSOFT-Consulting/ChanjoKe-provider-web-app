@@ -1,6 +1,6 @@
 import { Disclosure } from '@headlessui/react'
-import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { Badge, Button, Checkbox, Tag, FloatButton } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
+import { Badge, Button, Checkbox, Tag, FloatButton, Popconfirm } from 'antd'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -11,12 +11,15 @@ import { datePassed } from '../../utils/validate'
 import Table from '../DataTable'
 import { colorCodeVaccines, isQualified, outGrown } from './vaccineController'
 import SelectDialog from '../../common/dialog/SelectDialog'
+import useVaccination from '../../hooks/useVaccination'
 
 export default function NonRoutineVaccines({
   userCategory,
   patientData,
   nonRoutineVaccines,
   patientDetails,
+  immunizations,
+  fetchData,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -26,6 +29,16 @@ export default function NonRoutineVaccines({
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
 
   const dispatch = useDispatch()
+
+  const { updateImmunization } = useVaccination()
+
+  const deleteImmunization = async (id) => {
+    const immunization = immunizations?.find((entry) => entry.id === id)
+
+    immunization.status = 'entered-in-error'
+    await updateImmunization(immunization)
+    fetchData()
+  }
 
   function handleCheckBox(item) {
     const vaccineExists = vaccinesToAdminister.find(
@@ -120,7 +133,7 @@ export default function NonRoutineVaccines({
         if (text && record?.doseNumber > 1 && hasCompletedSeries) {
           return text?.format('DD-MM-YYYY')
         }
-        return '-'
+        return record.status === 'completed' ? text?.format('DD-MM-YYYY') : '-'
       },
     },
     {
@@ -146,20 +159,22 @@ export default function NonRoutineVaccines({
             color={
               text === 'completed'
                 ? 'green'
-                : text === 'not-done'
+                : text === 'Not Administered'
                 ? 'red'
-                : missed && text !== 'entered-in-error' && hasCompletedSeries
+                : missed &&
+                  text !== 'Contraindicated' &&
+                  text !== 'Not Administered'
                 ? 'red'
-                : text === 'entered-in-error'
+                : text === 'Contraindicated'
                 ? 'yellow'
                 : 'gray'
             }
           >
             {text === 'completed'
               ? 'Administered'
-              : text === 'not-done'
+              : text === 'Not Administered'
               ? 'Not Administered'
-              : text === 'entered-in-error'
+              : text === 'Contraindicated'
               ? 'Contraindicated'
               : missed && text !== 'entered-in-error' && hasCompletedSeries
               ? 'Missed'
@@ -173,16 +188,30 @@ export default function NonRoutineVaccines({
       dataIndex: 'actions',
       key: 'actions',
       render: (text, record) => (
-        <Button
-          disabled={!record?.id || record.status === 'not-done'}
-          onClick={() => {
-            navigate(`/view-vaccination/${record?.id}`)
-          }}
-          type="link"
-          className="font-bold text=[#173C94]"
-        >
-          View
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            disabled={!record?.id || record.status === 'not-done'}
+            onClick={() => {
+              navigate(`/view-vaccination/${record?.id}`)
+            }}
+            type="link"
+            className="font-bold text=[#173C94]"
+          >
+            View
+          </Button>
+          {record.status === 'completed' && (
+            <Popconfirm
+              title="Are you sure you want to delete this record?"
+              onConfirm={() => deleteImmunization(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="link" danger>
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+        </div>
       ),
     },
   ]
@@ -272,7 +301,7 @@ export default function NonRoutineVaccines({
                                     AEFIs
                                   </Button>
                                 ) : (
-                                  <PlusSmallIcon
+                                  <PlusOutlined
                                     className="h-6 w-6"
                                     aria-hidden="true"
                                   />

@@ -127,14 +127,14 @@ export default function ClientDetailsView() {
           </div>
         </div>
 
-        <div className="container px-3 py-3">
+        <div className="px-3 py-3">
           <div className="overflow-auto">
             {!patientData ? (
               <div className="my-10 mx-auto flex justify-center">
                 <LoadingArrows />
               </div>
             ) : (
-              <div className="flex w-full">
+              <div className="flex flex-col  md:flex-row w-full md:space-x-2">
                 <Table
                   columns={tHeaders}
                   dataSource={patientData ? [patientData] : []}
@@ -144,7 +144,7 @@ export default function ClientDetailsView() {
                   className="w-full"
                 />
                 {patientData?.hasNotificationOnly && (
-                  <div className="flex items-center bg-pink py-2 px-4 rounded-md ml-0 md:ml-2 h-full my-0 max-w-full md:max-w-xs ">
+                  <div className="flex mt-2 md:mt-0 items-center bg-pink py-2 px-4 rounded-md ml-0 h-full my-0 max-w-full md:max-w-xs ">
                     <WarningTwoTone
                       twoToneColor="red"
                       classID="text-black text-6xl"

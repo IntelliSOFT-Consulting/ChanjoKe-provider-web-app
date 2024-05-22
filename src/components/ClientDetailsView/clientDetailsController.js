@@ -178,7 +178,7 @@ export const formatWeightData = (observations, birthDate) => {
     const date = moment(observation.effectiveDateTime)
     const age = date.diff(dob, period)
 
-    const weight = observation.valueQuantity.value
+    const weight = observation.valueQuantity.value || 0
 
     return [age, weight]
   })
