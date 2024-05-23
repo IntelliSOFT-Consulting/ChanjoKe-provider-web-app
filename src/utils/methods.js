@@ -1,4 +1,5 @@
 import moment from 'moment'
+
 export const debounce = (func, delay) => {
   let debounceTimer
   return function () {

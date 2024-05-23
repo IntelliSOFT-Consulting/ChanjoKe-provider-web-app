@@ -1,34 +1,42 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation } from 'react-router-dom'
 import useAefi from '../../hooks/useAefi'
 import useVaccination from '../../hooks/useVaccination'
 import Table from '../DataTable'
 import dayjs from 'dayjs'
 import { Modal, Button, Descriptions } from 'antd'
-import { FundViewOutlined } from '@ant-design/icons'
+import usePatient from '../../hooks/usePatient'
+import { flattenPatientData } from '../../utils/flattenData'
+import { CalendarOutlined, UserOutlined } from '@ant-design/icons'
 
 export default function AEFIDetails({ patientInfo }) {
   const [vaccinationAEFIs, setVaccinationAEFIs] = useState([])
   const [aefiSelected, setAefiSelected] = useState(null)
-  const [patient, setPatient] = useState(patientInfo)
+  const [patient, setPatient] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const { getVaccineAefis } = useAefi()
 
   const { getImmunization } = useVaccination()
+  const { getPatient } = usePatient()
 
   const { vaccinationID } = useParams()
 
+  const { pathname } = useLocation()
+
   const fetchVaccinationInfo = async () => {
     const immunization = await getImmunization(vaccinationID)
-    setPatient({
-      id: immunization?.patient?.reference?.split('/')[1],
-    })
+    const response = await getPatient(
+      immunization?.patient?.reference?.split('/')[1]
+    )
+    setPatient(flattenPatientData(response))
   }
 
   useEffect(() => {
     if (!patientInfo) {
       fetchVaccinationInfo()
+    } else {
+      setPatient(flattenPatientData(patientInfo))
     }
   }, [patientInfo])
 
@@ -77,7 +85,7 @@ export default function AEFIDetails({ patientInfo }) {
             setAefiSelected(record)
           }}
           type="link"
-          className='text-primary font-semibold'
+          className="text-primary font-semibold"
         >
           View Details
         </Button>
@@ -92,7 +100,38 @@ export default function AEFIDetails({ patientInfo }) {
   }, [patient])
 
   return (
-    <div className='bg-white px-4 my-5 py-4 rounded-md'>
+    <div className="bg-white px-4 my-5 pb-4 rounded-md">
+      {patient && pathname?.includes('aefi-details') && (
+        <>
+          <div className="w-full py-4 font-bold mb-4 border-b">
+            AEFI Reports
+          </div>
+
+          <div className="py-4 px-2 mb-4 bg-gray-50 rounded-lg flex items-center">
+            <div className="w-16 h-16 rounded-lg bg-primary text-white font-extrabold flex justify-center items-center mr-4">
+              {patient?.name
+                ?.split(' ')
+                .map((name) => name.charAt(0))
+                .join('')}
+            </div>
+
+            <div className="">
+              <h2 className="font-bold">{patient?.name}</h2>
+              <div className="flex gap-2 text-xs font-semibold">
+                <div className="after:content-['|'] after:ml-0.5 after:text-primary">
+                  <CalendarOutlined />
+                  <span>{patient?.ageString}</span>
+                </div>
+
+                <div>
+                  <UserOutlined />
+                  <span>{patient?.gender}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       <Table
         columns={columns}
         dataSource={vaccinationAEFIs}

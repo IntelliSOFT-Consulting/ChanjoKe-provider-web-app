@@ -1,15 +1,15 @@
-import { Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
-import { useDispatch} from 'react-redux'
+import { Fragment } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { logout } from '../redux/actions/userActions'
-import { Link, useNavigate } from 'react-router-dom'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ')
 
 export default function ProfileDropdown() {
-  // const navigate = useNavigate()
-
   const dispatch = useDispatch()
+
+  const { user } = useSelector((state) => state.userInfo)
 
   return (
     <Menu as="div" className="relative">
@@ -17,11 +17,9 @@ export default function ProfileDropdown() {
         <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Open user menu</span>
-          <img
-            className="h-8 w-8 rounded-full"
-            src="https://ui-avatars.com/api/?name=John+Doe&background=163C94&color=fff"
-            alt=""
-          />
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+            {`${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}`}
+          </div>
         </Menu.Button>
       </div>
       <Transition
@@ -38,7 +36,11 @@ export default function ProfileDropdown() {
             {({ active }) => (
               <Link
                 to="/profile"
-                className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
+                className={classNames(
+                  active ? 'bg-gray-100' : '',
+                  'block px-4 py-2 text-sm text-gray-700'
+                )}
+              >
                 View Profile
               </Link>
             )}
@@ -47,7 +49,11 @@ export default function ProfileDropdown() {
             {({ active }) => (
               <Link
                 to="/"
-                className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
+                className={classNames(
+                  active ? 'bg-gray-100' : '',
+                  'block px-4 py-2 text-sm text-gray-700'
+                )}
+              >
                 Reset Password
               </Link>
             )}
@@ -58,7 +64,11 @@ export default function ProfileDropdown() {
                 onClick={() => {
                   dispatch(logout())
                 }}
-                className={classNames(active ? 'bg-gray-100 w-full' : '', 'block px-4 w-full py-2 text-left text-sm text-gray-700')}>
+                className={classNames(
+                  active ? 'bg-gray-100 w-full' : '',
+                  'block px-4 w-full py-2 text-left text-sm text-gray-700'
+                )}
+              >
                 Log Out
               </button>
             )}
