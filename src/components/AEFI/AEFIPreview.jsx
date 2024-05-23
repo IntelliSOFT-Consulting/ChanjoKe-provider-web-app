@@ -16,7 +16,7 @@ const AEFIPreview = ({ form }) => {
     },
     {
       title: 'Onset of Event',
-      value: formValues.eventOnset,
+      value: formValues.eventOnset?.format('DD-MM-YYYY'),
     },
     {
       title: 'Brief details on the AEFI',

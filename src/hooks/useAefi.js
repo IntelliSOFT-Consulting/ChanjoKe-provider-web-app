@@ -117,13 +117,14 @@ export default function useAefi() {
     await post(fhirEndpoint, payload)
   }
 
-  const getAefis = async (patientId = null) => {
+  const getAefis = async (patientId = null, params = '') => {
     setLoading(true)
     try {
+      params = params ? `?${params}` : ''
       const data = await get(
         `/hapi/fhir/AdverseEvent?subject=Patient/${
           patientId || currentPatient?.id || clientID
-        }`
+        }${params}`
       )
       setAefis(data.entry)
     } catch (error) {
@@ -133,9 +134,10 @@ export default function useAefi() {
     }
   }
 
-  const getVaccineAefis = async (patient, vaccineId) => {
+  const getVaccineAefis = async (patient, vaccineId, params = '') => {
+    params = params ? `&${params}` : ''
     const patientAefis = await get(
-      `/hapi/fhir/AdverseEvent?subject=Patient/${patient}`
+      `/hapi/fhir/AdverseEvent?subject=Patient/${patient}${params}`
     )
 
     return patientAefis?.entry?.filter((aefi) => {
