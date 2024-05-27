@@ -1,5 +1,6 @@
 import { Descriptions } from 'antd'
 import { useSelector } from 'react-redux'
+import { titleCase } from '../utils/methods'
 
 export default function Profile() {
   const { user } = useSelector((state) => state.userInfo)
@@ -19,8 +20,17 @@ export default function Profile() {
           <Descriptions.Item label="Phone Number">
             {user?.phone}
           </Descriptions.Item>
+          <Descriptions.Item label="County">
+            {titleCase(user?.countyName)}
+          </Descriptions.Item>
+          <Descriptions.Item label="Sub County">
+            {titleCase(user?.subCountyName)}
+          </Descriptions.Item>
+          <Descriptions.Item label="Ward">
+            {titleCase(user?.wardName)}
+          </Descriptions.Item>
           <Descriptions.Item label="Facility Attached">
-            {user?.facilityName}
+            {titleCase(user?.facilityName)}
           </Descriptions.Item>
         </Descriptions>
       </div>

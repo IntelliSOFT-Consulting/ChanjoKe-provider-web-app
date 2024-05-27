@@ -106,6 +106,7 @@ export default function RoutineVaccines({
   const handleDialogClose = () => {
     setDialogOpen(false)
   }
+  console.log('routineVaccines', routineVaccines)
 
   const administerVaccineBtns = [
     {
@@ -237,7 +238,8 @@ export default function RoutineVaccines({
               ? 'Contraindicated'
               : missed && text !== 'entered-in-error'
               ? 'Missed'
-              : moment().isAfter(record.dueDate) ? 'Due'
+              : moment().isAfter(record.dueDate)
+              ? 'Due'
               : 'Upcoming'}
           </Tag>
         )
@@ -252,7 +254,13 @@ export default function RoutineVaccines({
           <Button
             disabled={record.status === 'Due'}
             onClick={() => {
-              navigate(`/view-vaccination/${record?.id}`)
+              const url =
+                record.status === 'completed'
+                  ? `/view-vaccination/${record?.id}`
+                  : record.status === 'Contraindicated'
+                  ? `/view-contraindication/${record?.id}`
+                  : `/view-not-administered/${record?.id}`
+              navigate(url)
             }}
             type="link"
             className="font-bold text=[#173C94]"

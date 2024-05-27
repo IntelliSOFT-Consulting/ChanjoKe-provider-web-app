@@ -195,7 +195,13 @@ export default function NonRoutineVaccines({
           <Button
             disabled={!record?.id || record.status === 'not-done'}
             onClick={() => {
-              navigate(`/view-vaccination/${record?.id}`)
+              const url =
+                record.status === 'completed'
+                  ? `/view-vaccination/${record?.id}`
+                  : record.status === 'Contraindicated'
+                  ? `/view-contraindication/${record?.id}`
+                  : `/view-not-administered/${record?.id}`
+              navigate(url)
             }}
             type="link"
             className="font-bold text=[#173C94]"

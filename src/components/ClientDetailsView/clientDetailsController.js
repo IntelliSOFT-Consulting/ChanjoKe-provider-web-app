@@ -99,6 +99,7 @@ export const formatRecommendationsToObject = (recommendation) => {
     dependencyPeriod,
     statusReason: recommendation.statusReason,
     id: recommendation.id,
+    reasonCode: recommendation.reasonCode,
   }
 }
 
@@ -132,10 +133,12 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
 
     if (getVaccine) {
       const statusCode = getVaccine.reasonCode?.[0]?.text
-      recommendation.status = getVaccine.status === 'completed' ? 'completed' : statusCode
+      recommendation.status =
+        getVaccine.status === 'completed' ? 'completed' : statusCode
       recommendation.administeredDate = getVaccine.occurrenceDateTime
       recommendation.statusReason = getVaccine.statusReason
       recommendation.id = getVaccine.id
+      recommendation.reasonCode = getVaccine.reasonCode
     }
 
     const category =
@@ -169,10 +172,10 @@ export const formatWeightData = (observations, birthDate) => {
     days > 7 && days < 30
       ? 'weeks'
       : days > 30 && days < 365
-        ? 'months'
-        : days > 365
-          ? 'years'
-          : 'days'
+      ? 'months'
+      : days > 365
+      ? 'years'
+      : 'days'
 
   const formatted = weightData.map((observation) => {
     const date = moment(observation.effectiveDateTime)
