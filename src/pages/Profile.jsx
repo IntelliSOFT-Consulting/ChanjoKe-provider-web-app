@@ -10,7 +10,6 @@ export default function Profile() {
         <Descriptions
           column={3}
           className="w-full"
-          layout="vertical"
           bordered={false}
           labelStyle={{ fontWeight: 'bold', color: '#163C94' }}
           size="small"
