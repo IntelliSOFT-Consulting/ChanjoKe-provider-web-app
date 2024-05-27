@@ -128,7 +128,8 @@ export default function DefaulterTracing() {
         <Table
           dataSource={defaulters}
           columns={columns}
-          rowKey="uniqueID"
+          loading={loading}
+          rowKey="id"
           size="small"
           bordered
           pagination={{

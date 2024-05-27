@@ -25,6 +25,7 @@ import { colorCodeVaccines } from './vaccineController'
 import dayjs from 'dayjs'
 import SelectDialog from '../../common/dialog/SelectDialog'
 import useVaccination from '../../hooks/useVaccination'
+import moment from 'moment'
 
 export default function RoutineVaccines({
   userCategory,
@@ -236,6 +237,7 @@ export default function RoutineVaccines({
               ? 'Contraindicated'
               : missed && text !== 'entered-in-error'
               ? 'Missed'
+              : moment().isAfter(record.dueDate) ? 'Due'
               : 'Upcoming'}
           </Tag>
         )
