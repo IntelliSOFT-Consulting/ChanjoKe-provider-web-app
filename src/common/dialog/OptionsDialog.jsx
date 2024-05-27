@@ -1,8 +1,6 @@
-import { Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { Fragment, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import updateSVG from '../../assets/update-record.svg'
 
 export default function OptionsDialog({ open, onClose, buttons }) {
   

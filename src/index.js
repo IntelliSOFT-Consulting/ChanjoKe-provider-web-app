@@ -9,6 +9,7 @@ import { ConfigProvider } from 'antd'
 import { Provider } from 'react-redux'
 import store from './redux/store'
 import { createUseStyles } from 'react-jss'
+import { debounce } from './utils/methods'
 
 const useStyles = createUseStyles({
   '@global': {
@@ -84,6 +85,19 @@ const App = () => {
   const classes = useStyles()
 
   useEffect(() => {
+    debounce(() => {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width <= 1012) {
+            setIsMobileOrTablet(true)
+          } else {
+            setIsMobileOrTablet(false)
+          }
+        }
+      })
+
+      resizeObserver.observe(document.body)
+    }, 100)()
     const mediaQuery = window.matchMedia('(max-width: 1012px)')
     const handleWidthChange = (e) => {
       setIsMobileOrTablet(e.matches)

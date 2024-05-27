@@ -1,9 +1,8 @@
-import { Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { Button } from 'antd'
+import { Fragment, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import updateSVG from '../../assets/update-record.svg'
-import { Button } from 'antd'
 
 export default function SelectDialog({
   open,
@@ -54,7 +53,7 @@ export default function SelectDialog({
                 </div>
                 <div>
                   <div className="mx-auto mt-5 flex items-center justify-center rounded-full">
-                    <img className="h-20 w-20 mx-auto" src={updateSVG} />
+                    <img className="h-20 w-20 mx-auto" src={updateSVG} alt='' />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
                     <Dialog.Title

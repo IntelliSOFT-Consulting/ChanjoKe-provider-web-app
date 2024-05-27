@@ -12,6 +12,7 @@ import Table from '../DataTable'
 import { colorCodeVaccines, isQualified, outGrown } from './vaccineController'
 import SelectDialog from '../../common/dialog/SelectDialog'
 import useVaccination from '../../hooks/useVaccination'
+import moment from 'moment'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -177,7 +178,9 @@ export default function NonRoutineVaccines({
               : text === 'Contraindicated'
               ? 'Contraindicated'
               : missed && text !== 'entered-in-error' && hasCompletedSeries
-              ? 'Missed'
+              ? moment().isAfter(record.dueDate)
+                ? 'Due'
+                : 'Missed'
               : ''}
           </Tag>
         )

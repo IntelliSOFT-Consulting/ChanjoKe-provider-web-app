@@ -136,8 +136,7 @@ export default function Sidenav() {
 
     setNavigation(updatedNavigation)
     setSidebarOpen(false)
-
-  };
+  }
 
   return (
     <>
@@ -148,18 +147,6 @@ export default function Sidenav() {
             className="relative z-10 lg:hidden"
             onClose={setSidebarOpen}
           >
-            <Transition.Child
-              as={Fragment}
-              enter="transition-opacity ease-linear duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition-opacity ease-linear duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0 bg-gray-900/80" />
-            </Transition.Child>
-
             <div className="fixed inset-0 flex">
               <Transition.Child
                 as={Fragment}
@@ -207,7 +194,7 @@ export default function Sidenav() {
                       </div>
                     </div>
                     <nav className="flex flex-1 flex-col px-6">
-                      <ul role="list" className="-mx-2 space-y-1">
+                      <ul className="-mx-2 space-y-1">
                         {navigation.map((item) => (
                           <li key={item.name}>
                             {!item.children ? (
@@ -290,7 +277,7 @@ export default function Sidenav() {
               </div>
             </div>
             <nav className="flex flex-1 flex-col px-6">
-              <ul role="list" className="-mx-2 space-y-1">
+              <ul className="-mx-2 space-y-1">
                 {navigation.map((item) => (
                   <li key={item.name}>
                     {!item.children ? (

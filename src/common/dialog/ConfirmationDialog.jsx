@@ -1,14 +1,24 @@
-import { Fragment, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { CheckIcon } from '@heroicons/react/24/outline'
+import { Fragment, useRef } from 'react'
 
-export default function ConfirmationDialog({ open, onClose, title, description, onAccept }) {
-  
+export default function ConfirmationDialog({
+  open,
+  onClose,
+  title,
+  description,
+  onAccept,
+}) {
   const cancelButtonRef = useRef(null)
 
   return (
     <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={onClose}>
+      <Dialog
+        as="div"
+        className="relative z-10"
+        initialFocus={cancelButtonRef}
+        onClose={onClose}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -38,11 +48,17 @@ export default function ConfirmationDialog({ open, onClose, title, description, 
                 </div>
                 <div>
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 mt-5">
-                    <CheckIcon className="h-50 w-50 text-green-600" aria-hidden="true" />
+                    <CheckIcon
+                      className="h-50 w-50 text-green-600"
+                      aria-hidden="true"
+                    />
                   </div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title as="h2" className="text-base font-semibold text-3xl text-gray-900">
-                    { description }
+                    <Dialog.Title
+                      as="h2"
+                      className="text-base font-semibold text-3xl text-gray-900"
+                    >
+                      {description}
                     </Dialog.Title>
                   </div>
                 </div>
@@ -50,7 +66,8 @@ export default function ConfirmationDialog({ open, onClose, title, description, 
                   <button
                     onClick={() => onClose(false)}
                     ref={cancelButtonRef}
-                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+                  >
                     No
                   </button>
 
@@ -59,7 +76,8 @@ export default function ConfirmationDialog({ open, onClose, title, description, 
                       onClose(false)
                       onAccept(true)
                     }}
-                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]">
+                    className="mt-8 flex-shrink-0 rounded-lg bg-[#163C94] border border-[#163C94] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
+                  >
                     Yes
                   </button>
                 </div>
