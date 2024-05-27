@@ -1,10 +1,9 @@
-import TextInput from '../../common/forms/TextInput'
-import RadioGroup from '../../common/forms/RadioGroup'
-import SelectMenu from '../../common/forms/SelectMenu'
-import FormState from '../../utils/formState'
-import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import SelectMenu from '../../common/forms/SelectMenu'
+import TextInput from '../../common/forms/TextInput'
+import FormState from '../../utils/formState'
 
 export default function UpdateClientHistory() {
   const navigate = useNavigate()
@@ -13,7 +12,7 @@ export default function UpdateClientHistory() {
     navigate(-1)
     setDialogOpen(false)
   }
-  const { formData, formErrors, handleChange } = FormState(
+  const { formData,  handleChange } = FormState(
     {
       currentWeight: '',
       clientHIVStatus: '',
@@ -22,11 +21,6 @@ export default function UpdateClientHistory() {
     },
     {}
   )
-
-  const affirmOptions = [
-    { id: 1, title: 'Yes', name: 'Yes', value: true },
-    { id: 2, title: 'No', name: 'No', value: false },
-  ]
 
   const polarityOptions = [
     { name: 'Positive', value: true },
