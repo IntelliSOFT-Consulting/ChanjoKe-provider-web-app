@@ -4,18 +4,10 @@ import moment from 'moment'
 import Table from '../components/DataTable'
 import { useApiRequest } from '../api/useApiRequest'
 import { debounce } from '../utils/methods'
-import { render } from '@testing-library/react'
 
 export default function DefaulterTracing() {
   const [defaulters, setDefaulters] = useState([])
   const [loading, setLoading] = useState(false)
-
-  const [formData, setFormData] = useState({
-    clientName: '',
-    startDate: '',
-    endDate: '',
-    vaccineName: '',
-  })
 
   const { get } = useApiRequest()
 
@@ -36,10 +28,12 @@ export default function DefaulterTracing() {
     setLoading(false)
   }
 
+  useEffect(() => {
+    fetcbDefaulters({})
+  }, [])
+
   const handleChange = async () => {
     const formvalues = form.getFieldsValue()
-
-    console.log(formvalues)
 
     const startDate = formvalues.date?.[0]?.format('YYYY-MM-DD')
     const endDate = formvalues.date?.[1]?.format('YYYY-MM-DD')
@@ -102,7 +96,8 @@ export default function DefaulterTracing() {
               placeholder="Enter Client Name/ID"
               onChange={debounce(() => {
                 handleChange()
-              }, 300)}
+              }, 500)}
+              allowClear
             />
           </Form.Item>
 
@@ -110,7 +105,7 @@ export default function DefaulterTracing() {
             <DatePicker.RangePicker
               onChange={debounce(() => {
                 handleChange()
-              }, 300)}
+              }, 500)}
               className="w-full"
             />
           </Form.Item>
@@ -120,7 +115,8 @@ export default function DefaulterTracing() {
               placeholder="Enter Vaccine Name"
               onChange={debounce(() => {
                 handleChange()
-              }, 300)}
+              }, 500)}
+              allowClear
             />
           </Form.Item>
         </Form>
