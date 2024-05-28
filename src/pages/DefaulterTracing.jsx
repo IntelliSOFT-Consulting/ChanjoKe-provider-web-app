@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { DatePicker, Form, Input } from 'antd'
-import moment from 'moment'
 import Table from '../components/DataTable'
 import { useApiRequest } from '../api/useApiRequest'
 import { debounce } from '../utils/methods'

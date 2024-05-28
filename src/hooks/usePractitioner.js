@@ -6,6 +6,7 @@ import { useLocations } from './useLocation'
 
 const roleRoute = '/hapi/fhir/PractitionerRole'
 const practitionerRoute = '/hapi/fhir/Practitioner'
+
 export const usePractitioner = ({ pageSize = 12 }) => {
   const [practitioners, setPractitioners] = useState([])
   const [total, setTotal] = useState(0)
