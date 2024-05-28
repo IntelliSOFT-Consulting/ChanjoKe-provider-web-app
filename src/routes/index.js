@@ -194,7 +194,7 @@ const router = createBrowserRouter([
         element: <FAQs />,
       },
       {
-        path: '/referral-details',
+        path: '/referral-details/:id',
         element: <ReferralDetails />,
       },
     ],

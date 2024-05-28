@@ -1,62 +1,83 @@
+import { Button, Descriptions } from 'antd'
+import moment from 'moment'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import BaseTable from '../common/tables/BaseTable'
-import ConvertObjectToArray from '../components/RegisterClient/convertObjectToArray'
-import { useApiRequest } from '../api/useApiRequest'
-import { useEffect, useState } from 'react'
-import dayjs from 'dayjs'
+import Loading from '../common/spinners/LoadingArrows'
+import useReferral from '../hooks/useReferral'
+import { titleCase } from '../utils/methods'
 
 export default function ReferralDetails() {
-
   const navigate = useNavigate()
+  const { id } = useParams()
 
-  const chpDetails = ConvertObjectToArray({
-    'Referring CHP': 'James Kamau',
-    'Vaccine Referred': 'OPV II',
-    'Details': 'Provide a small section for detail on type of treatment'
-  })
+  const { getReferralById, loading, referral } = useReferral()
 
-  const scheduleDetails = ConvertObjectToArray({
-    'Date of Referral': '02/05/2023',
-    'Scheduled Vaccine Date': '02/05/2023',
-    'Date Vaccine Administered': '-',
-    'Health Facility Referred to': 'Facility XYZ'
-  })
+  useEffect(() => {
+    getReferralById(id)
+  }, [id])
 
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
         <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
-          <div className="text-2xl font-semibold py-5">
-            Referral Details
-          </div>
+          <div className="text-2xl font-semibold py-5">Referral Details</div>
         </div>
 
-        <div className="grid grid-cols-2 gap-10 mx-7 px-10 py-10">
-          <div>
-
-            <BaseTable data={chpDetails} />
-
+        {loading ? (
+          <div className="flex justify-center items-center h-96">
+            <Loading />
           </div>
-          <div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mx-7 px-10 py-10">
+            <Descriptions
+              title="Referral Details"
+              bordered
+              column={1}
+              size="small"
+              labelStyle={{ fontWeight: 'bold', color: '#163C94' }}
+            >
+              <Descriptions.Item label="Referring CHP">
+                {referral?.requester?.display || 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Vaccine Referred">
+                {referral?.reasonCode?.[0]?.text || 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Details">
+                {referral?.note?.[0]?.text || 'N/A'}
+              </Descriptions.Item>
+            </Descriptions>
 
-            <BaseTable data={scheduleDetails} />
+            <Descriptions
+              title="Schedule Details"
+              bordered
+              column={1}
+              size="small"
+              labelStyle={{ fontWeight: 'bold', color: '#163C94' }}
+            >
+              <Descriptions.Item label="Date of Referral">
+                {moment(referral?.authoredOn).format('DD-MM-YYYY') || 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Scheduled Vaccine Date">
+                {moment(referral?.occurrencePeriod?.start).format(
+                  'DD-MM-YYYY'
+                ) || 'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Date Vaccine Administered">
+                {moment(referral?.occurrencePeriod?.end).format('DD-MM-YYYY') ||
+                  'N/A'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Health Facility Referred to">
+                {titleCase(referral?.performer?.[0]?.display) || 'N/A'}
+              </Descriptions.Item>
+            </Descriptions>
           </div>
-        </div>
+        )}
 
         <div className="px-4 py-4 sm:px-6 flex justify-end">
-          <button
-            onClick={() => navigate(-1)}
-            className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-10 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          <Button onClick={() => navigate(-1)} type="primary" className="mr-4">
             Back
-          </button>
-
-          <button
-            className="ml-4 flex-shrink-0 rounded-md outline bg-[#163C94] outline-[#163C94] px-10 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94">
-            Administer
-          </button>
-          
+          </Button>
         </div>
-        
       </div>
     </>
   )
