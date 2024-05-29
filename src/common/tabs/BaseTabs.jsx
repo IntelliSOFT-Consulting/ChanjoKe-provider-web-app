@@ -35,7 +35,11 @@ export default function BaseTabs({
         setCurrentTab('nonRoutineVaccines')
       } if (activeTab === 'appointments') {
         setCurrentTab('appointments')
-      } else {
+      } 
+      if(queryParams === 'referrals') {
+        setCurrentTab('referrals')
+      }
+      else {
         setCurrentTab('routineVaccines')
       }
     }

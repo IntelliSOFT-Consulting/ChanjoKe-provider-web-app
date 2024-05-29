@@ -36,11 +36,24 @@ const useReferral = () => {
     return response
   }
 
+  const getPatientReferrals = async (patientId) => {
+    setLoading(true)
+    const response = await get(`${path}?subject=Patient/${patientId}`)
+    const data = response?.entry?.map((entry) => entry.resource) || []
+    setReferrals({
+      data,
+      total: response.total,
+    })
+    setLoading(false)
+    return response
+  }
+
   return {
     referrals,
     referral,
     loading,
     getReferralsToFacility,
+    getPatientReferrals,
     getReferralById,
   }
 }

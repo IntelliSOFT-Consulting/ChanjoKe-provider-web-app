@@ -123,6 +123,7 @@ export default function Sidenav() {
         { name: 'New Order', href: '/stock-management/new-order' },
         { name: 'Received Orders', href: '/stock-management/received-orders' },
         { name: 'Sent Orders', href: '/stock-management/sent-orders' },
+        { name: 'Store Management', href: '/stock-management/administration'},
         { name: 'Ledger', href: '/stock-management/ledger' },
       ],
     },

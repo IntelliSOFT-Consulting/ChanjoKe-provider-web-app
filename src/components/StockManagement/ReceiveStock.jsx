@@ -1,53 +1,68 @@
-import React from "react";
-import { Card, Button, Form, Input, Select, DatePicker } from "antd";
-import useInputTable from "../../hooks/InputTable";
-import { createUseStyles } from "react-jss";
+import React from 'react'
+import { Card, Button, Form, Input, Select, DatePicker } from 'antd'
+import useInputTable from '../../hooks/InputTable'
+import { createUseStyles } from 'react-jss'
 
-const { useForm } = Form;
+const { useForm } = Form
 
 const useStyles = createUseStyles({
   btnSuccess: {
-    backgroundColor: "#169416",
-    borderColor: "#169416",
-    color: "white",
-    "&:hover": {
-      backgroundColor: "#169416",
-      borderColor: "#169416",
-      color: "white",
+    backgroundColor: '#169416',
+    borderColor: '#169416',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#169416',
+      borderColor: '#169416',
+      color: 'white',
     },
   },
   btnPrimary: {
-    backgroundColor: "#163C94",
-    borderColor: "#163C94",
-    color: "white",
-    "&:hover": {
-      backgroundColor: "#163C94 !important",
-      borderColor: "#163C94",
-      color: "white !important",
+    backgroundColor: '#163C94',
+    borderColor: '#163C94',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#163C94 !important',
+      borderColor: '#163C94',
+      color: 'white !important',
     },
   },
-});
+})
 
 const ReceiveStock = () => {
-  const classes = useStyles();
-  const [form] = useForm();
+  const classes = useStyles()
+  const [form] = useForm()
 
   const columns = [
-    { title: "Vaccine/Diluents", dataIndex: "vaccine", type: "select" },
-    { title: "Batch Number", dataIndex: "batchNumber", type: "select" },
-    { title: "Expiry Date", dataIndex: "expiryDate", type: "date" },
-    { title: "Stock Quantity", dataIndex: "quantity", type: "number" },
-    { title: "Quantity", dataIndex: "stockQuantity", type: "number" },
-    { title: "VVM Status", dataIndex: "vvmStatus", type: "select" },
-    { title: "Manufacturer Details", dataIndex: "manufacturerDetails", type: "text" },
-    { title: "Action", dataIndex: "action", type: "remove" },
-  ];
+    { title: 'Vaccine/Diluents', dataIndex: 'vaccine', type: 'select' },
+    { title: 'Batch Number', dataIndex: 'batchNumber', type: 'select' },
+    { title: 'Expiry Date', dataIndex: 'expiryDate', type: 'date' },
+    { title: 'Stock Quantity', dataIndex: 'quantity', type: 'number' },
+    { title: 'Quantity', dataIndex: 'stockQuantity', type: 'number' },
+    {
+      title: 'VVM Status',
+      dataIndex: 'vvmStatus',
+      type: 'select',
+      options: [
+        // vaccine vial monitors
+        { value: 'Stage 1', label: 'Stage 1' },
+        { value: 'Stage 2', label: 'Stage 2' },
+        { value: 'Stage 3', label: 'Stage 3' },
+        { value: 'Stage 4', label: 'Stage 4' },
+      ],
+    },
+    {
+      title: 'Manufacturer Details',
+      dataIndex: 'manufacturerDetails',
+      type: 'text',
+    },
+    { title: 'Action', dataIndex: 'action', type: 'remove' },
+  ]
 
-  const { InputTable, values } = useInputTable({ columns });
+  const { InputTable, values } = useInputTable({ columns })
 
   const onSubmit = (values) => {
-    console.log(values);
-  };
+    console.log(values)
+  }
 
   return (
     <Card
@@ -55,7 +70,12 @@ const ReceiveStock = () => {
       title={<div className="text-xl font-semibold">Receive Stock</div>}
       actions={[
         <div className="flex w-full justify-end px-6">
-          <Button type="primary" className="mr-4" onClick={() => form.resetFields()} ghost>
+          <Button
+            type="primary"
+            className="mr-4"
+            onClick={() => form.resetFields()}
+            ghost
+          >
             Cancel
           </Button>
           <Button className={classes.btnPrimary} onClick={() => form.submit()}>
@@ -64,21 +84,27 @@ const ReceiveStock = () => {
         </div>,
       ]}
     >
-      <Form layout="vertical" form={form} onFinish={onSubmit}>
+      <Form layout="vertical" form={form} onFinish={onSubmit} className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
           <Form.Item
             label="Date Received"
             name="dateReceived"
-            rules={[{ required: true, message: "Please input the date received" }]}
+            rules={[
+              { required: true, message: 'Please input the date received' },
+            ]}
           >
             <DatePicker className="w-full" />
           </Form.Item>
-          <Form.Item label="Origin" rules={[{ required: true, message: "Please input the origin" }]} name="origin">
+          <Form.Item
+            label="Origin"
+            rules={[{ required: true, message: 'Please input the origin' }]}
+            name="origin"
+          >
             <Select
               name="origin"
               options={[
-                { value: "NPHCDA", label: "NPHCDA" },
-                { value: "State", label: "State" },
+                { value: 'NPHCDA', label: 'NPHCDA' },
+                { value: 'State', label: 'State' },
               ]}
               placeholder="Origin"
             />
@@ -87,15 +113,17 @@ const ReceiveStock = () => {
           <Form.Item
             label="Order Number"
             name="orderNumber"
-            rules={[{ required: true, message: "Please input the order number" }]}
+            rules={[
+              { required: true, message: 'Please input the order number' },
+            ]}
           >
-            <Input size="small" placeholder="Order number" />
+            <Input placeholder="Order number" />
           </Form.Item>
         </div>
         <InputTable />
       </Form>
     </Card>
-  );
-};
+  )
+}
 
-export default ReceiveStock;
+export default ReceiveStock

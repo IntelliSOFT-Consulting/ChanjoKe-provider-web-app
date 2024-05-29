@@ -32,6 +32,7 @@ import VVMStatusChange from '../components/StockManagement/VVMStatusChange'
 import NewOrder from '../components/StockManagement/NewOrder'
 import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
 import SentOrders from '../components/StockManagement/SentOrders'
+import Administration from '../components/StockManagement/Administration'
 import Ledger from '../components/StockManagement/Ledger'
 import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
 import Administer from '../components/AdministerVaccines/Administer'
@@ -42,6 +43,7 @@ import ContraindicationDetails from '../pages/ContraindicationDetails'
 import ReferralDetails from '../pages/ReferralDetails'
 import NewAppointment from '../components/ClientDetailsView/NewAppointment'
 import AEFIDetails from '../components/AEFI/AEFIDetails'
+import Referrals from '../pages/Referrals'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -129,6 +131,10 @@ const router = createBrowserRouter([
             element: <ReceivedOrders />,
           },
           { path: '/stock-management/sent-orders', element: <SentOrders /> },
+          {
+            path: '/stock-management/administration',
+            element: <Administration />,
+          },
           { path: '/stock-management/ledger', element: <Ledger /> },
         ],
       },
@@ -197,8 +203,13 @@ const router = createBrowserRouter([
         path: '/referral-details/:id',
         element: <ReferralDetails />,
       },
+      {
+        path: '/referrals',
+        element: <Referrals />,
+      },
     ],
   },
+
   {
     path: '/auth',
     element: <AuthRoute element={<Login />} />,

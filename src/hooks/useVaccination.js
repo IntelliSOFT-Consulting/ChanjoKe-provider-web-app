@@ -1,9 +1,8 @@
 import moment from 'moment'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useApiRequest } from '../api/useApiRequest'
 import { nonRoutineVaccines, routineVaccines } from '../data/vaccineData'
-import { formatCardTitle, getAgeInUnits } from '../utils/methods'
+import { formatCardTitle } from '../utils/methods'
 
 const recommendationsEndpoint = '/hapi/fhir/ImmunizationRecommendation'
 const immunizationsEndpoint = '/hapi/fhir/Immunization'
@@ -14,28 +13,16 @@ export default function useVaccination() {
   const [immunizations, setImmunizations] = useState(null)
   const [immunization, setImmunization] = useState(null)
 
-  const filterVaccinationRecommendations = (patient, recommendation) => {
-    const patientAge = getAgeInUnits(patient.birthDate, 'days')
+  const isEligibleByGender = (patientGender, vaccineGender) => {
+    if (!vaccineGender) return true
+    return patientGender?.toLowerCase() !== vaccineGender?.toLowerCase()
+  }
 
+  const filterVaccinationRecommendations = (patient) => {
     const filterVaccines = (vaccines) =>
-      vaccines.filter(({ adminRange, constraints, nhddCode, description }) => {
-        const eligibleByAge = patientAge <= adminRange.end
-        const eligibleByGender = constraints?.gender
-          ? patient.gender?.toLowerCase() !== constraints.gender?.toLowerCase()
-          : true
-
-        const isVaccineInSchedule = recommendation?.recommendation?.find(
-          (recommendation) =>
-            recommendation.vaccineCode?.[0]?.coding?.[0]?.code === nhddCode
-        )
-
-        return (
-          (eligibleByAge ||
-            isVaccineInSchedule ||
-            description === 'non-routine') &&
-          eligibleByGender
-        )
-      })
+      vaccines.filter(({ constraints }) =>
+        isEligibleByGender(patient.gender, constraints?.gender)
+      )
 
     return [
       ...filterVaccines(routineVaccines),
@@ -44,94 +31,69 @@ export default function useVaccination() {
   }
 
   const formatRecommendationsToFHIR = (patient, recommendation) => {
-    const recommendations = filterVaccinationRecommendations(
-      patient,
-      recommendation
-    )
+    const recommendations = filterVaccinationRecommendations(patient)
+
+    const formatDate = (date) => moment(date).format('YYYY-MM-DD')
+
+    const formatDateCriterion = (code, display, date) => ({
+      code: {
+        coding: [{ code, display }],
+      },
+      value: formatDate(date),
+    })
+
+    const formatRecommendation = (rec, birthDate) => {
+      const startDays = Number(rec.adminRange.start)
+      const endDays = Number(
+        rec.adminRange.end === Infinity ? 43800 : rec.adminRange.end
+      )
+
+      const earliestDate = moment(birthDate).add(startDays, 'days')
+      const latestDate = moment(birthDate).add(endDays, 'days')
+
+      return {
+        vaccineCode: {
+          coding: [{ code: rec.nhddCode, display: rec.vaccineCode }],
+          text: rec.vaccineName,
+        },
+        targetDisease: [
+          {
+            coding: [{ code: rec.diseaseTarget, display: rec.diseaseTarget }],
+            text: rec.diseaseTarget,
+          },
+        ],
+        forecastStatus: {
+          coding: [{ code: 'due', display: 'Due' }],
+        },
+        dateCriterion: [
+          formatDateCriterion(
+            'Earliest-date-to-administer',
+            'Earliest-date-to-administer',
+            earliestDate
+          ),
+          formatDateCriterion(
+            'Latest-date-to-administer',
+            'Latest-date-to-administer',
+            latestDate
+          ),
+        ],
+        series: formatCardTitle(rec.category),
+        description: rec.description,
+        doseNumberPositiveInt: rec.doseNumber,
+        seriesDosesString: rec.dependentVaccine
+          ? `${rec.dependentVaccine},${rec.dependencyPeriod}`
+          : null,
+      }
+    }
 
     return {
       resourceType: 'ImmunizationRecommendation',
       id: recommendation?.id,
-      patient: {
-        reference: `Patient/${patient.id}`,
-      },
-      date: moment().format('YYYY-MM-DD'),
-      recommendation: recommendations.map((recommendation) => {
-        let earliestDate = moment(patient.birthDate).add(
-          Number(recommendation.adminRange.start),
-          'days'
-        )
-
-        const latestDate = moment(patient.birthDate).add(
-          Number(
-            recommendation.adminRange.end === Infinity
-              ? 43800
-              : recommendation.adminRange.end
-          ),
-          'days'
-        )
-
-        return {
-          vaccineCode: {
-            coding: [
-              {
-                code: recommendation.nhddCode,
-                display: recommendation.vaccineCode,
-              },
-            ],
-            text: recommendation.vaccineName,
-          },
-          targetDisease: [
-            {
-              coding: [
-                {
-                  code: recommendation.diseaseTarget,
-                  display: recommendation.diseaseTarget,
-                },
-              ],
-              text: recommendation.diseaseTarget,
-            },
-          ],
-          forecastStatus: {
-            coding: [
-              {
-                code: 'due',
-                display: 'Due',
-              },
-            ],
-          },
-          dateCriterion: [
-            {
-              code: {
-                coding: [
-                  {
-                    code: 'Earliest-date-to-administer',
-                    display: 'Earliest-date-to-administer',
-                  },
-                ],
-              },
-              value: earliestDate.format('YYYY-MM-DD'),
-            },
-            {
-              code: {
-                coding: [
-                  {
-                    code: 'Latest-date-to-administer',
-                    display: 'Latest-date-to-administer',
-                  },
-                ],
-              },
-              value: latestDate.format('YYYY-MM-DD'),
-            },
-          ],
-          series: formatCardTitle(recommendation.category),
-          description: recommendation.description,
-          doseNumberPositiveInt: recommendation.doseNumber,
-          seriesDosesString: recommendation.dependentVaccine
-            ? `${recommendation.dependentVaccine},${recommendation.dependencyPeriod}`
-            : null,
-        }
-      }),
+      patient: { reference: `Patient/${patient.id}` },
+      date: formatDate(moment()),
+      recommendation: recommendations.map((rec) =>
+        formatRecommendation(rec, patient.birthDate)
+      ),
     }
   }
 
