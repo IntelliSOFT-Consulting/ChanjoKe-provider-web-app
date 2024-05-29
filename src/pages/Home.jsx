@@ -36,7 +36,7 @@ const stats = [
     icon: StockManagementIcon,
     href: 'stock-management',
   },
-  { name: 'Referrals', icon: ReferralIcon, href: 'search/referrals' },
+  { name: 'Referrals', icon: ReferralIcon, href: 'referrals' },
 ]
 
 const statsTwo = [

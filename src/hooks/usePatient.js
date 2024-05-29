@@ -19,14 +19,14 @@ export default function usePatient() {
             coding: [
               {
                 system: 'http://hl7.org/fhir/administrative-identifier',
-                code: data.identificationType?.toLowerCase(),
+                code: 'identification_type',
                 display: data.identificationType,
-                value: data.identificationType,
+                value: data.identificationNumber,
               },
             ],
             text: data.identificationNumber,
           },
-          system: 'identification',
+          system: 'identification_type',
           value: data.identificationNumber,
         },
         {
