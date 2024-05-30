@@ -13,6 +13,7 @@ import UpdateClientLogo from '../common/icons/updateClientLogo'
 import DefaulterTracingLogo from '../common/icons/defaulterTracingLogo'
 import SearchLogo from '../common/icons/searchLogo'
 import AppointmentLogo from '../common/icons/appointmentLogo'
+import ReferralIcon from '../common/icons/referralLogo'
 
 const iconComponents = {
   aefiLogo: AefiLogo,
@@ -24,6 +25,7 @@ const iconComponents = {
   defaulterTracingLogo: DefaulterTracingLogo,
   searchLogo: SearchLogo,
   appointmentLogo: AppointmentLogo,
+  referralIcon: ReferralIcon,
 }
 
 function classNames(...classes) {
@@ -98,6 +100,7 @@ export default function Sidenav() {
       icon: 'appointmentLogo',
     },
     { name: 'AEFI', href: '/search/aefi', icon: 'aefiLogo' },
+    { name: 'Referrals', href: '/referrals', icon: 'referralIcon' },
     {
       name: 'Defaulter Tracing',
       href: '/defaulter-tracing',

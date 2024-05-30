@@ -25,11 +25,24 @@ export default function Referrals() {
       const patient = patients?.find(
         (patient) => patient.id === referral.subject.reference.split('/')[1]
       )
+
+      let phone = patient?.telecom[0].value
+
+      if (!phone && patient.contact) {
+        const contact = patient.contact.find(
+          (contact) => contact.telecom[0].system === 'phone'
+        )
+
+        if (contact) {
+          phone = `${contact.telecom[0].value} (${contact.relationship[0].coding[0].display})`
+        }
+      }
+
       return {
         id: referral.id,
         patientName: `${patient?.name[0].given[0]} ${patient?.name[0].family}`,
         patientId: patient?.identifier[0].value,
-        phone: patient?.telecom[0].value,
+        phone: phone || '-',
         patientResourceId: patient?.id,
       }
     })
@@ -122,42 +135,35 @@ export default function Referrals() {
         <div className="text-2xl font-semibold py-5">Referrals</div>
       </div>
 
-      <div className="grid grid-cols-1 gap-10 mx-7 px-10 py-10">
+      <div className="grid grid-cols-1 gap-5 mx-7 px-10 py-10">
         <Form form={form} layout="vertical" onFinish={handleSearch}>
-          <div className="grid grid-cols-1 md:grid-cols-2 ">
-            <Form.Item name="date" label="Date Range" className='w-full'>
+          <div className="flex gap-5 md:col-span-2 w-full items-end ">
+            <Form.Item name="date" label="Start/End Date" className="w-full">
               <DatePicker.RangePicker
                 onChange={() => handleSearch()}
-                className='w-full'
-                size="large"
+                className="w-full"
+                format="DD-MM-YYYY"
               />
             </Form.Item>
-            <div className="flex gap-5 md:col-span-2 w-full items-end">
-              <Form.Item
-                name="patientName"
-                label="Search Client"
-                className="w-full"
-              >
-                <Input
-                  placeholder="Search Client"
-                  onChange={debounce(() => handleSearch(), 500)}
-                  allowClear
-                  className="w-full"
-                  size="large"
-                />
-              </Form.Item>
 
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  className="w-full"
-                  size="large"
-                >
-                  Search
-                </Button>
-              </Form.Item>
-            </div>
+            <Form.Item
+              name="patientName"
+              label="Client Name/ID"
+              className="w-full"
+            >
+              <Input
+                placeholder="Client Name/ID"
+                onChange={debounce(() => handleSearch(), 500)}
+                allowClear
+                className="w-full"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" className="w-full">
+                Search
+              </Button>
+            </Form.Item>
           </div>
         </Form>
         <Table
