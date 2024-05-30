@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { DatePicker, Form, Input } from 'antd'
+import { DatePicker, Form, Input, Select } from 'antd'
 import Table from '../components/DataTable'
 import { useApiRequest } from '../api/useApiRequest'
 import { debounce } from '../utils/methods'
+import moment from 'moment'
+import { routineVaccines, nonRoutineVaccines } from '../data/vaccineData'
 
 export default function DefaulterTracing() {
   const [defaulters, setDefaulters] = useState([])
@@ -11,6 +13,14 @@ export default function DefaulterTracing() {
   const { get } = useApiRequest()
 
   const [form] = Form.useForm()
+
+  const formatVaccines = () => {
+    const vaccines = [...routineVaccines, ...nonRoutineVaccines]
+    return vaccines.map((vaccine) => ({
+      value: vaccine.vaccineName,
+      label: vaccine.vaccineName,
+    }))
+  }
 
   const fetcbDefaulters = async (params) => {
     let query = '/reports/api/defaulters?'
@@ -53,7 +63,7 @@ export default function DefaulterTracing() {
       render: (_text, record) => `${record.given_name} ${record.family_name}`,
     },
     {
-      title: 'Unique ID',
+      title: 'ID Number',
       dataIndex: 'national_id',
       key: 'national_id',
     },
@@ -76,6 +86,7 @@ export default function DefaulterTracing() {
       title: 'Scheduled Date',
       dataIndex: 'due_date',
       key: 'due_date',
+      render: (text) => moment(text).format('DD-MM-YYYY'),
     },
   ]
 
@@ -106,16 +117,19 @@ export default function DefaulterTracing() {
                 handleChange()
               }, 500)}
               className="w-full"
+              format="DD-MM-YYYY"
             />
           </Form.Item>
 
           <Form.Item label="Vaccine" name="vaccineName">
-            <Input
-              placeholder="Enter Vaccine Name"
+            <Select
+              placeholder="Select Vaccine"
               onChange={debounce(() => {
                 handleChange()
               }, 500)}
               allowClear
+              options={formatVaccines()}
+              showSearch
             />
           </Form.Item>
         </Form>
