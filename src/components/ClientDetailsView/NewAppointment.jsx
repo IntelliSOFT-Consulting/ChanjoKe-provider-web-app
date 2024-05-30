@@ -21,12 +21,21 @@ export default function NewAppointment() {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
   const [loadingAppointment, setLoading] = useState(false)
 
+  function filterOutMatchingVaccines(vaccinesList = [], otherList = []) {
+    console.log({ vaccinesList })
+    // const otherVaccinesSet = new Set(otherList.map(item => item?.vaccineCode?.text));
+    // console.log({ otherVaccinesSet, otherList })
+    // const filteredList = vaccinesList.filter(item => !otherVaccinesSet.has(item?.resource?.vaccineCode?.text));
+
+    return [];
+}
+
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
 
-    // const appointments = await get(
-    //   `/hapi/fhir/Appointment?supporting-info=Patient/${userID}`
-    // )
+    const vaccines = await get(
+      `/hapi/fhir/Immunization?patient=Patient/${userID}`
+    )
 
     const response = await get(
       `/hapi/fhir/ImmunizationRecommendation?patient=Patient/${userID}`
@@ -41,6 +50,15 @@ export default function NewAppointment() {
             return vaccine;
         }
       }).filter(vaccine => vaccine !== undefined);
+
+      const filteredVaccines = filterOutMatchingVaccines(vaccines?.entry, canMakeAppointment);
+
+      console.log({
+        canMakeAppointment,
+        recommendation,
+        vaccines,
+        filteredVaccines
+      })
       setAppointmentList(canMakeAppointment)
       setLoadingRecommendations(false)
     } else {
@@ -64,6 +82,7 @@ export default function NewAppointment() {
     setLoading(true)
     const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
+      console.log({ vaccineData })
       await createNewAppointment(vaccineData)
     })
 
@@ -94,7 +113,7 @@ export default function NewAppointment() {
                       name="addvaccines"
                       label={
                         <div>
-                          <span className="font-bold">Add vaccines</span>
+                          <span className="font-bold">Add Vaccines</span>
                         </div>
                       }>
 
@@ -114,21 +133,21 @@ export default function NewAppointment() {
                           }
 
                           {!loadingRecommendations && <Select
-                        size='large'
-                        onChange={(e) => {
-                          const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
-                          setVaccineAppointments([...vaccinesAppointments, vaccine ])
+                            size='large'
+                            onChange={(e) => {
+                              const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+                              setVaccineAppointments([...vaccinesAppointments, vaccine ])
 
-                          const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
-                          setAppointmentList(vaccines)
-                        }}>
-                        {vaccinesToAppoint.map((option) => (
-                          <Select.Option
-                            value={option?.vaccineCode?.[0]?.text}>
-                            {option?.vaccineCode?.[0]?.text}
-                          </Select.Option>
-                        ))}
-                      </Select>}
+                              const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+                              setAppointmentList(vaccines)
+                            }}>
+                            {vaccinesToAppoint.map((option) => (
+                              <Select.Option
+                                value={option?.vaccineCode?.[0]?.text}>
+                                {option?.vaccineCode?.[0]?.text}
+                              </Select.Option>
+                            ))}
+                          </Select>}
                       
                     </Form.Item>
                   </Col>
@@ -150,16 +169,16 @@ export default function NewAppointment() {
           
           <Row className='mt-5 px-6' gutter={16}>
 
-            <Col className='gutter-row' span={3}>
+            <Col className='gutter-row' span={11}>
               <h3 className='text-1xl font-bold mt-10'>{vacc?.vaccineCode?.[0]?.text}</h3>
             </Col>
 
-            <Col className='gutter-row' span={10}>
+            <Col className='gutter-row' span={6}>
               <Form.Item
                  name="scheduledDate"
                  label={
                    <div>
-                     <span className="font-bold">Scheduled Date</span>
+                     <span className="font-bold pl-1">Scheduled Date</span>
                    </div>
                  }>
                 <DatePicker
@@ -170,12 +189,12 @@ export default function NewAppointment() {
               </Form.Item>
             </Col>
 
-            <Col className='gutter-row' span={10}>
+            <Col className='gutter-row' span={6}>
               <Form.Item
                 name={`${vacc?.vaccineCode?.[0]?.text}`}
                  label={
                    <div>
-                     <span className="font-bold">Appointment Date</span>
+                     <span className="font-bold pl-1">Appointment Date</span>
                    </div>
                  }
                  rules={[

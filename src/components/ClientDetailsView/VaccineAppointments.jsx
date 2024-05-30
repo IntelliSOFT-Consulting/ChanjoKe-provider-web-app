@@ -7,10 +7,14 @@ import { LoadingOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 
 export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
-  const { get } = useApiRequest()
+  const { get, put } = useApiRequest()
 
   const [appointments, setAppointments] = useState([])
   const [loadingAppointments, setLoadingAppointments] = useState(false)
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
   const fetchPatientImmunization = async () => {
     setLoadingAppointments(true)
@@ -22,14 +26,28 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         appointments: appointment?.resource?.description,
         scheduledDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
         appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
-        status: appointment?.resource?.status,
-        actions: [
-          { title: 'edit', url: '/' }
-        ]
+        status: capitalizeFirstLetter(appointment?.resource?.status),
+        actions: appointment?.resource?.status === 'cancelled' ? 
+         [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }] :
+         [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }, { title: 'cancel', btnAction: { appointment: `${JSON.stringify(appointment?.resource)}`, targetName: 'cancelAppointment' }}]
       }))
       setAppointments(appointments)
       setLoadingAppointments(false)
     } else {
+      setLoadingAppointments(false)
+    }
+  }
+
+  const handleActionBtn = async (payload) => {
+    const appointment = JSON.parse(payload?.appointment)
+    setLoadingAppointments(true)
+    const response = await put(
+      `/hapi/fhir/Appointment/${appointment?.id}`,
+      { ...appointment, status: 'cancelled' }
+    )
+    console.log({ response })
+    if (response) {
+      fetchPatientImmunization()
       setLoadingAppointments(false)
     }
   }
@@ -53,7 +71,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
       <Row
         gutter={16}
-        className='mb-10'>
+        className='mb-10 px-8'>
         <Col
           md={12}
           sm={24}>
@@ -88,6 +106,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
 
       {!loadingAppointments && appointments.length > 0 &&
         <SearchTable
+          onActionBtn={handleActionBtn}
           headers={tHeaders}
           data={appointments} />}
 

@@ -24,7 +24,10 @@ const createVaccinationAppointment = (data, patientID, recommendationID) => {
         "description": `${data?.vaccineCode?.[0]?.text} vaccination`,
         "supportingInformation": [
           {
-            "reference": `Patient/${patientID}`
+            "reference": `Patient/${patientID}`,
+          },
+          {
+            "doseNumber": data?.doseNumberPositiveInt,
           }
         ],
         "start": moment(data?.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm:ssZ'),
