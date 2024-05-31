@@ -1,46 +1,38 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { useApiRequest } from "../../api/useApiRequest"
-import { Spin, Form, Col, Row, DatePicker } from "antd"
-import { LoadingOutlined } from "@ant-design/icons"
+import { Form, Col, Row, DatePicker, Button } from "antd"
+import useAppointment from "../../hooks/useAppointment"
 import dayjs from "dayjs"
 
 export default function EditAppointment() {
   const { appointmentID } = useParams()
   const navigate = useNavigate()
-  const { get, put } = useApiRequest()
   const [form] = Form.useForm()
 
-  const [appointment, setAppointment] = useState({})
+  const {
+    appointment,
+    getAppointment,
+    updateAppointment,
+  } = useAppointment()
   const [loading, setLoader] = useState(false)
 
   const fetchAppointment = async () => {
     setLoader(true)
-    const response = await get(
-      `/hapi/fhir/Appointment/${appointmentID}`
-    )
-
-    if (Object.keys(response).length > 0) {
-      setAppointment(response)
-      form.setFieldValue('scheduledDate', dayjs(response?.created))
-      form.setFieldValue('appointmentDate', dayjs(response?.start))
-      setLoader(false)
-    } else {
-      setLoader(false)
-    }
+    await getAppointment(appointmentID)
+    setLoader(false)
   }
 
   const onFinish = async (values) => {
     setLoader(true)
     const datedd = dayjs(values?.appointmentDate).format('YYYY-MM-DDTHH:mm:ssZ')
-    const response = await put(
-      `/hapi/fhir/Appointment/${appointmentID}`,
-      { ...appointment, start: datedd }
-    )
-    if (response) {
-      setLoader(false)
-    }
+    await updateAppointment(appointmentID, { ...appointment, start: datedd, status: 'booked' })
+    setLoader(false)
   }
+
+  useEffect(() => {
+    form.setFieldValue('scheduledDate', dayjs(appointment?.created))
+    form.setFieldValue('appointmentDate', dayjs(appointment?.start))
+  }, [appointment])
 
   useEffect(() => {
     fetchAppointment()
@@ -106,17 +98,18 @@ export default function EditAppointment() {
             </Row>
 
             <div className="px-4 py-4 sm:px-6 flex justify-end">
-              <button
+              <Button
                 onClick={() => navigate(-1)}
-                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] px-5 py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                className="ml-4 flex-shrink-0 rounded-md outline outline-[#163C94] py-2 text-sm font-semibold text-[#163C94] shadow-sm hover:bg-[#163C94] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 htmlType="submit"
-                className='ml-4 outline outline-[#163C94] rounded-md px-5 py-2 bg-[#163C94] outline-2 text-white'>
-                  {loading && <><Spin indicator={ <LoadingOutlined style={{ fontSize: 24, color: 'white', marginRight: '8px' }} spin /> }/></>}
+                type="primary"
+                loading={loading}
+                className='ml-4 outline outline-[#163C94] rounded-md px-5 bg-[#163C94] outline-2 text-white'>
                 Update
-              </button>
+              </Button>
             </div>
 
           </Form>

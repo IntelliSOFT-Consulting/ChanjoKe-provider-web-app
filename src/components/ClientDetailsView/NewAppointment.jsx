@@ -2,17 +2,21 @@ import { Col, Row, DatePicker, Form, Select, Spin } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useApiRequest } from '../../api/useApiRequest'
+import useVaccination from '../../hooks/useVaccination'
 import dayjs from 'dayjs'
 import { lockVaccine } from '../../utils/validate'
 import {  createVaccinationAppointment } from './DataWrapper'
 import { LoadingOutlined } from '@ant-design/icons'
+import useAppointment from '../../hooks/useAppointment'
 
 export default function NewAppointment() {
 
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const { get, post } = useApiRequest()
+  const { post } = useApiRequest()
+  const { getRecommendations } = useVaccination()
+  const { createAppointment} = useAppointment()
 
   const [vaccinesToAppoint, setAppointmentList] = useState([])
   const [vaccinesAppointments, setVaccineAppointments] = useState([])
@@ -21,28 +25,14 @@ export default function NewAppointment() {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
   const [loadingAppointment, setLoading] = useState(false)
 
-  function filterOutMatchingVaccines(vaccinesList = [], otherList = []) {
-    console.log({ vaccinesList })
-    // const otherVaccinesSet = new Set(otherList.map(item => item?.vaccineCode?.text));
-    // console.log({ otherVaccinesSet, otherList })
-    // const filteredList = vaccinesList.filter(item => !otherVaccinesSet.has(item?.resource?.vaccineCode?.text));
-
-    return [];
-}
-
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
 
-    const vaccines = await get(
-      `/hapi/fhir/Immunization?patient=Patient/${userID}`
-    )
+    const recommendations = await getRecommendations(userID)
 
-    const response = await get(
-      `/hapi/fhir/ImmunizationRecommendation?patient=Patient/${userID}`
-    )
-    setRecommendationID(response?.entry?.[0]?.resource?.id)
-    if (response.entry && Array.isArray(response.entry)) {
-      const recommendation = response?.entry?.[0]?.resource?.recommendation
+    setRecommendationID(recommendations?.id)
+    if (Array.isArray(recommendations?.recommendation)) {
+      const recommendation = recommendations?.recommendation
 
       const canMakeAppointment = recommendation.map((vaccine) => {
         const locked = lockVaccine(dayjs(vaccine?.dateCriterion?.[0]?.value), dayjs(vaccine?.dateCriterion?.[1]?.value))
@@ -51,26 +41,11 @@ export default function NewAppointment() {
         }
       }).filter(vaccine => vaccine !== undefined);
 
-      const filteredVaccines = filterOutMatchingVaccines(vaccines?.entry, canMakeAppointment);
-
-      console.log({
-        canMakeAppointment,
-        recommendation,
-        vaccines,
-        filteredVaccines
-      })
       setAppointmentList(canMakeAppointment)
       setLoadingRecommendations(false)
     } else {
       setLoadingRecommendations(false)
     }
-  }
-
-  const createNewAppointment = async (appointmentData) => {
-    const response = await post(
-      `/hapi/fhir/Appointment`, appointmentData
-    )
-    console.log({ response })
   }
 
   useEffect(() => {
@@ -82,8 +57,7 @@ export default function NewAppointment() {
     setLoading(true)
     const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
-      console.log({ vaccineData })
-      await createNewAppointment(vaccineData)
+      await createAppointment(vaccineData)
     })
 
     await Promise.all(appointmentPromises)

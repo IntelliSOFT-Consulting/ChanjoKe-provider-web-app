@@ -1,55 +1,23 @@
 import SearchTable from '../../common/tables/SearchTable'
 import { useNavigate } from 'react-router-dom'
 import { Col, Row, Button, DatePicker, Spin } from 'antd'
-import { useEffect, useState } from 'react'
-import { useApiRequest } from '../../api/useApiRequest'
+import { useEffect } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
-import dayjs from 'dayjs'
+import useAppointment from '../../hooks/useAppointment'
 
 export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
-  const { get, put } = useApiRequest()
-
-  const [appointments, setAppointments] = useState([])
-  const [loadingAppointments, setLoadingAppointments] = useState(false)
-
-  function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-
-  const fetchPatientImmunization = async () => {
-    setLoadingAppointments(true)
-    const response = await get(
-      `/hapi/fhir/Appointment?supporting-info=Patient/${patientData?.id}`
-    )
-    if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
-      const appointments = response?.entry.map((appointment) => ({
-        appointments: appointment?.resource?.description,
-        scheduledDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
-        appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
-        status: capitalizeFirstLetter(appointment?.resource?.status),
-        actions: appointment?.resource?.status === 'cancelled' ? 
-         [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }] :
-         [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }, { title: 'cancel', btnAction: { appointment: `${JSON.stringify(appointment?.resource)}`, targetName: 'cancelAppointment' }}]
-      }))
-      setAppointments(appointments)
-      setLoadingAppointments(false)
-    } else {
-      setLoadingAppointments(false)
-    }
-  }
+  const {
+    loader,
+    appointments,
+    getPatientAppointments,
+    updateAppointment,
+  } = useAppointment()
 
   const handleActionBtn = async (payload) => {
     const appointment = JSON.parse(payload?.appointment)
-    setLoadingAppointments(true)
-    const response = await put(
-      `/hapi/fhir/Appointment/${appointment?.id}`,
-      { ...appointment, status: 'cancelled' }
-    )
-    console.log({ response })
-    if (response) {
-      fetchPatientImmunization()
-      setLoadingAppointments(false)
-    }
+
+    await updateAppointment(appointment?.id, { ...appointment, status: 'cancelled' })
+    getPatientAppointments(patientData?.id)
   }
 
   const tHeaders = [
@@ -63,7 +31,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchPatientImmunization()
+    getPatientAppointments(patientData?.id)
   }, [userCategory])
 
   return (
@@ -89,7 +57,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         </Col>
       </Row>
 
-      {loadingAppointments && 
+      {loader && 
         <div className='text-center'>
           <Spin
             indicator={
@@ -104,13 +72,13 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         </div>
         }
 
-      {!loadingAppointments && appointments.length > 0 &&
+      {!loader && appointments.length > 0 &&
         <SearchTable
           onActionBtn={handleActionBtn}
           headers={tHeaders}
           data={appointments} />}
 
-      {!loadingAppointments && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
+      {!loader && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
 
     </div>
   )
