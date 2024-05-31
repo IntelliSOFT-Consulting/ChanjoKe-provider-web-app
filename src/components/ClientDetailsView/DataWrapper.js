@@ -21,7 +21,7 @@ const createVaccinationAppointment = (data, patientID, recommendationID) => {
     return {
         "resourceType": "Appointment",
         "status": "booked",
-        "description": `${data?.vaccineCode?.[0]?.text} vaccination`,
+        "description": `${data?.vaccineCode?.[0]?.text}`,
         "supportingInformation": [
           {
             "reference": `Patient/${patientID}`,
