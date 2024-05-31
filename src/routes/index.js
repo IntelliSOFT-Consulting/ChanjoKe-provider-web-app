@@ -44,6 +44,7 @@ import ReferralDetails from '../pages/ReferralDetails'
 import NewAppointment from '../components/ClientDetailsView/NewAppointment'
 import AEFIDetails from '../components/AEFI/AEFIDetails'
 import Referrals from '../pages/Referrals'
+import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -186,6 +187,10 @@ const router = createBrowserRouter([
       {
         path: '/new-appointment/:userID',
         element: <NewAppointment />,
+      },
+      {
+        path: '/edit-appointment/:appointmentID',
+        element: <EditAppointment />
       },
       {
         path: '/view-contraindication/:contraindicationID',

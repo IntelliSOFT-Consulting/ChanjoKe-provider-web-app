@@ -1,37 +1,23 @@
 import SearchTable from '../../common/tables/SearchTable'
 import { useNavigate } from 'react-router-dom'
 import { Col, Row, Button, DatePicker, Spin } from 'antd'
-import { useEffect, useState } from 'react'
-import { useApiRequest } from '../../api/useApiRequest'
+import { useEffect } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
-import dayjs from 'dayjs'
+import useAppointment from '../../hooks/useAppointment'
 
 export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
-  const { get } = useApiRequest()
+  const {
+    loader,
+    appointments,
+    getPatientAppointments,
+    updateAppointment,
+  } = useAppointment()
 
-  const [appointments, setAppointments] = useState([])
-  const [loadingAppointments, setLoadingAppointments] = useState(false)
+  const handleActionBtn = async (payload) => {
+    const appointment = JSON.parse(payload?.appointment)
 
-  const fetchPatientImmunization = async () => {
-    setLoadingAppointments(true)
-    const response = await get(
-      `/hapi/fhir/Appointment?supporting-info=Patient/${patientData?.id}`
-    )
-    if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
-      const appointments = response?.entry.map((appointment) => ({
-        appointments: appointment?.resource?.description,
-        scheduledDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
-        appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
-        status: appointment?.resource?.status,
-        actions: [
-          { title: 'edit', url: '/' }
-        ]
-      }))
-      setAppointments(appointments)
-      setLoadingAppointments(false)
-    } else {
-      setLoadingAppointments(false)
-    }
+    await updateAppointment(appointment?.id, { ...appointment, status: 'cancelled' })
+    getPatientAppointments(patientData?.id)
   }
 
   const tHeaders = [
@@ -45,7 +31,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetchPatientImmunization()
+    getPatientAppointments(patientData?.id)
   }, [userCategory])
 
   return (
@@ -53,7 +39,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
       <Row
         gutter={16}
-        className='mb-10'>
+        className='mb-10 px-8'>
         <Col
           md={12}
           sm={24}>
@@ -71,7 +57,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         </Col>
       </Row>
 
-      {loadingAppointments && 
+      {loader && 
         <div className='text-center'>
           <Spin
             indicator={
@@ -86,12 +72,13 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         </div>
         }
 
-      {!loadingAppointments && appointments.length > 0 &&
+      {!loader && appointments.length > 0 &&
         <SearchTable
+          onActionBtn={handleActionBtn}
           headers={tHeaders}
           data={appointments} />}
 
-      {!loadingAppointments && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
+      {!loader && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
 
     </div>
   )

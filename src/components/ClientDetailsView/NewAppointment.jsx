@@ -2,17 +2,21 @@ import { Col, Row, DatePicker, Form, Select, Spin } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useApiRequest } from '../../api/useApiRequest'
+import useVaccination from '../../hooks/useVaccination'
 import dayjs from 'dayjs'
 import { lockVaccine } from '../../utils/validate'
 import {  createVaccinationAppointment } from './DataWrapper'
 import { LoadingOutlined } from '@ant-design/icons'
+import useAppointment from '../../hooks/useAppointment'
 
 export default function NewAppointment() {
 
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const { get, post } = useApiRequest()
+  const { post } = useApiRequest()
+  const { getRecommendations } = useVaccination()
+  const { createAppointment} = useAppointment()
 
   const [vaccinesToAppoint, setAppointmentList] = useState([])
   const [vaccinesAppointments, setVaccineAppointments] = useState([])
@@ -24,16 +28,11 @@ export default function NewAppointment() {
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
 
-    // const appointments = await get(
-    //   `/hapi/fhir/Appointment?supporting-info=Patient/${userID}`
-    // )
+    const recommendations = await getRecommendations(userID)
 
-    const response = await get(
-      `/hapi/fhir/ImmunizationRecommendation?patient=Patient/${userID}`
-    )
-    setRecommendationID(response?.entry?.[0]?.resource?.id)
-    if (response.entry && Array.isArray(response.entry)) {
-      const recommendation = response?.entry?.[0]?.resource?.recommendation
+    setRecommendationID(recommendations?.id)
+    if (Array.isArray(recommendations?.recommendation)) {
+      const recommendation = recommendations?.recommendation
 
       const canMakeAppointment = recommendation.map((vaccine) => {
         const locked = lockVaccine(dayjs(vaccine?.dateCriterion?.[0]?.value), dayjs(vaccine?.dateCriterion?.[1]?.value))
@@ -41,18 +40,12 @@ export default function NewAppointment() {
             return vaccine;
         }
       }).filter(vaccine => vaccine !== undefined);
+
       setAppointmentList(canMakeAppointment)
       setLoadingRecommendations(false)
     } else {
       setLoadingRecommendations(false)
     }
-  }
-
-  const createNewAppointment = async (appointmentData) => {
-    const response = await post(
-      `/hapi/fhir/Appointment`, appointmentData
-    )
-    console.log({ response })
   }
 
   useEffect(() => {
@@ -64,7 +57,7 @@ export default function NewAppointment() {
     setLoading(true)
     const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
-      await createNewAppointment(vaccineData)
+      await createAppointment(vaccineData)
     })
 
     await Promise.all(appointmentPromises)
@@ -94,7 +87,7 @@ export default function NewAppointment() {
                       name="addvaccines"
                       label={
                         <div>
-                          <span className="font-bold">Add vaccines</span>
+                          <span className="font-bold">Add Vaccines</span>
                         </div>
                       }>
 
@@ -114,21 +107,21 @@ export default function NewAppointment() {
                           }
 
                           {!loadingRecommendations && <Select
-                        size='large'
-                        onChange={(e) => {
-                          const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
-                          setVaccineAppointments([...vaccinesAppointments, vaccine ])
+                            size='large'
+                            onChange={(e) => {
+                              const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+                              setVaccineAppointments([...vaccinesAppointments, vaccine ])
 
-                          const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
-                          setAppointmentList(vaccines)
-                        }}>
-                        {vaccinesToAppoint.map((option) => (
-                          <Select.Option
-                            value={option?.vaccineCode?.[0]?.text}>
-                            {option?.vaccineCode?.[0]?.text}
-                          </Select.Option>
-                        ))}
-                      </Select>}
+                              const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+                              setAppointmentList(vaccines)
+                            }}>
+                            {vaccinesToAppoint.map((option) => (
+                              <Select.Option
+                                value={option?.vaccineCode?.[0]?.text}>
+                                {option?.vaccineCode?.[0]?.text}
+                              </Select.Option>
+                            ))}
+                          </Select>}
                       
                     </Form.Item>
                   </Col>
@@ -150,16 +143,16 @@ export default function NewAppointment() {
           
           <Row className='mt-5 px-6' gutter={16}>
 
-            <Col className='gutter-row' span={3}>
+            <Col className='gutter-row' span={11}>
               <h3 className='text-1xl font-bold mt-10'>{vacc?.vaccineCode?.[0]?.text}</h3>
             </Col>
 
-            <Col className='gutter-row' span={10}>
+            <Col className='gutter-row' span={6}>
               <Form.Item
                  name="scheduledDate"
                  label={
                    <div>
-                     <span className="font-bold">Scheduled Date</span>
+                     <span className="font-bold pl-1">Scheduled Date</span>
                    </div>
                  }>
                 <DatePicker
@@ -170,12 +163,12 @@ export default function NewAppointment() {
               </Form.Item>
             </Col>
 
-            <Col className='gutter-row' span={10}>
+            <Col className='gutter-row' span={6}>
               <Form.Item
                 name={`${vacc?.vaccineCode?.[0]?.text}`}
                  label={
                    <div>
-                     <span className="font-bold">Appointment Date</span>
+                     <span className="font-bold pl-1">Appointment Date</span>
                    </div>
                  }
                  rules={[

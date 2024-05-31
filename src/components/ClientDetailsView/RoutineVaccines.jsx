@@ -106,7 +106,6 @@ export default function RoutineVaccines({
   const handleDialogClose = () => {
     setDialogOpen(false)
   }
-  console.log('routineVaccines', routineVaccines)
 
   const administerVaccineBtns = [
     {
