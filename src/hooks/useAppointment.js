@@ -52,7 +52,7 @@ export default function useAppointment() {
         appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
         status: capitalizeFirstLetter(appointment?.resource?.status),
         actions: appointment?.resource?.status === 'cancelled' ? 
-         [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }] :
+         [] :
          [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }, { title: 'cancel', btnAction: { appointment: `${JSON.stringify(appointment?.resource)}`, targetName: 'cancelAppointment' }}]
       }))
       setAppointments(appointmentsResponse)

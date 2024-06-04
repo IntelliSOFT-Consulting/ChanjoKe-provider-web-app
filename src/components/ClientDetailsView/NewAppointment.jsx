@@ -1,7 +1,6 @@
 import { Col, Row, DatePicker, Form, Select, Spin } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { useApiRequest } from '../../api/useApiRequest'
 import useVaccination from '../../hooks/useVaccination'
 import dayjs from 'dayjs'
 import { lockVaccine } from '../../utils/validate'
@@ -14,7 +13,6 @@ export default function NewAppointment() {
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const { post } = useApiRequest()
   const { getRecommendations } = useVaccination()
   const { createAppointment} = useAppointment()
 
@@ -41,7 +39,7 @@ export default function NewAppointment() {
         }
       }).filter(vaccine => vaccine !== undefined);
 
-      setAppointmentList(canMakeAppointment)
+      setAppointmentList(canMakeAppointment.filter((vaccine) => vaccine.description === 'routine'))
       setLoadingRecommendations(false)
     } else {
       setLoadingRecommendations(false)
