@@ -13,8 +13,8 @@ export default function NewAppointment() {
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const { getRecommendations } = useVaccination()
-  const { createAppointment} = useAppointment()
+  const { getRecommendations, getImmunizations } = useVaccination()
+  const { createAppointment, getPatientAppointments} = useAppointment()
 
   const [vaccinesToAppoint, setAppointmentList] = useState([])
   const [vaccinesAppointments, setVaccineAppointments] = useState([])
@@ -23,10 +23,30 @@ export default function NewAppointment() {
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
   const [loadingAppointment, setLoading] = useState(false)
 
+  function removeVaccineWord(inputString) {
+    return inputString.replace(/vaccination/gi, '');
+  }
+
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
 
     const recommendations = await getRecommendations(userID)
+    const immunizations = await getImmunizations(userID)
+    const appointments = await getPatientAppointments(userID)
+    const doneImmunizations = []
+    const existingAppointments = []
+
+    // Filter out appointments that have been completed, user should not create an appointment for an existing
+    // completed vaccine administration
+    if (Array.isArray(immunizations) && immunizations.length > 0) {
+      const doneVaccines = immunizations.filter((vaccine) => vaccine.status === 'completed')
+      doneVaccines.forEach((vaccine) => doneImmunizations.push(vaccine?.vaccineCode?.text))
+    }
+
+    // Filter out existing appointments to avoid duplication
+    if (Array.isArray(appointments) && appointments.length > 0) {
+      appointments.forEach((appointment) => existingAppointments.push(removeVaccineWord(appointment?.appointments)))
+    }
 
     setRecommendationID(recommendations?.id)
     if (Array.isArray(recommendations?.recommendation)) {
@@ -39,7 +59,11 @@ export default function NewAppointment() {
         }
       }).filter(vaccine => vaccine !== undefined);
 
-      setAppointmentList(canMakeAppointment.filter((vaccine) => vaccine.description === 'routine'))
+      const completedImmunizations = canMakeAppointment.filter((vaccine) => !doneImmunizations.includes(vaccine?.vaccineCode?.[0]?.text))
+      const existingAppoinentImmunizations = completedImmunizations.filter((vaccine) => !existingAppointments.includes(vaccine?.vaccineCode?.[0]?.text))
+      const selectableAppointments = existingAppoinentImmunizations.filter((vaccine) => vaccine?.series === existingAppoinentImmunizations[0]?.series)
+
+      setAppointmentList(selectableAppointments.filter((vaccine) => vaccine.description === 'routine'))
       setLoadingRecommendations(false)
     } else {
       setLoadingRecommendations(false)

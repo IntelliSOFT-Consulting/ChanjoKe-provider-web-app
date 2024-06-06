@@ -57,6 +57,7 @@ export default function useAppointment() {
       }))
       setAppointments(appointmentsResponse)
       setLoader(false)
+      return appointmentsResponse
     } else {
       setAppointments([])
       setLoader(false)
