@@ -24,7 +24,7 @@ export default function NewAppointment() {
   const [loadingAppointment, setLoading] = useState(false)
 
   function removeVaccineWord(inputString) {
-    return inputString.replace(/\bvaccination\b/gi, '');
+    return inputString.replace(/vaccination/gi, '');
   }
 
   const fetchPatientImmunization = async () => {
