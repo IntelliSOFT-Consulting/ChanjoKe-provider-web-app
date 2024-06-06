@@ -24,9 +24,8 @@ export default function NewAppointment() {
   const [loadingAppointment, setLoading] = useState(false)
 
   function removeVaccineWord(inputString) {
-    let filteredWords = inputString.split(' ').filter(word => word.toLowerCase() !== 'vaccination'.toLowerCase());
-    return filteredWords.join(' ');
-}
+    return inputString.replace(/\bvaccination\b/gi, '');
+  }
 
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
