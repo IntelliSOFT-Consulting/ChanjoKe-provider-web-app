@@ -30,7 +30,7 @@ export default function RenderActionButton({ actions, onBtnAction, data }) {
           </Popconfirm>
         )
       } else return (
-        <button key={index} className={`${action.class} px-2 py-1`} onClick={() => handleActionClick(action)}>
+        <button key={index} className={`${action.class} px-2 py-1 text-blue-400`} onClick={() => handleActionClick(action)}>
           {action.title.charAt(0).toUpperCase() + action.title.slice(1)}
         </button>
         )
