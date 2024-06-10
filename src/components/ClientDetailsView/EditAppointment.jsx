@@ -2,12 +2,15 @@ import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Form, Col, Row, DatePicker, Button } from "antd"
 import useAppointment from "../../hooks/useAppointment"
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import dayjs from "dayjs"
 
 export default function EditAppointment() {
   const { appointmentID } = useParams()
   const navigate = useNavigate()
   const [form] = Form.useForm()
+
+  const [isDialogOpen, setDialogOpen] = useState(false)
 
   const {
     appointment,
@@ -27,6 +30,7 @@ export default function EditAppointment() {
     const datedd = dayjs(values?.appointmentDate).format('YYYY-MM-DDTHH:mm:ssZ')
     await updateAppointment(appointmentID, { ...appointment, start: datedd, status: 'booked' })
     setLoader(false)
+    setDialogOpen(true)
   }
 
   useEffect(() => {
@@ -39,6 +43,18 @@ export default function EditAppointment() {
   }, [])
     return (
       <>
+        <ConfirmDialog
+          open={isDialogOpen}
+          description={
+            <div className='font-normal'>
+              <p>Appointment successfully rescheduled!</p>
+            </div>
+          }
+          onClose={() => {
+            navigate(-1)
+          }}
+        />
+
         <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
           <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
             <h3 className="text-xl font-medium">Edit Appointment</h3>

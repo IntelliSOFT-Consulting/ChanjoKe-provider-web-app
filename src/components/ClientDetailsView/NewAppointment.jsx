@@ -7,6 +7,7 @@ import { lockVaccine } from '../../utils/validate'
 import {  createVaccinationAppointment } from './DataWrapper'
 import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
+import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 
 export default function NewAppointment() {
 
@@ -15,6 +16,8 @@ export default function NewAppointment() {
   const [form] = Form.useForm()
   const { getRecommendations, getImmunizations } = useVaccination()
   const { createAppointment, getPatientAppointments} = useAppointment()
+
+  const [isDialogOpen, setDialogOpen] = useState(false)
 
   const [vaccinesToAppoint, setAppointmentList] = useState([])
   const [vaccinesAppointments, setVaccineAppointments] = useState([])
@@ -84,12 +87,24 @@ export default function NewAppointment() {
 
     await Promise.all(appointmentPromises)
     setLoading(false)
-
-    navigate(`/client-details/${userID}/appointments`)
+    setDialogOpen(true)
   };
 
   return (
     <>
+
+      <ConfirmDialog
+        open={isDialogOpen}
+        description={
+          <div className='font-normal'>
+            <p>Appointment successfully created!</p>
+          </div>
+        }
+        onClose={() => {
+          navigate(`/client-details/${userID}/appointments`)
+        }}
+      />
+    
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
           <h3 className="text-xl font-medium">New Appointment</h3>
