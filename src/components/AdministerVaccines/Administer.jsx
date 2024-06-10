@@ -133,10 +133,6 @@ export default function Administer() {
                 <span className="font-semibold mr-2 text-primary">Due Date:</span>
                 {nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}
               </p>
-              <p>
-                <span className="font-semibold mr-2 text-primary">Interval:</span>
-                {nextVaccines?.nextGroup}
-              </p>
             </div>
           </div>
         }
