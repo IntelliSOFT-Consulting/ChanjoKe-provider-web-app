@@ -1,4 +1,5 @@
 import RenderActionButton from './RenderActionsButton';
+import Pagination from '../Pagination';
 
 function getStatusColorClass(status) {
   switch (status) {
@@ -15,7 +16,7 @@ function getStatusColorClass(status) {
   }
 }
 
-export default function SearchTable({ headers, data, onActionBtn, onCheckbox, disabledChechboxes }) {
+export default function SearchTable({ headers, data, onActionBtn, onCheckbox, disabledChechboxes, link, updatePaginationURL }) {
 
   const handleActionBtn = (actionData, data) => {
     onActionBtn && onActionBtn(actionData, data);
@@ -64,6 +65,8 @@ export default function SearchTable({ headers, data, onActionBtn, onCheckbox, di
               ))}
               </tbody>
             </table>
+
+            <Pagination link={link} updateURL={updatePaginationURL} />
           </div>
         </div>
       </div>

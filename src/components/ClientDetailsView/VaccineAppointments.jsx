@@ -9,6 +9,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
   const {
     loader,
     appointments,
+    appointmentsPagination,
     getPatientAppointments,
     updateAppointment,
   } = useAppointment()
@@ -33,6 +34,10 @@ export default function VaccineAppointments({ userCategory, patientData, patient
   useEffect(() => {
     getPatientAppointments(patientData?.id)
   }, [userCategory])
+
+  const updateAppointmentURL = (data) => {
+    getPatientAppointments(null, data)
+  }
 
   return (
     
@@ -76,6 +81,8 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         <SearchTable
           onActionBtn={handleActionBtn}
           headers={tHeaders}
+          link={appointmentsPagination}
+          updatePaginationURL={updateAppointmentURL}
           data={appointments} />}
 
       {!loader && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
