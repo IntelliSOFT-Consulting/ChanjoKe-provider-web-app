@@ -31,6 +31,10 @@ export default function EditAppointment() {
     await updateAppointment(appointmentID, { ...appointment, start: datedd, status: 'booked' })
     setLoader(false)
     setDialogOpen(true)
+
+    setTimeout(() => {
+      setDialogOpen(false)
+    }, 2000)
   }
 
   useEffect(() => {

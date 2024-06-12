@@ -14,6 +14,8 @@ export default function useAppointment() {
   const [loader, setLoader] = useState(false)
   const [appointment, setAppointment] = useState({})
   const [appointments, setAppointments] = useState([])
+  const [totalAppointments, setTotal] = useState(0)
+  const [appointmentsPagination, setAppointmentPagination] = useState([])
 
   const getAppointment = async (appointment) => {
     setLoader(true)
@@ -40,22 +42,25 @@ export default function useAppointment() {
     )
   }
 
-  const getPatientAppointments = async (patientID) => {
+  const getPatientAppointments = async (patientID, offset = 0) => {
     setLoader(true)
-    const response = await get(
-      `${appointmentsEndpoint}?supporting-info=Patient/${patientID}`
-    )
+
+    const url = offset < 1 ? `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&_count=5` : `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&_count=5&_offset=${offset}`
+    const response = await get(url)
     if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
       const appointmentsResponse = response?.entry.map((appointment) => ({
         appointments: appointment?.resource?.description,
         scheduledDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
         appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
         status: capitalizeFirstLetter(appointment?.resource?.status),
-        actions: appointment?.resource?.status === 'cancelled' ? 
-         [] :
-         [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }, { title: 'cancel', btnAction: { appointment: `${JSON.stringify(appointment?.resource)}`, targetName: 'cancelAppointment' }}]
+        id: appointment?.resource?.id,
+        // actions: appointment?.resource?.status === 'cancelled' ? 
+        //  [] :
+        //  [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }, { title: 'cancel', btnAction: { appointment: `${JSON.stringify(appointment?.resource)}`, targetName: 'cancelAppointment' }}]
       }))
       setAppointments(appointmentsResponse)
+      setAppointmentPagination(response?.link)
+      setTotal(response?.total)
       setLoader(false)
       return appointmentsResponse
     } else {
@@ -68,6 +73,8 @@ export default function useAppointment() {
     loader,
     appointment,
     appointments,
+    appointmentsPagination,
+    totalAppointments,
     getAppointment,
     updateAppointment,
     createAppointment,
