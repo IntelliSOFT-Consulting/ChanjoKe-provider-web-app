@@ -1,33 +1,25 @@
-import SearchTable from '../../common/tables/SearchTable'
-import { useNavigate } from 'react-router-dom'
-import { Col, Row, Button, DatePicker, Spin } from 'antd'
+// import SearchTable from '../../common/tables/SearchTable'
+import { useNavigate, Link } from 'react-router-dom'
+import { Col, Row, Button, DatePicker, Spin, Popconfirm } from 'antd'
 import { useEffect } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
+import Table from '../DataTable'
+import { getOffset } from '../../utils/methods'
 
 export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
   const {
     loader,
     appointments,
-    appointmentsPagination,
+    totalAppointments,
     getPatientAppointments,
     updateAppointment,
   } = useAppointment()
 
   const handleActionBtn = async (payload) => {
-    const appointment = JSON.parse(payload?.appointment)
-
-    await updateAppointment(appointment?.id, { ...appointment, status: 'cancelled' })
+    await updateAppointment(payload?.id, { ...payload, status: 'cancelled', resourceType: 'Appointment' })
     getPatientAppointments(patientData?.id)
   }
-
-  const tHeaders = [
-    {title: 'Appointments', class: '', key: 'appointments' },
-    {title: 'Scheduled Date', class: '', key: 'scheduledDate'},
-    {title: 'Appointment Date', class: '', key: 'appointmentDate'},
-    {title: 'Status', class: '', key: 'status'},
-    {title: 'Actions', class: '', key: 'actions'},
-  ]
 
   const navigate = useNavigate()
 
@@ -35,9 +27,62 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     getPatientAppointments(patientData?.id)
   }, [userCategory])
 
-  const updateAppointmentURL = (data) => {
-    getPatientAppointments(null, data)
+  const updateAppointmentURL = (page) => {
+    const offset = getOffset(page, 5)
+    getPatientAppointments(patientData?.id, offset)
   }
+
+  const columns = [
+    {
+      title: 'Appointments',
+      dataIndex: 'appointments',
+      key: 'appointments',
+    },
+    {
+      title: 'Scheduled Date',
+      dataIndex: 'scheduledDate',
+      key: 'scheduledDate',
+    },
+    {
+      title: 'Appointment Date',
+      dataIndex: 'appointmentDate',
+      key: 'appointmentDate',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'Actions',
+      dataIndex: '',
+      key: 'x',
+      render: (_, record) => {
+        if (record?.status === 'Booked') {
+          return (
+            <>
+              <Link
+                to={`/edit-appointment/${record?.id}`}
+                className="text-[#163C94] font-semibold"
+              >
+                Edit
+              </Link>
+              <Popconfirm
+                title="Are you sure you want to cancel?"
+                onConfirm={() => handleActionBtn(record)}
+                okText="Yes"
+                cancelText="No">
+                <button className={`px-2 py-1 text-red-400`}>
+                  Cancel
+                </button>
+              </Popconfirm>
+            </>
+          )
+        }
+      }
+    },
+  ]
+  
 
   return (
     
@@ -78,12 +123,30 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         }
 
       {!loader && appointments.length > 0 &&
-        <SearchTable
-          onActionBtn={handleActionBtn}
-          headers={tHeaders}
-          link={appointmentsPagination}
-          updatePaginationURL={updateAppointmentURL}
-          data={appointments} />}
+        <Table
+          columns={columns}
+          dataSource={appointments}
+          size="small"
+          loading={loader}
+          pagination={{
+            pageSize: 5,
+            showSizeChanger: false,
+            hideOnSinglePage: true,
+            showTotal: (total) => `Total ${total} items`,
+            total: totalAppointments - 1,
+            onChange: (page) => updateAppointmentURL(page),
+          }}
+          locale={{
+            emptyText: (
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-gray-400 text-sm my-2">
+                  No Appointments Made
+                </p>
+              </div>
+            ),
+          }}
+        />
+      }
 
       {!loader && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
 
