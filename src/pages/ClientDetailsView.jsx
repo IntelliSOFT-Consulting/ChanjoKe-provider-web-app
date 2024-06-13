@@ -61,12 +61,6 @@ export default function ClientDetailsView() {
   }, [patient])
 
   useEffect(() => {
-    if (observations) {
-      setObservationsData(formatWeightData(observations, patient?.birthDate))
-    }
-  }, [observations])
-
-  useEffect(() => {
     if (recommendations) {
       const groupedVaccines = groupVaccinesByCategory(
         recommendations?.recommendation,
@@ -76,7 +70,11 @@ export default function ClientDetailsView() {
       setNonRoutineVaccines(groupedVaccines.non_routine)
       dispatch(setVaccineSchedules(groupedVaccines.routine))
     }
-  }, [immunizations, recommendations])
+
+    if (observations) {
+      setObservationsData(formatWeightData(observations, patient?.birthDate))
+    }
+  }, [immunizations, recommendations, observations])
 
   const handleDialogClose = (confirmed) => {
     setDialogOpen(false)

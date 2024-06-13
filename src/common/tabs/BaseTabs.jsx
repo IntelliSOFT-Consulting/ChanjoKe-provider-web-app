@@ -39,7 +39,7 @@ export default function BaseTabs({
       if(queryParams === 'referrals') {
         setCurrentTab('referrals')
       }
-      else {
+      if (queryParams === 'routineVaccines') {
         setCurrentTab('routineVaccines')
       }
     }
