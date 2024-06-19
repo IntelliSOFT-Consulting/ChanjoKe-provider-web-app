@@ -1,4 +1,4 @@
-import { Form, Input, Select, Button, Popconfirm } from 'antd'
+import { Form, Input, Select, Button, Popconfirm, InputNumber } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -12,6 +12,7 @@ import {
   getBodyWeight,
   updateVaccineDueDates,
 } from './administerController'
+import { InfoCircleFilled } from '@ant-design/icons'
 
 export default function Administer() {
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -110,7 +111,11 @@ export default function Administer() {
       updateVaccineDueDates(recommendation, selectedVaccines)
     )
 
-    const encounter = await createEncounter(clientID, user?.fhirPractitionerId, user?.facility?.split('/')[1])
+    const encounter = await createEncounter(
+      clientID,
+      user?.fhirPractitionerId,
+      user?.facility?.split('/')[1]
+    )
 
     await createObservation(values, clientID, encounter?.id)
 
@@ -125,14 +130,20 @@ export default function Administer() {
       <ConfirmDialog
         open={isDialogOpen}
         description={
-          <div className='font-normal'>
+          <div className="font-normal">
             <p>The vaccines have been successfully administered!</p>
-            <div className='mt-2'>
-              <p className="font-semibold text-primary">Next Vaccine Appointment:</p>
-              <p>
-                <span className="font-semibold mr-2 text-primary">Due Date:</span>
-                {nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}
-              </p>
+            <div className="mt-2 bg-gray-200 w-fit mx-auto p-4 rounded-lg grid alert-col">
+              <div className="flex items-start justify-center mb-2">
+                <InfoCircleFilled className="text-primary text-2xl" />
+              </div>
+              <div className="ml-2">
+                <p className="font-semibold text-primary">
+                  Next Vaccine Appointment:
+                </p>
+                <p className="font-semibold text-black">
+                  {nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}
+                </p>
+              </div>
             </div>
           </div>
         }
@@ -150,22 +161,24 @@ export default function Administer() {
             form={form}
             onFinish={handleFormSubmit}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 px-6 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 px-6 gap-4">
               <div className="col-span-2 border-b ">
                 <Form.Item
                   name="currentWeight"
                   label="Current Weight"
                   className="w-1/2 addon"
                 >
-                  <Input
+                  <InputNumber
                     placeholder="Current Weight"
-                    size="large"
+                    controls={false}
                     addonAfter={
-                      <Form.Item name="weightMetric">
+                      <Form.Item
+                        name="weightMetric"
+                        style={{ margin: '0px !important' }}
+                      >
                         <Select
                           defaultValue="kg"
-                          style={{ width: 70 }}
-                          size="large"
+                          style={{ width: 70, margin: '0px !important' }}
                         >
                           <Select.Option value="kg">Kg</Select.Option>
                           <Select.Option value="g">g</Select.Option>
@@ -210,7 +223,6 @@ export default function Administer() {
                                       ?.coding?.[0]?.code
                               }
                               style={{ width: '100%' }}
-                              size="large"
                             >
                               <Select.Option value="HDKKD8777847">
                                 HDKKD8777847
@@ -228,7 +240,6 @@ export default function Administer() {
                             label="Disease Target"
                           >
                             <Input
-                              size="large"
                               placeholder={selectedVaccines[index].disease}
                               disabled
                             />
