@@ -158,8 +158,9 @@ export default function useVaccination() {
     return resources
   }
 
-  const getImmunization = async (immunizationId) => {
-    const response = await get(`${immunizationsEndpoint}/${immunizationId}`)
+  const getImmunization = async (immunizationId, client=false) => {
+    const include = client ? '?_include=Immunization:patient' : ''
+    const response = await get(`${immunizationsEndpoint}/${immunizationId}${include}`)
     setImmunization(response)
     return response
   }

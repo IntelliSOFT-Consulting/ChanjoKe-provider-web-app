@@ -96,7 +96,7 @@ export default function UpdateVaccineHistory() {
 
       const timeout = setTimeout(() => {
         setDialogOpen(false)
-        navigate(`/client-details/${clientID}`)
+        navigate(`/client-details/${clientID}/routineVaccines`)
       }, 1500)
 
       return () => {

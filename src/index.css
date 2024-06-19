@@ -178,3 +178,11 @@ code {
   background-position: left;
   background-repeat: no-repeat;
 }
+
+.ant-input-number-group-addon .ant-form-item {
+  margin: 0px !important;
+}
+
+.alert-col {
+  grid-template-columns: 2rem auto;
+}
