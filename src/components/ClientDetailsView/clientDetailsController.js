@@ -30,14 +30,13 @@ export const formatClientDetails = (patientResource) => {
   const clientCategory = classifyUserByAge(patientResource.birthDate)
   const ages = calculateAges(patientResource.birthDate)
 
-  const otherIdentifiers = patientResource.identifier.filter(
-    (id) =>
-      !id?.type?.coding?.[0]?.display?.toLowerCase().includes('system') &&
-      !id?.type?.coding?.[0]?.display?.toLowerCase().includes('caregiver')
+  const identifiers = patientResource.identifier.filter(
+    (id) => id?.type?.coding?.[0]?.code?.toLowerCase() === 'identification_type'
   )
+
   const isNotificationOnly =
-    otherIdentifiers?.length === 1 &&
-    otherIdentifiers?.[0]?.type?.coding?.[0]?.display
+    identifiers?.length === 1 &&
+    identifiers[0]?.type?.coding?.[0]?.display
       ?.toLowerCase()
       ?.includes('notification')
 

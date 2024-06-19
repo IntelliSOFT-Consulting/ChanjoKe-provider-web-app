@@ -88,6 +88,7 @@ export default function ClientDetailsView() {
     { title: 'Gender', dataIndex: 'gender', key: 'gender' },
   ]
 
+  console.log('patientData', patientData)
   return (
     <>
       <SelectDialog

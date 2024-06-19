@@ -67,7 +67,7 @@ export default function ClientDetails() {
 
   const navigate = useNavigate()
 
-  const { createPatient } = usePatient()
+  const { createPatient, checkPatientExists } = usePatient()
   const { createEncounter } = useEncounter()
   const {
     counties,
@@ -185,6 +185,18 @@ export default function ClientDetails() {
 
   const handleClientType = (e) => {
     setClientType(e.target.value)
+  }
+
+  const handleValidateId = async (_, value) => {
+    console.log('value', value)
+    if (value) {
+      const idType = form.getFieldValue('identificationType')
+      const exists = await checkPatientExists(value, idType)
+      if (exists) {
+        return Promise.reject('Client already exists in the system')
+      }
+    }
+    return Promise.resolve()
   }
 
   return (
@@ -404,7 +416,7 @@ export default function ClientDetails() {
                   name="dateOfBirth"
                   label={
                     <div>
-                      <span className="font-bold">Estimated Date of Birth</span>
+                      <span className="font-bold">Date of Birth</span>
                     </div>
                   }
                 >
@@ -449,10 +461,17 @@ export default function ClientDetails() {
                     required: true,
                     message: 'Please input identifier number',
                   },
+                  {
+                    validator: handleValidateId,
+                  },
                 ]}
               >
                 <Input
                   disabled={!isDocumentTypeSelected}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+                    form.setFieldValue('identificationNumber', value)
+                  }}
                   placeholder="Document Identification Number"
                   autoComplete="off"
                   className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
