@@ -213,12 +213,31 @@ export default function usePatient() {
     }
   }
 
+  const checkPatientExists = async (identifier, type = null) => {
+    try {
+      const response = await get(
+        `${fhirEndpoint}/Patient?identifier=${identifier}`
+      )
+
+      const resources = response?.entry?.map((entry) => entry.resource)
+
+      const patient = resources?.find((resource) =>
+        resource.identifier.find((id) => id.type.coding[0].display === type)
+      )
+
+      return patient
+    } catch (error) {
+      return null
+    }
+  }
+
   return {
     createPatient,
     getPatient,
     savePatient,
     updatePatient,
     searchPatients,
+    checkPatientExists,
     patient,
   }
 }

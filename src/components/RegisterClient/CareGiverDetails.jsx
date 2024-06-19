@@ -144,6 +144,10 @@ export default function CaregiverDetails({
               placeholder="eg 12345678"
               autoComplete="off"
               className="w-full"
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+                form.setFieldValue('caregiverID', value)
+              }}
             />
           </Form.Item>
 

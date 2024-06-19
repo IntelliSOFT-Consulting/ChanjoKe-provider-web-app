@@ -122,8 +122,20 @@ export const formatCardTitle = (input) => {
 }
 
 export const passwordGenerator = (length) => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
   return Array.from({ length }, () =>
     characters.charAt(Math.floor(Math.random() * characters.length))
   ).join('')
+}
+
+export const convertCamelCaseString = (inputString) => {
+  let stringWithSpaces = inputString?.replace(/([a-z])([A-Z])/g, '$1 $2')
+  stringWithSpaces = stringWithSpaces?.replace(/\b\w+/g, (word) => {
+    if (word.toLowerCase().includes('of')) {
+      return word.toLowerCase()
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1)
+  })
+  return stringWithSpaces
 }
