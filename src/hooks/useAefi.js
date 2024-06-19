@@ -105,8 +105,37 @@ export default function useAefi() {
       },
       extension: [
         {
-          url: 'https://www.hl7.org/fhir/adverseevent-definitions.html#AdverseEvent.mitigatingAction',
+          url: 'http://example.org/StructureDefinition/types-of-aefi',
+          aefiReportType: {
+            coding: [
+              {
+                code: values.aefiReportType,
+                display: values.aefiReportType,
+                system: 'http://example.org/StructureDefinition/types-of-aefi',
+              },
+            ],
+            text: values.aefiReportType,
+          },
+        },
+        {
+          url: 'http://example.org/StructureDefinition/past-medical-history',
           pastMedicalHistory: values.pastMedicalHistory,
+        },
+        {
+          url: 'http://example.org/StructureDefinition/treatment-given',
+          treatmentGiven: values.treatmentGiven,
+        },
+        {
+          url: 'http://example.org/StructureDefinition/treatment-details',
+          treatmentDetails: values.treatmentDetails,
+        },
+        {
+          url: 'http://example.org/StructureDefinition/specimen-collected',
+          specimenCollected: values.specimenCollected,
+        },
+        {
+          url: 'http://example.org/StructureDefinition/specimen-details',
+          specimenDetails: values.specimenDetails,
         },
       ],
     }

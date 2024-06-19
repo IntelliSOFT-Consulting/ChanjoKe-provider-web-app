@@ -102,7 +102,6 @@ export default function CaregiverDetails({
             ]}
           >
             <Select
-              size="large"
               placeholder={`Select ${caregiverType()} Type`}
               options={caregiverTypes}
               showSearch
@@ -124,7 +123,6 @@ export default function CaregiverDetails({
             <Input
               placeholder="eg John Doe"
               autoComplete="off"
-              size="large"
               onBlur={() => {
                 const name = form.getFieldValue('caregiverName')
                 form.setFieldValue('caregiverName', titleCase(name))
@@ -142,12 +140,10 @@ export default function CaregiverDetails({
               },
             ]}
           >
-            <InputNumber
+            <Input
               placeholder="eg 12345678"
               autoComplete="off"
-              size="large"
               className="w-full"
-              controls={false}
             />
           </Form.Item>
 
@@ -164,11 +160,9 @@ export default function CaregiverDetails({
           >
             <Input
               placeholder="7xxxxxxxx"
-              size="large"
               addonBefore={
                 <Form.Item name="phoneCode" noStyle>
                   <Select
-                    size="large"
                     style={{ width: 120 }}
                     showSearch
                     options={countryCodes}
