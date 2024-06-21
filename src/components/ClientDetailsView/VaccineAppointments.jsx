@@ -1,11 +1,12 @@
 // import SearchTable from '../../common/tables/SearchTable'
 import { useNavigate, Link } from 'react-router-dom'
 import { Col, Row, Button, DatePicker, Spin, Popconfirm } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
 import Table from '../DataTable'
 import { getOffset } from '../../utils/methods'
+import useVaccination from '../../hooks/useVaccination'
 
 export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
   const {
@@ -15,6 +16,9 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     getPatientAppointments,
     updateAppointment,
   } = useAppointment()
+  const { immunizations, getImmunizations} = useVaccination()
+
+  const [unvaccinatedAppointments, setUnvaccinatedAppointments] = useState([])
 
   const handleActionBtn = async (payload) => {
     await updateAppointment(payload?.id, { ...payload, status: 'cancelled', resourceType: 'Appointment' })
@@ -25,7 +29,16 @@ export default function VaccineAppointments({ userCategory, patientData, patient
 
   useEffect(() => {
     getPatientAppointments(patientData?.id)
+    getImmunizations(patientData?.id)
   }, [userCategory])
+
+  useEffect(() => {
+    if (Array.isArray(immunizations) && immunizations.length > 0) {
+      const immunizedAppointments = immunizations.map((item) => item?.vaccineCode?.text)
+      const filtered = appointments.filter((appointment) => !immunizedAppointments.includes(appointment.appointments))
+      setUnvaccinatedAppointments(filtered)
+    }
+  }, [immunizations])
 
   const updateAppointmentURL = (page) => {
     const offset = getOffset(page, 5)
@@ -123,10 +136,10 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         </div>
         }
 
-      {!loader && appointments.length > 0 &&
+      {!loader && unvaccinatedAppointments.length > 0 &&
         <Table
           columns={columns}
-          dataSource={appointments}
+          dataSource={unvaccinatedAppointments}
           size="small"
           loading={loader}
           pagination={{
