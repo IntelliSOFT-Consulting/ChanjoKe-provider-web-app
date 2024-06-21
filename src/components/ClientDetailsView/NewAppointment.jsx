@@ -9,13 +9,14 @@ import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import { WarningTwoTone } from '@ant-design/icons'
+import moment from 'moment'
 
 export default function NewAppointment() {
 
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const { getRecommendations, getImmunizations } = useVaccination()
+  const { getRecommendations, getImmunizations, updateRecommendations, recommendations } = useVaccination()
   const { createAppointment, getPatientAppointments} = useAppointment()
 
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -84,6 +85,22 @@ export default function NewAppointment() {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
       await createAppointment(vaccineData)
     })
+
+    const recs = recommendations?.recommendation
+    const vaccineNames = vaccinesAppointments.map((vaccine) => vaccine?.vaccineCode?.[0]?.text)
+    const newRecommendations = recs.map((recommendation) => {
+      if (vaccineNames.includes(recommendation?.vaccineCode?.[0]?.text)) {
+        const found = vaccinesAppointments.find((vaccine) => vaccine?.vaccineCode?.[0]?.text)
+        recommendation.dateCriterion[0].value = moment(found.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DD')
+        return recommendation
+      } else {
+        return recommendation
+      }
+    })
+
+    recommendations.recommendation = newRecommendations
+
+    await updateRecommendations(recommendations)
 
     await Promise.all(appointmentPromises)
     setLoading(false)
@@ -192,7 +209,7 @@ export default function NewAppointment() {
                 <div>
                 <Col className="gutter-row" span={12}>
                     <Form.Item
-                      name="addvaccines"
+                      name="numberOfAppointments"
                       label={
                         <div>
                           <span className="font-bold">Number of Appointments:</span>
