@@ -1,4 +1,4 @@
-import { Col, Row, DatePicker, Form, Select, Spin } from 'antd'
+import { Col, Row, DatePicker, Form, Select, Spin, Input } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import useVaccination from '../../hooks/useVaccination'
@@ -8,6 +8,7 @@ import {  createVaccinationAppointment } from './DataWrapper'
 import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import { WarningTwoTone } from '@ant-design/icons'
 
 export default function NewAppointment() {
 
@@ -75,7 +76,6 @@ export default function NewAppointment() {
 
   useEffect(() => {
     fetchPatientImmunization()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
   const onFinish = async (values) => {
@@ -88,6 +88,11 @@ export default function NewAppointment() {
     await Promise.all(appointmentPromises)
     setLoading(false)
     setDialogOpen(true)
+
+    setTimeout(() => {
+      setDialogOpen(false)
+      navigate(`/client-details/${userID}/appointments`)
+    }, 2000)
   };
 
   return (
@@ -119,51 +124,85 @@ export default function NewAppointment() {
               <div className="grid grid-cols-2 gap-4 px-8 py-5">
                 <div>
 
-                  <Col className="gutter-row" span={12}>
+                  {loadingRecommendations &&
+                    <>
+                      <Spin
+                        className='mt-2'
+                        indicator={
+                          <LoadingOutlined
+                            style={{
+                              fontSize: 24,
+                            }}
+                            spin
+                            />
+                          }
+                        />
+                      <span className='ml-4'>Loading Eligible Vaccines</span>
+                    </>
+                  }
+
+                  {vaccinesToAppoint.length < 1 && vaccinesAppointments.length < 1 && !loadingRecommendations &&
+                  <>
+                    <div className="flex mt-2 md:mt-0 items-center bg-pink py-2 px-4 rounded-md ml-0 h-full my-0 max-w-full md:max-w-xs ">
+                      <WarningTwoTone
+                        twoToneColor="red"
+                        classID="text-black text-6xl"
+                      />
+                      <div className="ml-2 text-sm">
+                        This client is not currently eligible for any routine vaccines.
+                      </div>
+                    </div>
+                  </>
+                  }
+
+                  {vaccinesToAppoint.length > 0 &&
+                    <>
+                      <Col className="gutter-row" span={12}>
+                        <Form.Item
+                          name="addvaccines"
+                          label={
+                            <div>
+                              <span className="font-bold">Add Vaccines</span>
+                            </div>
+                          }>
+
+                              {!loadingRecommendations && <Select
+                                size='large'
+                                onChange={(e) => {
+                                  const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+                                  setVaccineAppointments([...vaccinesAppointments, vaccine ])
+
+                                  const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+                                  setAppointmentList(vaccines)
+                                }}>
+                                {vaccinesToAppoint.map((option) => (
+                                  <Select.Option
+                                    value={option?.vaccineCode?.[0]?.text}>
+                                    {option?.vaccineCode?.[0]?.text}
+                                  </Select.Option>
+                                ))}
+                              </Select>}
+                          
+                        </Form.Item>
+                      </Col>
+                    </>
+                  }
+
+                </div>
+                <div>
+                <Col className="gutter-row" span={12}>
                     <Form.Item
                       name="addvaccines"
                       label={
                         <div>
-                          <span className="font-bold">Add Vaccines</span>
+                          <span className="font-bold">Number of Appointments:</span>
                         </div>
                       }>
 
-                        {loadingRecommendations &&
-                            <><Spin
-                              indicator={
-                                <LoadingOutlined
-                                  style={{
-                                    fontSize: 24,
-                                  }}
-                                  spin
-                                />
-                              }
-                            />
-                            <span className='ml-4'>Loading Eligible Vaccines</span>
-                            </>
-                          }
-
-                          {!loadingRecommendations && <Select
-                            size='large'
-                            onChange={(e) => {
-                              const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
-                              setVaccineAppointments([...vaccinesAppointments, vaccine ])
-
-                              const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
-                              setAppointmentList(vaccines)
-                            }}>
-                            {vaccinesToAppoint.map((option) => (
-                              <Select.Option
-                                value={option?.vaccineCode?.[0]?.text}>
-                                {option?.vaccineCode?.[0]?.text}
-                              </Select.Option>
-                            ))}
-                          </Select>}
+                        <Input placeholder="12" className='py-2' disabled />
                       
                     </Form.Item>
                   </Col>
-                </div>
-                <div>
                 </div>
               </div>
             

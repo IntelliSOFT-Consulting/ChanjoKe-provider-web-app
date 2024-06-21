@@ -34,6 +34,7 @@ export default function EditAppointment() {
 
     setTimeout(() => {
       setDialogOpen(false)
+      navigate(-1)
     }, 2000)
   }
 
