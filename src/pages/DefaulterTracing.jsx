@@ -79,8 +79,8 @@ export default function DefaulterTracing() {
     },
     {
       title: 'Dose',
-      dataIndex: 'the_vaccine_seq',
-      key: 'the_vaccine_seq',
+      dataIndex: 'the_dose',
+      key: 'the_dose',
     },
     {
       title: 'Scheduled Date',

@@ -188,8 +188,7 @@ export default function ClientDetails() {
   }
 
   const handleValidateId = async (_, value) => {
-    console.log('value', value)
-    if (value) {
+    if (value && !clientID) {
       const idType = form.getFieldValue('identificationType')
       const exists = await checkPatientExists(value, idType)
       if (exists) {
