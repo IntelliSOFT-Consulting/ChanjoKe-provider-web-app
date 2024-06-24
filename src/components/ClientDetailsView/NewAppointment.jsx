@@ -167,7 +167,6 @@ export default function NewAppointment() {
                   }
 
                   {vaccinesToAppoint.length < 1 && vaccinesAppointments.length < 1 && !loadingRecommendations &&
-                  <>
                     <div className="flex mt-2 md:mt-0 items-center bg-pink py-2 px-4 rounded-md ml-0 h-full my-0 max-w-full md:max-w-xs ">
                       <WarningTwoTone
                         twoToneColor="red"
@@ -177,7 +176,6 @@ export default function NewAppointment() {
                         This client is not currently eligible for any routine vaccines.
                       </div>
                     </div>
-                  </>
                   }
 
                   {vaccinesToAppoint.length > 0 &&
@@ -318,7 +316,7 @@ export default function NewAppointment() {
             <button
               htmlType="submit"
               className='ml-4 outline outline-[#163C94] rounded-md px-5 py-2 bg-[#163C94] outline-2 text-white'>
-                {loadingAppointment && <><Spin indicator={ <LoadingOutlined style={{ fontSize: 24, color: 'white', marginRight: '8px' }} spin /> }/></>}
+                {loadingAppointment && <Spin indicator={ <LoadingOutlined style={{ fontSize: 24, color: 'white', marginRight: '8px' }} spin /> }/>}
               Submit
             </button>
           </div>
