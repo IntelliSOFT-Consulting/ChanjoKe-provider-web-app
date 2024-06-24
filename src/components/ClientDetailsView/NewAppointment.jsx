@@ -78,7 +78,7 @@ export default function NewAppointment() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
-  const onFinish = async (values) => {
+  const onFinish = async () => {
     setLoading(true)
     const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
@@ -89,6 +89,14 @@ export default function NewAppointment() {
     setLoading(false)
     setDialogOpen(true)
   };
+
+  const addVaccineRecommendation = () => {
+    const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+    setVaccineAppointments([...vaccinesAppointments, vaccine ])
+
+    const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+    setAppointmentList(vaccines)
+  }
 
   return (
     <>
@@ -119,7 +127,67 @@ export default function NewAppointment() {
               <div className="grid grid-cols-2 gap-4 px-8 py-5">
                 <div>
 
-                  <Col className="gutter-row" span={12}>
+                  {loadingRecommendations &&
+                    <>
+                      <Spin
+                        className='mt-2'
+                        indicator={
+                          <LoadingOutlined
+                            style={{
+                              fontSize: 24,
+                            }}
+                            spin
+                            />
+                          }
+                        />
+                      <span className='ml-4'>Loading Eligible Vaccines</span>
+                    </>
+                  }
+
+                  {vaccinesToAppoint.length < 1 && vaccinesAppointments.length < 1 && !loadingRecommendations &&
+                  <>
+                    <div className="flex mt-2 md:mt-0 items-center bg-pink py-2 px-4 rounded-md ml-0 h-full my-0 max-w-full md:max-w-xs ">
+                      <WarningTwoTone
+                        twoToneColor="red"
+                        classID="text-black text-6xl"
+                      />
+                      <div className="ml-2 text-sm">
+                        This client is not currently eligible for any routine vaccines.
+                      </div>
+                    </div>
+                  </>
+                  }
+
+                  {vaccinesToAppoint.length > 0 &&
+                    <>
+                      <Col className="gutter-row" span={12}>
+                        <Form.Item
+                          name="addvaccines"
+                          label={
+                            <div>
+                              <span className="font-bold">Add Vaccines</span>
+                            </div>
+                          }>
+
+                              {!loadingRecommendations && <Select
+                                size='large'
+                                onChange={() => addVaccineRecommendation()}>
+                                {vaccinesToAppoint.map((option) => (
+                                  <Select.Option
+                                    value={option?.vaccineCode?.[0]?.text}>
+                                    {option?.vaccineCode?.[0]?.text}
+                                  </Select.Option>
+                                ))}
+                              </Select>}
+                          
+                        </Form.Item>
+                      </Col>
+                    </>
+                  }
+
+                </div>
+                <div>
+                <Col className="gutter-row" span={12}>
                     <Form.Item
                       name="addvaccines"
                       label={
