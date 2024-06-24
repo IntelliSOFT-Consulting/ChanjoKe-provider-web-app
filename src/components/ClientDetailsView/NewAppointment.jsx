@@ -196,6 +196,7 @@ export default function NewAppointment() {
                                 onChange={() => addVaccineRecommendation()}>
                                 {vaccinesToAppoint.map((option) => (
                                   <Select.Option
+                                    key={option?.vaccineCode?.[0]?.text}
                                     value={option?.vaccineCode?.[0]?.text}>
                                     {option?.vaccineCode?.[0]?.text}
                                   </Select.Option>
