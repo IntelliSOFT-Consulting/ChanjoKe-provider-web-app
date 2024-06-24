@@ -24,10 +24,8 @@ export default function DefaulterTracing() {
 
   const fetcbDefaulters = async (params) => {
     let query = '/reports/api/defaulters?'
-    console.log(params)
     for (const key in params) {
       if (params[key]) {
-        console.log(params[key])
         query += `${key}=${params[key]}&`
       }
     }

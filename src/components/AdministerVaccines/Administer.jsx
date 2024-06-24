@@ -132,18 +132,21 @@ export default function Administer() {
         description={
           <div className="font-normal">
             <p>The vaccines have been successfully administered!</p>
-            <div className="mt-2 bg-gray-200 w-fit mx-auto p-4 rounded-lg grid alert-col">
-              <div className="flex items-start justify-center mb-2">
-                <InfoCircleFilled className="text-primary text-2xl" />
-              </div>
-              <div className="ml-2">
+            <div className="mt-2 bg-gray-200 w-fit mx-auto p-4 rounded-lg alert-col">
+              <div className="ml-2 mt-2">
                 <p className="font-semibold text-primary">
-                  Next Vaccine Appointment:
+                  Next Vaccine Appointment: <span className='text-black'>{nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}</span>
                 </p>
-                <p className="font-semibold text-black">
-                  {nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}
-                </p>
+
+                <Form.Item
+                  name="numberOfAppointments"
+                  className='mt-3'
+                  label="Number of Appointments">
+                  <Input placeholder='12' disabled />
+                </Form.Item>
               </div>
+
+              
             </div>
           </div>
         }
