@@ -112,6 +112,14 @@ export default function NewAppointment() {
     }, 2000)
   };
 
+  const addVaccineRecommendation = () => {
+    const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+    setVaccineAppointments([...vaccinesAppointments, vaccine ])
+
+    const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+    setAppointmentList(vaccines)
+  }
+
   return (
     <>
 
@@ -185,13 +193,7 @@ export default function NewAppointment() {
 
                               {!loadingRecommendations && <Select
                                 size='large'
-                                onChange={(e) => {
-                                  const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
-                                  setVaccineAppointments([...vaccinesAppointments, vaccine ])
-
-                                  const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
-                                  setAppointmentList(vaccines)
-                                }}>
+                                onChange={() => addVaccineRecommendation()}>
                                 {vaccinesToAppoint.map((option) => (
                                   <Select.Option
                                     value={option?.vaccineCode?.[0]?.text}>
