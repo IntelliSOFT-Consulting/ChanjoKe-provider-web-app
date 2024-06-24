@@ -181,7 +181,6 @@ export default function NewAppointment() {
                   }
 
                   {vaccinesToAppoint.length > 0 &&
-                    <>
                       <Col className="gutter-row" span={12}>
                         <Form.Item
                           name="addvaccines"
@@ -205,7 +204,6 @@ export default function NewAppointment() {
                           
                         </Form.Item>
                       </Col>
-                    </>
                   }
 
                 </div>
