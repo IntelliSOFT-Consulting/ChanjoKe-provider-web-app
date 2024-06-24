@@ -78,7 +78,7 @@ export default function NewAppointment() {
     fetchPatientImmunization()
   }, [])
   
-  const onFinish = async (values) => {
+  const onFinish = async () => {
     setLoading(true)
     const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
       const vaccineData = createVaccinationAppointment(vaccine, userID, recommendationID)
@@ -94,6 +94,14 @@ export default function NewAppointment() {
       navigate(`/client-details/${userID}/appointments`)
     }, 2000)
   };
+
+  const addVaccineRecommendation = () => {
+    const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
+    setVaccineAppointments([...vaccinesAppointments, vaccine ])
+
+    const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
+    setAppointmentList(vaccines)
+  }
 
   return (
     <>
@@ -168,13 +176,7 @@ export default function NewAppointment() {
 
                               {!loadingRecommendations && <Select
                                 size='large'
-                                onChange={(e) => {
-                                  const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
-                                  setVaccineAppointments([...vaccinesAppointments, vaccine ])
-
-                                  const vaccines = vaccinesToAppoint.filter((item) => item?.vaccineCode?.[0]?.text !== e)
-                                  setAppointmentList(vaccines)
-                                }}>
+                                onChange={() => addVaccineRecommendation()}>
                                 {vaccinesToAppoint.map((option) => (
                                   <Select.Option
                                     value={option?.vaccineCode?.[0]?.text}>
