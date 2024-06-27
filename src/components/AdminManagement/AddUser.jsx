@@ -9,6 +9,9 @@ export default function AddUser({
   visible,
   practitionerData,
   setPractitionerData,
+  fetchPractitioners,
+  activeTab,
+  currentPage,
 }) {
   const [defaultCounties, setDefaultCounties] = useState(null)
   const [defaultSubCounties, setDefaultSubCounties] = useState(null)
@@ -44,6 +47,8 @@ export default function AddUser({
     setDefaultWards(null)
     setDefaultFacilities(null)
     setVisible(false)
+
+    await fetchPractitioners(null, activeTab === '1', currentPage)
   }
 
   const fetchPractitioner = async (id) => {
@@ -174,6 +179,11 @@ export default function AddUser({
                   value: county.key,
                   label: county.name,
                 }))}
+                showSearch
+                allowClear
+                filterOption={(input, option) =>
+                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
+                }
               />
             </Form.Item>
 
@@ -191,6 +201,11 @@ export default function AddUser({
                     label: subCounty.name,
                   })
                 )}
+                showSearch
+                allowClear
+                filterOption={(input, option) =>
+                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
+                }
               />
             </Form.Item>
 
@@ -206,6 +221,11 @@ export default function AddUser({
                   label: ward.name,
                 }))}
                 onChange={handleWardChange}
+                showSearch
+                filterOption={(input, option) =>
+                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
+                }
+                allowClear
               />
             </Form.Item>
 
@@ -220,6 +240,11 @@ export default function AddUser({
                   value: facility.key,
                   label: facility.name,
                 }))}
+                showSearch
+                filterOption={(input, option) =>
+                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
+                }
+                allowClear
               />
             </Form.Item>
           </div>
@@ -235,7 +260,7 @@ export default function AddUser({
                 { required: true, message: 'Please select a role group' },
               ]}
             >
-              <Select placeholder="Select Role Group">
+              <Select placeholder="Select Role Group" showSearch>
                 <Select.Option value="ADMINISTRATOR">
                   Administrator
                 </Select.Option>

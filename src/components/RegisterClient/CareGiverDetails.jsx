@@ -179,9 +179,11 @@ export default function CaregiverDetails({
                 </Form.Item>
               }
               onChange={(e) => {
+                e.target.value = e.target.value.replace(/\D/g, '')
                 if (e.target.value.length > 9) {
-                  form.setFieldValue('phoneNumber', e.target.value.slice(0, 9))
+                  e.target.value = e.target.value.slice(0, 9)
                 }
+                form.setFieldValue('phoneNumber', e.target.value.slice(0, 9))
               }}
             />
           </Form.Item>
