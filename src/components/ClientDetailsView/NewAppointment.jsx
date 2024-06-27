@@ -112,7 +112,7 @@ export default function NewAppointment() {
     }, 2000)
   };
 
-  const addVaccineRecommendation = () => {
+  const addVaccineRecommendation = (e) => {
     const vaccine = vaccinesToAppoint.find((item) => item?.vaccineCode?.[0]?.text === e)
     setVaccineAppointments([...vaccinesAppointments, vaccine ])
 
@@ -190,7 +190,7 @@ export default function NewAppointment() {
 
                               {!loadingRecommendations && <Select
                                 size='large'
-                                onChange={() => addVaccineRecommendation()}>
+                                onChange={(e) => addVaccineRecommendation(e)}>
                                 {vaccinesToAppoint.map((option) => (
                                   <Select.Option
                                     key={option?.vaccineCode?.[0]?.text}
