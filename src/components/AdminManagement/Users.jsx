@@ -203,6 +203,9 @@ export default function Users() {
           visible={visible}
           setPractitionerData={setPractitionerData}
           practitionerData={practitionerData}
+          fetchPractitioners={fetchPractitioners}
+          activeTab={activeTab}
+          currentPage={currentPage}
         />
       </Modal>
     </Card>
