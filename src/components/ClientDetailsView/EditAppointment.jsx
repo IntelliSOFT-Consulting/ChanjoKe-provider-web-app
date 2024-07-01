@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Form, Col, Row, DatePicker, Button } from "antd"
+import useVaccination from '../../hooks/useVaccination'
 import useAppointment from "../../hooks/useAppointment"
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import dayjs from "dayjs"
 
 export default function EditAppointment() {
-  const { appointmentID } = useParams()
+  const { appointmentID, userID } = useParams()
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
@@ -17,6 +18,11 @@ export default function EditAppointment() {
     getAppointment,
     updateAppointment,
   } = useAppointment()
+  const {
+    recommendations,
+    updateRecommendations,
+    getRecommendations,
+  } = useVaccination()
   const [loading, setLoader] = useState(false)
 
   const fetchAppointment = async () => {
@@ -32,6 +38,21 @@ export default function EditAppointment() {
     setLoader(false)
     setDialogOpen(true)
 
+    const recs = recommendations?.recommendation
+
+    const newRecomendations = recs.map((recommendation) => {
+      if (recommendation?.vaccineCode?.[0]?.text === appointment.description) {
+        recommendation.dateCriterion[0].value = dayjs(values?.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DD')
+        return recommendation
+      } else {
+        return recommendation
+      }
+    })
+
+    recommendations.recommendation = newRecomendations
+
+    await updateRecommendations(recommendations)
+
     setTimeout(() => {
       setDialogOpen(false)
       navigate(-1)
@@ -45,6 +66,7 @@ export default function EditAppointment() {
 
   useEffect(() => {
     fetchAppointment()
+    getRecommendations(userID)
   }, [])
     return (
       <>

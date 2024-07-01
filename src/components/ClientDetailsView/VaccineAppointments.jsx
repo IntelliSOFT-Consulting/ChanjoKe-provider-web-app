@@ -76,7 +76,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
           return (
             <>
               <Link
-                to={`/edit-appointment/${record?.id}`}
+                to={`/edit-appointment/${record?.id}/${patientData?.id}`}
                 className="text-[#163C94] font-semibold"
               >
                 Edit

@@ -189,7 +189,7 @@ const router = createBrowserRouter([
         element: <NewAppointment />,
       },
       {
-        path: '/edit-appointment/:appointmentID',
+        path: '/edit-appointment/:appointmentID/:userID',
         element: <EditAppointment />
       },
       {
