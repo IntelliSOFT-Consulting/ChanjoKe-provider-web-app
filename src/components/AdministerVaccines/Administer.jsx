@@ -1,18 +1,26 @@
-import { Form, Input, Select, Button, Popconfirm, InputNumber } from 'antd'
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Popconfirm,
+  Select,
+} from 'antd'
+import dayjs from 'dayjs'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import useEncounter from '../../hooks/useEncounter'
 import useObservations from '../../hooks/useObservations'
 import useVaccination from '../../hooks/useVaccination'
-import useEncounter from '../../hooks/useEncounter'
 import {
   createImmunizationResource,
   getBodyWeight,
   updateVaccineDueDates,
 } from './administerController'
-import { InfoCircleFilled } from '@ant-design/icons'
 
 export default function Administer() {
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -20,6 +28,8 @@ export default function Administer() {
   const [loading, setLoading] = useState(false)
 
   const [form] = Form.useForm()
+
+  const [nexVaccineForm] = Form.useForm()
 
   const currentPatient = useSelector((state) => state.currentPatient)
 
@@ -48,6 +58,7 @@ export default function Administer() {
     setNextVaccines({
       nextGroup: keys[indexOfKey + 1],
       nextScheduleDate: vaccineSchedules[keys[indexOfKey + 1]]?.[0]?.dueDate,
+      nextContent: vaccineSchedules[keys[indexOfKey + 1]],
     })
   }
 
@@ -125,6 +136,28 @@ export default function Administer() {
     }
   }
 
+  const handleNextDueDateChange = async (values) => {
+    const newScheduleDate = dayjs(values.nextDueDate).format('YYYY-MM-DD')
+    const previousScheduleDate = dayjs(nextVaccines?.nextScheduleDate).format(
+      'YYYY-MM-DD'
+    )
+
+    if (newScheduleDate !== previousScheduleDate) {
+      const updatedRecommendations = await getRecommendations(clientID)
+
+      await updateRecommendations(
+        updateVaccineDueDates(
+          updatedRecommendations,
+          nextVaccines.nextContent,
+          newScheduleDate
+        )
+      )
+    }
+    setDialogOpen(false)
+
+    window.location.reload()
+  }
+
   return (
     <>
       <ConfirmDialog
@@ -133,24 +166,40 @@ export default function Administer() {
           <div className="font-normal">
             <p>The vaccines have been successfully administered!</p>
             <div className="mt-2 bg-gray-200 w-fit mx-auto p-4 rounded-lg alert-col">
-              <div className="ml-2 mt-2">
-                <p className="font-semibold text-primary">
-                  Next Vaccine Appointment: <span className='text-black'>{nextVaccines?.nextScheduleDate?.format('DD MMM YYYY')}</span>
-                </p>
+              {isDialogOpen && (
+                <Form
+                  form={nexVaccineForm}
+                  className="ml-2 mt-2"
+                  onFinish={handleNextDueDateChange}
+                  initialValues={{
+                    nextDueDate: dayjs(nextVaccines?.nextScheduleDate),
+                  }}
+                >
+                  <p className="font-semibold text-primary">
+                    Next Vaccine Appointment
+                  </p>
 
-                <Form.Item
-                  name="numberOfAppointments"
-                  className='mt-3'
-                  label="Number of Appointments">
-                  <Input placeholder='12' disabled />
-                </Form.Item>
-              </div>
+                  <Form.Item name="nextDueDate" label="Next Due Date">
+                    <DatePicker
+                      defaultValue={dayjs(nextVaccines?.nextScheduleDate)}
+                      style={{ width: '100%' }}
+                    />
+                  </Form.Item>
 
-              
+                  <Form.Item
+                    name="numberOfAppointments"
+                    className="mt-3"
+                    label="Number of Appointments"
+                  >
+                    <Input placeholder="12" disabled />
+                  </Form.Item>
+                </Form>
+              )}
             </div>
           </div>
         }
-        onClose={() => window.location.reload()}
+        onClose={() => nexVaccineForm.submit()}
+        cancelText='Save'
       />
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
