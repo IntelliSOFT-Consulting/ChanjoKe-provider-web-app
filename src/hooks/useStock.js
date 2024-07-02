@@ -41,7 +41,7 @@ const useStock = () => {
 
   const receiveStock = async (data) => {
     setLoading(true)
-    const response = await post(inventoryPath, data)
+    const response = await post(deliveryPath, data)
     setLoading(false)
     return response
   }
