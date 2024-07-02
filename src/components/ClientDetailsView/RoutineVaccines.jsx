@@ -1,32 +1,23 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import {
-  Badge,
-  Button,
-  Checkbox,
-  Tag,
-  Tooltip,
-  FloatButton,
-  Popconfirm,
-} from 'antd'
+import { Badge, Button, Checkbox, FloatButton, Tag, Tooltip } from 'antd'
+import dayjs from 'dayjs'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useApiRequest } from '../../api/useApiRequest'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
+import SelectDialog from '../../common/dialog/SelectDialog'
 import Loader from '../../common/spinners/LoadingArrows'
 import useAefi from '../../hooks/useAefi'
+import useVaccination from '../../hooks/useVaccination'
 import { setCurrentPatient } from '../../redux/actions/patientActions'
 import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
-import { colorCodeVaccines } from './vaccineController'
-import dayjs from 'dayjs'
-import SelectDialog from '../../common/dialog/SelectDialog'
-import useVaccination from '../../hooks/useVaccination'
-import moment from 'moment'
 import DeleteModal from './DeleteModal'
+import { colorCodeVaccines } from './vaccineController'
 
 export default function RoutineVaccines({
   userCategory,
@@ -281,7 +272,9 @@ export default function RoutineVaccines({
             View
           </Button>
           {record.status === 'completed' &&
-            user?.practitionerRole?.toLowerCase()?.includes('administrator')(
+            user?.practitionerRole
+              ?.toLowerCase()
+              ?.includes('administrator') && (
               <Button
                 type="link"
                 danger
