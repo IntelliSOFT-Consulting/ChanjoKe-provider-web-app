@@ -147,9 +147,10 @@ export default function useVaccination() {
     return resources
   }
 
-  const getFacilityImmunizations = async (facilityId) => {
+  const getFacilityImmunizations = async (facilityId, params='') => {
+    
     const responses = await get(
-      `${immunizationsEndpoint}?location=${facilityId}&_count=10000000&status:not=entered-in-error&_count=100`
+      `${immunizationsEndpoint}?location=${facilityId}&_count=10000000&status:not=entered-in-error&_count=100${params}`
     )
 
     const resources = responses?.entry?.map((entry) => entry.resource)
