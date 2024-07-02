@@ -26,6 +26,7 @@ import dayjs from 'dayjs'
 import SelectDialog from '../../common/dialog/SelectDialog'
 import useVaccination from '../../hooks/useVaccination'
 import moment from 'moment'
+import DeleteModal from './DeleteModal'
 
 export default function RoutineVaccines({
   userCategory,
@@ -38,6 +39,7 @@ export default function RoutineVaccines({
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [selectAefi, setSelectAefi] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [immunizationToDelete, setImmunizationToDelete] = useState(null)
 
   const navigate = useNavigate()
 
@@ -46,6 +48,7 @@ export default function RoutineVaccines({
   const { updateImmunization } = useVaccination()
 
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const { user } = useSelector((state) => state.userInfo)
 
   const { getAefis, loading: loadingAefis } = useAefi()
 
@@ -53,11 +56,22 @@ export default function RoutineVaccines({
     ? [...new Set(Object.keys(routineVaccines))]
     : []
 
-  const deleteImmunization = async (id) => {
+  const deleteImmunization = async (id, reason) => {
     const immunization = immunizations?.find((entry) => entry.id === id)
 
     immunization.status = 'entered-in-error'
+    immunization.statusReason = {
+      coding: [
+        {
+          code: 'entered-in-error',
+          display: reason,
+        },
+      ],
+      text: reason,
+    }
+
     await updateImmunization(immunization)
+    setImmunizationToDelete(null)
     fetchData()
   }
 
@@ -266,18 +280,16 @@ export default function RoutineVaccines({
           >
             View
           </Button>
-          {record.status === 'completed' && (
-            <Popconfirm
-              title="Are you sure you want to delete this record?"
-              onConfirm={() => deleteImmunization(record.id)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button type="link" danger>
+          {record.status === 'completed' &&
+            user?.practitionerRole?.toLowerCase()?.includes('administrator')(
+              <Button
+                type="link"
+                danger
+                onClick={() => setImmunizationToDelete(record.id)}
+              >
                 Delete
               </Button>
-            </Popconfirm>
-          )}
+            )}
         </div>
       ),
     },
@@ -289,6 +301,13 @@ export default function RoutineVaccines({
         open={isDialogOpen}
         buttons={administerVaccineBtns}
         onClose={handleDialogClose}
+      />
+      <DeleteModal
+        immunization={immunizationToDelete}
+        onCancel={() => setImmunizationToDelete(null)}
+        onOk={(values) =>
+          deleteImmunization(immunizationToDelete, values.reason)
+        }
       />
       <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
         <div className="flex justify-between">

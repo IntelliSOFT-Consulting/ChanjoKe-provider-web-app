@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import useVaccination from '../hooks/useVaccination'
 import { useSelector } from 'react-redux'
 import LoadingArrows from '../common/spinners/LoadingArrows'
+import moment from 'moment'
 
 const stats = [
   { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient' },
@@ -71,8 +72,10 @@ export default function Home() {
 
   const { getFacilityImmunizations, immunizations } = useVaccination()
 
+  const today = moment().format('YYYY-MM-DD')
+
   useEffect(() => {
-    getFacilityImmunizations(user?.facility)
+    getFacilityImmunizations(user?.facility, `&date=gt${today}`)
   }, [user?.facility])
 
   const totalVaccines = immunizations?.length || 0
