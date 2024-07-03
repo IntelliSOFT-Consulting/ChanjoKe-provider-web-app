@@ -37,7 +37,10 @@ export default function VaccineAppointments({ userCategory, patientData, patient
       const completedImmunizations = immunizations.filter((immunization) => immunization.status === 'completed')
       const immunizedAppointments = completedImmunizations.map((item) => item?.vaccineCode?.text)
       const filtered = appointments.filter((appointment) => !immunizedAppointments.includes(appointment.appointments))
+      console.log({ filtered })
       setUnvaccinatedAppointments(filtered)
+    } else {
+      setUnvaccinatedAppointments(appointments)
     }
   }, [immunizations, appointments])
 

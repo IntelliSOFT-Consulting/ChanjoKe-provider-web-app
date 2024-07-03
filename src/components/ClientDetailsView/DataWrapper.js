@@ -7,6 +7,8 @@ dayjs.extend(utc);
 const createVaccinationAppointment = (data, patientID, recommendationID) => {
     let dateToAdminister = '';
 
+    const practitioner = JSON.parse(localStorage.getItem('practitioner'))
+
     try {
         const item = data?.dateCriterion?.find(item => 
             item.code.coding.some(code => code.code === "Earliest-date-to-administer")
@@ -28,15 +30,13 @@ const createVaccinationAppointment = (data, patientID, recommendationID) => {
           },
           {
             "doseNumber": data?.doseNumberPositiveInt,
-          }
+          },
+          {
+            "display": practitioner?.facility,
+          },
         ],
         "start": moment(data?.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm:ssZ'),
         "created": moment(dateToAdminister).format('YYYY-MM-DDTHH:mm:ssZ'),
-        // "basedOn": [
-        //   {
-        //     "reference": `ImmunizationRecommendation/${recommendationID}`
-        //   }
-        // ]
       }
 }
 
