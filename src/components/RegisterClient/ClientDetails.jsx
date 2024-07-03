@@ -591,6 +591,7 @@ export default function ClientDetails() {
             )}
             {currentStep < 4 && (
               <Tooltip
+                color="red"
                 title={
                   draftCaregiver
                     ? 'Please add the draft caregiver details to proceed.'
