@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { getOffset } from '../utils/methods'
+import { useSelector } from 'react-redux'
 
 const inventoryPath = '/hapi/fhir/InventoryItem'
 const deliveryPath = '/hapi/fhir/SupplyDelivery'
@@ -11,7 +12,97 @@ const useStock = () => {
   const [stockItem, setStockItem] = useState({})
   const [loading, setLoading] = useState(false)
 
+  const { user } = useSelector((state) => state.userInfo)
+
   const { get, post, put } = useApiRequest()
+
+
+  const createPayload = (values) => {
+    return {
+      resourceType: 'SupplyRequest',
+      identifier: [
+        {
+          system: 'https://hl7.org/fhir/R4/supplyrequest-definitions.html',
+        }
+      ],
+      status: 'active',
+      category: {
+        coding: [
+          {
+            code: 'central',
+            display: 'Central Supply'
+          }
+        ]
+      },
+      priority: 'routine',
+      itemCodeableConcept: {
+        coding: [
+          {
+            code: values.vaccine,
+            display: values.vaccine,
+          }
+        ]
+      },
+      quantity: {
+        value: values.quantity,
+      },
+      authoredOn: new Date().toISOString(),
+      occurrenceDateTime: values.preferredPickupDate,
+      requester: {
+        reference: `Practitioner/${user?.fhirPractitionerId}`,
+      },
+      deliverTo: {
+        reference: `Location/${values.facility}`,
+        display: values.facility,
+      },
+      extension: [
+        {
+          url: 'http://example.org/fhir/StructureDefinition/level',
+          valueString: values.level
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/last-order-date',
+          valueDateTime: values.lastOrderDate
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/this-order-date',
+          valueDateTime: values.thisOrderDate
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/expected-next-order-date',
+          valueDateTime: values.expectedDateOfNextOrder
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/total-population',
+          valueString: values.totalPopulation
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/children-0-11-months',
+          valueString: values.children011Months
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/pregnant-women',
+          valueString: values.pregnantWomen
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/doses-in-stock',
+          valueString: values.dosesInStock
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/minimum-doses',
+          valueString: values.minimumDoses
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/maximum-doses',
+          valueString: values.maximumDoses
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/recommended-stock',
+          valueString: values.recommendedStock
+        }
+      ]
+    }
+  }
 
   const getStock = async (page = 0, facility = null) => {
     setLoading(true)
@@ -41,7 +132,7 @@ const useStock = () => {
 
   const receiveStock = async (data) => {
     setLoading(true)
-    const response = await post(inventoryPath, data)
+    const response = await post(deliveryPath, data)
     setLoading(false)
     return response
   }
@@ -138,8 +229,10 @@ const useStock = () => {
 
   const requestStock = async (data) => {
     setLoading(true)
-    const response = await post(supplyRequestPath, data)
+    const payload = createPayload(data)
+    const response = await post(supplyRequestPath, payload)
     setLoading(false)
+    console.log(response)
     return response
   }
 
@@ -166,6 +259,7 @@ const useStock = () => {
     adjustVVMStatus,
     updateStockCount,
     requestStock,
+    createPayload
   }
 }
 

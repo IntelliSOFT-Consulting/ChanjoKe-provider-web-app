@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { nonRoutineVaccines, routineVaccines } from '../data/vaccineData'
 import { formatCardTitle } from '../utils/methods'
@@ -181,6 +181,16 @@ export default function useVaccination() {
     await put(`${immunizationsEndpoint}/${immunization.id}`, immunization)
   }
 
+  const getAllVaccines = useCallback(async () => {
+    console.log('Fetching all vaccines')
+    const allVaccines = [
+      ...routineVaccines,
+      ...nonRoutineVaccines,
+    ]
+    console.log(allVaccines)
+    return allVaccines
+  }, [])
+
   return {
     createRecommendations,
     updateRecommendations,
@@ -195,5 +205,6 @@ export default function useVaccination() {
     immunizations,
     immunization,
     getFacilityImmunizations,
+    getAllVaccines,
   }
 }

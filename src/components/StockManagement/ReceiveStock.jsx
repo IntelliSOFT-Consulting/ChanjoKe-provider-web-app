@@ -1,7 +1,8 @@
 import React from 'react'
-import { Card, Button, Form, Input, Select, DatePicker } from 'antd'
+import { Card, Button, Form, Input, Select, DatePicker, notification } from 'antd'
 import useInputTable from '../../hooks/InputTable'
 import { createUseStyles } from 'react-jss'
+import useStock from '../../hooks/useStock'
 
 const { useForm } = Form
 
@@ -31,6 +32,7 @@ const useStyles = createUseStyles({
 const ReceiveStock = () => {
   const classes = useStyles()
   const [form] = useForm()
+  const { receiveStock, loading } = useStock()
 
   const columns = [
     { title: 'Vaccine/Diluents', dataIndex: 'vaccine', type: 'select' },
@@ -60,8 +62,18 @@ const ReceiveStock = () => {
 
   const { InputTable, values } = useInputTable({ columns })
 
-  const onSubmit = (values) => {
-    console.log(values)
+  const onSubmit = async(values) => {
+    try {
+      const response = await receiveStock(values)
+      notification.success({
+        message: 'Stock received successfully',
+      })
+      form.resetFields()
+    } catch (error) {
+      notification.error({
+        message: 'Failed to receive stock',
+      })
+    }
   }
 
   return (
@@ -78,7 +90,7 @@ const ReceiveStock = () => {
           >
             Cancel
           </Button>
-          <Button className={classes.btnPrimary} onClick={() => form.submit()}>
+          <Button className={classes.btnPrimary} onClick={() => form.submit()} loading={loading}>
             Save
           </Button>
         </div>,
