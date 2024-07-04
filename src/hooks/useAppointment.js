@@ -54,9 +54,8 @@ export default function useAppointment() {
         appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
         status: capitalizeFirstLetter(appointment?.resource?.status),
         id: appointment?.resource?.id,
-        // actions: appointment?.resource?.status === 'cancelled' ? 
-        //  [] :
-        //  [{ title: 'edit', url: `/edit-appointment/${appointment?.resource?.id}` }, { title: 'cancel', btnAction: { appointment: `${JSON.stringify(appointment?.resource)}`, targetName: 'cancelAppointment' }}]
+        location: appointment?.resource?.supportingInformation?.[1]?.display,
+        createdAt: appointment?.resource?.meta?.lastUpdated,
       }))
       setAppointments(appointmentsResponse)
       setAppointmentPagination(response?.link)

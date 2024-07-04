@@ -15,13 +15,8 @@ export default function NewAppointment() {
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const {
-    getRecommendations,
-    getImmunizations,
-    updateRecommendations,
-    recommendations,
-  } = useVaccination()
-  const { createAppointment, getPatientAppointments } = useAppointment()
+  const { getRecommendations, getImmunizations, updateRecommendations, recommendations } = useVaccination()
+  const { createAppointment, getPatientAppointments, appointments } = useAppointment()
 
   const [isDialogOpen, setDialogOpen] = useState(false)
 
@@ -31,10 +26,18 @@ export default function NewAppointment() {
 
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
   const [loadingAppointment, setLoading] = useState(false)
+  const [facilityAppointmentCount, setFacilityAppointmentCount] = useState([])
 
   function removeVaccineWord(inputString) {
     return inputString.replace(/vaccination/gi, '')
   }
+
+  useEffect(() => {
+    const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
+    const appointmentsToday = appointments.filter((appointment) => moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(moment(), 'day') ? appointment : null)
+    const facilityAppointments = appointmentsToday.filter((appointment) => appointment?.location === practitionerDetails?.facility)
+    setFacilityAppointmentCount(facilityAppointments)
+  }, [appointments])
 
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
@@ -258,9 +261,10 @@ export default function NewAppointment() {
                             Number of Appointments:
                           </span>
                         </div>
-                      }
-                    >
-                      <Input placeholder="12" className="py-2" disabled />
+                      }>
+
+                        <Input placeholder={facilityAppointmentCount.length} className='py-2' disabled />
+                      
                     </Form.Item>
                   </Col>
                 </div>

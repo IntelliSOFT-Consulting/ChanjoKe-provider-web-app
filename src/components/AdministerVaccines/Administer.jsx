@@ -16,6 +16,7 @@ import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useEncounter from '../../hooks/useEncounter'
 import useObservations from '../../hooks/useObservations'
 import useVaccination from '../../hooks/useVaccination'
+import useAppointment from '../../hooks/useAppointment'
 import {
   createImmunizationResource,
   getBodyWeight,
@@ -70,6 +71,8 @@ export default function Administer() {
   } = useVaccination()
 
   const { createEncounter } = useEncounter()
+  const { getPatientAppointments, appointments } = useAppointment()
+  const [facilityAppointmentCount, setFacilityAppointmentCount] = useState([])
 
   const getWeight = async () => {
     const observation = await getLatestObservation(clientID)
@@ -85,6 +88,7 @@ export default function Administer() {
   }
 
   useEffect(() => {
+    getPatientAppointments(clientID)
     if (!selectedVaccines || selectedVaccines?.length === 0) {
       navigate(`/client-details/${clientID}/routineVaccines`)
     } else {
@@ -92,6 +96,13 @@ export default function Administer() {
       findNextVaccines()
     }
   }, [selectedVaccines])
+
+  useEffect(() => {
+    const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
+    const appointmentsToday = appointments.filter((appointment) => moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(moment(), 'day') ? appointment : null)
+    const facilityAppointments = appointmentsToday.filter((appointment) => appointment?.location === practitionerDetails?.facility)
+    setFacilityAppointmentCount(facilityAppointments)
+  }, [appointments])
 
   const handleFormSubmit = async (values) => {
     setLoading(true)
@@ -191,7 +202,7 @@ export default function Administer() {
                     className="mt-3"
                     label="Number of Appointments"
                   >
-                    <Input placeholder="12" disabled />
+                    <Input placeholder={facilityAppointmentCount.length} disabled />
                   </Form.Item>
                 </Form>
               )}
