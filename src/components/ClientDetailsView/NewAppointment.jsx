@@ -33,7 +33,6 @@ export default function NewAppointment() {
   }
 
   useEffect(() => {
-    console.log({ appointments })
     const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
     const appointmentsToday = appointments.filter((appointment) => moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(moment(), 'day') ? appointment : null)
     const facilityAppointments = appointmentsToday.filter((appointment) => appointment?.location === practitionerDetails?.facility)
