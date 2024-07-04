@@ -1,6 +1,11 @@
 import { Card, Button, Form, Input, Select, DatePicker, notification } from 'antd'
 import { createUseStyles } from 'react-jss'
 import useInputTable from '../../hooks/InputTable'
+import useStock from '../../hooks/useStock'
+import { useLocations } from '../../hooks/useLocation'
+import useVaccination from '../../hooks/useVaccination'
+import { useEffect, useState } from 'react'
+import moment from 'moment'
 
 const { useForm } = Form
 
@@ -30,17 +35,58 @@ const useStyles = createUseStyles({
 export default function NewOrder() {
   const classes = useStyles()
   const [form] = useForm()
+  const { loading, requestStock } = useStock()
+  const { getAllVaccines } = useVaccination()
+  const [ vaccineOptions, setVaccineOptions ] = useState([])
 
+  const { 
+    counties,
+    subCounties,
+    facilities,
+    wards, 
+    handleCountyChange, 
+    handleSubCountyChange,
+    handleWardChange
+  } = useLocations(form)
+
+
+  useEffect(() => {
+    const fetchVaccines = async() => {
+      try{
+        const vaccines = await getAllVaccines()
+        if(Array.isArray(vaccines)){
+          const formattedVaccines = vaccines.map((vaccine) => ({
+            value: vaccine.vaccineName,
+            label: vaccine.vaccineName
+          }))
+
+          setVaccineOptions(formattedVaccines)
+        }else{
+          console.error("Vaccine data is not an Array", vaccines)
+        }
+      }catch(error){
+        console.log("Error fetching vaccines: ", error)
+      }
+
+    }
+
+    fetchVaccines()
+  }, [getAllVaccines])
 
   const columns = [
-    { title: 'Antigen ', dataIndex: 'vaccine', type: 'select' },
-    { title: 'Doses in Stock', dataIndex: 'batchNumber', type: 'number' },
-    { title: 'Minimum', dataIndex: 'expiryDate', type: 'number' },
-    { title: 'Maximum', dataIndex: 'quantity', type: 'number' },
-    { title: 'Recommended Stock', dataIndex: 'stockQuantity', type: 'number' },
+    { 
+      title: 'Antigen ', 
+      dataIndex: 'vaccine', 
+      type: 'select', 
+      options: vaccineOptions,
+    },
+    { title: 'Doses in Stock', dataIndex: 'dosesInStock', type: 'number' },
+    { title: 'Minimum', dataIndex: 'minimumDoses', type: 'number' },
+    { title: 'Maximum', dataIndex: 'maximumDoses', type: 'number' },
+    { title: 'Recommended Stock', dataIndex: 'recommendedStock', type: 'number' },
     {
       title: 'Ordered Amount',
-      dataIndex: 'manufacturerDetails',
+      dataIndex: 'quantity',
       type: 'number',
     },
     { title: 'Action', dataIndex: 'action', type: 'remove' },
@@ -48,11 +94,19 @@ export default function NewOrder() {
 
   const { InputTable } = useInputTable({ columns })
 
-  const onSubmit = (data) => {
-    console.log(data)
-    notification.success({
-      message: 'Order created successfully',
-    })
+  const onSubmit = async(data) => {
+    try{
+      await requestStock(data)
+      console.log(data)
+      notification.success({
+        message: 'Order created successfully',
+      })
+      form.resetFields()
+    }catch{
+      notification.error({
+        message: 'Error creating order',
+      })
+    }
   }
 
   return (
@@ -90,31 +144,91 @@ export default function NewOrder() {
             label="Name of County:"
             name="nameOfCounty"
           >
-            <Input placeholder="Name of the County" />
+            <Select
+              onChange={(value) => handleCountyChange(value)}
+              placeholder="Select County"
+              options={counties?.map((county) => ({
+                value: county.key,
+                label: county.name,
+              }))}
+              allowClear
+              showSearch
+              filterOption={(input, option) =>
+                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            />
           </Form.Item>
 
           <Form.Item
             label="Sub-county"
             name="subCounty"
           >
-            <Input placeholder="Sub County" />
+            <Select
+              onChange={(value) => handleSubCountyChange(value)}
+              placeholder="Select Subcounty"
+              options={subCounties?.map((subCounty) => ({
+                value: subCounty.key,
+                label: subCounty.name,
+              }))}
+              allowClear
+              showSearch
+              filterOption={(input, option) =>
+                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            />
+          </Form.Item>
+
+          <Form.Item
+            label='Ward'
+            name="ward"
+          >
+            <Select
+              onChange={(value) => handleWardChange(value)}
+              placeholder="Select a Ward"
+              options={wards?.map((ward) => ({
+                value: ward.key,
+                label: ward.name,
+              }))}
+              allowClear
+              showSearch
+              filterOption={(input, option) =>
+                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            />
           </Form.Item>
 
           <Form.Item
             label="Order Location"
-            name="orderLocation"
+            name="facility"
             rules={[
               { required: true, message: 'Please input the order location' },
             ]}
           >
-            <Input placeholder="Select Order Location" />
+            <Select
+              placeholder="Select Order Location"
+              options={facilities?.map((facility) => ({
+                value: facility.key,
+                label: facility.name,
+              }))}
+              allowClear
+              showSearch
+              filterOption={(input, option) =>
+                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            />
           </Form.Item>
 
           <Form.Item
             label="Date of Last Order:"
             name="lastOrderDate"
           >
-            <DatePicker className="w-full" placeholder="Date of Last Order" />
+            <DatePicker 
+              className="w-full" 
+              placeholder="Date of Last Order" 
+              disabledDate={(current) => 
+                current && current > moment().subtract(1, 'days').startOf('days')
+              }
+            />
           </Form.Item>
 
           <Form.Item
