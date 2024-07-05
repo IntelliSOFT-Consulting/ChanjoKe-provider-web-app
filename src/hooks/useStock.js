@@ -259,7 +259,8 @@ const useStock = () => {
     adjustVVMStatus,
     updateStockCount,
     requestStock,
-    createPayload
+    createPayload,
+    myFacilityRequests
   }
 }
 
