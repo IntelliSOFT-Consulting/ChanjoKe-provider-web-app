@@ -44,6 +44,8 @@ import ReferralDetails from '../pages/ReferralDetails'
 import NewAppointment from '../components/ClientDetailsView/NewAppointment'
 import AEFIDetails from '../components/AEFI/AEFIDetails'
 import Referrals from '../pages/Referrals'
+import Campaigns from '../pages/Campaigns'
+import CampaignDetails from '../components/Campaigns/CampaignDetails'
 import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 
 function SearchInterfaceWrapper() {
@@ -212,6 +214,14 @@ const router = createBrowserRouter([
         path: '/referrals',
         element: <Referrals />,
       },
+      {
+        path: '/campaigns',
+        element: <Campaigns />,
+      },
+      {
+        path: '/campaign/:campaignID',
+        element: <CampaignDetails />
+      }
     ],
   },
 

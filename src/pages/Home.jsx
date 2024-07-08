@@ -38,6 +38,7 @@ const stats = [
     href: 'stock-management',
   },
   { name: 'Referrals', icon: ReferralIcon, href: 'referrals' },
+  { name: 'Campaigns', icon: ReferralIcon, href: 'campaigns' },
 ]
 
 const statsTwo = [
@@ -124,7 +125,7 @@ export default function Home() {
       <br />
 
       <div>
-        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-4 p-6 rounded-lg shadow-xl border bg-white">
+        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 p-6 rounded-lg shadow-xl border bg-white">
           {stats.map((item) => (
             <Link
               to={item.href}
