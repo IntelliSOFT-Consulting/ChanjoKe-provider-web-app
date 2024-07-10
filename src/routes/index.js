@@ -45,6 +45,7 @@ import NewAppointment from '../components/ClientDetailsView/NewAppointment'
 import AEFIDetails from '../components/AEFI/AEFIDetails'
 import Referrals from '../pages/Referrals'
 import EditAppointment from '../components/ClientDetailsView/EditAppointment'
+import OrderDetails from '../components/StockManagement/OrderDetails'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -136,7 +137,14 @@ const router = createBrowserRouter([
             path: '/stock-management/administration',
             element: <Administration />,
           },
-          { path: '/stock-management/ledger', element: <Ledger /> },
+          { 
+            path: '/stock-management/ledger', 
+            element: <Ledger /> 
+          },
+          {
+            path: '/stock-management/order-details/:orderID',
+            element: <OrderDetails />,
+          }
         ],
       },
       {
