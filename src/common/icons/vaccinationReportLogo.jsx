@@ -3,7 +3,7 @@ export default function VaccinationReportLogo(props) {
     <>
       <svg id="vuesax_linear_task-square" data-name="vuesax/linear/task-square" xmlns="http://www.w3.org/2000/svg" width={props.width} height={props.height} viewBox="0 0 20.004 20.004">
         <g id="task-square">
-          <path id="Vector" d="M0,0H4.376" transform="translate(10.311 7.402)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector" d="M0,0H4.376" transform="translate(10.311 7.402)" fill="none" stroke="#292d32"  strokeLinecap="round" strokeLinejoin="round" stroke-width="1.5"/>
           <path id="Vector-2" data-name="Vector" d="M0,1.25l.625.625L2.5,0" transform="translate(5.318 6.151)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
           <path id="Vector-3" data-name="Vector" d="M0,0H4.376" transform="translate(10.311 13.236)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
           <path id="Vector-4" data-name="Vector" d="M0,1.25l.625.625L2.5,0" transform="translate(5.318 11.986)" fill="none" stroke="#292d32"  stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>

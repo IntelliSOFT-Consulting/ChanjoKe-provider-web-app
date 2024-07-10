@@ -12,11 +12,24 @@ import { WarningTwoTone } from '@ant-design/icons'
 import moment from 'moment'
 
 export default function NewAppointment() {
+  const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
+
   const navigate = useNavigate()
   const { userID } = useParams()
   const [form] = Form.useForm()
-  const { getRecommendations, getImmunizations, updateRecommendations, recommendations } = useVaccination()
-  const { createAppointment, getPatientAppointments, appointments } = useAppointment()
+  const {
+    recommendations,
+    getRecommendations,
+    getImmunizations,
+    updateRecommendations,
+  } = useVaccination()
+  const {
+    loader,
+    facilityAppointments,
+    getFacilityAppointments,
+    createAppointment,
+    getPatientAppointments,
+  } = useAppointment()
 
   const [isDialogOpen, setDialogOpen] = useState(false)
 
@@ -26,18 +39,10 @@ export default function NewAppointment() {
 
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
   const [loadingAppointment, setLoading] = useState(false)
-  const [facilityAppointmentCount, setFacilityAppointmentCount] = useState([])
 
   function removeVaccineWord(inputString) {
     return inputString.replace(/vaccination/gi, '')
   }
-
-  useEffect(() => {
-    const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
-    const appointmentsToday = appointments.filter((appointment) => moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(moment(), 'day') ? appointment : null)
-    const facilityAppointments = appointmentsToday.filter((appointment) => appointment?.location === practitionerDetails?.facility)
-    setFacilityAppointmentCount(facilityAppointments)
-  }, [appointments])
 
   const fetchPatientImmunization = async () => {
     setLoadingRecommendations(true)
@@ -252,7 +257,24 @@ export default function NewAppointment() {
                   )}
                 </div>
                 <div>
-                  <Col className="gutter-row" span={12}>
+                  {loader && (
+                    <>
+                      <Spin
+                        className="mt-2"
+                        indicator={
+                          <LoadingOutlined
+                            style={{
+                              fontSize: 24,
+                            }}
+                            spin
+                          />
+                        }
+                      />
+                      <span className="ml-4">Loading appointments on selected date</span>
+                    </>
+                  )}
+
+                  {!loader && <Col className="gutter-row" span={12}>
                     <Form.Item
                       name="numberOfAppointments"
                       label={
@@ -263,10 +285,11 @@ export default function NewAppointment() {
                         </div>
                       }>
 
-                        <Input placeholder={facilityAppointmentCount.length} className='py-2' disabled />
+                        <Input placeholder={facilityAppointments.length} className='py-2' disabled />
                       
                     </Form.Item>
                   </Col>
+                  }
                 </div>
               </div>
             </Form>
@@ -339,6 +362,7 @@ export default function NewAppointment() {
                               dayjs(e).format('DD-MM-YYYY'))
                           }
                         })
+                        getFacilityAppointments(practitionerDetails?.facility, dayjs(e).format('YYYY-MM-DD'))
                       }}
                       format={'DD-MM-YYYY'}
                       className="w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"

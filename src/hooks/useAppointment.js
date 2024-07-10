@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useApiRequest } from "../api/useApiRequest"
 import dayjs from "dayjs";
+import moment from 'moment';
 
 const appointmentsEndpoint = '/hapi/fhir/Appointment'
 
@@ -15,6 +16,7 @@ export default function useAppointment() {
   const [appointment, setAppointment] = useState({})
   const [appointments, setAppointments] = useState([])
   const [totalAppointments, setTotal] = useState(0)
+  const [facilityAppointments, setFacilityAppointments] = useState([])
   const [appointmentsPagination, setAppointmentPagination] = useState([])
 
   const getAppointment = async (appointment) => {
@@ -68,15 +70,26 @@ export default function useAppointment() {
     }
   }
 
+  const getFacilityAppointments = async (facilityId, appointmentDate) => {
+    setLoader(true)
+    const response = await get(`${appointmentsEndpoint}?_count=10000`)
+    const appointmentsOnAppointmentDate = response?.entry?.filter((appointment) => moment(moment(appointment?.resource?.start).format('YYYY-MM-DD')).isSame(appointmentDate, 'day'))
+    const facilityAppointmentsF = appointmentsOnAppointmentDate?.filter((appointment) => appointment?.resource?.supportingInformation?.[1]?.display === facilityId)
+    setFacilityAppointments(facilityAppointmentsF)
+    setLoader(false)
+  }
+
   return {
     loader,
     appointment,
     appointments,
     appointmentsPagination,
     totalAppointments,
+    facilityAppointments,
     getAppointment,
     updateAppointment,
     createAppointment,
     getPatientAppointments,
+    getFacilityAppointments,
   }
 }
