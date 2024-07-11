@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { Form, Col, Row, DatePicker, Button } from "antd"
 import useVaccination from '../../hooks/useVaccination'
 import useAppointment from "../../hooks/useAppointment"
@@ -7,6 +7,8 @@ import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import dayjs from "dayjs"
 
 export default function EditAppointment() {
+  const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
+
   const { appointmentID, userID } = useParams()
   const navigate = useNavigate()
   const [form] = Form.useForm()
@@ -15,27 +17,25 @@ export default function EditAppointment() {
 
   const {
     appointment,
+    loader,
+    facilityAppointments,
     getAppointment,
     updateAppointment,
+    getFacilityAppointments,
   } = useAppointment()
   const {
     recommendations,
     updateRecommendations,
     getRecommendations,
   } = useVaccination()
-  const [loading, setLoader] = useState(false)
 
   const fetchAppointment = async () => {
-    setLoader(true)
     await getAppointment(appointmentID)
-    setLoader(false)
   }
 
   const onFinish = async (values) => {
-    setLoader(true)
     const datedd = dayjs(values?.appointmentDate).format('YYYY-MM-DDTHH:mm:ssZ')
     await updateAppointment(appointmentID, { ...appointment, start: datedd, status: 'booked' })
-    setLoader(false)
     setDialogOpen(true)
 
     const recs = recommendations?.recommendation
@@ -62,6 +62,7 @@ export default function EditAppointment() {
   useEffect(() => {
     form.setFieldValue('scheduledDate', dayjs(appointment?.created))
     form.setFieldValue('appointmentDate', dayjs(appointment?.start))
+    getFacilityAppointments(practitionerDetails?.facility, dayjs(appointment?.start).format('YYYY-MM-DD'))
   }, [appointment])
 
   useEffect(() => {
@@ -83,8 +84,12 @@ export default function EditAppointment() {
         />
 
         <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
-          <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
+          <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 rounded-lg px-4 sm:flex-nowrap sm:px-6 lg:px-8 shadow py-4">
             <h3 className="text-xl font-medium">Edit Appointment</h3>
+            <h2 className="ml-auto flex items-center gap-x-1 ">
+              <span className="font-bold">Number of Appointments: </span>
+              <span>{facilityAppointments.length || 0}</span>
+            </h2>
           </div>
 
           <Form
@@ -133,6 +138,9 @@ export default function EditAppointment() {
                       const today = dayjs();
                       return current && (current < today);
                     }}
+                    onChange={(e) => {
+                      getFacilityAppointments(practitionerDetails?.facility, dayjs(e).format('YYYY-MM-DD'))
+                    }}
                     format={'DD-MM-YYYY'}
                     className='w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]' />
                 </Form.Item>
@@ -149,7 +157,7 @@ export default function EditAppointment() {
               <Button
                 htmlType="submit"
                 type="primary"
-                loading={loading}
+                loading={loader}
                 className='ml-4 outline outline-[#163C94] rounded-md px-5 bg-[#163C94] outline-2 text-white'>
                 Update
               </Button>
