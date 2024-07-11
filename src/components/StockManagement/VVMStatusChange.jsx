@@ -1,5 +1,113 @@
+import { Button, Card } from "antd";
+import useInputTable from "../../hooks/InputTable";
+import { useEffect, useState } from "react";
+import useVaccination from "../../hooks/useVaccination";
+import { createUseStyles } from "react-jss";
+
+const useStyles = createUseStyles({
+  btnPrimary: {
+    backgroundColor: '#163C94',
+    borderColor: '#163C94',
+    color: 'white',
+    '&:hover': {
+      backgroundColor: '#163C94 !important',
+      borderColor: '#163C94',
+      color: 'white !important',
+    },
+  },
+})
+
 export default function VVMStatusChange() {
+
+  const [vaccineOptions, setVaccineOptions] = useState([])
+
+  const { getAllVaccines } = useVaccination()
+
+  const classes = useStyles()
+
+  useEffect(() => {
+    const fetchVaccines = async () => {
+      try {
+        const vaccines = await getAllVaccines()
+        if (Array.isArray(vaccines)) {
+          const formattedVaccines = vaccines.map((vaccine) => ({
+            value: vaccine.vaccineName,
+            label: vaccine.vaccineName
+          }))
+          setVaccineOptions(formattedVaccines)
+        } else {
+          console.error("Vaccine data is not an Array", vaccines)
+        }
+      } catch (error) {
+        console.log("Error fetching vaccines: ", error)
+      }
+    }
+
+    fetchVaccines()
+  }, [getAllVaccines])
+
+  const columns = [
+    {
+      title: 'Vaccine/Diluents',
+      dataIndex: 'vaccine',
+      type: 'select',
+      options: vaccineOptions,
+    },
+    {
+      title: 'Batch Number',
+      dataIndex: 'batchNumber',
+      type: 'select',
+    },
+    {
+      title: 'Previous VVM',
+      dataIndex: 'expiryDate',
+      type: 'select',
+    },
+    {
+      title: 'New VVM',
+      dataIndex: 'stockQuantity',
+      type: 'select',
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      type: 'number',
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      type: 'remove',
+    }
+  ]
+
+  const { InputTable } = useInputTable({ columns })
+
   return (
-    <>VVM Status Change</>
+    <>
+      <Card
+        className="mt-5"
+        title={<div className="text-xl font-semibold">VVM Status Change</div>}
+        actions={[
+          <div className="flex justify-end px-6">
+            <Button
+              type="primary"
+              className="mr-4"
+              ghost
+            >
+              Cancel
+            </Button>
+            <Button
+              className={classes.btnPrimary}
+            >
+              Submit
+            </Button>
+          </div>
+        ]}
+      >
+        <div className="p-5">
+          <InputTable />
+        </div>
+      </Card>
+    </>
   )
 }
