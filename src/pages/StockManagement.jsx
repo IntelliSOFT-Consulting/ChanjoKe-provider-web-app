@@ -30,9 +30,9 @@ export default function StockManagement() {
 
   const stats = [
     { name: "Receive Stock", icon: "ReceiveStockLogo", href: "receive-stock" },
-    { name: "Order Stock", icon: "OrderStockLogo", href: "order-stock" },
+    { name: "Order Stock", icon: "OrderStockLogo", href: "new-order" },
     { name: "Issue Stock", icon: "IssueStockLogo", href: "issue-stock" },
-    { name: "Stock Ledger", icon: "StockLedgerLogo", href: "stock-ledger" },
+    { name: "Stock Ledger", icon: "StockLedgerLogo", href: "ledger" },
   ];
 
   const tHeaders = [
