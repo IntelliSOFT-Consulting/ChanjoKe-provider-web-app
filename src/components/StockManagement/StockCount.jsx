@@ -93,7 +93,7 @@ export default function StockCount() {
     <>
       <Card
         className="mt-5"
-        title={<div className="text-xl font-semibold">VVM Status Change</div>}
+        title={<div className="text-xl font-semibold">Stock Count</div>}
         actions={[
           <div className="flex justify-end px-6">
             <Button
