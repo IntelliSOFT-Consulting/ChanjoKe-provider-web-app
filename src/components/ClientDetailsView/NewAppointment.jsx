@@ -163,6 +163,7 @@ export default function NewAppointment() {
     const vaccine = vaccinesToAppoint.find(
       (item) => item?.vaccineCode?.[0]?.text === e
     )
+    console.log({ vaccine })
     setVaccineAppointments([...vaccinesAppointments, vaccine])
 
     const vaccines = vaccinesToAppoint.filter(
@@ -240,7 +241,10 @@ export default function NewAppointment() {
                         {!loadingRecommendations && (
                           <Select
                             size="large"
-                            onChange={(e) => addVaccineRecommendation(e)}
+                            onChange={(e) => {
+                              console.log({ e, vaccinesToAppoint })
+                              addVaccineRecommendation(e)
+                            }}
                           >
                             {vaccinesToAppoint.map((option) => (
                               <Select.Option
@@ -379,6 +383,7 @@ export default function NewAppointment() {
                           item?.vaccineCode?.[0]?.text !==
                           vacc?.vaccineCode?.[0]?.text
                       )
+                      setAppointmentList([...vaccinesToAppoint, vacc ])
                       setVaccineAppointments(vaccines)
                     }}
                     className="flex-shrink-0 size-4 mr-2 mt-10 inline-flex rounded-full"
