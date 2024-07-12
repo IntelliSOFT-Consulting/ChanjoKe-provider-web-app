@@ -92,11 +92,22 @@ export default function NewOrder() {
     { title: 'Action', dataIndex: 'action', type: 'remove' },
   ]
 
-  const { InputTable } = useInputTable({ columns })
+  const { InputTable, values: tableValues, setValues } = useInputTable({ columns })
 
   const onSubmit = async(data) => {
     try{
-      await requestStock(data)
+      const combinedData = {
+        ...data, 
+        ...tableValues[0]
+      }
+
+      localStorage.setItem('orderData', JSON.stringify(combinedData))
+
+      const antigenData = JSON.parse(localStorage.getItem('orderData'))
+
+      console.log(antigenData, combinedData, data)
+
+      await requestStock(antigenData)
       console.log(data)
       notification.success({
         message: 'Order created successfully',
