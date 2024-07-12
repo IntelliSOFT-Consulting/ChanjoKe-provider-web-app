@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Input, InputNumber, Select, DatePicker } from "antd";
+import { Button, Input, InputNumber, Select, DatePicker, Form } from "antd";
 import DataTable from "../components/DataTable";
 import { createUseStyles } from "react-jss";
 import dayjs from "dayjs";
@@ -51,13 +51,17 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
         );
       case "select":
         return (
-          <Select
-            className="w-full"
-            placeholder={column.inputPlaceholder}
-            value={values[index][column.dataIndex]}
-            onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
-            {...column}
-          />
+          <Form.Item
+            name={values[index][column.dataIndex]}
+          >
+            <Select
+              className="w-full"
+              placeholder={column.inputPlaceholder}
+              // value={values[index][column.dataIndex]}
+              onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+              {...column}
+            />
+          </Form.Item>
         );
       case "date":
         return (
@@ -71,12 +75,16 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
         );
       case "number":
         return (
-          <InputNumber
-            placeholder={column.inputPlaceholder}
-            value={values[index][column.dataIndex]}
-            onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
-            {...column}
-          />
+          <Form.Item
+            name={values[index][column.dataIndex]}
+          >
+            <InputNumber
+              placeholder={column.inputPlaceholder}
+              // value={values[index][column.dataIndex]}
+              onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+              {...column}
+            />
+          </Form.Item>
         );
       case "remove":
         return (
@@ -116,5 +124,5 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
       </div>
     );
   };
-  return { InputTable, values };
+  return { InputTable, values, setValues };
 }
