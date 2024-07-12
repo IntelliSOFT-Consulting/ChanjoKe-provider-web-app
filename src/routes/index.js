@@ -27,7 +27,8 @@ import CreateAEFI from '../components/AEFI/CreateAEFI'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
-import Adjustments from '../components/StockManagement/Adjustments'
+import PositiveAdjustments from '../components/StockManagement/PositiveAdjustments'
+import NegativeAdjustments from '../components/StockManagement/NegativeAdjustments'
 import VVMStatusChange from '../components/StockManagement/VVMStatusChange'
 import NewOrder from '../components/StockManagement/NewOrder'
 import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
@@ -117,11 +118,11 @@ const router = createBrowserRouter([
           { path: '/stock-management/stock-count', element: <StockCount /> },
           {
             path: '/stock-management/positive-adjustment',
-            element: <Adjustments polarity={'positive'} />,
+            element: <PositiveAdjustments />,
           },
           {
             path: '/stock-management/negative-adjustment',
-            element: <Adjustments polarity={'negative'} />,
+            element: <NegativeAdjustments />,
           },
           {
             path: '/stock-management/vvm-status',
