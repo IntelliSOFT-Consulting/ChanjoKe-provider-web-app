@@ -227,6 +227,13 @@ const useStock = () => {
     return data
   }
 
+  const getSupplyRequestById = async (id) => {
+    setLoading(true)
+    const response = await get(`${supplyRequestPath}/${id}`)
+    setLoading(false)
+    return response
+  }
+
   const requestStock = async (data) => {
     setLoading(true)
     const payload = createPayload(data)
@@ -260,7 +267,9 @@ const useStock = () => {
     updateStockCount,
     requestStock,
     createPayload,
-    myFacilityRequests
+    myFacilityRequests,
+    mySupplyRequests,
+    getSupplyRequestById,
   }
 }
 
