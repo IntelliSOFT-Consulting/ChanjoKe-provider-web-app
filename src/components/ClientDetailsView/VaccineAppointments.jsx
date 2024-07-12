@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
 import Table from '../DataTable'
+import dayjs from 'dayjs'
 import { getOffset } from '../../utils/methods'
 import useVaccination from '../../hooks/useVaccination'
 
@@ -33,6 +34,10 @@ export default function VaccineAppointments({ userCategory, patientData, patient
   }, [userCategory])
 
   useEffect(() => {
+    fetchVaccinations()
+  }, [immunizations, appointments])
+
+  const fetchVaccinations = () => {
     if (Array.isArray(immunizations) && immunizations.length > 0) {
       const completedImmunizations = immunizations.filter((immunization) => immunization.status === 'completed')
       const immunizedAppointments = completedImmunizations.map((item) => item?.vaccineCode?.text)
@@ -42,7 +47,7 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     } else {
       setUnvaccinatedAppointments(appointments)
     }
-  }, [immunizations, appointments])
+  }
 
   const updateAppointmentURL = (page) => {
     const offset = getOffset(page, 5)
@@ -110,7 +115,17 @@ export default function VaccineAppointments({ userCategory, patientData, patient
         <Col
           md={12}
           sm={24}>
-          <DatePicker />
+          <DatePicker
+            format={'DD-MM-YYYY'}
+            onChange={(e) => {
+              if (e) {
+                const time = dayjs(e).format('DD-MM-YYYY')
+                const filteredAppointments = unvaccinatedAppointments.filter((appointment) => appointment.appointmentDate === time)
+                setUnvaccinatedAppointments(filteredAppointments)
+              } else {
+                fetchVaccinations()
+              }
+            }}/>
         </Col>
         <Col
           md={12}
