@@ -46,7 +46,7 @@ const useStock = () => {
       quantity: {
         value: values.quantity,
       },
-      authoredOn: new Date().toISOString(),
+      authoredOn: values.authoredOn,
       occurrenceDateTime: values.preferredPickupDate,
       requester: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
