@@ -56,6 +56,7 @@ export default function NewCampaign() {
         </div>
 
         <Form
+          form={form}
           layout="vertical"
           onFinish={(e) => saveCampaign(e)}>
 
@@ -147,7 +148,7 @@ export default function NewCampaign() {
                       disabledDate={(current) => {
                         const today = dayjs()
                         return (
-                          current && (current < today)
+                          current && (current < today || current > dayjs(form.getFieldValue('endDate')))
                         )
                       }}
                       format={'DD-MM-YYYY'}
@@ -202,7 +203,7 @@ export default function NewCampaign() {
                       disabledDate={(current) => {
                         const today = dayjs()
                         return (
-                          current && (current < today)
+                          current && (current < today || current < dayjs(form.getFieldValue('startDate')))
                         )
                       }}
                       placeholder='End Date'

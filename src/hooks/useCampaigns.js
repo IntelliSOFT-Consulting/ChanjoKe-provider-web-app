@@ -8,13 +8,29 @@ export default function useCampaign() {
   const { get, post } = useApiRequest()
 
   const [campaigns, setCampaigns] = useState([])
+  const [campaign, setCampaign] = useState({})
   const [loading, setLoading]  = useState(false)
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = async (title = '') => {
     setLoading(true)
-    const response = await get(`${fhirApi}`)
+    const response = await get(title ? `${fhirApi}` : `${fhirApi}?_count=10000000&_status:active`)
 
-    if (response?.total > 0) setCampaigns(response?.entry.map((value) => ({
+    const searchTitle = title.toLowerCase()
+
+    if (response?.total > 0 && title) {
+      const searchedCampaigns = response?.entry?.filter(campaign => {
+        return campaign?.resource?.title.toLowerCase().includes(searchTitle);
+      });
+      setCampaigns((searchedCampaigns.map((value) => ({
+        id: value?.resource?.id,
+        campaignName: value?.resource?.title,
+        dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
+        campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} - ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`
+      }))))
+    }
+
+    if (response?.total > 0 && title === '') setCampaigns(response?.entry.map((value) => ({
+      id: value?.resource?.id,
       campaignName: value?.resource?.title,
       dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
       campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} - ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`
@@ -23,12 +39,23 @@ export default function useCampaign() {
     return response
   }
 
+  const fetchCampaign = async(campaignID) => {
+    setLoading(true)
+    const response = await get(`${fhirApi}/${campaignID}`)
+    setCampaign(response)
+    setLoading(false)
+  }
+
   const createPayload = (values) => {
     return {
       resourceType : "CarePlan",
       status: "active",
       intent: "plan",
       title: values.campaignName,
+      identifier: [{
+        value: values.campaignName,
+      }],
+      description: values.campaignName,
       created: new Date().toISOString(),
       period: [
         {
@@ -70,7 +97,9 @@ export default function useCampaign() {
   return {
     loading,
     campaigns,
+    campaign,
     fetchCampaigns,
+    fetchCampaign,
     createCampaign,
   }
 }

@@ -1,5 +1,5 @@
 import { Form, Input, Button, Popconfirm } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
 import useCampaigns from '../hooks/useCampaigns'
@@ -58,18 +58,16 @@ const columns = [
 
 export default function Campaigns() {
 
-  const [results, setResults] = useState([
-    { campaignName: 'Polio', dateCreated: '12 Jun 2024', campaignDuration: '12 Jun 2024 - 13 Aug 2024', id: 'geeg' },
-    { campaignName: 'Malaria', dateCreated: '21 Mar 2024', campaignDuration: '21 Mar 2024 - 22 Sep 2024', id: 'heeh' },
-    { campaignName: 'Covid', dateCreated: '01 May 2024', campaignDuration: '01 May 2024 - 12 Dec 2024', id: 'ieei' },
-  ])
-
   const navigate = useNavigate()
   const { loading, campaigns, fetchCampaigns } = useCampaigns()
 
   useEffect(() => {
     fetchCampaigns()
   }, [])
+
+  const searchCampaigns = (values) => {
+    fetchCampaigns(values?.searchText)
+  }
   
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
@@ -88,16 +86,20 @@ export default function Campaigns() {
         <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
           <Form
             className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 mx-2 sm:mx-10 mb-0"
-            onFinish={(values) => console.log({ values })}
+            onFinish={(values) => searchCampaigns(values)}
             autoComplete="off"
           >
             <div className="col-span-4">
-              <Form.Item name="searchCampaigns">
+              <Form.Item name="searchText">
                 <Input
                   allowClear
+                  onChange={(e) => {
+                    if (!e?.target?.value) {
+                      fetchCampaigns()
+                    }
+                  }}
                   size="large"
                   placeholder="Search Campaigns"
-                  onChange={(e) => console.log({ e })}
                 />
               </Form.Item>
             </div>
@@ -138,7 +140,7 @@ export default function Campaigns() {
           </div>
 
           <div className="sm:hidden mt-5">
-            {results.map((result) => (
+            {campaigns.map((result) => (
               <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
                 <div className="py-5 pr-6 col-span-4">
                   <div className="text-sm pl-5 leading-6 text-gray-900">{result.campaignName}</div>

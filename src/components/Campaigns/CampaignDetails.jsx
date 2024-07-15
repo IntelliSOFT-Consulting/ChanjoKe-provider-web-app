@@ -1,37 +1,43 @@
 import { Button, Descriptions } from 'antd'
 import Loading from '../../common/spinners/LoadingArrows'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { convertCamelCaseString } from '../../utils/methods'
+import useCampaign from '../../hooks/useCampaigns'
+import dayjs from 'dayjs'
 
 export default function CampaignDetails () {
 
   const navigate = useNavigate()
+  const { campaignID } = useParams()
+  const { loading, campaign, fetchCampaign } = useCampaign()
   const [details, setDetails] = useState({})
 
-  const [loader, setLoader] = useState(false)
+  useEffect(() => {
+    fetchCampaign(campaignID)
+  }, [campaignID])
 
   useEffect(() => {
     setDetails({
-      'Campaign Name': 'Polio',
-      'County': 'Bungoma',
-      'Sub-County': 'Bungoma Sub County',
-      'Ward': 'Some ward',
-      'Start Date': '12 Mar 2023',
-      'End Date': '14 Sep 2024',
-      'Facility': 'Some picked facility'
+      'Campaign Name': campaign?.title,
+      'County': campaign?.category?.[0]?.coding?.[0]?.display,
+      'Sub-County': campaign?.category?.[0]?.coding?.[1]?.display,
+      'Ward': campaign?.category?.[0]?.coding?.[2]?.display,
+      'Start Date': dayjs(campaign?.period?.start).format('DD-MM-YYYY'),
+      'End Date': dayjs(campaign?.period?.end).format('DD-MM-YYYY'),
+      'Facility': campaign?.category?.[0]?.coding?.[3]?.display
     })
-  }, [])
+  }, [campaign])
   return (
     <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
-      {loader ? (
+      {loading ? (
         <div className="flex justify-center items-center h-96">
           <Loading />
         </div>
       ) : (
         <>
           <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
-            <div className="text-3xl">Polio Campaign</div>
+            <div className="text-3xl">{campaign?.title} Campaign</div>
             <div className="right-0">
               <Button
                 type="primary"

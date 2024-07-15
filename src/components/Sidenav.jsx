@@ -68,8 +68,9 @@ export default function Sidenav() {
       name: 'Admin Management',
       icon: '',
       children: [
-        { name: 'Add Users', href: '/admin-users' },
-        { name: 'Add Facility', href: '/admin-add-facility' },
+        { name: 'Users', href: '/admin-users' },
+        { name: 'Facility', href: '/admin-add-facility' },
+        { name: 'Campaigns', href: '/campaigns' },
       ],
     },
     {
