@@ -1,8 +1,7 @@
 import { Form, Input, Button } from 'antd'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
-import { PlusOutlined } from '@ant-design/icons'
 
 const columns = [
   {
@@ -43,10 +42,23 @@ export default function Campaigns() {
     { campaignName: 'Malaria', dateCreated: '21 Mar 2024', campaignDuration: '21 Mar 2024 - 22 Sep 2024', id: 'heeh' },
     { campaignName: 'Covid', dateCreated: '01 May 2024', campaignDuration: '01 May 2024 - 12 Dec 2024', id: 'ieei' },
   ])
+
+  const navigate = useNavigate()
   
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
-        <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">Campaigns</div>
+        <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
+          <div className="text-3xl">Campaigns</div>
+          <div className="right-0">
+            <Button
+              type="primary"
+              onClick={() => navigate('/new-campaign')}
+              className="ml-4 font-semibold px-10"
+            >
+              New
+            </Button>
+          </div>
+        </div>
         <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
           <Form
             className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 mx-2 sm:mx-10 mb-0"

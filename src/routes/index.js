@@ -46,6 +46,7 @@ import NewAppointment from '../components/ClientDetailsView/NewAppointment'
 import AEFIDetails from '../components/AEFI/AEFIDetails'
 import Referrals from '../pages/Referrals'
 import Campaigns from '../pages/Campaigns'
+import NewCampaign from '../components/Campaigns/NewCampaign'
 import CampaignDetails from '../components/Campaigns/CampaignDetails'
 import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 import OrderDetails from '../components/StockManagement/OrderDetails'
@@ -226,6 +227,10 @@ const router = createBrowserRouter([
       {
         path: '/campaigns',
         element: <Campaigns />,
+      },
+      {
+        path: '/new-campaign',
+        element: <NewCampaign />,
       },
       {
         path: '/campaign/:campaignID',
