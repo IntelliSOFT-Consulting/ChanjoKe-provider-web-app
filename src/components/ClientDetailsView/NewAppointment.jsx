@@ -163,7 +163,6 @@ export default function NewAppointment() {
     const vaccine = vaccinesToAppoint.find(
       (item) => item?.vaccineCode?.[0]?.text === e
     )
-    console.log({ vaccine })
     setVaccineAppointments([...vaccinesAppointments, vaccine])
 
     const vaccines = vaccinesToAppoint.filter(
@@ -171,6 +170,20 @@ export default function NewAppointment() {
     )
     setAppointmentList(vaccines)
   }
+
+  const removeVaccineRecommendation = (e) => {
+    const vaccine = vaccinesAppointments.find(
+      (item) => item?.vaccineCode?.[0]?.text === e
+    );
+  
+    const updatedVaccineAppointments = vaccinesAppointments.filter(
+      (item) => item?.vaccineCode?.[0]?.text !== e
+    );
+    setVaccineAppointments(updatedVaccineAppointments);
+
+    const updatedVaccinesToAppoint = [...vaccinesToAppoint, vaccine];
+    setAppointmentList(updatedVaccinesToAppoint);
+  };
 
   return (
     <>
@@ -377,15 +390,7 @@ export default function NewAppointment() {
                 <Col span={1}>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      const vaccines = vaccinesAppointments.filter(
-                        (item) =>
-                          item?.vaccineCode?.[0]?.text !==
-                          vacc?.vaccineCode?.[0]?.text
-                      )
-                      setAppointmentList([...vaccinesToAppoint, vacc ])
-                      setVaccineAppointments(vaccines)
-                    }}
+                    onClick={(e) => removeVaccineRecommendation(vacc?.vaccineCode?.[0]?.text)}
                     className="flex-shrink-0 size-4 mr-2 mt-10 inline-flex rounded-full"
                   >
                     <span className="sr-only">Remove badge</span>
@@ -418,6 +423,7 @@ export default function NewAppointment() {
               </button>
               <button
                 htmlType="submit"
+                disabled={vaccinesAppointments.length === 0}
                 className="ml-4 outline outline-[#163C94] rounded-md px-5 py-2 bg-[#163C94] outline-2 text-white"
               >
                 {loadingAppointment && (
