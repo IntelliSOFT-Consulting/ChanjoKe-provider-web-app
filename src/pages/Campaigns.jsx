@@ -1,7 +1,11 @@
-import { Form, Input, Button } from 'antd'
-import { useState } from 'react'
+import { Form, Input, Button, Popconfirm } from 'antd'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
+import useCampaigns from '../hooks/useCampaigns'
+
+const practitioner = JSON.parse(localStorage.getItem('practitioner'))
+const practitionerRole = practitioner?.practitionerRole
 
 const columns = [
   {
@@ -24,6 +28,24 @@ const columns = [
     dataIndex: '',
     key: 'x',
     render: (_, record) => (
+      practitionerRole === 'ADMINISTRATOR' ?
+      <>
+        <Link
+          to={`/campaign/${record?.id}`}
+          className="text-[#163C94] font-semibold mr-4"
+        >
+          View
+        </Link>
+        <Popconfirm
+          title="Are you sure you want to archive this campaign?"
+          onConfirm={() => console.log('archived')}
+          okText="Yes"
+          cancelText="No">
+          <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
+            Archive
+          </button>
+        </Popconfirm>
+      </>:
       <Link
         to={`/campaign/${record?.id}`}
         className="text-[#163C94] font-semibold"
@@ -36,7 +58,6 @@ const columns = [
 
 export default function Campaigns() {
 
-  const [loading, setLoading] = useState(false)
   const [results, setResults] = useState([
     { campaignName: 'Polio', dateCreated: '12 Jun 2024', campaignDuration: '12 Jun 2024 - 13 Aug 2024', id: 'geeg' },
     { campaignName: 'Malaria', dateCreated: '21 Mar 2024', campaignDuration: '21 Mar 2024 - 22 Sep 2024', id: 'heeh' },
@@ -44,6 +65,11 @@ export default function Campaigns() {
   ])
 
   const navigate = useNavigate()
+  const { loading, campaigns, fetchCampaigns } = useCampaigns()
+
+  useEffect(() => {
+    fetchCampaigns()
+  }, [])
   
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
@@ -88,7 +114,7 @@ export default function Campaigns() {
           <div className="hidden sm:block sm:px-10 my-6">
             <Table
               columns={columns}
-              dataSource={results}
+              dataSource={campaigns}
               size="small"
               loading={loading}
               pagination={{
