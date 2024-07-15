@@ -77,6 +77,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
         return (
           <Form.Item
             name={values[index][column.dataIndex]}
+            className="w-full"
           >
             <InputNumber
               placeholder={column.inputPlaceholder}

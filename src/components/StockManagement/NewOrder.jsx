@@ -38,6 +38,7 @@ export default function NewOrder() {
   const { loading, requestStock } = useStock()
   const { getAllVaccines } = useVaccination()
   const [ vaccineOptions, setVaccineOptions ] = useState([])
+  const [ nextOrderDate, setNextOrderDate] = useState(null)
 
   const { 
     counties,
@@ -92,7 +93,7 @@ export default function NewOrder() {
     { title: 'Action', dataIndex: 'action', type: 'remove' },
   ]
 
-  const { InputTable, values: tableValues, setValues } = useInputTable({ columns })
+  const { InputTable, values: tableValues } = useInputTable({ columns })
 
   const onSubmit = async(data) => {
     try{
@@ -108,7 +109,7 @@ export default function NewOrder() {
       console.log(antigenData, combinedData, data)
 
       await requestStock(antigenData)
-      console.log(data)
+      console.log(antigenData)
       notification.success({
         message: 'Order created successfully',
       })
@@ -244,26 +245,42 @@ export default function NewOrder() {
 
           <Form.Item
             label="Date of This Order:"
-            name="thisOrderDate"
+            name="authoredOn"
             rules={[
-              { required: true, message: 'Please input the order location' },
+              { required: true, message: 'Please input the order date' },
             ]}
           >
-            <DatePicker className="w-full" placeholder="Date of This Order" />
+            <DatePicker 
+              className="w-full"
+              placeholder="Date of This Order"
+              onChange={(date) => setNextOrderDate(date)}
+            />
           </Form.Item>
 
           <Form.Item
             label="Preferred Pickup Date:"
             name="preferredPickupDate"
           >
-            <DatePicker className="w-full" placeholder="Preferred Pickup Date" />
+            <DatePicker 
+              className="w-full" 
+              placeholder="Preferred Pickup Date"
+              disabledDate={(current) => 
+                current && current < moment().startOf('days')
+              }  
+            />
           </Form.Item>
 
           <Form.Item
             label="Expected Date of Next Order:"
             name="expectedDateOfNextOrder"
           >
-            <DatePicker className="w-full" placeholder="Expected Date of Next Order" />
+            <DatePicker 
+              className="w-full" 
+              placeholder="Expected Date of Next Order" 
+              disabledDate={(current) => 
+                current && nextOrderDate ? current < nextOrderDate.startOf('days') : false
+              }
+            />
           </Form.Item>
         </div>
         <div className="border-2 mb-10"></div>

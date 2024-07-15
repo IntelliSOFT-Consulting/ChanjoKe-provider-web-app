@@ -46,7 +46,7 @@ const useStock = () => {
       quantity: {
         value: values.quantity,
       },
-      authoredOn: new Date().toISOString(),
+      authoredOn: values.authoredOn,
       occurrenceDateTime: values.preferredPickupDate,
       requester: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
@@ -61,43 +61,39 @@ const useStock = () => {
           valueString: values.level
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/last-order-date',
+          url: 'http://example.org/StructureDefinition/date-of-last-order',
           valueDateTime: values.lastOrderDate
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/this-order-date',
-          valueDateTime: values.thisOrderDate
-        },
-        {
-          url: 'http://example.org/fhir/StructureDefinition/expected-next-order-date',
+          url: 'http://example.org/StructureDefinition/expected-date-of-next-order',
           valueDateTime: values.expectedDateOfNextOrder
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/total-population',
+          url: 'http://example.org/StructureDefinition/total-population',
           valueString: values.totalPopulation
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/children-0-11-months',
+          url: 'http://example.org/StructureDefinition/children',
           valueString: values.children011Months
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/pregnant-women',
+          url: 'http://example.org/StructureDefinition/pregnant-women',
           valueString: values.pregnantWomen
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/doses-in-stock',
+          url: 'http://example.org/StructureDefinition/doses-in-stock',
           valueString: values.dosesInStock
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/minimum-doses',
+          url: 'http://example.org/StructureDefinition/minimum',
           valueString: values.minimumDoses
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/maximum-doses',
+          url: 'http://example.org/StructureDefinition/maximum',
           valueString: values.maximumDoses
         },
         {
-          url: 'http://example.org/fhir/StructureDefinition/recommended-stock',
+          url: 'http://example.org/StructureDefinition/recommended-stock',
           valueString: values.recommendedStock
         }
       ]
