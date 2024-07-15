@@ -43,6 +43,9 @@ const useStock = () => {
           }
         ]
       },
+      itemReference: {
+        reference: `Medicine/${values.vaccine}`,
+      },
       quantity: {
         value: values.quantity,
       },
