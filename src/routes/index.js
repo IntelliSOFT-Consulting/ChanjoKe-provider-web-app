@@ -48,6 +48,7 @@ import Referrals from '../pages/Referrals'
 import Campaigns from '../pages/Campaigns'
 import NewCampaign from '../components/Campaigns/NewCampaign'
 import CampaignDetails from '../components/Campaigns/CampaignDetails'
+import CampaignSite from '../components/Campaigns/CampaignSite'
 import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 import OrderDetails from '../components/StockManagement/OrderDetails'
 
@@ -78,7 +79,7 @@ const router = createBrowserRouter([
     children: [
       { path: '/', element: <Home /> },
       {
-        path: '/search/:searchType',
+        path: '/search/:searchType/:campaignSite',
         element: <SearchInterfaceWrapper />,
       },
       { path: '/admin-users', element: <Users /> },
@@ -231,6 +232,10 @@ const router = createBrowserRouter([
       {
         path: '/new-campaign',
         element: <NewCampaign />,
+      },
+      {
+        path: '/campaign-site/:campaignID',
+        element: <CampaignSite />,
       },
       {
         path: '/campaign/:campaignID',

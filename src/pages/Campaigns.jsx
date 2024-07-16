@@ -47,7 +47,7 @@ const columns = [
         </Popconfirm>
       </>:
       <Link
-        to={`/campaign/${record?.id}`}
+        to={`/campaign-site/${record?.id}`}
         className="text-[#163C94] font-semibold"
       >
         Select
