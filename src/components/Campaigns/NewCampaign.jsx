@@ -247,6 +247,11 @@ export default function NewCampaign() {
 
             <div className="px-4 py-4 sm:px-6 flex justify-end">
                 <Button
+                  onClick={() => navigate(-1)}
+                  className='ml-4 outline outline-[#163C94] rounded-md px-5 outline-2'>
+                  Back
+                </Button>
+                <Button
                   htmlType="submit"
                   className='ml-4 outline outline-[#4e8d6e] rounded-md px-5 bg-[#4e8d6e] outline-2 text-white'>
                   Save

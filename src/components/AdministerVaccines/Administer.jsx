@@ -6,6 +6,7 @@ import {
   InputNumber,
   Popconfirm,
   Select,
+  Radio,
 } from 'antd'
 import dayjs from 'dayjs'
 import moment from 'moment'
@@ -203,6 +204,22 @@ export default function Administer() {
                     label="Number of Appointments"
                   >
                     <Input placeholder={facilityAppointmentCount.length} disabled />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="afpCase"
+                    label="AFP Case "
+                    className='mt-2'
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Mark if AFP Case',
+                      },
+                    ]}>
+                    <Radio.Group>
+                      <Radio value={true}>Yes</Radio>
+                      <Radio value={false}>No</Radio>
+                    </Radio.Group>
                   </Form.Item>
                 </Form>
               )}
