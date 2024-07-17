@@ -42,47 +42,58 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
     switch (column.type) {
       case "text":
         return (
-          <Input
-            placeholder={column.inputPlaceholder}
-            value={values[index][column.dataIndex]}
-            onChange={(e) => handleChange({ [column.dataIndex]: e.target.value }, index)}
-            {...column}
-          />
+          <Form.Item
+            name={values[index][column.dataIndex]}
+            className="w-full m-0"
+          >
+            <Input
+              placeholder={column.inputPlaceholder}
+              // value={values[index][column.dataIndex]}
+              // onChange={(e) => handleChange({ [column.dataIndex]: e.target.value }, index)}
+              {...column}
+            />
+          </Form.Item>
         );
       case "select":
         return (
           <Form.Item
             name={values[index][column.dataIndex]}
+            className="w-full m-0"
           >
             <Select
               className="w-full"
               placeholder={column.inputPlaceholder}
               // value={values[index][column.dataIndex]}
-              onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+              // onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
               {...column}
             />
           </Form.Item>
         );
       case "date":
         return (
-          <DatePicker
-            style={{ width: "100%" }}
-            placeholder={column.inputPlaceholder}
-            value={dayjs(values[index][column.dataIndex])}
-            onChange={(date, dateString) => handleChange({ [column.dataIndex]: dateString }, index)}
-            {...column}
-          />
+          <Form.Item
+            name={values[index][column.dataIndex]}
+            className="w-full m-0"
+          >
+            <DatePicker
+              style={{ width: "100%" }}
+              placeholder={column.inputPlaceholder}
+              // value={dayjs(values[index][column.dataIndex])}
+              // onChange={(date, dateString) => handleChange({ [column.dataIndex]: dateString }, index)}
+              {...column}
+            />
+          </Form.Item>
         );
       case "number":
         return (
           <Form.Item
             name={values[index][column.dataIndex]}
-            className="w-full"
+            className="w-full m-0"
           >
             <InputNumber
               placeholder={column.inputPlaceholder}
               // value={values[index][column.dataIndex]}
-              onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+              // onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
               {...column}
             />
           </Form.Item>
