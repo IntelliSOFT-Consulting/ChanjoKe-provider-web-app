@@ -56,6 +56,7 @@ export default function SentOrders() {
       try {
         const facility = JSON.parse(localStorage.getItem('practitioner')).facility
         const sentOrders = await myFacilityRequests(facility)
+        console.log(sentOrders)
         const formattedOrders = sentOrders.map((order) => ({
           id: order.id,
           date: order.authoredOn,

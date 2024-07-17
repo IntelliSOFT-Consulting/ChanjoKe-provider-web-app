@@ -22,7 +22,8 @@ const useStock = () => {
       resourceType: 'SupplyRequest',
       identifier: [
         {
-          system: 'https://hl7.org/fhir/R4/supplyrequest-definitions.html',
+          system: 'https://hl7.org/fhir/R4/supplyrequest-definitions',
+          value: `${values.vaccine}-${values.facility}-${values.authoredOn}`
         }
       ],
       status: 'active',
@@ -42,6 +43,9 @@ const useStock = () => {
             display: values.vaccine,
           }
         ]
+      },
+      itemReference: {
+        reference: `Medication/${values.vaccine}`,
       },
       quantity: {
         value: values.quantity,
@@ -191,19 +195,23 @@ const useStock = () => {
 
   const myFacilityRequests = async (facility, page = 0) => {
     setLoading(true)
-    const facilityCode = facility?.replace(/Location\//g, '')
-    const offset = getOffset(page)
-    const response = await get(
-      `${supplyRequestPath}?requester=${facilityCode}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
-    )
-    const data = response?.entry?.map((entry) => entry.resource) || []
-    setStock({
-      data,
-      total: response.total,
-    })
-    setLoading(false)
+    try{
+      const facilityCode = facility?.replace(/Location\//g, '')
+      const offset = getOffset(page)
+      const response = await get(
+        `${supplyRequestPath}?requester=${facilityCode}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+      )
+      const data = response?.entry?.map((entry) => entry.resource) || []
+      setStock({
+        data,
+        total: response.total,
+      })
+      setLoading(false)
 
-    return data
+      return data
+    }catch(error){
+      console.log(error)
+    }
   }
 
   const mySupplyRequests = async (facility, page = 0) => {
