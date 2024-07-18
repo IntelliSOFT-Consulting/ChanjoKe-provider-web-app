@@ -99,17 +99,15 @@ export default function NewOrder() {
     try{
       const combinedData = {
         ...data, 
-        ...tableValues[0]
+        ...tableValues[0],
+        facilityName: form.getFieldValue('facilityName')
       }
 
       localStorage.setItem('orderData', JSON.stringify(combinedData))
 
       const antigenData = JSON.parse(localStorage.getItem('orderData'))
 
-      console.log(antigenData, combinedData, data)
-
       await requestStock(antigenData)
-      console.log(antigenData)
       notification.success({
         message: 'Order created successfully',
       })
@@ -227,6 +225,13 @@ export default function NewOrder() {
               filterOption={(input, option) =>
                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
+              onChange={(value) => {
+                const selectedFacility = facilities.find((facility) => facility.key === value);
+                form.setFieldsValue({
+                  facility: selectedFacility ? selectedFacility.key : '',
+                  facilityName: selectedFacility ? selectedFacility.name : ''
+                });
+              }}
             />
           </Form.Item>
 

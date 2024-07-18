@@ -3,6 +3,8 @@ import { createUseStyles } from 'react-jss'
 import { Link } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
 import { useEffect, useState } from 'react'
+import moment from 'moment'
+import usePaginatedQuery from '../../hooks/usePaginatedQuery'
 
 
 const useStyles = createUseStyles({
@@ -50,20 +52,22 @@ export default function SentOrders() {
   const { myFacilityRequests } = useStock()
   const [results, setResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
+  const { pageSize, handlePageChange } = usePaginatedQuery()
 
   useEffect(() => {
     const fetchStock = async () => {
       try {
         const facility = JSON.parse(localStorage.getItem('practitioner')).facility
-        const sentOrders = await myFacilityRequests(facility)
+        const sentOrders = await myFacilityRequests()
         console.log(sentOrders)
         const formattedOrders = sentOrders.map((order) => ({
+          // id: order.identifier[0].value,
           id: order.id,
-          date: order.authoredOn,
+          date: moment(order.date).format('DD-MM-YYYY'),
           facility: order.deliverTo.display,
           status: order.status,
-          quantity: order.quantity.value,
-          products: order.itemCodeableConcept.coding.display
+          quantity: order.quantity?.value,
+          products: order.itemCodeableConcept?.coding.length
         }))
 
         setResults(formattedOrders)
@@ -181,6 +185,7 @@ export default function SentOrders() {
             columns={columns}
             dataSource={results}
             size="small"
+            bordered
             className={classes.tableHeader}
             pagination={{
               pageSize: 12,
