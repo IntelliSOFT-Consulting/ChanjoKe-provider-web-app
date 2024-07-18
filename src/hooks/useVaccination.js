@@ -182,12 +182,10 @@ export default function useVaccination() {
   }
 
   const getAllVaccines = useCallback(async () => {
-    console.log('Fetching all vaccines')
     const allVaccines = [
       ...routineVaccines,
       ...nonRoutineVaccines,
     ]
-    console.log(allVaccines)
     return allVaccines
   }, [])
 

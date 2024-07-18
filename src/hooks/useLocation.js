@@ -66,6 +66,7 @@ export const useLocations = (form) => {
     const facilities = await fetchFacilities(ward)
     setFacilities(facilities)
     form.setFieldValue('facility', '')
+    console.log(facilities)
   }
 
   return {

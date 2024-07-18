@@ -18,12 +18,13 @@ const useStock = () => {
 
 
   const createPayload = (values) => {
+    const authoredOn = values.authoredOn.replace(/[^0-9]/g, '')
     return {
       resourceType: 'SupplyRequest',
       identifier: [
         {
           system: 'https://hl7.org/fhir/R4/supplyrequest-definitions',
-          value: `${values.vaccine}-${values.facility}-${values.authoredOn}`
+          value: `${values.facility}${authoredOn}`,
         }
       ],
       status: 'active',
@@ -57,7 +58,7 @@ const useStock = () => {
       },
       deliverTo: {
         reference: `Location/${values.facility}`,
-        display: values.facility,
+        display: values.facilityName,
       },
       extension: [
         {
@@ -196,12 +197,18 @@ const useStock = () => {
   const myFacilityRequests = async (facility, page = 0) => {
     setLoading(true)
     try{
-      const facilityCode = facility?.replace(/Location\//g, '')
+      const requester = user?.fhirPractitionerId
       const offset = getOffset(page)
       const response = await get(
-        `${supplyRequestPath}?requester=${facilityCode}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+        `${supplyRequestPath}?requester=${requester}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
       )
-      const data = response?.entry?.map((entry) => entry.resource) || []
+      const data = response?.entry?.map((entry) => {
+        const resource = entry.resource
+        if(resource.status === 'active'){
+          resource.status = 'Pending'
+        }
+        return resource
+      }) || []
       setStock({
         data,
         total: response.total,
