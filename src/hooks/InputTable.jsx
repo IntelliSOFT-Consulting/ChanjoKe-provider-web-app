@@ -48,8 +48,8 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
           >
             <Input
               placeholder={column.inputPlaceholder}
-              // value={values[index][column.dataIndex]}
-              // onChange={(e) => handleChange({ [column.dataIndex]: e.target.value }, index)}
+              value={values[index][column.dataIndex]}
+              onChange={(e) => handleChange({ [column.dataIndex]: e.target.value }, index)}
               {...column}
             />
           </Form.Item>
@@ -63,8 +63,8 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
             <Select
               className="w-full"
               placeholder={column.inputPlaceholder}
-              // value={values[index][column.dataIndex]}
-              // onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+              value={values[index][column.dataIndex]}
+              onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
               {...column}
             />
           </Form.Item>
@@ -78,8 +78,8 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
             <DatePicker
               style={{ width: "100%" }}
               placeholder={column.inputPlaceholder}
-              // value={dayjs(values[index][column.dataIndex])}
-              // onChange={(date, dateString) => handleChange({ [column.dataIndex]: dateString }, index)}
+              value={dayjs(values[index][column.dataIndex])}
+              onChange={(date, dateString) => handleChange({ [column.dataIndex]: dateString }, index)}
               {...column}
             />
           </Form.Item>
@@ -92,8 +92,8 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
           >
             <InputNumber
               placeholder={column.inputPlaceholder}
-              // value={values[index][column.dataIndex]}
-              // onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
+              value={values[index][column.dataIndex]}
+              onChange={(value) => handleChange({ [column.dataIndex]: value }, index)}
               {...column}
             />
           </Form.Item>
