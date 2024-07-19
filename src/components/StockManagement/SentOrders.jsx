@@ -1,6 +1,6 @@
 import { Card, Button, notification, Table } from 'antd'
 import { createUseStyles } from 'react-jss'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
 import { useEffect, useState } from 'react'
 import moment from 'moment'
@@ -53,6 +53,7 @@ export default function SentOrders() {
   const [results, setResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
   const { pageSize, handlePageChange } = usePaginatedQuery()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchStock = async () => {
@@ -138,6 +139,7 @@ export default function SentOrders() {
       render: (record) => (
         <div className="flex items-center gap-10">
           <Link
+            to={`/stock-management/order-details/${record.id}`}
             className="text-[#163C94] font-semibold"
           >
             View
@@ -169,6 +171,7 @@ export default function SentOrders() {
             <Button
               type="primary"
               htmlType="submit"
+              onClick={() => navigate('/stock-management/new-order')}
               className={classes.btnPrimary}
             >
               Add New
@@ -220,7 +223,7 @@ export default function SentOrders() {
               <div className="py-5 max-w-auto right-5">
                 <div className="flex flex-col items-start">
                   <a
-                    href={`/client-details/${result.id}/routineVaccines`}
+                    href={`/stock-management/order-details/${result.id}`}
                     className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
                   >
                     View
