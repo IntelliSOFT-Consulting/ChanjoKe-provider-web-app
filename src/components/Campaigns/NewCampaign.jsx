@@ -95,7 +95,10 @@ export default function NewCampaign() {
                   ]}>
                   <Select
                     placeholder="County"
-                    onChange={handleCountyChange}
+                    onChange={(value, data) => {
+                      handleCountyChange(value)
+                      form.setFieldValue('county', data?.label)
+                    }}
                     options={counties?.map((county) => ({
                       value: county.key,
                       label: county.name,
@@ -103,9 +106,7 @@ export default function NewCampaign() {
                     size="large"
                     allowClear
                     showSearch
-                    filterOption={(input, option) =>
-                      option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
+                    filterOption={(input, option) => option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                   />
                 </Form.Item>
 
@@ -122,6 +123,9 @@ export default function NewCampaign() {
                       value: facility.key,
                       label: facility.name,
                     }))}
+                    onChange={(value, data) => {
+                      form.setFieldValue('facility', data?.label)
+                    }}
                     showSearch
                     filterOption={(input, option) =>
                       option?.label.toLowerCase()?.includes(input?.toLowerCase())
@@ -147,9 +151,11 @@ export default function NewCampaign() {
                   <DatePicker
                       disabledDate={(current) => {
                         const today = dayjs()
+                        const endDate = form.getFieldValue('endDate');
                         return (
-                          current && (current < today || current > dayjs(form.getFieldValue('endDate')))
-                        )
+                          current && 
+                          (current < today || (endDate && current > dayjs(endDate)))
+                        );
                       }}
                       format={'DD-MM-YYYY'}
                       className="w-full rounded-md border-0 py-1.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
