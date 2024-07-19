@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, Button, Form, Input, Select, DatePicker, notification } from 'antd'
 import useInputTable from '../../hooks/InputTable'
 import { createUseStyles } from 'react-jss'
 import useStock from '../../hooks/useStock'
+import useVaccination from '../../hooks/useVaccination'
 
 const { useForm } = Form
 
@@ -33,13 +34,42 @@ const ReceiveStock = () => {
   const classes = useStyles()
   const [form] = useForm()
   const { receiveStock, loading } = useStock()
+  const { getAllVaccines } = useVaccination()
+  const [vaccineOptions, setVaccineOptions] = useState([])
+
+  useEffect(() => {
+    const fetchVaccines = async () => {
+      try {
+        const vaccines = await getAllVaccines()
+        setVaccineOptions(vaccines)
+      }catch(error){
+        console.log("Error fetching vaccines", error)
+      }
+    }
+    fetchVaccines()
+  }, [getAllVaccines])
 
   const columns = [
-    { title: 'Vaccine/Diluents', dataIndex: 'vaccine', type: 'select' },
-    { title: 'Batch Number', dataIndex: 'batchNumber', type: 'select' },
+    { 
+      title: 'Vaccine/Diluents', 
+      dataIndex: 'vaccine', 
+      type: 'select',
+      options: vaccineOptions
+    },
+    { 
+      title: 'Batch Number', 
+      dataIndex: 'batchNumber', 
+      type: 'select',
+      options: [
+        { value: '1', label: '1' },
+        { value: '2', label: '2' },
+        { value: '3', label: '3' },
+        { value: '4', label: '4' },
+      ],
+    },
     { title: 'Expiry Date', dataIndex: 'expiryDate', type: 'date' },
-    { title: 'Stock Quantity', dataIndex: 'quantity', type: 'number' },
-    { title: 'Quantity', dataIndex: 'stockQuantity', type: 'number' },
+    { title: 'Quantity', dataIndex: 'quantity', type: 'number' },
+    { title: 'Stock Quantity', dataIndex: 'stockQuantity', type: 'number' },
     {
       title: 'VVM Status',
       dataIndex: 'vvmStatus',
@@ -60,15 +90,24 @@ const ReceiveStock = () => {
     { title: 'Action', dataIndex: 'action', type: 'remove' },
   ]
 
-  const { InputTable, values } = useInputTable({ columns })
+  const { InputTable, values: tableValues } = useInputTable({ columns })
 
   const onSubmit = async(values) => {
     try {
-      const response = await receiveStock(values)
+      const combinedData = {
+        ...values,
+        ...tableValues[0],
+      }
+
+      localStorage.setItem('receiveData', JSON.stringify(combinedData))
+
+      await receiveStock(combinedData)
+
       notification.success({
         message: 'Stock received successfully',
       })
       form.resetFields()
+
     } catch (error) {
       notification.error({
         message: 'Failed to receive stock',

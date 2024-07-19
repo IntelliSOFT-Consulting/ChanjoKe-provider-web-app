@@ -112,6 +112,84 @@ const useStock = () => {
     }
   }
 
+  const stockPayload = (values) => {
+    return {
+      resourceType: 'SupplyDelivery',
+      identifier: [
+        {
+          system: "https://hl7.org/fhir/R4/supplydelivery-definitions",
+          value: '12345'
+        }
+      ],
+      basedOn: [
+        {
+          reference: `SupplyRequest/${values.supplyRequest}`,
+        }
+      ],
+      status: 'completed',
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/supply-item-type',
+            code: 'medication'
+          }
+        ],
+        text: 'Vaccine'
+      },
+      suppliedItem: {
+        quantity: {
+          value: values.quantity,
+          unit: 'doses'
+        },
+        itemCodeableConcept: {
+          coding: [
+            {
+              system: 'http://example.org/supply-items',
+              code: values.vaccine
+            }
+          ],
+          text: "Vaccine"
+        }
+      },
+      occurrenceDateTime: values.dateReceived,
+      supplier: {
+        reference: `Practitioner/${values.origin}`,
+      },
+      destination: {
+        reference: `Location/${user?.facility}`,
+      },
+      receiver: {
+        reference: `Practitioner/${user?.fhirPractitionerId}`,
+      },
+      extension: [
+        {
+          url: "http://example.org/fhir/StructureDefinition/order-number",
+          valueString: values.orderNumber
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/batch-number',
+          valueString: values.batchNumber
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/expiry-date',
+          valueDateTime: values.expiryDate
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/stock-quantity',
+          valueString: values.stockQuantity
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/vvm-status',
+          valueString: values.vvmStatus
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/manufacturer-details',
+          valueString: values.manufacturerDetails
+        }
+      ]
+    }
+  }
+
   const getStock = async (page = 0, facility = null) => {
     setLoading(true)
     const offset = getOffset(page)
@@ -140,7 +218,8 @@ const useStock = () => {
 
   const receiveStock = async (data) => {
     setLoading(true)
-    const response = await post(deliveryPath, data)
+    const payload = stockPayload(data)
+    const response = await post(deliveryPath, payload)
     setLoading(false)
     return response
   }
