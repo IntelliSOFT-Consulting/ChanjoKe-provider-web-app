@@ -186,7 +186,10 @@ export default function useVaccination() {
       ...routineVaccines,
       ...nonRoutineVaccines,
     ]
-    return allVaccines
+    return allVaccines.map((vaccine) => ({
+      value: vaccine.vaccineName,
+      label: vaccine.vaccineName,
+    }))
   }, [])
 
   return {

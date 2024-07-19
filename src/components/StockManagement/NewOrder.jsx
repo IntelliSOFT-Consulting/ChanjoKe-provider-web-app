@@ -52,25 +52,14 @@ export default function NewOrder() {
 
 
   useEffect(() => {
-    const fetchVaccines = async() => {
-      try{
+    const fetchVaccines = async () => {
+      try {
         const vaccines = await getAllVaccines()
-        if(Array.isArray(vaccines)){
-          const formattedVaccines = vaccines.map((vaccine) => ({
-            value: vaccine.vaccineName,
-            label: vaccine.vaccineName
-          }))
-
-          setVaccineOptions(formattedVaccines)
-        }else{
-          console.error("Vaccine data is not an Array", vaccines)
-        }
+        setVaccineOptions(vaccines)
       }catch(error){
-        console.log("Error fetching vaccines: ", error)
+        console.log("Error fetching vaccines", error)
       }
-
     }
-
     fetchVaccines()
   }, [getAllVaccines])
 
