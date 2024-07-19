@@ -1,5 +1,5 @@
-import { Form, Input, Button, Popconfirm } from 'antd'
-import { useEffect } from 'react'
+import { Form, Input, Button, Popconfirm, Tabs } from 'antd'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
 import useCampaigns from '../hooks/useCampaigns'
@@ -7,59 +7,101 @@ import useCampaigns from '../hooks/useCampaigns'
 const practitioner = JSON.parse(localStorage.getItem('practitioner'))
 const practitionerRole = practitioner?.practitionerRole
 
-const columns = [
-  {
-    title: 'Campaign Name',
-    dataIndex: 'campaignName',
-    key: 'campaignName',
-  },
-  {
-    title: 'Date Created',
-    dataIndex: 'dateCreated',
-    key: 'dateCreated',
-  },
-  {
-    title: 'Campaign Duration',
-    dataIndex: 'campaignDuration',
-    key: 'campaignDuration',
-  },
-  {
-    title: 'Actions',
-    dataIndex: '',
-    key: 'x',
-    render: (_, record) => (
-      practitionerRole === 'ADMINISTRATOR' ?
-      <>
-        <Link
-          to={`/campaign/${record?.id}`}
-          className="text-[#163C94] font-semibold mr-4"
-        >
-          View
-        </Link>
-        <Popconfirm
-          title="Are you sure you want to archive this campaign?"
-          onConfirm={() => console.log('archived')}
-          okText="Yes"
-          cancelText="No">
-          <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
-            Archive
-          </button>
-        </Popconfirm>
-      </>:
-      <Link
-        to={`/campaign-site/${record?.id}`}
-        className="text-[#163C94] font-semibold"
-      >
-        Select
-      </Link>
-    ),
-  },
-]
-
 export default function Campaigns() {
 
   const navigate = useNavigate()
-  const { loading, campaigns, fetchCampaigns } = useCampaigns()
+  const { loading, campaigns, campaignTotal, fetchCampaigns, updateCampaign } = useCampaigns()
+
+  const [activeTab, setActiveTab] = useState('1')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filteredCampaigns, setFilteredCampaigns] = useState([])
+
+  const columns = [
+    {
+      title: 'Campaign Name',
+      dataIndex: 'campaignName',
+      key: 'campaignName',
+    },
+    {
+      title: 'Date Created',
+      dataIndex: 'dateCreated',
+      key: 'dateCreated',
+    },
+    {
+      title: 'Campaign Duration',
+      dataIndex: 'campaignDuration',
+      key: 'campaignDuration',
+    },
+    {
+      title: 'Actions',
+      dataIndex: '',
+      key: 'x',
+      render: (_, record) => (
+        practitionerRole === 'ADMINISTRATOR' ?
+        <>
+          <Link
+            to={`/campaign/${record?.id}`}
+            className="text-[#163C94] font-semibold mr-4"
+          >
+            View
+          </Link>
+          { activeTab === '1' &&
+            <Popconfirm
+              title="Are you sure you want to archive this campaign?"
+              onConfirm={() => {
+                updateCampaign(record?.id, {
+                  id: record?.id,
+                  campaignName: record?.resource?.title,
+                  startDate: record?.resource?.period?.start,
+                  endDate: record?.resource?.period?.end,
+                  county: record?.resource?.category?.[0]?.coding?.[0]?.display,
+                  subCounty: record?.resource?.category?.[0]?.coding?.[1]?.display,
+                  ward: record?.resource?.category?.[0]?.coding?.[2]?.display,
+                  facility: record?.resource?.category?.[0]?.coding?.[3]?.display,
+                }, 'on-hold')
+                filterItems()
+              }}
+              okText="Yes"
+              cancelText="No">
+              <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
+                Archive
+              </button>
+            </Popconfirm>
+          }
+
+          {activeTab === '2' &&
+            <Popconfirm
+              title="Are you sure you want to make this campaign active?"
+              onConfirm={() => {
+                updateCampaign(record?.id, {
+                  id: record?.id,
+                  campaignName: record?.resource?.title,
+                  startDate: record?.resource?.period?.start,
+                  endDate: record?.resource?.period?.end,
+                  county: record?.resource?.category?.[0]?.coding?.[0]?.display,
+                  subCounty: record?.resource?.category?.[0]?.coding?.[1]?.display,
+                  ward: record?.resource?.category?.[0]?.coding?.[2]?.display,
+                  facility: record?.resource?.category?.[0]?.coding?.[3]?.display,
+                }, 'active')
+                filterItems()
+              }}
+              okText="Yes"
+              cancelText="No">
+              <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
+                Unarchive
+              </button>
+            </Popconfirm>
+          }
+        </>:
+        <Link
+          to={`/campaign-site/${record?.id}`}
+          className="text-[#163C94] font-semibold"
+        >
+          Select
+        </Link>
+      ),
+    },
+  ]
 
   useEffect(() => {
     fetchCampaigns()
@@ -68,12 +110,26 @@ export default function Campaigns() {
   const searchCampaigns = (values) => {
     fetchCampaigns(values?.searchText)
   }
+
+  const filterItems = () => {
+    if (activeTab === '1') {
+      const activeCampaigns = campaigns?.filter((campaign) => campaign.status === 'active')
+      setFilteredCampaigns(activeCampaigns)
+    } else {
+      const archivedCampaigns = campaigns?.filter((campaign) => campaign.status === 'on-hold')
+      setFilteredCampaigns(archivedCampaigns)
+    }
+  }
+
+  useEffect(() => {
+    filterItems()
+  }, [campaigns, activeTab])
   
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
         <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
           <div className="text-3xl">Campaigns</div>
-          <div className="right-0">
+          {practitionerRole === 'ADMINISTRATOR' && <div className="right-0">
             <Button
               type="primary"
               onClick={() => navigate('/new-campaign')}
@@ -82,60 +138,77 @@ export default function Campaigns() {
               New
             </Button>
           </div>
+          }
         </div>
         <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
-          <Form
-            className="grid grid-cols-1 sm:grid-cols-5 gap-x-4 mx-2 sm:mx-10 mb-0"
-            onFinish={(values) => searchCampaigns(values)}
-            autoComplete="off"
-          >
-            <div className="col-span-4">
-              <Form.Item name="searchText">
-                <Input
-                  allowClear
-                  onChange={(e) => {
-                    if (!e?.target?.value) {
-                      fetchCampaigns()
-                    }
-                  }}
-                  size="large"
-                  placeholder="Search Campaigns"
-                />
-              </Form.Item>
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="flex-shrink-0 rounded-lg w-full bg-[#163C94] border border-[#163C94] px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#163C94] active:bg-[#13327b] active:outline-[#13327b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#163C94]"
-              >
-                Search
-              </button>
-            </div>
-          </Form>
 
-          <div className="hidden sm:block sm:px-10 my-6">
-            <Table
-              columns={columns}
-              dataSource={campaigns}
-              size="small"
-              loading={loading}
-              pagination={{
-                pageSize: 12,
-                showSizeChanger: false,
-                hideOnSinglePage: true,
-                showTotal: (total) => `Total ${total} items`,
-                // total: totalItems - 1,
-                onChange: (page) => console.log({ page }),
+          <div className="px-4 py-5 sm:p-6">
+            <Tabs
+              defaultActiveKey="1"
+              onChange={(key) => {
+                setActiveTab(key)
+                setCurrentPage(1)
               }}
-              locale={{
-                emptyText: (
-                  <div className="flex flex-col items-center justify-center">
-                    <p className="text-gray-400 text-sm my-2">
-                      Campaign not found
-                    </p>
+              items={['Active Campaigns', 'Archived Campaigns'].map((item, index) => ({
+                key: (index + 1).toString(),
+                label: item,
+                children: (
+                  <div>
+                    <div className="my-2 flex">
+                      <Form
+                        onFinish={(values) => {
+                          searchCampaigns(values)
+                        }}
+                        className="flex w-full items-center"
+                      >
+                        <Form.Item name="searchText" className="w-full mr-4">
+                          <Input
+                            allowClear
+                            placeholder="Search Campaign"
+                            className="w-full ml-auto"
+                            onChange={(e) => {
+                              if (!e?.target?.value) {
+                                fetchCampaigns()
+                                filterItems()
+                              }
+                            }}
+                            size="large"
+                            autocomplete="off"
+                          />
+                        </Form.Item>
+                        <Form.Item>
+                          <Button type="primary" htmlType="submit" size="large">
+                            Search
+                          </Button>
+                        </Form.Item>
+                      </Form>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <Table
+                        columns={columns}
+                        dataSource={filteredCampaigns}
+                        size="small"
+                        loading={loading}
+                        rowKey="id"
+                        pagination={{
+                          pageSize: 12,
+                          showTotal: (total, range) =>
+                            `${range[0]} - ${range[1]} of ${
+                              activeTab === '1' ? '10' : campaignTotal
+                            } campaigns`,
+                          showSizeChanger: false,
+                          defaultCurrent: 1,
+                          current: currentPage,
+                          total: activeTab === '1' ? '10' : campaignTotal,
+                          onChange: async (page) => {
+                            setCurrentPage(page)
+                          },
+                        }}
+                      />
+                    </div>
                   </div>
                 ),
-              }}
+              }))}
             />
           </div>
 
