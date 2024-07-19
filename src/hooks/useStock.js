@@ -32,7 +32,8 @@ const useStock = () => {
         coding: [
           {
             code: 'central',
-            display: 'Central Supply'
+            display: 'Central Supply',
+            system: 'http://terminology.hl7.org/CodeSystem/supply-kind'
           }
         ]
       },
@@ -43,18 +44,24 @@ const useStock = () => {
             code: values.vaccine,
             display: values.vaccine,
           }
-        ]
+        ],
+        text: "Antigen"
       },
       itemReference: {
         reference: `Medication/${values.vaccine}`,
       },
       quantity: {
         value: values.quantity,
+        unit: 'doses'
       },
       authoredOn: values.authoredOn,
       occurrenceDateTime: values.preferredPickupDate,
       requester: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
+      },
+      deliverFrom: {
+        reference: `Location/${user?.facility}`,
+        display: user?.facilityName,
       },
       deliverTo: {
         reference: `Location/${values.facility}`,
