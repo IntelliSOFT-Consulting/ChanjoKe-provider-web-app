@@ -14,7 +14,7 @@ import LoadingArrows from '../common/spinners/LoadingArrows'
 import moment from 'moment'
 
 const stats = [
-  { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient' },
+  { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient/n' },
   {
     name: 'Register Client',
     icon: RegisterClientIcon,
@@ -23,15 +23,15 @@ const stats = [
   {
     name: 'Update Vaccine History',
     icon: UpdateClientHistoryIcon,
-    href: 'search/updateClient',
+    href: 'search/updateClient/n',
   },
   {
     name: 'Administer Vaccine',
     icon: AdministerVaccineIcon,
-    href: 'search/administerVaccine',
+    href: 'search/administerVaccine/n',
   },
-  { name: 'AEFI', icon: AefiIcon, href: 'search/aefi' },
-  { name: 'Appointments', icon: AppointmentIcon, href: 'search/appointments' },
+  { name: 'AEFI', icon: AefiIcon, href: 'search/aefi/n' },
+  { name: 'Appointments', icon: AppointmentIcon, href: 'search/appointments/n' },
   {
     name: 'Stock Management',
     icon: StockManagementIcon,
