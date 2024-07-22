@@ -62,8 +62,7 @@ export default function SentOrders() {
         const sentOrders = await myFacilityRequests()
         console.log(sentOrders)
         const formattedOrders = sentOrders.map((order) => ({
-          // id: order.identifier[0].value,
-          id: order.id,
+          id: order.identifier[0].value,
           date: moment(order.date).format('DD-MM-YYYY'),
           facility: order.deliverTo.display,
           status: order.status,

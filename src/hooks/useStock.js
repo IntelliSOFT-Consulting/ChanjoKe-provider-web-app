@@ -16,15 +16,16 @@ const useStock = () => {
 
   const { get, post, put } = useApiRequest()
 
+  const createPayload = (values, totalCount) => {
+    const identifierFacility = values.facilityName.split(' ')[0].toUpperCase()
+    const identifierNumber = (totalCount + 1).toString().padStart(4, '0')
 
-  const createPayload = (values) => {
-    const authoredOn = values.authoredOn.replace(/[^0-9]/g, '')
     return {
       resourceType: 'SupplyRequest',
       identifier: [
         {
           system: 'https://hl7.org/fhir/R4/supplyrequest-definitions',
-          value: `${values.facility}${authoredOn}`,
+          value: `${identifierFacility}-${identifierNumber}`,
         }
       ],
       status: 'active',
@@ -285,14 +286,18 @@ const useStock = () => {
     try{
       const requester = user?.fhirPractitionerId
       const offset = getOffset(page)
+      const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
+      const totalCount = totalResponse?.total
       const response = await get(
-        `${supplyRequestPath}?requester=${requester}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+        `${supplyRequestPath}?requester=${requester}&_count=${totalCount}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
       )
-      const data = response?.entry?.map((entry) => {
+
+      const data = response?.entry?.map((entry, index) => {
         const resource = entry.resource
         if(resource.status === 'active'){
           resource.status = 'Pending'
         }
+
         return resource
       }) || []
       setStock({
@@ -333,11 +338,17 @@ const useStock = () => {
 
   const requestStock = async (data) => {
     setLoading(true)
-    const payload = createPayload(data)
-    const response = await post(supplyRequestPath, payload)
-    setLoading(false)
-    console.log(response)
-    return response
+    try{
+      const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
+      const totalCount = totalResponse.total
+      const payload = createPayload(data, totalCount)
+      const response = await post(supplyRequestPath, payload)
+      setLoading(false)
+      console.log(response)
+      return response
+    }catch(error){
+      console.log(error)
+    }
   }
 
   const updaTeRequesStatus = async (id, status) => {
