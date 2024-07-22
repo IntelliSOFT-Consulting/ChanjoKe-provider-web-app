@@ -79,7 +79,7 @@ export default function Sidenav() {
       href: '/reports',
       icon: 'vaccinationReportLogo',
     },
-    { name: 'Search Client', href: '/search/searchClient', icon: 'searchLogo' },
+    { name: 'Search Client', href: '/search/searchClient/n', icon: 'searchLogo' },
     {
       name: 'Register Client',
       href: '/register-client',
@@ -87,20 +87,20 @@ export default function Sidenav() {
     },
     {
       name: 'Update Vaccine History',
-      href: '/search/updateClient',
+      href: '/search/updateClient/n',
       icon: 'updateClientLogo',
     },
     {
       name: 'Administer Vaccine',
-      href: '/search/administerVaccine',
+      href: '/search/administerVaccine/n',
       icon: 'administerVaccineLogo',
     },
     {
       name: 'Appointments',
-      href: '/search/appointments',
+      href: '/search/appointments/n',
       icon: 'appointmentLogo',
     },
-    { name: 'AEFI', href: '/search/aefi', icon: 'aefiLogo' },
+    { name: 'AEFI', href: '/search/aefi/n', icon: 'aefiLogo' },
     { name: 'Referrals', href: '/referrals', icon: 'referralIcon' },
     {
       name: 'Defaulter Tracing',
