@@ -33,21 +33,47 @@ const useStyles = createUseStyles({
 const ReceiveStock = () => {
   const classes = useStyles()
   const [form] = useForm()
-  const { receiveStock, loading } = useStock()
+  const { receiveStock, loading, fetchActiveSupplyRequests, getSupplyRequestById } = useStock()
   const { getAllVaccines } = useVaccination()
   const [vaccineOptions, setVaccineOptions] = useState([])
+  const [originOptions, setOriginOptions] = useState([])
+  const [supplier, setSupplier] = useState('')
 
   useEffect(() => {
-    const fetchVaccines = async () => {
+    const fetchOrigins = async () => {
       try {
-        const vaccines = await getAllVaccines()
-        setVaccineOptions(vaccines)
+        const origins = await fetchActiveSupplyRequests()
+        const formattedOrigins = origins.map((origin) => ({
+          value: origin.id,
+          label: origin.label,
+          id: origin.id,
+          key: origin.key,
+          identifier: origin.identifier,
+          supplier: origin.supplier
+        }))
+        setOriginOptions(formattedOrigins)
       }catch(error){
-        console.log("Error fetching vaccines", error)
+        console.log("Error fetching origins", error)
       }
     }
-    fetchVaccines()
-  }, [getAllVaccines])
+    fetchOrigins()
+  }, [fetchActiveSupplyRequests])
+
+  const onOriginSelect = async(selectedOriginId, option) => {
+    try{
+      const supplyRequest = await getSupplyRequestById(selectedOriginId)
+      const vaccine = supplyRequest.itemCodeableConcept.coding.map((code => ({
+        value: code.code,
+        label: code.display
+      })))
+      setVaccineOptions(vaccine)
+
+      form.setFieldsValue({ orderNumber: supplyRequest.identifier[0].value })
+      setSupplier(option.supplier)
+    } catch(error){
+      console.log(error)
+    }
+  }
 
   const columns = [
     { 
@@ -59,13 +85,7 @@ const ReceiveStock = () => {
     { 
       title: 'Batch Number', 
       dataIndex: 'batchNumber', 
-      type: 'select',
-      options: [
-        { value: '1', label: '1' },
-        { value: '2', label: '2' },
-        { value: '3', label: '3' },
-        { value: '4', label: '4' },
-      ],
+      type: 'text',
     },
     { title: 'Expiry Date', dataIndex: 'expiryDate', type: 'date' },
     { title: 'Quantity', dataIndex: 'quantity', type: 'number' },
@@ -96,6 +116,7 @@ const ReceiveStock = () => {
     try {
       const combinedData = {
         ...values,
+        supplier: supplier,
         ...tableValues[0],
       }
 
@@ -153,11 +174,14 @@ const ReceiveStock = () => {
           >
             <Select
               name="origin"
-              options={[
-                { value: 'NPHCDA', label: 'NPHCDA' },
-                { value: 'State', label: 'State' },
-              ]}
+              showSearch
+              allowClear
+              filterOption={(input, option) =>
+                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+              }
+              options={originOptions}
               placeholder="Origin"
+              onSelect={onOriginSelect}
             />
           </Form.Item>
 
@@ -168,7 +192,7 @@ const ReceiveStock = () => {
               { required: true, message: 'Please input the order number' },
             ]}
           >
-            <Input placeholder="Order number" />
+            <Input placeholder="Order number" disabled />
           </Form.Item>
         </div>
         <InputTable />

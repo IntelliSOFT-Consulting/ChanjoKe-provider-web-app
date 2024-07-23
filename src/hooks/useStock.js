@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { getOffset } from '../utils/methods'
 import { useSelector } from 'react-redux'
@@ -28,7 +28,7 @@ const useStock = () => {
           value: `${identifierFacility}-${identifierNumber}`,
         }
       ],
-      status: 'active',
+      status: values.status || 'active',
       category: {
         coding: [
           {
@@ -124,7 +124,7 @@ const useStock = () => {
       ],
       basedOn: [
         {
-          reference: `SupplyRequest/${values.supplyRequest}`,
+          reference: `SupplyRequest/${values.supplyRequestId}`,
         }
       ],
       status: 'completed',
@@ -154,7 +154,7 @@ const useStock = () => {
       },
       occurrenceDateTime: values.dateReceived,
       supplier: {
-        reference: `Practitioner/${values.origin}`,
+        reference: `Practitioner/${values.supplier}`,
       },
       destination: {
         reference: `Location/${user?.facility}`,
@@ -296,6 +296,8 @@ const useStock = () => {
         const resource = entry.resource
         if(resource.status === 'active'){
           resource.status = 'Pending'
+        }else if(resource.status === 'completed'){
+          resource.status = 'Received'
         }
 
         return resource
@@ -311,6 +313,27 @@ const useStock = () => {
       console.log(error)
     }
   }
+
+  const fetchActiveSupplyRequests = useCallback(async () => {
+    setLoading(true)
+    try{
+      const response = await myFacilityRequests()
+      setLoading(false)
+      const activeData = response?.filter((entry) => entry.status === 'Pending')
+      const data = activeData?.map((entry) => ({
+        id: entry.id,
+        key: entry.id,
+        label: entry.deliverTo.display,
+        value: entry.deliverTo.display,
+        identifier: entry.identifier[0].value,
+        supplier: entry.requester.reference.split('/')[1],
+      })) || []
+      return data
+    } catch(error){
+      setLoading(false)
+      console.log(error)
+    }
+  }, [])
 
   const mySupplyRequests = async (facility, page = 0) => {
     setLoading(true)
@@ -351,10 +374,11 @@ const useStock = () => {
     }
   }
 
-  const updaTeRequesStatus = async (id, status) => {
+  const updaTeRequestStatus = async (id, status) => {
     const request = await get(`${supplyRequestPath}/${id}`)
-    request.status = status
-    const response = await put(`${supplyRequestPath}/${id}`, request)
+    const updatedPayload = {...request, status: status}
+    console.log(request)
+    const response = await put(`${supplyRequestPath}/${id}`, updatedPayload)
     return response
   }
 
@@ -378,6 +402,8 @@ const useStock = () => {
     myFacilityRequests,
     mySupplyRequests,
     getSupplyRequestById,
+    updaTeRequestStatus,
+    fetchActiveSupplyRequests
   }
 }
 

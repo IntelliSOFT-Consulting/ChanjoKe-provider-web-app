@@ -116,6 +116,10 @@ const router = createBrowserRouter([
             element: <ReceiveStock status={'receive'} />,
           },
           {
+            path: '/stock-management/receive-stock/:orderID',
+            element: <ReceiveStock status={'receive'} />,
+          },
+          {
             path: '/stock-management/issue-stock',
             element: <IssueStock status={'issue'} />,
           },

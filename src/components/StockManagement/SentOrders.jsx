@@ -49,7 +49,7 @@ const useStyles = createUseStyles({
 
 export default function SentOrders() {
   const classes = useStyles()
-  const { myFacilityRequests } = useStock()
+  const { myFacilityRequests, updaTeRequestStatus } = useStock()
   const [results, setResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
   const { pageSize, handlePageChange } = usePaginatedQuery()
@@ -62,7 +62,8 @@ export default function SentOrders() {
         const sentOrders = await myFacilityRequests()
         console.log(sentOrders)
         const formattedOrders = sentOrders.map((order) => ({
-          id: order.identifier[0].value,
+          id: order.id,
+          identifier: order.identifier[0].value,
           date: moment(order.date).format('DD-MM-YYYY'),
           facility: order.deliverTo.display,
           status: order.status,
@@ -81,6 +82,7 @@ export default function SentOrders() {
   }, [])
 
   const changeStatus = (id) => {
+    const updatedStatus = updaTeRequestStatus(id, 'completed')
     setResults(prevResult => 
       prevResult.map(order => 
         order.id === id ? { ...order, status: 'Received' } : order
@@ -92,7 +94,7 @@ export default function SentOrders() {
   const columns = [
     {
       title: 'ID',
-      dataIndex: 'id',
+      dataIndex: 'identifier',
       key: 'id',
     },
     {
@@ -149,7 +151,8 @@ export default function SentOrders() {
             </Button>
           ) : (
             <Button
-              onClick={() => changeStatus(record.id)}
+              // onClick={() => changeStatus(record.id)}
+              onClick={() => navigate(`/stock-management/receive-stock/${record.id}`)}
               className="text-[#163C94] font-semibold border-none p-0"
             >
               Receive
@@ -212,7 +215,7 @@ export default function SentOrders() {
           {results.map((result) => (
             <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
               <div className="py-5 pr-6 col-span-4">
-                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">ID: <span className='font-bold'>{result.id}</span></div>
+                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">ID: <span className='font-bold'>{result.identifier}</span></div>
                 <div className="text-sm pl-5 leading-6 text-gray-900">{result.date}</div>
                 <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">{result.facility}</div>
                 <div className={`text-sm pl-5 leading-6 font-semibold ${result.status === "Pending" ? "text-[#efd406]" : "text-[#186e03]"}`}>{result.status}</div>
