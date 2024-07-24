@@ -132,7 +132,7 @@ export default function Campaigns() {
           {practitionerRole === 'ADMINISTRATOR' && <div className="right-0">
             <Button
               type="primary"
-              onClick={() => navigate('/new-campaign')}
+              onClick={() => navigate('/new-campaign/0')}
               className="ml-4 font-semibold px-10"
             >
               New

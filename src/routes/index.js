@@ -230,7 +230,7 @@ const router = createBrowserRouter([
         element: <Campaigns />,
       },
       {
-        path: '/new-campaign',
+        path: '/new-campaign/:campaignID',
         element: <NewCampaign />,
       },
       {

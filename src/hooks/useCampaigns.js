@@ -103,6 +103,7 @@ export default function useCampaign() {
   }
 
   const updateCampaign = async (id, payload, status) => {
+    console.log({ payload })
     setLoading(true)
     const updatedCampaignPayload = createPayload(payload, status)
     await put(`${fhirApi}/${id}`, updatedCampaignPayload)

@@ -39,13 +39,13 @@ export default function CampaignDetails () {
           <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
             <div className="text-3xl">{campaign?.title} Campaign</div>
             <div className="right-0">
-              {/* <Button
+              <Button
                 type="primary"
-                onClick={() => navigate('/new-campaign')}
+                onClick={() => navigate(`/new-campaign/${campaignID}`)}
                 className="ml-4 font-semibold px-10"
               >
                 Edit
-              </Button> */}
+              </Button>
             </div>
           </div>
           <div className="px-4 py-5 sm:p-6">
