@@ -32,14 +32,15 @@ export default function NewCampaign() {
   }, [])
 
   useEffect(() => {
-    console.log({ campaign })
-    form.setFieldValue('campaignName', campaign?.title)
-    form.setFieldValue('startDate', dayjs(campaign?.period?.start))
-    form.setFieldValue('endDate', dayjs(campaign?.period?.end))
-    form.setFieldValue('county', campaign?.category?.[0]?.coding?.[0]?.display)
-    form.setFieldValue('subCounty', campaign?.category?.[0]?.coding?.[1]?.display)
-    form.setFieldValue('ward', campaign?.category?.[0]?.coding?.[2]?.display)
-    form.setFieldValue('facility', campaign?.category?.[0]?.coding?.[3]?.display)
+    if (campaignID !== '0') {
+      form.setFieldValue('campaignName', campaign?.title)
+      form.setFieldValue('startDate', dayjs(campaign?.period?.start))
+      form.setFieldValue('endDate', dayjs(campaign?.period?.end))
+      form.setFieldValue('county', campaign?.category?.[0]?.coding?.[0]?.display)
+      form.setFieldValue('subCounty', campaign?.category?.[0]?.coding?.[1]?.display)
+      form.setFieldValue('ward', campaign?.category?.[0]?.coding?.[2]?.display)
+      form.setFieldValue('facility', campaign?.category?.[0]?.coding?.[3]?.display)
+    }
   }, [campaign])
 
   const saveCampaign = (values) => {
@@ -49,20 +50,16 @@ export default function NewCampaign() {
       setDialogOpen(true)
 
       setTimeout(() => {
-        if (isDialogOpen === true) {
-          setDialogOpen(false)
-          navigate('/campaigns')
-        }
+        setDialogOpen(false)
+        navigate('/campaigns')
       }, 2000)
     } else {
       updateCampaign(campaignID, { id: campaignID, ...values }, 'active')
       setDialogOpen(true)
 
       setTimeout(() => {
-        if (isDialogOpen === true) {
-          setDialogOpen(false)
-          navigate('/campaigns')
-        }
+        setDialogOpen(false)
+        navigate('/campaigns')
       }, 2000)
     }
     
