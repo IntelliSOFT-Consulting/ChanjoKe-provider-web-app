@@ -255,7 +255,6 @@ export default function NewAppointment() {
                           <Select
                             size="large"
                             onChange={(e) => {
-                              console.log({ e, vaccinesToAppoint })
                               addVaccineRecommendation(e)
                             }}
                           >

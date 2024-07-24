@@ -1,14 +1,15 @@
 import { Form, Input, Button, Row, Col, DatePicker, Select } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { useLocations } from '../../hooks/useLocation'
 import useCampaign from '../../hooks/useCampaigns'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function NewCampaign() {
 
   const [form] = Form.useForm()
+  const { campaignID } = useParams()
 
   const {
     counties,
@@ -19,22 +20,52 @@ export default function NewCampaign() {
     handleSubCountyChange,
     handleWardChange,
   } = useLocations(form)
-  const { createCampaign } = useCampaign()
+  const { createCampaign, fetchCampaign, campaign, updateCampaign } = useCampaign()
   const navigate = useNavigate()
 
   const [isDialogOpen, setDialogOpen] = useState(false)
 
+  useEffect(() => {
+    if (campaignID !== '0') {
+      fetchCampaign(campaignID)
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log({ campaign })
+    form.setFieldValue('campaignName', campaign?.title)
+    form.setFieldValue('startDate', dayjs(campaign?.period?.start))
+    form.setFieldValue('endDate', dayjs(campaign?.period?.end))
+    form.setFieldValue('county', campaign?.category?.[0]?.coding?.[0]?.display)
+    form.setFieldValue('subCounty', campaign?.category?.[0]?.coding?.[1]?.display)
+    form.setFieldValue('ward', campaign?.category?.[0]?.coding?.[2]?.display)
+    form.setFieldValue('facility', campaign?.category?.[0]?.coding?.[3]?.display)
+  }, [campaign])
+
   const saveCampaign = (values) => {
-    createCampaign(values)
+    if (campaignID === '0') {
+      createCampaign(values)
 
-    setDialogOpen(true)
+      setDialogOpen(true)
 
-    setTimeout(() => {
-      if (isDialogOpen === true) {
-        setDialogOpen(false)
-        navigate('/campaigns')
-      }
-    }, 2000)
+      setTimeout(() => {
+        if (isDialogOpen === true) {
+          setDialogOpen(false)
+          navigate('/campaigns')
+        }
+      }, 2000)
+    } else {
+      updateCampaign(campaignID, { id: campaignID, ...values }, 'active')
+      setDialogOpen(true)
+
+      setTimeout(() => {
+        if (isDialogOpen === true) {
+          setDialogOpen(false)
+          navigate('/campaigns')
+        }
+      }, 2000)
+    }
+    
   }
 
   return (
@@ -43,7 +74,7 @@ export default function NewCampaign() {
         open={isDialogOpen}
         description={
           <div className="font-normal">
-            <p>Campaign saved successfully</p>
+            <p>{campaignID === '0' ? 'Campaign Saved Successfully' : 'Campaign Updated'}</p>
           </div>
         }
         onClose={() => navigate('/campaigns')}
@@ -52,7 +83,9 @@ export default function NewCampaign() {
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
         <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
-          <div className="text-3xl">Create a Campaign</div>
+          <div className="text-3xl">
+            {campaignID === '0' ? 'Create a Campaign' : 'Edit Campaign'}
+          </div>
         </div>
 
         <Form
@@ -260,7 +293,7 @@ export default function NewCampaign() {
                 <Button
                   htmlType="submit"
                   className='ml-4 outline outline-[#4e8d6e] rounded-md px-5 bg-[#4e8d6e] outline-2 text-white'>
-                  Save
+                  {campaignID === '0' ? 'Save' : 'Update'}
                 </Button>
               </div>
           </div>
