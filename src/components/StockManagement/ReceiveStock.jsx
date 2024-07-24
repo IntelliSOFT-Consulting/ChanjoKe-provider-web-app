@@ -38,19 +38,27 @@ const ReceiveStock = () => {
   const [vaccineOptions, setVaccineOptions] = useState([])
   const [originOptions, setOriginOptions] = useState([])
   const [supplier, setSupplier] = useState('')
+  const [requestId, setRequestId] = useState('')
+  const [authoredOn, setAuthoredOn] = useState('')
+  const [facilityName, setFacilityName] = useState('')
+  const [facilityCode, setFacilityCode] = useState('')
 
   useEffect(() => {
     const fetchOrigins = async () => {
       try {
         const origins = await fetchActiveSupplyRequests()
+        console.log(origins)
         const formattedOrigins = origins.map((origin) => ({
           value: origin.id,
           label: origin.label,
           id: origin.id,
           key: origin.key,
           identifier: origin.identifier,
-          supplier: origin.supplier
+          supplier: origin.supplier,
+          authoredOn: origin.authoredOn,
+          facility: origin.facility
         }))
+        console.log(formattedOrigins)
         setOriginOptions(formattedOrigins)
       }catch(error){
         console.log("Error fetching origins", error)
@@ -62,6 +70,8 @@ const ReceiveStock = () => {
   const onOriginSelect = async(selectedOriginId, option) => {
     try{
       const supplyRequest = await getSupplyRequestById(selectedOriginId)
+
+      console.log(supplyRequest)
       const vaccine = supplyRequest.itemCodeableConcept.coding.map((code => ({
         value: code.code,
         label: code.display
@@ -70,6 +80,10 @@ const ReceiveStock = () => {
 
       form.setFieldsValue({ orderNumber: supplyRequest.identifier[0].value })
       setSupplier(option.supplier)
+      setRequestId(supplyRequest.id)
+      setAuthoredOn(option.authoredOn)
+      setFacilityName(option.label)
+      setFacilityCode(option.facility)
     } catch(error){
       console.log(error)
     }
@@ -118,8 +132,12 @@ const ReceiveStock = () => {
         ...values,
         supplier: supplier,
         ...tableValues[0],
+        supplyRequestId: requestId,
+        authoredOn: authoredOn,
+        facilityName: facilityName,
+        facilityCode: facilityCode
       }
-
+      
       localStorage.setItem('receiveData', JSON.stringify(combinedData))
 
       await receiveStock(combinedData)

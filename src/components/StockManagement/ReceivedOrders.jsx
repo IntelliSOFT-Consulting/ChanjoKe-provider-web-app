@@ -3,6 +3,7 @@ import { createUseStyles } from 'react-jss'
 import { Link } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
 import { useEffect, useState } from 'react'
+import moment from 'moment'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -51,14 +52,20 @@ export default function ReceivedOrders() {
       try {
         const facility = JSON.parse(localStorage.getItem('practitioner')).facility
         const receivedOrders = await mySupplyRequests(facility)
+        console.log(receivedOrders)
         const formattedOrders = receivedOrders.map((order) => ({
           id: order.id,
-          authoredOn: order.authoredOn,
-          occurenceDateTime: order.occurenceDateTime,
-          deliverTo: order.deliverTo.display,
-          products: order.itemCodeableConcept.coding.display,
+          key: order.id,
+          orderNumber: order.extension[0].valueString,
+          authoredOn: moment(order.extension[5]?.valueDateTime).format('DD-MM-YYYY'),
+          // authoredOn: order.extension[5]?.valueDateTime,
+          occurenceDateTime: moment(order.occurrenceDateTime).format('DD-MM-YYYY'),
+          // deliverTo: order.destination?.reference.split('/')[1],
+          deliverTo: order.destination?.display,
+          products: order.suppliedItem.itemCodeableConcept?.coding.length,
           status: order.status
         }))
+        console.log(formattedOrders)
         setResults(formattedOrders)
         setFilteredResults(formattedOrders)
       } catch(error) {
@@ -83,8 +90,8 @@ export default function ReceivedOrders() {
   const columns = [
     {
       title: 'Order Number',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'orderNumber',
+      key: 'orderNumber',
       className: {
         [classes.columnText]: true
       },
