@@ -97,7 +97,7 @@ export default function Campaigns() {
           to={`/campaign-site/${record?.id}`}
           className="text-[#163C94] font-semibold"
         >
-          Select
+          {activeTab === '1' ? 'Select' : ''}
         </Link>
       ),
     },
