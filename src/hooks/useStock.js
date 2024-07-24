@@ -19,6 +19,7 @@ const useStock = () => {
   const createPayload = (values, totalCount) => {
     const identifierFacility = values.facilityName.split(' ')[0].toUpperCase()
     const identifierNumber = (totalCount + 1).toString().padStart(4, '0')
+    const destinationFacility = user?.facility.split('/')[1]
 
     return {
       resourceType: 'SupplyRequest',
@@ -61,7 +62,7 @@ const useStock = () => {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
       },
       deliverFrom: {
-        reference: `Location/${user?.facility}`,
+        reference: `Location/${destinationFacility}`,
         display: user?.facilityName,
       },
       deliverTo: {
@@ -114,6 +115,7 @@ const useStock = () => {
   }
 
   const stockPayload = (values) => {
+    const destinationFacility = user?.facility.split('/')[1]
     return {
       resourceType: 'SupplyDelivery',
       identifier: [
@@ -157,7 +159,8 @@ const useStock = () => {
         reference: `Practitioner/${values.supplier}`,
       },
       destination: {
-        reference: `Location/${user?.facility}`,
+        reference: `Location/${destinationFacility}`,
+        display: user?.facilityName,
       },
       receiver: {
         reference: `Practitioner/${user?.fhirPractitionerId}`,
@@ -186,6 +189,10 @@ const useStock = () => {
         {
           url: 'http://example.org/fhir/StructureDefinition/manufacturer-details',
           valueString: values.manufacturerDetails
+        },
+        {
+          url: 'http://example.org/fhir/StructureDefinition/date-received',
+          valueDateTime: values.authoredOn
         }
       ]
     }
@@ -327,7 +334,11 @@ const useStock = () => {
         value: entry.deliverTo.display,
         identifier: entry.identifier[0].value,
         supplier: entry.requester.reference.split('/')[1],
+        authoredOn: entry.authoredOn,
+        status: entry.status,
+        facility: entry.deliverTo.reference.split('/')[1],
       })) || []
+      console.log(data)
       return data
     } catch(error){
       setLoading(false)
@@ -337,10 +348,11 @@ const useStock = () => {
 
   const mySupplyRequests = async (facility, page = 0) => {
     setLoading(true)
-    const facilityCode = facility?.replace(/Location\//g, '')
+    const supplier = user?.fhirPractitionerId
     const offset = getOffset(page)
+    const totalResponse = await get(`${deliveryPath}?_summary=count`)
     const response = await get(
-      `${supplyRequestPath}?supplier=${facilityCode}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+      `${deliveryPath}?supplier=${supplier}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
     )
     const data = response?.entry?.map((entry) => entry.resource) || []
     setStock({
@@ -367,7 +379,6 @@ const useStock = () => {
       const payload = createPayload(data, totalCount)
       const response = await post(supplyRequestPath, payload)
       setLoading(false)
-      console.log(response)
       return response
     }catch(error){
       console.log(error)
