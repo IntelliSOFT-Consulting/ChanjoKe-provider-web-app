@@ -43,7 +43,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
       case "text":
         return (
           <Form.Item
-            name={values[index][column.dataIndex]}
+            name={[index][column.dataIndex]}
             className="w-full m-0"
           >
             <Input
@@ -57,7 +57,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
       case "select":
         return (
           <Form.Item
-            name={values[index][column.dataIndex]}
+            name={[index][column.dataIndex]}
             className="w-full m-0"
           >
             <Select
@@ -72,7 +72,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
       case "date":
         return (
           <Form.Item
-            name={values[index][column.dataIndex]}
+            name={[index][column.dataIndex]}
             className="w-full m-0"
           >
             <DatePicker
@@ -87,7 +87,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
       case "number":
         return (
           <Form.Item
-            name={values[index][column.dataIndex]}
+            name={[index][column.dataIndex]}
             className="w-full m-0"
           >
             <InputNumber

@@ -138,6 +138,7 @@ const ReceiveStock = () => {
         facilityCode: facilityCode
       }
       
+      console.log(combinedData)
       localStorage.setItem('receiveData', JSON.stringify(combinedData))
 
       await receiveStock(combinedData)
