@@ -33,7 +33,7 @@ const useStyles = createUseStyles({
 const ReceiveStock = () => {
   const classes = useStyles()
   const [form] = useForm()
-  const { receiveStock, loading, fetchActiveSupplyRequests, getSupplyRequestById } = useStock()
+  const { receiveStock, loading, fetchActiveSupplyRequests, getSupplyRequestById, updaTeRequestStatus } = useStock()
   const { getAllVaccines } = useVaccination()
   const [vaccineOptions, setVaccineOptions] = useState([])
   const [originOptions, setOriginOptions] = useState([])
@@ -47,7 +47,6 @@ const ReceiveStock = () => {
     const fetchOrigins = async () => {
       try {
         const origins = await fetchActiveSupplyRequests()
-        console.log(origins)
         const formattedOrigins = origins.map((origin) => ({
           value: origin.id,
           label: origin.label,
@@ -58,7 +57,6 @@ const ReceiveStock = () => {
           authoredOn: origin.authoredOn,
           facility: origin.facility
         }))
-        console.log(formattedOrigins)
         setOriginOptions(formattedOrigins)
       }catch(error){
         console.log("Error fetching origins", error)
@@ -71,7 +69,6 @@ const ReceiveStock = () => {
     try{
       const supplyRequest = await getSupplyRequestById(selectedOriginId)
 
-      console.log(supplyRequest)
       const vaccine = supplyRequest.itemCodeableConcept.coding.map((code => ({
         value: code.code,
         label: code.display
@@ -85,6 +82,16 @@ const ReceiveStock = () => {
       setFacilityName(option.label)
       setFacilityCode(option.facility)
     } catch(error){
+      console.log(error)
+    }
+  }
+
+  // Update supply request status
+  const changeStatus = async(id) => {
+    try{
+      await updaTeRequestStatus(id, 'completed')
+      notification.success({ message: 'Status changed to Received' })
+    }catch(error){
       console.log(error)
     }
   }
@@ -142,6 +149,7 @@ const ReceiveStock = () => {
       localStorage.setItem('receiveData', JSON.stringify(combinedData))
 
       await receiveStock(combinedData)
+      await changeStatus(requestId)
 
       notification.success({
         message: 'Stock received successfully',
