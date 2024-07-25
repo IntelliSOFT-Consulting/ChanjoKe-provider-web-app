@@ -338,7 +338,6 @@ const useStock = () => {
         status: entry.status,
         facility: entry.deliverTo.reference.split('/')[1],
       })) || []
-      console.log(data)
       return data
     } catch(error){
       setLoading(false)
@@ -388,7 +387,6 @@ const useStock = () => {
   const updaTeRequestStatus = async (id, status) => {
     const request = await get(`${supplyRequestPath}/${id}`)
     const updatedPayload = {...request, status: status}
-    console.log(request)
     const response = await put(`${supplyRequestPath}/${id}`, updatedPayload)
     return response
   }

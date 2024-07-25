@@ -60,7 +60,6 @@ export default function SentOrders() {
       try {
         const facility = JSON.parse(localStorage.getItem('practitioner')).facility
         const sentOrders = await myFacilityRequests()
-        console.log(sentOrders)
         const formattedOrders = sentOrders.map((order) => ({
           id: order.id,
           identifier: order.identifier[0].value,
@@ -80,16 +79,6 @@ export default function SentOrders() {
 
     fetchStock()
   }, [])
-
-  const changeStatus = (id) => {
-    const updatedStatus = updaTeRequestStatus(id, 'completed')
-    setResults(prevResult => 
-      prevResult.map(order => 
-        order.id === id ? { ...order, status: 'Received' } : order
-      )
-    )
-    notification.success({ message: 'Status changed to Received' })
-  }
 
   const columns = [
     {
@@ -236,7 +225,7 @@ export default function SentOrders() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => changeStatus(result.id)}
+                      onClick={() => navigate(`/stock-management/receive-stock/${result.id}`)}
                       className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500 border-none p-0"
                     >
                       Receive
