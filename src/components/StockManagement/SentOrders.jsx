@@ -141,7 +141,7 @@ export default function SentOrders() {
           ) : (
             <Button
               // onClick={() => changeStatus(record.id)}
-              onClick={() => navigate(`/stock-management/receive-stock/${record.id}`)}
+              onClick={() => navigate(`/stock-management/receive-stock/${record.id}`, { state: { orderNumber: record.identifier, origin: record.facility, selectedOriginId: record.id } })}
               className="text-[#163C94] font-semibold border-none p-0"
             >
               Receive
@@ -225,7 +225,7 @@ export default function SentOrders() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => navigate(`/stock-management/receive-stock/${result.id}`)}
+                      onClick={() => navigate(`/stock-management/receive-stock/${result.id}`, { state: { orderNumber: result.identifier, origin: result.facility } })}
                       className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500 border-none p-0"
                     >
                       Receive

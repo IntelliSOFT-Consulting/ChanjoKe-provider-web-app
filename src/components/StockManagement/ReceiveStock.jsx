@@ -4,6 +4,7 @@ import useInputTable from '../../hooks/InputTable'
 import { createUseStyles } from 'react-jss'
 import useStock from '../../hooks/useStock'
 import useVaccination from '../../hooks/useVaccination'
+import { useParams, useLocation } from 'react-router-dom'
 
 const { useForm } = Form
 
@@ -43,6 +44,11 @@ const ReceiveStock = () => {
   const [facilityName, setFacilityName] = useState('')
   const [facilityCode, setFacilityCode] = useState('')
 
+  const { id } = useParams()
+  const location = useLocation()
+  const state = location.state || {}
+  const { orderNumber = '', origin = '', selectedOriginId = '' } = state
+
   useEffect(() => {
     const fetchOrigins = async () => {
       try {
@@ -63,7 +69,13 @@ const ReceiveStock = () => {
       }
     }
     fetchOrigins()
-  }, [fetchActiveSupplyRequests])
+
+    form.setFieldsValue({ orderNumber, origin })
+
+    if(selectedOriginId){
+      onOriginSelect(selectedOriginId)
+    }
+  }, [fetchActiveSupplyRequests, form, selectedOriginId, orderNumber, origin])
 
   const onOriginSelect = async(selectedOriginId, option) => {
     try{
@@ -86,7 +98,6 @@ const ReceiveStock = () => {
     }
   }
 
-  // Update supply request status
   const changeStatus = async(id) => {
     try{
       await updaTeRequestStatus(id, 'completed')
