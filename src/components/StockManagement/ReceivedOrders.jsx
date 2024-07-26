@@ -1,4 +1,4 @@
-import { Card, Button, Form, Select, Table } from 'antd'
+import { Card, Button, Form, Table, DatePicker } from 'antd'
 import { createUseStyles } from 'react-jss'
 import { Link } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
@@ -76,10 +76,10 @@ export default function ReceivedOrders() {
     fetchOrders()
   }, [])
 
-  const handleStatusChange = (value) => {
-    setFilter(value)
-    if(value) {
-      const filtered = results.filter((order) => order.status === value)
+  const handleDateChange = (date, dateString) => {
+    setFilter(dateString)
+    if(dateString) {
+      const filtered = results.filter((order) => order.occurenceDateTime === dateString)
       setFilteredResults(filtered)
     } else {
       setFilteredResults(results)
@@ -161,28 +161,15 @@ export default function ReceivedOrders() {
 
         <Form layout="vertical" className="p-4 flex w-full justify-end">
           <Form.Item
-            label='Filter by Status'
+            label='Filter by Date'
             name="filterByStatus"
             className="w-1/4"
           >
-            <Select
-              placeholder="All"
-              allowClear
-              showSearch
-              filterOption={(input, option) =>
-                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-              onChange={handleStatusChange}
-              options={[
-                {
-                  value: 'Pending',
-                  label: 'Pending',
-                },
-                {
-                  value: 'Received',
-                  label: 'Received',
-                },
-              ]}
+            <DatePicker 
+              placeholder="Filter by Date"
+              className='w-full'
+              onChange={handleDateChange}
+              format='DD-MM-YYYY'
             />
           </Form.Item>
         </Form>

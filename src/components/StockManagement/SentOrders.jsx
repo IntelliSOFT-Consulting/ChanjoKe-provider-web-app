@@ -1,4 +1,4 @@
-import { Card, Button, notification, Table } from 'antd'
+import { Card, Button, Table, Form, Select } from 'antd'
 import { createUseStyles } from 'react-jss'
 import { Link, useNavigate } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
@@ -49,8 +49,9 @@ const useStyles = createUseStyles({
 
 export default function SentOrders() {
   const classes = useStyles()
-  const { myFacilityRequests, updaTeRequestStatus } = useStock()
+  const { myFacilityRequests, updateRequestStatus } = useStock()
   const [results, setResults] = useState([])
+  const [filteredResults, setFilteredResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
   const { pageSize, handlePageChange } = usePaginatedQuery()
   const navigate = useNavigate()
@@ -74,6 +75,7 @@ export default function SentOrders() {
         }))
 
         setResults(formattedOrders)
+        setFilteredResults(formattedOrders)
         setTotalItems(sentOrders.length)
       } catch (error) {
         console.log(error)
@@ -82,6 +84,17 @@ export default function SentOrders() {
 
     fetchStock()
   }, [])
+
+  const handleStatusChange = (value) => {
+    if(value) {
+      const filtered = results.filter((order) => order.status === value)
+      setFilteredResults(filtered)
+      setTotalItems(filtered.length)
+    } else {
+      setFilteredResults(results)
+      setTotalItems(results.length)
+    }
+  }
 
   const columns = [
     {
@@ -177,10 +190,29 @@ export default function SentOrders() {
           <h3 className="text-[#707070] font-semibold text-base">Order Details</h3>
         </div>
 
+        <Form layout="vertical" className="p-4 flex w-full justify-end">
+          <Form.Item
+            label='Filter by Date'
+            name="filterByStatus"
+            className="w-1/4"
+          >
+            <Select 
+              placeholder='Select Status'
+              className='w-full'
+              allowClear
+              onChange={handleStatusChange}
+              options={[
+                { label: 'Pending', value: 'Pending' },
+                { label: 'Received', value: 'Received' },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+
         <div className='hidden sm:block sm:px-4 mb-10'>
           <Table 
             columns={columns}
-            dataSource={results}
+            dataSource={filteredResults}
             size="small"
             bordered
             className={classes.tableHeader}
