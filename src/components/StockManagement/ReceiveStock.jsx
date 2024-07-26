@@ -4,7 +4,7 @@ import useInputTable from '../../hooks/InputTable'
 import { createUseStyles } from 'react-jss'
 import useStock from '../../hooks/useStock'
 import useVaccination from '../../hooks/useVaccination'
-import { useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 
 const { useForm } = Form
 
@@ -48,6 +48,8 @@ const ReceiveStock = () => {
   const location = useLocation()
   const state = location.state || {}
   const { orderNumber = '', origin = '', selectedOriginId = '' } = state
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchOrigins = async () => {
@@ -165,6 +167,8 @@ const ReceiveStock = () => {
       notification.success({
         message: 'Stock received successfully',
       })
+
+      navigate('/stock-management/received-orders')
       form.resetFields()
 
     } catch (error) {
