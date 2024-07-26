@@ -47,7 +47,7 @@ const ReceiveStock = () => {
   const { id } = useParams()
   const location = useLocation()
   const state = location.state || {}
-  const { orderNumber = '', origin = '', selectedOriginId = '' } = state
+  const { orderNumber = '', origin = '', selectedOriginId = '', supplierId = '' } = state
 
   const navigate = useNavigate()
 
@@ -75,9 +75,9 @@ const ReceiveStock = () => {
     form.setFieldsValue({ orderNumber, origin })
 
     if(selectedOriginId){
-      onOriginSelect(selectedOriginId)
+      onOriginSelect(selectedOriginId, { supplier: supplierId } )
     }
-  }, [fetchActiveSupplyRequests, form, selectedOriginId, orderNumber, origin])
+  }, [fetchActiveSupplyRequests, form, selectedOriginId, orderNumber, origin, supplierId])
 
   const onOriginSelect = async(selectedOriginId, option) => {
     try{
@@ -158,7 +158,6 @@ const ReceiveStock = () => {
         facilityCode: facilityCode
       }
       
-      console.log(combinedData)
       localStorage.setItem('receiveData', JSON.stringify(combinedData))
 
       await receiveStock(combinedData)
