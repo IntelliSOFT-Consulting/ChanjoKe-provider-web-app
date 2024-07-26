@@ -6,6 +6,7 @@ import { useLocations } from '../../hooks/useLocation'
 import useVaccination from '../../hooks/useVaccination'
 import { useEffect, useState } from 'react'
 import moment from 'moment'
+import { useNavigate } from 'react-router-dom'
 
 const { useForm } = Form
 
@@ -39,6 +40,8 @@ export default function NewOrder() {
   const { getAllVaccines } = useVaccination()
   const [ vaccineOptions, setVaccineOptions ] = useState([])
   const [ nextOrderDate, setNextOrderDate] = useState(null)
+
+  const navigate = useNavigate()
 
   const { 
     counties,
@@ -100,6 +103,7 @@ export default function NewOrder() {
       notification.success({
         message: 'Order created successfully',
       })
+      navigate('/stock-management/sent-orders')
       form.resetFields()
     }catch{
       notification.error({
