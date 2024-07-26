@@ -55,6 +55,8 @@ export default function SentOrders() {
   const { pageSize, handlePageChange } = usePaginatedQuery()
   const navigate = useNavigate()
 
+  const user = JSON.parse(localStorage.getItem('practitioner'))
+
   useEffect(() => {
     const fetchStock = async () => {
       try {
@@ -67,7 +69,8 @@ export default function SentOrders() {
           facility: order.deliverTo.display,
           status: order.status,
           quantity: order.quantity?.value,
-          products: order.itemCodeableConcept?.coding.length
+          products: order.itemCodeableConcept?.coding.length,
+          supplier: order.requester.reference.split('/')[1],
         }))
 
         setResults(formattedOrders)
@@ -141,7 +144,7 @@ export default function SentOrders() {
           ) : (
             <Button
               // onClick={() => changeStatus(record.id)}
-              onClick={() => navigate(`/stock-management/receive-stock/${record.id}`, { state: { orderNumber: record.identifier, origin: record.facility, selectedOriginId: record.id } })}
+              onClick={() => navigate(`/stock-management/receive-stock/${record.id}`, { state: { orderNumber: record.identifier, origin: record.facility, selectedOriginId: record.id, supplierId: record.supplier  } })}
               className="text-[#163C94] font-semibold border-none p-0"
             >
               Receive
@@ -225,7 +228,7 @@ export default function SentOrders() {
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => navigate(`/stock-management/receive-stock/${result.id}`, { state: { orderNumber: result.identifier, origin: result.facility } })}
+                      onClick={() => navigate(`/stock-management/receive-stock/${result.id}`, { state: { orderNumber: result.identifier, origin: result.facility, selectedOriginId: result.id, supplierId: result.supplier } })}
                       className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500 border-none p-0"
                     >
                       Receive
