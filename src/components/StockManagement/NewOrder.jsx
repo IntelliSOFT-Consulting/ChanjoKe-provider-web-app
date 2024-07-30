@@ -103,6 +103,9 @@ export default function NewOrder() {
       notification.success({
         message: 'Order created successfully',
       })
+      localStorage.removeItem('orderData')
+      localStorage.removeItem('formValues')
+      localStorage.removeItem('receiveData')
       navigate('/stock-management/sent-orders')
       form.resetFields()
     }catch{
