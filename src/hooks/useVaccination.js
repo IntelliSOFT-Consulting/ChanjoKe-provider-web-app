@@ -146,7 +146,7 @@ export default function useVaccination() {
       `${immunizationsEndpoint}?location=${facilityId}&_count=10000000&status:not=entered-in-error&_count=100${params}`
     )
 
-    const resources = responses?.entry?.map((entry) => entry.resource)
+    const resources = responses?.entry?.map((entry) => entry.resource) || []
 
     setImmunizations(resources)
     return resources
