@@ -94,9 +94,11 @@ export default function NotAdministered() {
     if (responses) {
       setDialogOpen(true)
       setLoading(false)
+      const vaccineType =
+        selectedVaccines[0].type === 'non-routine' ? 'type=non-routine' : ''
       const time = setTimeout(() => {
         setDialogOpen(false)
-        window.location.reload()
+        window.location.href = `/client-details/${clientID}/vaccines?${vaccineType}`
       }, 1500)
       return () => clearTimeout(time)
     }

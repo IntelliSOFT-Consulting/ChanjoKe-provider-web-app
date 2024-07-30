@@ -100,13 +100,23 @@ export default function Administer() {
 
   useEffect(() => {
     const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
-    const appointmentsToday = appointments.filter((appointment) => moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(moment(), 'day') ? appointment : null)
-    const facilityAppointments = appointmentsToday.filter((appointment) => appointment?.location === practitionerDetails?.facility)
+    const appointmentsToday = appointments.filter((appointment) =>
+      moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(
+        moment(),
+        'day'
+      )
+        ? appointment
+        : null
+    )
+    const facilityAppointments = appointmentsToday.filter(
+      (appointment) => appointment?.location === practitionerDetails?.facility
+    )
     setFacilityAppointmentCount(facilityAppointments)
   }, [appointments])
 
   const handleFormSubmit = async (values) => {
     setLoading(true)
+
     const selected = selectedVaccines.map((vaccine, index) => {
       vaccine.batchNumber = values.vaccines[index].batchNumber
       vaccine.status = 'completed'
@@ -149,6 +159,8 @@ export default function Administer() {
   }
 
   const handleNextDueDateChange = async (values) => {
+    const vaccineType =
+      selectedVaccines[0].type === 'non-routine' ? 'type=non-routine' : ''
     const newScheduleDate = dayjs(values.nextDueDate).format('YYYY-MM-DD')
     const previousScheduleDate = dayjs(nextVaccines?.nextScheduleDate).format(
       'YYYY-MM-DD'
@@ -167,7 +179,9 @@ export default function Administer() {
     }
     setDialogOpen(false)
 
-    window.location.reload()
+    window.location.assign(
+      `/client-details/${clientID}/routineVaccines?${vaccineType}`
+    )
   }
 
   return (
@@ -195,6 +209,9 @@ export default function Administer() {
                     <DatePicker
                       defaultValue={dayjs(nextVaccines?.nextScheduleDate)}
                       style={{ width: '100%' }}
+                      disabledDate={(current) => {
+                        return current && current < moment().endOf('day')
+                      }}
                     />
                   </Form.Item>
 
@@ -203,23 +220,10 @@ export default function Administer() {
                     className="mt-3"
                     label="Number of Appointments"
                   >
-                    <Input placeholder={facilityAppointmentCount.length} disabled />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="afpCase"
-                    label="AFP Case "
-                    className='mt-2'
-                    rules={[
-                      {
-                        required: true,
-                        message: 'Mark if AFP Case',
-                      },
-                    ]}>
-                    <Radio.Group>
-                      <Radio value={true}>Yes</Radio>
-                      <Radio value={false}>No</Radio>
-                    </Radio.Group>
+                    <Input
+                      placeholder={facilityAppointmentCount.length}
+                      disabled
+                    />
                   </Form.Item>
                 </Form>
               )}
@@ -227,7 +231,7 @@ export default function Administer() {
           </div>
         }
         onClose={() => nexVaccineForm.submit()}
-        cancelText='Save'
+        cancelText="Save"
       />
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">

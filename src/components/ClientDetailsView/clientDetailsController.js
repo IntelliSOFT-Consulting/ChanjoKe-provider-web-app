@@ -99,6 +99,7 @@ export const formatRecommendationsToObject = (recommendation) => {
     statusReason: recommendation.statusReason,
     id: recommendation.id,
     reasonCode: recommendation.reasonCode,
+    type: recommendation.description,
   }
 }
 

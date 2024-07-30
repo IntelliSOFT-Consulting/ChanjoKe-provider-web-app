@@ -81,11 +81,13 @@ export default function Contraindications() {
     )
 
     if (responses) {
+      const vaccineType =
+        selectedVaccines[0].type === 'non-routine' ? 'type=non-routine' : ''
       setDialogOpen(true)
       setLoading(false)
       const time = setTimeout(() => {
         setDialogOpen(false)
-        window.location.reload()
+        window.location.href = `/client-details/${clientID}/vaccines?${vaccineType}`
       }, 1500)
       return () => clearTimeout(time)
     }
