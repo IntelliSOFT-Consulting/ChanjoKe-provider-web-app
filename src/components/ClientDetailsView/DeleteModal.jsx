@@ -1,4 +1,4 @@
-import { Modal, Button, Form, Select } from 'antd'
+import { Modal, Button, Form, Select, Input } from 'antd'
 import { useState } from 'react'
 
 const DeleteModal = ({ immunization, onCancel, onOk }) => {
