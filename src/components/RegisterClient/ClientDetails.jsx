@@ -1,3 +1,4 @@
+import { WarningOutlined } from '@ant-design/icons'
 import {
   Alert,
   Button,
@@ -6,8 +7,7 @@ import {
   Input,
   InputNumber,
   Radio,
-  Select,
-  Tooltip,
+  Select
 } from 'antd'
 import dayjs from 'dayjs'
 import localeDate from 'dayjs/plugin/localeData'
@@ -569,6 +569,15 @@ export default function ClientDetails() {
             />
           )}
 
+          {draftCaregiver && currentStep === 2 && (
+            <div className="shadow w-fit p-2 flex ml-auto rounded-md bg-red-50 text-semibold">
+              <WarningOutlined className="text-red-500 mr-2" />
+              <p className="text-red-700">
+                Please add the draft caregiver details to proceed.
+              </p>
+            </div>
+          )}
+
           <div className="px-4 py-4 sm:px-6 flex justify-end">
             {currentStep > 1 && (
               <Button
@@ -589,35 +598,27 @@ export default function ClientDetails() {
                 Submit
               </Button>
             )}
+
             {currentStep < 4 && (
-              <Tooltip
-                color="red"
-                title={
-                  draftCaregiver
-                    ? 'Please add the draft caregiver details to proceed.'
-                    : ''
-                }
-              >
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    if (currentStep === 2) {
-                      const caregiverData = caregiverForm.getFieldsValue()
-                      delete caregiverData['phoneCode']
-                      const caregiverValues = Object.values(caregiverData)
-                      const isEmpty = caregiverValues.every((value) => !value)
-                      if (!isEmpty) {
-                        setDraftCaregiver(true)
-                        return
-                      }
-                      setDraftCaregiver(false)
+              <Button
+                type="primary"
+                onClick={() => {
+                  if (currentStep === 2) {
+                    const caregiverData = caregiverForm.getFieldsValue()
+                    delete caregiverData['phoneCode']
+                    const caregiverValues = Object.values(caregiverData)
+                    const isEmpty = caregiverValues.every((value) => !value)
+                    if (!isEmpty) {
+                      setDraftCaregiver(true)
+                      return
                     }
-                    setCurrentStep(currentStep + 1)
-                  }}
-                >
-                  {currentStep === 3 ? 'Preview' : 'Next'}
-                </Button>
-              </Tooltip>
+                    setDraftCaregiver(false)
+                  }
+                  setCurrentStep(currentStep + 1)
+                }}
+              >
+                {currentStep === 3 ? 'Preview' : 'Next'}
+              </Button>
             )}
           </div>
         </Form>
