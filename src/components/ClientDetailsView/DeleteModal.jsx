@@ -1,6 +1,9 @@
 import { Modal, Button, Form, Select } from 'antd'
+import { useState } from 'react'
 
 const DeleteModal = ({ immunization, onCancel, onOk }) => {
+  const [isOther, setIsOther] = useState(false)
+
   const [form] = Form.useForm()
   const reasons = [
     'Patient request',
@@ -30,7 +33,11 @@ const DeleteModal = ({ immunization, onCancel, onOk }) => {
             { required: true, message: 'Please select a reason for deletion' },
           ]}
         >
-          <Select showSearch allowClear>
+          <Select
+            showSearch
+            allowClear
+            onChange={(value) => setIsOther(value === 'Other')}
+          >
             {reasons.map((reason) => (
               <Select.Option key={reason} value={reason}>
                 {reason}
@@ -38,6 +45,24 @@ const DeleteModal = ({ immunization, onCancel, onOk }) => {
             ))}
           </Select>
         </Form.Item>
+        {isOther && (
+          <Form.Item
+            name="otherReason"
+            label="Other reason"
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (getFieldValue('reason') === 'Other' && !value) {
+                    return Promise.reject('Please provide a reason')
+                  }
+                  return Promise.resolve()
+                },
+              }),
+            ]}
+          >
+            <Input.Textarea rows={3} placeholder="Please provide a reason" />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   )
