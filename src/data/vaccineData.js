@@ -781,7 +781,7 @@ export const nonRoutineVaccines = [
     category: 'HPV',
     description: 'non-routine',
     adminRange: {
-      start: 3650,
+      start: 3830,
       end: 5110,
       unit: 'days',
     },
@@ -795,8 +795,8 @@ export const nonRoutineVaccines = [
         hpv1?.status === 'completed'
           ? hpv1.occurrenceDateTime
             ? moment(hpv1.occurrenceDateTime).add(180, 'days')
-            : moment(dob).add(3650, 'days')
-          : moment(dob).add(3650, 'days')
+            : moment(dob).add(3830, 'days')
+          : moment(dob).add(3830, 'days')
 
       return date.format('DD-MM-YYYY')
     },

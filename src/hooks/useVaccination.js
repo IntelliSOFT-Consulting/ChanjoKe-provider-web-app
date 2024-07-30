@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { nonRoutineVaccines, routineVaccines } from '../data/vaccineData'
 import { formatCardTitle } from '../utils/methods'
+import { generateDueDates } from '../utils/calculators/vaccineDates'
 
 const recommendationsEndpoint = '/hapi/fhir/ImmunizationRecommendation'
 const immunizationsEndpoint = '/hapi/fhir/Immunization'
@@ -31,7 +32,10 @@ export default function useVaccination() {
   }
 
   const formatRecommendationsToFHIR = (patient, recommendation) => {
-    const recommendations = filterVaccinationRecommendations(patient)
+    const recommendations = generateDueDates(
+      filterVaccinationRecommendations(patient),
+      patient.birthDate
+    )
 
     const formatDate = (date) => moment(date).format('YYYY-MM-DD')
 
@@ -42,15 +46,7 @@ export default function useVaccination() {
       value: formatDate(date),
     })
 
-    const formatRecommendation = (rec, birthDate) => {
-      const startDays = Number(rec.adminRange.start)
-      const endDays = Number(
-        rec.adminRange.end === Infinity ? 43800 : rec.adminRange.end
-      )
-
-      const earliestDate = moment(birthDate).add(startDays, 'days')
-      const latestDate = moment(birthDate).add(endDays, 'days')
-
+    const formatRecommendation = (rec) => {
       return {
         vaccineCode: {
           coding: [{ code: rec.nhddCode, display: rec.vaccineCode }],
@@ -69,12 +65,12 @@ export default function useVaccination() {
           formatDateCriterion(
             'Earliest-date-to-administer',
             'Earliest-date-to-administer',
-            earliestDate
+            rec.dueDate
           ),
           formatDateCriterion(
             'Latest-date-to-administer',
             'Latest-date-to-administer',
-            latestDate
+            rec.eligibilityEndDate
           ),
         ],
         series: formatCardTitle(rec.category),
@@ -91,9 +87,7 @@ export default function useVaccination() {
       id: recommendation?.id,
       patient: { reference: `Patient/${patient.id}` },
       date: formatDate(moment()),
-      recommendation: recommendations.map((rec) =>
-        formatRecommendation(rec, patient.birthDate)
-      ),
+      recommendation: recommendations.map((rec) => formatRecommendation(rec)),
     }
   }
 
@@ -147,8 +141,7 @@ export default function useVaccination() {
     return resources
   }
 
-  const getFacilityImmunizations = async (facilityId, params='') => {
-    
+  const getFacilityImmunizations = async (facilityId, params = '') => {
     const responses = await get(
       `${immunizationsEndpoint}?location=${facilityId}&_count=10000000&status:not=entered-in-error&_count=100${params}`
     )
@@ -159,9 +152,11 @@ export default function useVaccination() {
     return resources
   }
 
-  const getImmunization = async (immunizationId, client=false) => {
+  const getImmunization = async (immunizationId, client = false) => {
     const include = client ? '?_include=Immunization:patient' : ''
-    const response = await get(`${immunizationsEndpoint}/${immunizationId}${include}`)
+    const response = await get(
+      `${immunizationsEndpoint}/${immunizationId}${include}`
+    )
     setImmunization(response)
     return response
   }
@@ -182,10 +177,7 @@ export default function useVaccination() {
   }
 
   const getAllVaccines = useCallback(async () => {
-    const allVaccines = [
-      ...routineVaccines,
-      ...nonRoutineVaccines,
-    ]
+    const allVaccines = [...routineVaccines, ...nonRoutineVaccines]
     return allVaccines.map((vaccine) => ({
       value: vaccine.vaccineName,
       label: vaccine.vaccineName,

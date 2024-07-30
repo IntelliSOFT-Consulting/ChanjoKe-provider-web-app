@@ -10,6 +10,11 @@ import { Provider } from 'react-redux'
 import store from './redux/store'
 import { createUseStyles } from 'react-jss'
 import { debounce } from './utils/methods'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
+
+const dateFormat = 'DD-MM-YYYY'
 
 const useStyles = createUseStyles({
   '@global': {
@@ -146,6 +151,9 @@ const App = () => {
                 borderRadius: 0,
               },
             },
+          }}
+          datePicker={{
+            format: dateFormat,
           }}
         >
           <div className={classes.root}>

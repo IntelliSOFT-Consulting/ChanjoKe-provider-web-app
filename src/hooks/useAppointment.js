@@ -49,7 +49,7 @@ export default function useAppointment() {
 
     const url = offset < 1 ? `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&_count=5` : `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&_count=5&_offset=${offset}`
     const response = await get(url)
-    console.log({ entry: response })
+
     if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
       const appointmentsResponse = response?.entry.map((appointment) => ({
         appointments: appointment?.resource?.description,
