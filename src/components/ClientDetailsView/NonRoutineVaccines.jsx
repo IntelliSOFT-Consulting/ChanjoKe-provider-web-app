@@ -248,7 +248,7 @@ export default function NonRoutineVaccines({
         immunization={immunizationToDelete}
         onCancel={() => setImmunizationToDelete(null)}
         onOk={(values) =>
-          deleteImmunization(immunizationToDelete, values.reason)
+          deleteImmunization(immunizationToDelete, values.reason === 'Other' ? values.otherReason : values.reason)
         }
       />
       <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
