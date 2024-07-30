@@ -1,5 +1,5 @@
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
-import { Form, Input, message } from 'antd'
+import { Form, Input, message, Button } from 'antd'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApiRequest } from '../api/useApiRequest'
@@ -47,7 +47,7 @@ export default function ForgotPassword() {
   }
   return (
     <div className="grid md:grid-cols-2 h-full bg-[#f9fafb]">
-       <div className="hidden md:block md:h-screen w-full login-bg" />
+      <div className="hidden md:block md:h-screen w-full login-bg" />
 
       <div>
         <div className="md:collapse flex flex-wrap text-center px-4 sm:flex-nowrap sm:px-6 lg:px-8 bg-[#163C94] text-white shadow py-4">
@@ -71,7 +71,7 @@ export default function ForgotPassword() {
                 onFinish={onFinish}
                 autoComplete="off"
                 layout="vertical"
-                className="mt-20 w-full max-w-64 px-16 flex flex-col"
+                className="mt-20 w-full px-16 flex flex-col"
               >
                 <Form.Item
                   name="idNumber"
@@ -91,6 +91,7 @@ export default function ForgotPassword() {
                   <Input
                     prefix={<UserOutlined className="site-form-item-icon" />}
                     placeholder="ID Number"
+                    size="large"
                   />
                 </Form.Item>
 
@@ -112,25 +113,20 @@ export default function ForgotPassword() {
                   <Input
                     prefix={<MailOutlined className="site-form-item-icon" />}
                     placeholder="Email"
+                    size="large"
                   />
                 </Form.Item>
 
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div></div>
-                  <button
+                <div className="ml-auto">
+                  <Button
                     type="primary"
                     htmlType="submit"
-                    className="flex w-full items-center justify-center gap-3 rounded-md bg-[#163C94] px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
+                    loading={loading}
+                    size="large"
+                    className="w-fit"
                   >
-                    {loading && (
-                      <span>
-                        <LoadingIcon className="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
-                      </span>
-                    )}
-                    <span className="text-sm font-semibold leading-6">
-                      Reset Password
-                    </span>
-                  </button>
+                    Reset Password
+                  </Button>
                 </div>
               </Form>
             )}
@@ -139,8 +135,7 @@ export default function ForgotPassword() {
               <Form
                 onFinish={resetPassword}
                 autoComplete="off"
-                layout="vertical"
-                className="mt-20 w-full max-w-64 px-40"
+                className="mt-20 w-full px-16 flex flex-col"
               >
                 <Form.Item
                   name="resetCode"
@@ -157,7 +152,7 @@ export default function ForgotPassword() {
                     },
                   ]}
                 >
-                  <Input placeholder="Reset Code" />
+                  <Input size="large" placeholder="Reset Code" />
                 </Form.Item>
 
                 <Form.Item
@@ -176,6 +171,7 @@ export default function ForgotPassword() {
                   ]}
                 >
                   <Input
+                    size="large"
                     prefix={<UserOutlined className="site-form-item-icon" />}
                     placeholder="ID Number"
                   />
@@ -198,26 +194,20 @@ export default function ForgotPassword() {
                   <Input.Password
                     prefix={<LockOutlined className="site-form-item-icon" />}
                     type="password"
-                    placeholder="Password"
+                    placeholder="Your new password"
+                    size="large"
                   />
                 </Form.Item>
 
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div></div>
-                  <button
+                <div className="ml-auto">
+                  <Button
                     type="primary"
                     htmlType="submit"
-                    className="flex w-full items-center justify-center gap-3 rounded-md bg-[#163C94] px-3 py-3 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
+                    loading={loading}
+                    size="large"
                   >
-                    {loading && (
-                      <span>
-                        <LoadingIcon className="w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
-                      </span>
-                    )}
-                    <span className="text-sm font-semibold leading-6">
-                      Set Password
-                    </span>
-                  </button>
+                    Set Password
+                  </Button>
                 </div>
               </Form>
             )}
