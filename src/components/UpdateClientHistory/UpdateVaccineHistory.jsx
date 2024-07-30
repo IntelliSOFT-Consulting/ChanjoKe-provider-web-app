@@ -11,6 +11,7 @@ import {
   createImmunizationResource,
   updateVaccineDueDates,
 } from '../AdministerVaccines/administerController'
+import usePatient from '../../hooks/usePatient'
 
 export default function UpdateVaccineHistory() {
   const navigate = useNavigate()
@@ -19,6 +20,8 @@ export default function UpdateVaccineHistory() {
 
   const { clientID } = useParams()
   const { user } = useSelector((state) => state.userInfo)
+
+  const { getPatient, patient } = usePatient()
 
   const {
     getRecommendations,
@@ -32,6 +35,7 @@ export default function UpdateVaccineHistory() {
   useEffect(() => {
     getRecommendations(clientID)
     getImmunizations(clientID)
+    getPatient(clientID)
   }, [clientID])
 
   const getMissedVaccines = () => {
@@ -137,8 +141,12 @@ export default function UpdateVaccineHistory() {
                     allowClear
                     size="large"
                     showSearch
-                    filterOption={(input, option) =>{
-                      return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    filterOption={(input, option) => {
+                      return (
+                        option.label
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      )
                     }}
                   />
                 </Form.Item>
@@ -154,7 +162,8 @@ export default function UpdateVaccineHistory() {
                     size="large"
                     className="w-full"
                     disabledDate={(current) =>
-                      current && current > moment().endOf('day')
+                      (current && current > moment().endOf('day')) ||
+                      current < moment(patient?.birthDate).startOf('day')
                     }
                   />
                 </Form.Item>

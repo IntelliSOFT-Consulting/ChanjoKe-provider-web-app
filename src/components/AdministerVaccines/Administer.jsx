@@ -212,6 +212,7 @@ export default function Administer() {
                       disabledDate={(current) => {
                         return current && current < moment().endOf('day')
                       }}
+                      format='DD-MM-YYYY'
                     />
                   </Form.Item>
 

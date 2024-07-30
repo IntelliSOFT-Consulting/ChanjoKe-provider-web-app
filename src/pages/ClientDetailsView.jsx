@@ -3,7 +3,6 @@ import { Button } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import SelectDialog from '../common/dialog/SelectDialog'
 import LoadingArrows from '../common/spinners/LoadingArrows'
 import BaseTabs from '../common/tabs/BaseTabs'
 import {
@@ -11,16 +10,15 @@ import {
   formatWeightData,
   groupVaccinesByCategory,
 } from '../components/ClientDetailsView/clientDetailsController'
+import WeightChart from '../components/ClientDetailsView/WeightChart'
 import Table from '../components/DataTable'
+import useObservations from '../hooks/useObservations'
 import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
-import useObservations from '../hooks/useObservations'
 import { setCurrentPatient } from '../redux/actions/patientActions'
 import { setVaccineSchedules } from '../redux/actions/vaccineActions'
-import WeightChart from '../components/ClientDetailsView/WeightChart'
 
 export default function ClientDetailsView() {
-  const [isDialogOpen, setDialogOpen] = useState(false)
   const [patientData, setPatientData] = useState(null)
   const [routineVaccines, setRoutineVaccines] = useState([])
   const [nonRoutineVaccines, setNonRoutineVaccines] = useState([])
@@ -50,7 +48,7 @@ export default function ClientDetailsView() {
   }
 
   useEffect(() => {
-   fetchData()
+    fetchData()
   }, [clientID])
 
   useEffect(() => {
@@ -76,10 +74,6 @@ export default function ClientDetailsView() {
     }
   }, [immunizations, recommendations, observations])
 
-  const handleDialogClose = (confirmed) => {
-    setDialogOpen(false)
-  }
-
   const tHeaders = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
     { title: 'System ID', dataIndex: 'systemID', key: 'systemID' },
@@ -90,21 +84,6 @@ export default function ClientDetailsView() {
 
   return (
     <>
-      <SelectDialog
-        open={isDialogOpen}
-        title="Info"
-        description="Select Record to update"
-        btnOne={{
-          text: 'Client Record',
-          url: `/update-client-history/${patient?.id}`,
-        }}
-        btnTwo={{
-          text: 'Vaccine Details',
-          url: `/update-vaccine-history/${patient?.id}`,
-        }}
-        onClose={handleDialogClose}
-      />
-
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
         <div className="flex justify-between px-4 text-2xl py-5 sm:px-6">
           <div className="text-3xl">Client Details</div>
@@ -117,10 +96,10 @@ export default function ClientDetailsView() {
             </Button>
             <Button
               type="primary"
-              onClick={() => setDialogOpen(true)}
+              onClick={() => navigate(`/update-vaccine-history/${patient?.id}`)}
               className="ml-4 font-semibold"
             >
-              Update personal details
+              Update vaccine history
             </Button>
           </div>
         </div>
