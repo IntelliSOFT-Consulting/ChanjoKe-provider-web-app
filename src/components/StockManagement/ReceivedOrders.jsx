@@ -162,7 +162,7 @@ export default function ReceivedOrders() {
         <Form layout="vertical" className="p-4 flex w-full justify-end">
           <Form.Item
             label='Filter by Date'
-            name="filterByStatus"
+            name="filterByDate"
             className="w-1/4"
           >
             <DatePicker 

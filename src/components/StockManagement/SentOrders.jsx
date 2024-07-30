@@ -192,7 +192,7 @@ export default function SentOrders() {
 
         <Form layout="vertical" className="p-4 flex w-full justify-end">
           <Form.Item
-            label='Filter by Date'
+            label='Filter by Status'
             name="filterByStatus"
             className="w-1/4"
           >
