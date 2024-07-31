@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import useVaccination from '../hooks/useVaccination'
 import { useSelector } from 'react-redux'
 import LoadingArrows from '../common/spinners/LoadingArrows'
+import useAppointment from '../hooks/useAppointment'
 import moment from 'moment'
 
 const stats = [
@@ -31,7 +32,11 @@ const stats = [
     href: 'search/administerVaccine/n',
   },
   { name: 'AEFI', icon: AefiIcon, href: 'search/aefi/n' },
-  { name: 'Appointments', icon: AppointmentIcon, href: 'search/appointments/n' },
+  {
+    name: 'Appointments',
+    icon: AppointmentIcon,
+    href: 'search/appointments/n',
+  },
   {
     name: 'Stock Management',
     icon: StockManagementIcon,
@@ -41,44 +46,45 @@ const stats = [
   { name: 'Campaigns', icon: ReferralIcon, href: 'campaigns' },
 ]
 
-const statsTwo = [
-  {
-    id: 1,
-    name: 'Appointments',
-    stat: '0',
-    icon: AppointmentIcon,
-    change: '',
-    changeType: 'increase',
-  },
-  {
-    id: 2,
-    name: 'Referrals',
-    stat: '0',
-    icon: ReferralIcon,
-    change: '',
-    changeType: 'increase',
-  },
-  {
-    id: 2,
-    name: 'Vaccines Administered',
-    stat: '100',
-    icon: AdministerVaccineIcon,
-    change: '',
-    changeType: 'increase',
-  },
-]
-
 export default function Home() {
   const { user } = useSelector((state) => state.userInfo)
 
   const { getFacilityImmunizations, immunizations } = useVaccination()
+  const { getFacilityAppointments, facilityAppointments } = useAppointment()
 
   const today = moment().format('YYYY-MM-DD')
 
   useEffect(() => {
     getFacilityImmunizations(user?.facility, `&date=gt${today}`)
+    getFacilityAppointments(today)
   }, [user?.facility])
 
+  const statsTwo = [
+    {
+      id: 1,
+      name: 'Appointments',
+      stat: facilityAppointments?.length || 0,
+      icon: AppointmentIcon,
+      change: '',
+      changeType: 'increase',
+    },
+    {
+      id: 2,
+      name: 'Referrals',
+      stat: '0',
+      icon: ReferralIcon,
+      change: '',
+      changeType: 'increase',
+    },
+    {
+      id: 2,
+      name: 'Vaccines Administered',
+      stat: immunizations?.length || 0,
+      icon: AdministerVaccineIcon,
+      change: '',
+      changeType: 'increase',
+    },
+  ]
   const totalVaccines = immunizations?.length || 0
 
   return (
@@ -110,9 +116,7 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="text-7xl text-[#163C94] font-bold mt-10">
-                      {item.name === 'Vaccines Administered'
-                        ? totalVaccines
-                        : item.stat}
+                      {item.stat}
                     </div>
                   </div>
                 </div>

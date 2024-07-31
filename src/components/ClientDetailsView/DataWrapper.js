@@ -1,180 +1,206 @@
-import dayjs from "dayjs"
-import moment from "moment";
+import dayjs from 'dayjs'
+import moment from 'moment'
 import utc from 'dayjs/plugin/utc'
 
-dayjs.extend(utc);
+dayjs.extend(utc)
 
-const createVaccinationAppointment = (data, patientID, recommendationID) => {
-    let dateToAdminister = '';
+const createVaccinationAppointment = (data, patientID, user) => {
+  let dateToAdminister = ''
 
-    const practitioner = JSON.parse(localStorage.getItem('practitioner'))
+  const practitioner = JSON.parse(localStorage.getItem('practitioner'))
 
-    try {
-        const item = data?.dateCriterion?.find(item => 
-            item.code.coding.some(code => code.code === "Earliest-date-to-administer")
-        );
-        if (item) {
-            dateToAdminister = item.value;
-        }
-    } catch (error) {
-        return;
+  try {
+    const item = data?.dateCriterion?.find((item) =>
+      item.code.coding.some(
+        (code) => code.code === 'Earliest-date-to-administer'
+      )
+    )
+    if (item) {
+      dateToAdminister = item.value
     }
+  } catch (error) {
+    return
+  }
 
-    return {
-        "resourceType": "Appointment",
-        "status": "booked",
-        "description": `${data?.vaccineCode?.[0]?.text}`,
-        "supportingInformation": [
-          {
-            "reference": `Patient/${patientID}`,
-          },
-          {
-            "doseNumber": data?.doseNumberPositiveInt,
-          },
-          {
-            "display": practitioner?.facility,
-          },
-        ],
-        "start": moment(data?.appointmentDate, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm:ssZ'),
-        "created": moment(dateToAdminister).format('YYYY-MM-DDTHH:mm:ssZ'),
-      }
+  return {
+    resourceType: 'Appointment',
+    status: 'booked',
+    description: `${data?.vaccineCode?.[0]?.text}`,
+    supportingInformation: [
+      {
+        reference: `Patient/${patientID}`,
+      },
+      {
+        doseNumber: data?.doseNumberPositiveInt,
+      },
+      {
+        display: practitioner?.facility,
+      },
+    ],
+    start: moment(data?.appointmentDate, 'DD-MM-YYYY').format(
+      'YYYY-MM-DDTHH:mm:ssZ'
+    ),
+    created: moment(dateToAdminister).format('YYYY-MM-DDTHH:mm:ssZ'),
+    participant: [
+      {
+        actor: {
+          reference: `Practitioner/${user?.fhirPractitionerId}`,
+        },
+      },
+      {
+        actor: {
+          reference: `${user?.facility}`,
+        },
+      },
+      {
+        actor: {
+          reference: `Patient/${patientID}`,
+        },
+      },
+    ],
+  }
 }
 
 const createVaccineImmunization = (data, patientID, status) => {
   return {
-    "resourceType": "Immunization",
-    "status": status,
-    "vaccineCode": {
-        "coding": [
-            {
-                "code": data?.vaccineCode,
-                "display": data?.vaccineName,
-            }
-        ],
-        "text": data?.vaccineName,
-    },
-    "patient": {
-        "reference": `Patient/${patientID}`
-    },
-    "encounter": {
-        "reference": "Encounter/69ccb241-c809-4dfb-82d4-3e4b70d46dde"
-    },
-    "occurrenceDateTime": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
-    "doseQuantity": {
-        "value": data?.doseNumber,
-    },
-    "note": [
+    resourceType: 'Immunization',
+    status: status,
+    vaccineCode: {
+      coding: [
         {
-            "text": "Facility",
+          code: data?.vaccineCode,
+          display: data?.vaccineName,
         },
-        {
-            "authorString": data?.contraindicationDetails
-        }
+      ],
+      text: data?.vaccineName,
+    },
+    patient: {
+      reference: `Patient/${patientID}`,
+    },
+    encounter: {
+      reference: 'Encounter/69ccb241-c809-4dfb-82d4-3e4b70d46dde',
+    },
+    occurrenceDateTime: dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+    doseQuantity: {
+      value: data?.doseNumber,
+    },
+    note: [
+      {
+        text: 'Facility',
+      },
+      {
+        authorString: data?.contraindicationDetails,
+      },
     ],
-    "education": data?.education,
-    "protocolApplied": [
-        {
-            "series": "3",
-                "targetDisease": [
-                    {
-                        "text": data?.diseaseTarget,
-                    }
-                ],
-            "seriesDosesString": data?.doseNumber,
-        }
-    ]
-}
+    education: data?.education,
+    protocolApplied: [
+      {
+        series: '3',
+        targetDisease: [
+          {
+            text: data?.diseaseTarget,
+          },
+        ],
+        seriesDosesString: data?.doseNumber,
+      },
+    ],
+  }
 }
 
 const recommendation = (recommendation) => {
-
-    if (!recommendation) {
-
-    } else {
-        return {
-            "vaccineCode": {
-                "text": recommendation?.vaccineName,
-                "code": recommendation?.vaccineCode,
-            },
-            "targetDisease": {
-                "text": recommendation?.diseaseTarget,
-            },
-            "forecastStatus": {
-                "text": recommendation?.forecastStatus,
-            },
-            "dateCriterion": [
-                {
-                    "code": {
-                        "text": "Date vaccine due"
-                    },
-                    "value": dayjs(recommendation?.vaccineDueDate).format('YYYY-MM-DDTHH:mm:ssZ') !== 'Invalid Date' ? dayjs(recommendation?.vaccineDueDate).format('YYYY-MM-DDTHH:mm:ssZ') : ''
-                }
-            ],
-            "description": `category: ${recommendation?.category}`,
-            "doseNumberString": recommendation?.doseNumber.toString(),
-            // "seriesDosesString": "5"
-        }
+  if (!recommendation) {
+  } else {
+    return {
+      vaccineCode: {
+        text: recommendation?.vaccineName,
+        code: recommendation?.vaccineCode,
+      },
+      targetDisease: {
+        text: recommendation?.diseaseTarget,
+      },
+      forecastStatus: {
+        text: recommendation?.forecastStatus,
+      },
+      dateCriterion: [
+        {
+          code: {
+            text: 'Date vaccine due',
+          },
+          value:
+            dayjs(recommendation?.vaccineDueDate).format(
+              'YYYY-MM-DDTHH:mm:ssZ'
+            ) !== 'Invalid Date'
+              ? dayjs(recommendation?.vaccineDueDate).format(
+                  'YYYY-MM-DDTHH:mm:ssZ'
+                )
+              : '',
+        },
+      ],
+      description: `category: ${recommendation?.category}`,
+      doseNumberString: recommendation?.doseNumber.toString(),
+      // "seriesDosesString": "5"
     }
+  }
 }
 
 const createImmunizationRecommendation = (recommendations, patient) => {
-    return {
-        "resourceType": "ImmunizationRecommendation",
-        "patient": {
-            "reference": `Patient/${patient?.id}`
-        },
-        "date": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
-        "recommendation": recommendations
-            .filter(recommendation => recommendation)
-            .map((r) => recommendation(r)),
-    }
+  return {
+    resourceType: 'ImmunizationRecommendation',
+    patient: {
+      reference: `Patient/${patient?.id}`,
+    },
+    date: dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+    recommendation: recommendations
+      .filter((recommendation) => recommendation)
+      .map((r) => recommendation(r)),
+  }
 }
 
 const createAppointment = (data, patientID, status) => {
-    return {
-      "resourceType": "Immunization",
-      "status": status,
-      "vaccineCode": {
-          "coding": [
-              {
-                  "code": data?.vaccineCode,
-                  "display": data?.vaccineName,
-              }
-          ],
-          "text": data?.vaccineName,
-      },
-      "patient": {
-          "reference": `Patient/${patientID}`
-      },
-      "encounter": {
-          "reference": "Encounter/69ccb241-c809-4dfb-82d4-3e4b70d46dde"
-      },
-      "occurrenceDateTime": dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
-      "doseQuantity": {
-          "value": data?.doseNumber,
-      },
-      "note": [
-          {
-              "text": "Facility",
-          },
-          {
-              "authorString": data?.contraindicationDetails
-          }
+  return {
+    resourceType: 'Immunization',
+    status: status,
+    vaccineCode: {
+      coding: [
+        {
+          code: data?.vaccineCode,
+          display: data?.vaccineName,
+        },
       ],
-      "education": data?.education,
-      "protocolApplied": [
+      text: data?.vaccineName,
+    },
+    patient: {
+      reference: `Patient/${patientID}`,
+    },
+    encounter: {
+      reference: 'Encounter/69ccb241-c809-4dfb-82d4-3e4b70d46dde',
+    },
+    occurrenceDateTime: dayjs(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+    doseQuantity: {
+      value: data?.doseNumber,
+    },
+    note: [
+      {
+        text: 'Facility',
+      },
+      {
+        authorString: data?.contraindicationDetails,
+      },
+    ],
+    education: data?.education,
+    protocolApplied: [
+      {
+        series: '3',
+        targetDisease: [
           {
-              "series": "3",
-                  "targetDisease": [
-                      {
-                          "text": data?.diseaseTarget,
-                      }
-                  ],
-              "seriesDosesString": data?.doseNumber,
-          }
-      ]
+            text: data?.diseaseTarget,
+          },
+        ],
+        seriesDosesString: data?.doseNumber,
+      },
+    ],
   }
-  }
+}
 
 export {
   createVaccineImmunization,
