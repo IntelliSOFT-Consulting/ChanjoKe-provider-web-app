@@ -5,6 +5,7 @@ import useVaccination from '../../hooks/useVaccination'
 import dayjs from 'dayjs'
 import { lockVaccine } from '../../utils/validate'
 import { createVaccinationAppointment } from './DataWrapper'
+import { useSelector } from 'react-redux'
 import { LoadingOutlined } from '@ant-design/icons'
 import useAppointment from '../../hooks/useAppointment'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
@@ -39,6 +40,7 @@ export default function NewAppointment() {
 
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
   const [loadingAppointment, setLoading] = useState(false)
+  const { user } = useSelector((state) => state.userInfo)
 
   function removeVaccineWord(inputString) {
     return inputString.replace(/vaccination/gi, '')
@@ -118,11 +120,7 @@ export default function NewAppointment() {
   const onFinish = async () => {
     setLoading(true)
     const appointmentPromises = vaccinesAppointments.map(async (vaccine) => {
-      const vaccineData = createVaccinationAppointment(
-        vaccine,
-        userID,
-        recommendationID
-      )
+      const vaccineData = createVaccinationAppointment(vaccine, userID, user)
       await createAppointment(vaccineData)
     })
 
@@ -174,16 +172,16 @@ export default function NewAppointment() {
   const removeVaccineRecommendation = (e) => {
     const vaccine = vaccinesAppointments.find(
       (item) => item?.vaccineCode?.[0]?.text === e
-    );
-  
+    )
+
     const updatedVaccineAppointments = vaccinesAppointments.filter(
       (item) => item?.vaccineCode?.[0]?.text !== e
-    );
-    setVaccineAppointments(updatedVaccineAppointments);
+    )
+    setVaccineAppointments(updatedVaccineAppointments)
 
-    const updatedVaccinesToAppoint = [...vaccinesToAppoint, vaccine];
-    setAppointmentList(updatedVaccinesToAppoint);
-  };
+    const updatedVaccinesToAppoint = [...vaccinesToAppoint, vaccine]
+    setAppointmentList(updatedVaccinesToAppoint)
+  }
 
   return (
     <>
@@ -286,26 +284,32 @@ export default function NewAppointment() {
                           />
                         }
                       />
-                      <span className="ml-4">Loading appointments on selected date</span>
+                      <span className="ml-4">
+                        Loading appointments on selected date
+                      </span>
                     </>
                   )}
 
-                  {!loader && <Col className="gutter-row" span={12}>
-                    <Form.Item
-                      name="numberOfAppointments"
-                      label={
-                        <div>
-                          <span className="font-bold">
-                            Number of Appointments:
-                          </span>
-                        </div>
-                      }>
-
-                        <Input placeholder={facilityAppointments.length} className='py-2' disabled />
-                      
-                    </Form.Item>
-                  </Col>
-                  }
+                  {!loader && (
+                    <Col className="gutter-row" span={12}>
+                      <Form.Item
+                        name="numberOfAppointments"
+                        label={
+                          <div>
+                            <span className="font-bold">
+                              Number of Appointments:
+                            </span>
+                          </div>
+                        }
+                      >
+                        <Input
+                          placeholder={facilityAppointments?.length || 0}
+                          className="py-2"
+                          disabled
+                        />
+                      </Form.Item>
+                    </Col>
+                  )}
                 </div>
               </div>
             </Form>
@@ -378,7 +382,7 @@ export default function NewAppointment() {
                               dayjs(e).format('DD-MM-YYYY'))
                           }
                         })
-                        getFacilityAppointments(practitionerDetails?.facility, dayjs(e).format('YYYY-MM-DD'))
+                        getFacilityAppointments(dayjs(e).format('YYYY-MM-DD'))
                       }}
                       format={'DD-MM-YYYY'}
                       className="w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
@@ -389,7 +393,9 @@ export default function NewAppointment() {
                 <Col span={1}>
                   <button
                     type="button"
-                    onClick={(e) => removeVaccineRecommendation(vacc?.vaccineCode?.[0]?.text)}
+                    onClick={(e) =>
+                      removeVaccineRecommendation(vacc?.vaccineCode?.[0]?.text)
+                    }
                     className="flex-shrink-0 size-4 mr-2 mt-10 inline-flex rounded-full"
                   >
                     <span className="sr-only">Remove badge</span>

@@ -9,7 +9,11 @@ import dayjs from 'dayjs'
 import { getOffset } from '../../utils/methods'
 import useVaccination from '../../hooks/useVaccination'
 
-export default function VaccineAppointments({ userCategory, patientData, patientDetails }) {
+export default function VaccineAppointments({
+  userCategory,
+  patientData,
+  patientDetails,
+}) {
   const {
     loader,
     appointments,
@@ -17,12 +21,16 @@ export default function VaccineAppointments({ userCategory, patientData, patient
     getPatientAppointments,
     updateAppointment,
   } = useAppointment()
-  const { immunizations, getImmunizations} = useVaccination()
+  const { immunizations, getImmunizations } = useVaccination()
 
   const [unvaccinatedAppointments, setUnvaccinatedAppointments] = useState([])
 
   const handleActionBtn = async (payload) => {
-    await updateAppointment(payload?.id, { ...payload, status: 'cancelled', resourceType: 'Appointment' })
+    await updateAppointment(payload?.id, {
+      ...payload,
+      status: 'cancelled',
+      resourceType: 'Appointment',
+    })
     getPatientAppointments(patientData?.id)
   }
 
@@ -39,9 +47,16 @@ export default function VaccineAppointments({ userCategory, patientData, patient
 
   const fetchVaccinations = () => {
     if (Array.isArray(immunizations) && immunizations.length > 0) {
-      const completedImmunizations = immunizations.filter((immunization) => immunization.status === 'completed')
-      const immunizedAppointments = completedImmunizations.map((item) => item?.vaccineCode?.text)
-      const filtered = appointments.filter((appointment) => !immunizedAppointments.includes(appointment.appointments))
+      const completedImmunizations = immunizations.filter(
+        (immunization) => immunization.status === 'completed'
+      )
+      const immunizedAppointments = completedImmunizations.map(
+        (item) => item?.vaccineCode?.text
+      )
+      const filtered = appointments.filter(
+        (appointment) =>
+          !immunizedAppointments.includes(appointment.appointments)
+      )
       setUnvaccinatedAppointments(filtered)
     } else {
       setUnvaccinatedAppointments(appointments)
@@ -92,55 +107,49 @@ export default function VaccineAppointments({ userCategory, patientData, patient
                 title="Are you sure you want to cancel?"
                 onConfirm={() => handleActionBtn(record)}
                 okText="Yes"
-                cancelText="No">
-                <button className={`px-2 py-1 text-red-400`}>
-                  Cancel
-                </button>
+                cancelText="No"
+              >
+                <button className={`px-2 py-1 text-red-400`}>Cancel</button>
               </Popconfirm>
             </>
           )
         }
-      }
+      },
     },
   ]
-  
 
   return (
-    
     <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
-      <Row
-        gutter={16}
-        className='mb-10 px-8'>
-        <Col
-          md={12}
-          sm={24}>
+      <div className="flex justify-between mb-6">
+        <div className="w-1/2">
           <DatePicker
-            format={'DD-MM-YYYY'}
+            format='DD-MM-YYYY'
+            className="w-full"
             onChange={(e) => {
               if (e) {
                 const time = dayjs(e).format('DD-MM-YYYY')
-                const filteredAppointments = unvaccinatedAppointments.filter((appointment) => appointment.appointmentDate === time)
+                const filteredAppointments = unvaccinatedAppointments.filter(
+                  (appointment) => appointment.appointmentDate === time
+                )
                 setUnvaccinatedAppointments(filteredAppointments)
               } else {
                 fetchVaccinations()
               }
-            }}/>
-        </Col>
-        <Col
-          md={12}
-          sm={24}
-          className='grid'>
-          <Button
-            onClick={() => navigate(`/new-appointment/${patientData.id}`)}
-            className="ml-4 place-self-end font-semibold"
-            type="primary">
-            New Appointment
-          </Button>
-        </Col>
-      </Row>
+            }}
+          />
+        </div>
 
-      {loader && 
-        <div className='text-center'>
+        <Button
+          onClick={() => navigate(`/new-appointment/${patientData.id}`)}
+          className="ml-4 place-self-end font-semibold"
+          type="primary"
+        >
+          New Appointment
+        </Button>
+      </div>
+
+      {loader && (
+        <div className="text-center">
           <Spin
             indicator={
               <LoadingOutlined
@@ -149,12 +158,12 @@ export default function VaccineAppointments({ userCategory, patientData, patient
                 }}
                 spin
               />
-              }
-            />
+            }
+          />
         </div>
-        }
+      )}
 
-      {!loader && unvaccinatedAppointments.length > 0 &&
+      {!loader && unvaccinatedAppointments.length > 0 && (
         <Table
           columns={columns}
           dataSource={unvaccinatedAppointments}
@@ -178,10 +187,13 @@ export default function VaccineAppointments({ userCategory, patientData, patient
             ),
           }}
         />
-      }
+      )}
 
-      {!loader && appointments.length < 1 && <><p className='text-center'>No appointments made</p></>}
-
+      {!loader && appointments.length < 1 && (
+        <>
+          <p className="text-center">No appointments made</p>
+        </>
+      )}
     </div>
   )
 }

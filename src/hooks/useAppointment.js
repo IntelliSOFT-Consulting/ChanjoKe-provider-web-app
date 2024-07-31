@@ -1,12 +1,13 @@
-import { useState } from "react"
-import { useApiRequest } from "../api/useApiRequest"
-import dayjs from "dayjs";
-import moment from 'moment';
+import { useState } from 'react'
+import { useApiRequest } from '../api/useApiRequest'
+import dayjs from 'dayjs'
+import moment from 'moment'
+import { useSelector } from 'react-redux'
 
 const appointmentsEndpoint = '/hapi/fhir/Appointment'
 
 function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
 export default function useAppointment() {
@@ -19,12 +20,14 @@ export default function useAppointment() {
   const [facilityAppointments, setFacilityAppointments] = useState([])
   const [appointmentsPagination, setAppointmentPagination] = useState([])
 
+  const { user } = useSelector((state) => state.userInfo)
+
   const getAppointment = async (appointment) => {
     setLoader(true)
     const response = await get(`${appointmentsEndpoint}/${appointment}`)
     setAppointment(response)
     setLoader(false)
-    return;
+    return
   }
 
   const updateAppointment = async (appointment, payload) => {
@@ -35,26 +38,35 @@ export default function useAppointment() {
     )
     setAppointment(response)
     setLoader(false)
-    return;
+    return
   }
 
   const createAppointment = async (payload) => {
-    await post(
-      `${appointmentsEndpoint}`, payload
-    )
+    await post(`${appointmentsEndpoint}`, payload)
   }
 
   const getPatientAppointments = async (patientID, offset = 0) => {
     setLoader(true)
 
-    const url = offset < 1 ? `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&_count=5` : `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&_count=5&_offset=${offset}`
+    const facilityParam = `actor=${user?.facility}`
+
+    const url =
+      offset < 1
+        ? `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&${facilityParam}&_count=5`
+        : `${appointmentsEndpoint}?supporting-info=Patient/${patientID}&${facilityParam}&_count=5&_offset=${offset}`
     const response = await get(url)
 
-    if (response?.entry && Array.isArray(response?.entry) && response?.entry.length > 0) {
+    if (
+      response?.entry &&
+      Array.isArray(response?.entry) &&
+      response?.entry.length > 0
+    ) {
       const appointmentsResponse = response?.entry.map((appointment) => ({
         appointments: appointment?.resource?.description,
-        scheduledDate: dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
-        appointmentDate: dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
+        scheduledDate:
+          dayjs(appointment?.resource?.created).format('DD-MM-YYYY') || '',
+        appointmentDate:
+          dayjs(appointment?.resource?.start).format('DD-MM-YYYY') || '',
         status: capitalizeFirstLetter(appointment?.resource?.status),
         id: appointment?.resource?.id,
         location: appointment?.resource?.supportingInformation?.[1]?.display,
@@ -71,12 +83,17 @@ export default function useAppointment() {
     }
   }
 
-  const getFacilityAppointments = async (facilityId, appointmentDate) => {
+  const getFacilityAppointments = async (appointmentDate) => {
     setLoader(true)
-    const response = await get(`${appointmentsEndpoint}?_count=10000`)
-    const appointmentsOnAppointmentDate = response?.entry?.filter((appointment) => moment(moment(appointment?.resource?.start).format('YYYY-MM-DD')).isSame(appointmentDate, 'day'))
-    const facilityAppointmentsF = appointmentsOnAppointmentDate?.filter((appointment) => appointment?.resource?.supportingInformation?.[1]?.display === facilityId)
-    setFacilityAppointments(facilityAppointmentsF)
+    const facilityParam = `actor=${user?.facility}`
+    const dateFilter = appointmentDate
+      ? `&date=${moment(appointmentDate).format('YYYY-MM-DD')}`
+      : ''
+    const response = await get(
+      `${appointmentsEndpoint}?${facilityParam}${dateFilter}&_count=10000`
+    )
+
+    setFacilityAppointments(response?.entry)
     setLoader(false)
   }
 
