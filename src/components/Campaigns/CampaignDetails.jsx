@@ -2,20 +2,11 @@ import { Button, Descriptions } from 'antd'
 import Loading from '../../common/spinners/LoadingArrows'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { convertCamelCaseString } from '../../utils/methods'
+import { convertCamelCaseString, capitalizeFirstLetter } from '../../utils/methods'
 import useCampaign from '../../hooks/useCampaigns'
 import dayjs from 'dayjs'
 
 export default function CampaignDetails () {
-
-  function capitalizeFirstLetter(value = '') {
-    return value
-      .split(/[\s-]+/)
-      .map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-      )
-      .join(' ');
-}
 
   const navigate = useNavigate()
   const { campaignID } = useParams()
