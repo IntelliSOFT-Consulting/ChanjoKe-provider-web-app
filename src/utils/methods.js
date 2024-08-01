@@ -129,6 +129,15 @@ export const passwordGenerator = (length) => {
   ).join('')
 }
 
+export const capitalizeFirstLetter = (value = '') => {
+  return value
+    .split(/[\s-]+/)
+    .map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join(' ');
+}
+
 export const convertCamelCaseString = (inputString) => {
   let stringWithSpaces = inputString?.replace(/([a-z])([A-Z])/g, '$1 $2')
   stringWithSpaces = stringWithSpaces?.replace(/\b\w+/g, (word) => {

@@ -2,7 +2,7 @@ import { Button, Descriptions } from 'antd'
 import Loading from '../../common/spinners/LoadingArrows'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { convertCamelCaseString } from '../../utils/methods'
+import { convertCamelCaseString, capitalizeFirstLetter } from '../../utils/methods'
 import useCampaign from '../../hooks/useCampaigns'
 import dayjs from 'dayjs'
 
@@ -20,12 +20,12 @@ export default function CampaignDetails () {
   useEffect(() => {
     setDetails({
       'Campaign Name': campaign?.title,
-      'County': campaign?.category?.[0]?.coding?.[0]?.display,
-      'Sub-County': campaign?.category?.[0]?.coding?.[1]?.display,
-      'Ward': campaign?.category?.[0]?.coding?.[2]?.display,
+      'County': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[0]?.display),
+      'Sub-County': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[1]?.display),
+      'Ward': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[2]?.display),
       'Start Date': dayjs(campaign?.period?.start).format('DD-MM-YYYY'),
       'End Date': dayjs(campaign?.period?.end).format('DD-MM-YYYY'),
-      'Facility': campaign?.category?.[0]?.coding?.[3]?.display
+      'Facility': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[3]?.display),
     })
   }, [campaign])
   return (
