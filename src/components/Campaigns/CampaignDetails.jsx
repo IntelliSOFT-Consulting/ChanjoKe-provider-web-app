@@ -8,6 +8,15 @@ import dayjs from 'dayjs'
 
 export default function CampaignDetails () {
 
+  function capitalizeFirstLetter(value = '') {
+    return value
+      .split(/[\s-]+/)
+      .map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      )
+      .join(' ');
+}
+
   const navigate = useNavigate()
   const { campaignID } = useParams()
   const { loading, campaign, fetchCampaign } = useCampaign()
@@ -20,12 +29,12 @@ export default function CampaignDetails () {
   useEffect(() => {
     setDetails({
       'Campaign Name': campaign?.title,
-      'County': campaign?.category?.[0]?.coding?.[0]?.display,
-      'Sub-County': campaign?.category?.[0]?.coding?.[1]?.display,
-      'Ward': campaign?.category?.[0]?.coding?.[2]?.display,
+      'County': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[0]?.display),
+      'Sub-County': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[1]?.display),
+      'Ward': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[2]?.display),
       'Start Date': dayjs(campaign?.period?.start).format('DD-MM-YYYY'),
       'End Date': dayjs(campaign?.period?.end).format('DD-MM-YYYY'),
-      'Facility': campaign?.category?.[0]?.coding?.[3]?.display
+      'Facility': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[3]?.display),
     })
   }, [campaign])
   return (
