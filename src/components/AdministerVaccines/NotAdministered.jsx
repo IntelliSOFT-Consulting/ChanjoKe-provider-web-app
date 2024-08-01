@@ -41,8 +41,8 @@ export default function NotAdministered() {
   const fhirReasons = [
     { label: 'Immunity', value: 'IMMUNE' },
     { label: 'Medical precaution', value: 'MEDPREC' },
-    //{ name: 'Product out of stock', value: 'OSTOCK' },
-    // { name: 'Patient objection', value: 'PATOBJ' },
+    { name: 'Product out of stock', value: 'OSTOCK' },
+    { name: 'Patient objection', value: 'PATOBJ' },
     { label: 'Caregiver refusal', value: 'PHILISOP' },
     { label: 'Religious objection', value: 'RELIG' },
     { label: 'Cold Chain Break', value: 'VACEFF' },

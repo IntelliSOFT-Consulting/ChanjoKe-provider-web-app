@@ -1,7 +1,7 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusOutlined } from '@ant-design/icons'
 import { Badge, Button, Checkbox, Tag, FloatButton, Popconfirm } from 'antd'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
@@ -14,6 +14,8 @@ import SelectDialog from '../../common/dialog/SelectDialog'
 import useVaccination from '../../hooks/useVaccination'
 import moment from 'moment'
 import DeleteModal from './DeleteModal'
+import useAefi from '../../hooks/useAefi'
+import { getDeceasedStatus } from './clientDetailsController'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -27,6 +29,7 @@ export default function NonRoutineVaccines({
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [selectAefi, setSelectAefi] = useState(false)
   const [immunizationToDelete, setImmunizationToDelete] = useState(null)
+  const [isDeceased, setIsDeceased] = useState(false)
 
   const navigate = useNavigate()
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
@@ -35,6 +38,17 @@ export default function NonRoutineVaccines({
   const dispatch = useDispatch()
 
   const { updateImmunization } = useVaccination()
+  const { getAefis, loading: loadingAefis, aefis } = useAefi()
+
+  useEffect(() => {
+    getAefis()
+  }, [])
+
+  useEffect(() => {
+    if (aefis) {
+      setIsDeceased(getDeceasedStatus(aefis))
+    }
+  }, [aefis])
 
   const deleteImmunization = async (id, reason) => {
     const immunization = immunizations?.find((entry) => entry.id === id)
@@ -114,7 +128,9 @@ export default function NonRoutineVaccines({
             defaultChecked={completed}
             className="tooltip"
             disabled={
-              !isQualified(allVaccines, record) || outGrown(record?.lastDate)
+              !isQualified(allVaccines, record) ||
+              outGrown(record?.lastDate) ||
+              isDeceased
             }
             onChange={() => handleCheckBox(record)}
           />
@@ -172,7 +188,7 @@ export default function NonRoutineVaccines({
             color={
               text === 'completed'
                 ? 'green'
-                : text === 'Not Administered'
+                : text === 'Not Administered' || isDeceased
                 ? 'red'
                 : missed &&
                   text !== 'Contraindicated' &&
@@ -185,6 +201,8 @@ export default function NonRoutineVaccines({
           >
             {text === 'completed'
               ? 'Administered'
+              : text !== 'completed' && isDeceased
+              ? 'Deceased'
               : text === 'Not Administered'
               ? 'Not Administered'
               : text === 'Contraindicated'
@@ -248,7 +266,10 @@ export default function NonRoutineVaccines({
         immunization={immunizationToDelete}
         onCancel={() => setImmunizationToDelete(null)}
         onOk={(values) =>
-          deleteImmunization(immunizationToDelete, values.reason === 'Other' ? values.otherReason : values.reason)
+          deleteImmunization(
+            immunizationToDelete,
+            values.reason === 'Other' ? values.otherReason : values.reason
+          )
         }
       />
       <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">

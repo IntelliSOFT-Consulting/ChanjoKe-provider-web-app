@@ -51,14 +51,22 @@ export default function SearchInterface(props) {
       title: 'Actions',
       dataIndex: '',
       key: 'x',
-      render: (_, record) => (
+      render: (_, record) => {
+        let link = `/client-details/${record.id}/${props.searchType === 'appointments' ? 'appointments' : 'routineVaccines'}`
+
+        switch (props.searchType) {
+          case 'updateClient':
+            link = `/update-vaccine-history/${record.id}`
+            break
+        }
+        return (
         <Link
-          to={`/client-details/${record.id}/${props.searchType === 'appointments' ? 'appointments' : 'routineVaccines'}`}
+          to={link}
           className="text-[#163C94] font-semibold"
         >
           View
         </Link>
-      ),
+      )},
     },
   ]
 

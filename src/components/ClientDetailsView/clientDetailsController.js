@@ -188,3 +188,10 @@ export const formatWeightData = (observations, birthDate) => {
 
   return [[period, 'Weight (Kg)'], [0, 0], ...formatted]
 }
+
+export const getDeceasedStatus = (aefis) => {
+  const deceased = aefis.find(
+    (aefi) => aefi.resource?.outcome?.text?.toLowerCase() === 'died'
+  )
+  return deceased
+}
