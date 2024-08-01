@@ -18,6 +18,7 @@ import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import DeleteModal from './DeleteModal'
 import { colorCodeVaccines } from './vaccineController'
+import { getDeceasedStatus } from './clientDetailsController'
 
 export default function RoutineVaccines({
   userCategory,
@@ -31,6 +32,7 @@ export default function RoutineVaccines({
   const [selectAefi, setSelectAefi] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [immunizationToDelete, setImmunizationToDelete] = useState(null)
+  const [isDeceased, setIsDeceased] = useState(false)
 
   const navigate = useNavigate()
 
@@ -41,7 +43,13 @@ export default function RoutineVaccines({
   const selectedVaccines = useSelector((state) => state.selectedVaccines)
   const { user } = useSelector((state) => state.userInfo)
 
-  const { getAefis, loading: loadingAefis } = useAefi()
+  const { getAefis, loading: loadingAefis, aefis } = useAefi()
+
+  useEffect(() => {
+    if (aefis) {
+      setIsDeceased(getDeceasedStatus(aefis))
+    }
+  }, [aefis])
 
   const categories = routineVaccines
     ? [...new Set(Object.keys(routineVaccines))]
@@ -138,6 +146,9 @@ export default function RoutineVaccines({
       record.status,
       record?.dueDate?.format('YYYY-MM-DD')
     )
+    if (isDeceased && record.status !== 'completed') {
+      return 'Patient is deceased'
+    }
     switch (record?.status) {
       case 'completed':
         return 'Vaccine already administered'
@@ -176,7 +187,7 @@ export default function RoutineVaccines({
               value={record.vaccine}
               defaultChecked={completed}
               disabled={
-                completed ||
+                completed || isDeceased ||
                 (locked &&
                   !['Contraindicated', 'Not Administered'].includes(
                     record.status
@@ -223,7 +234,7 @@ export default function RoutineVaccines({
             color={
               text === 'completed'
                 ? 'green'
-                : text === 'Not Administered'
+                : text === 'Not Administered' || isDeceased
                 ? 'red'
                 : missed &&
                   text !== 'Contraindicated' &&
@@ -236,6 +247,8 @@ export default function RoutineVaccines({
           >
             {text === 'completed'
               ? 'Administered'
+              : isDeceased && text !== 'completed'
+              ? 'Deceased'
               : text === 'Not Administered'
               ? 'Not Administered'
               : text === 'Contraindicated'

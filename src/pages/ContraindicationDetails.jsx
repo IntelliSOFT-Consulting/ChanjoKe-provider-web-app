@@ -4,6 +4,17 @@ import { useNavigate, useParams } from 'react-router-dom'
 import useVaccination from '../hooks/useVaccination'
 import LoadingArrows from '../common/spinners/LoadingArrows'
 
+const mapReasons = {
+  IMMUNE: 'Immunity',
+  MEDPREC: 'Medical precaution',
+  OSTOCK: 'Product out of stock',
+  PATOBJ: 'Patient objection',
+  PHILISOP: 'Caregiver refusal',
+  RELIG: 'Religious objection',
+  VACEFF: 'Cold Chain Break',
+  VACSAF: 'Expired Product',
+}
+
 export default function ContraindicationDetails({ notAdministered }) {
   const [contraindicationInfo, setContraindicationInfo] = useState(null)
   const [contraindications, setContraindications] = useState(null)
@@ -41,7 +52,7 @@ export default function ContraindicationDetails({ notAdministered }) {
         vaccine: immunization?.vaccineCode?.text,
         date: dayjs(immunization?.occurrenceDateTime).format('DD-MM-YYYY'),
         status: status,
-        statusReason: immunization?.statusReason?.text,
+        statusReason: mapReasons?.[immunization?.statusReason?.text],
         disease: disease?.targetDisease?.text,
         nextVaccinationDate: dayjs(nextVaccinationDate).format('DD-MM-YYYY'),
         doseNumber: immunization?.doseQuantity?.value,
