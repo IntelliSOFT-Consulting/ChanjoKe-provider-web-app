@@ -8,6 +8,7 @@ import { Modal, Button, Descriptions } from 'antd'
 import usePatient from '../../hooks/usePatient'
 import { flattenPatientData } from '../../utils/flattenData'
 import { CalendarOutlined, UserOutlined } from '@ant-design/icons'
+import { formatExtensions } from './aefiController'
 
 export default function AEFIDetails({ patientInfo }) {
   const [vaccinationAEFIs, setVaccinationAEFIs] = useState([])
@@ -42,6 +43,7 @@ export default function AEFIDetails({ patientInfo }) {
 
   const formatAefis = (aefis) => {
     return aefis?.map((aefi) => {
+      const extensions = formatExtensions(aefi?.resource?.extension)
       return {
         reportType: aefi?.identifier?.[0]?.value || '-',
         symptomName: aefi?.resource?.event?.coding?.[0]?.display,
@@ -50,6 +52,7 @@ export default function AEFIDetails({ patientInfo }) {
         outcome:
           aefi?.resource?.outcome?.text ||
           aefi?.resource?.outcome?.coding?.[0]?.display,
+        ...extensions,
       }
     })
   }
@@ -63,8 +66,8 @@ export default function AEFIDetails({ patientInfo }) {
   const columns = [
     {
       title: 'Report Type',
-      dataIndex: 'reportType',
-      key: 'reportType',
+      dataIndex: 'aefiReportType',
+      key: 'aefiReportType',
     },
     {
       title: 'AEFI Type',
@@ -166,7 +169,7 @@ export default function AEFIDetails({ patientInfo }) {
           }}
         >
           <Descriptions.Item label="Type of AEFI Report">
-            {aefiSelected?.reportType}
+            {aefiSelected?.aefiReportType}
           </Descriptions.Item>
           <Descriptions.Item label="AEFI Type">
             {aefiSelected?.symptomName}
@@ -180,11 +183,28 @@ export default function AEFIDetails({ patientInfo }) {
           <Descriptions.Item label="Past Medical History">
             {aefiSelected?.pastMedicalHistory}
           </Descriptions.Item>
-          <Descriptions.Item label="Action Taken">
-            {aefiSelected?.action}
-          </Descriptions.Item>
           <Descriptions.Item label="AEFI Outcome">
             {aefiSelected?.outcome}
+          </Descriptions.Item>
+          <Descriptions.Item label="Action Taken">
+            {aefiSelected?.treatmentGiven === 'Yes' && (
+              <div className="flex space-x-2">
+                <h4 className="font-semibold">Treatment Given:</h4>
+                <p>
+                  {aefiSelected?.treatmentDetails || 'No details specified'}
+                </p>
+              </div>
+            )}
+            {aefiSelected?.specimenCollected === 'Yes' && (
+              <div
+                className={`flex space-x-2 ${
+                  aefiSelected?.treatmentGiven === 'Yes' ? 'mt-4' : ''
+                }`}
+              >
+                <h4 className="font-semibold">Specimen Collected:</h4>
+                <p>{aefiSelected?.specimenDetails || 'No details specified'}</p>
+              </div>
+            )}
           </Descriptions.Item>
         </Descriptions>
       </Modal>
