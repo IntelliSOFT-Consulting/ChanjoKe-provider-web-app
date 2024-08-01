@@ -216,7 +216,6 @@ export default function CreateAEFI() {
                     disabledDate={(current) => {
                       return (
                         (current && current > moment().endOf('day')) ||
-                        //   include the earliest due date
                         current.isBefore(earliestDueDate)
                       )
                     }}
@@ -249,12 +248,12 @@ export default function CreateAEFI() {
                   onChange={(values) => {
                     setIsTreatmentGiven(values.includes('Treatment given'))
                     setIsSpecimenCollected(
-                      values.includes('specimen collected')
+                      values.includes('Specimen collected')
                     )
                   }}
                 >
                   <Checkbox value="Treatment given">Treatment Given</Checkbox>
-                  <Checkbox value="specimen collected">
+                  <Checkbox value="Specimen collected">
                     Specimen collected for investigation
                   </Checkbox>
                 </Checkbox.Group>
@@ -302,7 +301,7 @@ export default function CreateAEFI() {
                     },
                   ]}
                 >
-                  <Select size="large" options={aefiOutcomes} />
+                  <Select size="large" options={aefiOutcomes} placeholder="Select AEFI Outcome" />
                 </Form.Item>
               </div>
             </div>

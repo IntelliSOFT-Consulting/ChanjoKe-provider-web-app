@@ -4,6 +4,122 @@ import { useSelector } from 'react-redux'
 import { message } from 'antd'
 import { useParams } from 'react-router-dom'
 
+const FHIR_ENDPOINT = '/hapi/fhir/AdverseEvent'
+
+const createAefiPayload = (values, currentPatient, user, selectedVaccines) => ({
+  resourceType: 'AdverseEvent',
+  identifier: [
+    {
+      system: 'https://www.hl7.org/fhir/adverseevent-definitions.html',
+      value: values.aefiReportType,
+    },
+  ],
+  subject: {
+    reference: `Patient/${currentPatient?.id}`,
+  },
+  recorder: {
+    reference: `Practitioner/${user?.fhirPractitionerId}`,
+  },
+  date: new Date().toISOString(),
+  event: {
+    coding: [
+      {
+        code: values.aefiType,
+        display: values.aefiType,
+        system: 'http://terminology.hl7.org/CodeSystem/adverse-event-type',
+      },
+    ],
+    text: values.aefiDetails,
+  },
+  category: [
+    {
+      coding: [
+        {
+          code: 'medication-mishap',
+          display: 'Medication Mishap',
+          system:
+            'http://terminology.hl7.org/CodeSystem/adverse-event-category',
+        },
+      ],
+    },
+  ],
+  detected: new Date(values.eventOnset).toISOString(),
+  recordedDate: new Date().toISOString(),
+  mitigatingAction: {
+    coding: createMitigatingActionCoding(values),
+  },
+  outcome: {
+    coding: [
+      {
+        code: 'outcome',
+        display: values.aefiOutcome,
+        system: 'http://terminology.hl7.org/CodeSystem/adverse-event-outcome',
+      },
+    ],
+    text: values.aefiOutcome,
+  },
+  suspectEntity: [
+    ...(selectedVaccines?.map((vaccine) => ({
+      instance: {
+        reference: `Immunization/${vaccine.id}`,
+      },
+    })) || []),
+    {
+      casuality: [
+        {
+          id: values.aefiReportType,
+        },
+      ],
+    },
+  ],
+  location: {
+    reference: user?.facility,
+  },
+  extension: createExtensions(values),
+})
+
+const createMitigatingActionCoding = (values) =>
+  values?.actionTaken
+    ? values.actionTaken.map((action) => ({
+        code: action,
+        display:
+          action === 'Treatment given'
+            ? values.treatmentDetails
+            : values.specimenDetails,
+        system:
+          'http://terminology.hl7.org/CodeSystem/adverse-event-mitigating-action',
+      }))
+    : []
+
+const createExtensions = (values) => [
+  {
+    url: 'http://example.org/StructureDefinition/types-of-aefi',
+    valueCode: values.aefiReportType,
+  },
+  {
+    url: 'http://example.org/StructureDefinition/past-medical-history',
+    valueString: values.pastMedicalHistory,
+  },
+  {
+    url: 'http://example.org/StructureDefinition/treatment-given',
+    valueString: values.actionTaken?.includes('Treatment given') ? 'Yes' : 'No',
+  },
+  {
+    url: 'http://example.org/StructureDefinition/treatment-details',
+    valueString: values.treatmentDetails,
+  },
+  {
+    url: 'http://example.org/StructureDefinition/specimen-collected',
+    valueString: values.actionTaken?.includes('Specimen collected')
+      ? 'Yes'
+      : 'No',
+  },
+  {
+    url: 'http://example.org/StructureDefinition/specimen-details',
+    valueString: values.specimenDetails,
+  },
+]
+
 export default function useAefi() {
   const [aefis, setAefis] = useState([])
   const [loading, setLoading] = useState(false)
@@ -16,144 +132,24 @@ export default function useAefi() {
 
   const { clientID } = useParams()
 
-  const fhirEndpoint = '/hapi/fhir/AdverseEvent'
-
-  const createPayload = (values) => {
-    return {
-      resourceType: 'AdverseEvent',
-      identifier: [
-        {
-          system: 'https://www.hl7.org/fhir/adverseevent-definitions.html',
-          value: values.aefiReportType,
-        },
-      ],
-      subject: {
-        reference: `Patient/${currentPatient?.id}`,
-      },
-      recorder: {
-        reference: `Practitioner/${user?.fhirPractitionerId}`,
-      },
-      date: new Date().toISOString(),
-      event: {
-        coding: [
-          {
-            code: values.aefiType,
-            display: values.aefiType,
-            system: 'http://terminology.hl7.org/CodeSystem/adverse-event-type',
-          },
-        ],
-        text: values.aefiDetails,
-      },
-      category: [
-        {
-          coding: [
-            {
-              code: 'medication-mishap',
-              display: 'Medication Mishap',
-              system:
-                'http://terminology.hl7.org/CodeSystem/adverse-event-category',
-            },
-          ],
-        },
-      ],
-      detected: new Date(values.eventOnset).toISOString(),
-      recordedDate: new Date().toISOString(),
-      mitigatingAction: {
-        coding: values?.actionTaken
-          ? values?.actionTaken?.map((action) => {
-              return {
-                code: action,
-                display:
-                  action === 'Treatment given'
-                    ? values.treatmentDetails
-                    : values.specimenDetails,
-                system:
-                  'http://terminology.hl7.org/CodeSystem/adverse-event-mitigating-action',
-              }
-            })
-          : [],
-      },
-      outcome: {
-        coding: [
-          {
-            code: 'outcome',
-            display: values.aefiOutcome,
-            system:
-              'http://terminology.hl7.org/CodeSystem/adverse-event-outcome',
-          },
-        ],
-        text: values.aefiOutcome,
-      },
-      suspectEntity: [
-        ...(selectedVaccines?.map((vaccine) => {
-          return {
-            instance: {
-              reference: `Immunization/${vaccine.id}`,
-            },
-          }
-        }) || []),
-        {
-          casuality: [
-            {
-              id: values.aefiReportType,
-            },
-          ],
-        },
-      ],
-      location: {
-        reference: user?.facility,
-      },
-      extension: [
-        {
-          url: 'http://example.org/StructureDefinition/types-of-aefi',
-          aefiReportType: {
-            coding: [
-              {
-                code: values.aefiReportType,
-                display: values.aefiReportType,
-                system: 'http://example.org/StructureDefinition/types-of-aefi',
-              },
-            ],
-            text: values.aefiReportType,
-          },
-        },
-        {
-          url: 'http://example.org/StructureDefinition/past-medical-history',
-          pastMedicalHistory: values.pastMedicalHistory,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/treatment-given',
-          treatmentGiven: values.treatmentGiven,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/treatment-details',
-          treatmentDetails: values.treatmentDetails,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/specimen-collected',
-          specimenCollected: values.specimenCollected,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/specimen-details',
-          specimenDetails: values.specimenDetails,
-        },
-      ],
-    }
-  }
-
   const submitAefi = async (values) => {
-    const payload = createPayload(values)
-    await post(fhirEndpoint, payload)
+    const payload = createAefiPayload(
+      values,
+      currentPatient,
+      user,
+      selectedVaccines
+    )
+    await post(FHIR_ENDPOINT, payload)
   }
 
   const getAefis = async (patientId = null, params = '') => {
     setLoading(true)
     try {
-      params = params ? `?${params}` : ''
+      const queryParams = params ? `?${params}` : ''
       const data = await get(
-        `/hapi/fhir/AdverseEvent?subject=Patient/${
+        `${FHIR_ENDPOINT}?subject=Patient/${
           patientId || currentPatient?.id || clientID
-        }${params}`
+        }${queryParams}`
       )
       setAefis(data.entry)
     } catch (error) {
@@ -164,9 +160,9 @@ export default function useAefi() {
   }
 
   const getVaccineAefis = async (patient, vaccineId, params = '') => {
-    params = params ? `&${params}` : ''
+    const queryParams = params ? `&${params}` : ''
     const patientAefis = await get(
-      `/hapi/fhir/AdverseEvent?subject=Patient/${patient}${params}`
+      `${FHIR_ENDPOINT}?subject=Patient/${patient}${queryParams}`
     )
 
     return patientAefis?.entry?.filter((aefi) => {
@@ -178,13 +174,14 @@ export default function useAefi() {
   }
 
   const isVaccineInAefi = (vaccineIds) => {
-    return aefis?.some((aefi) => {
-      return aefi.resource.suspectEntity?.some((entity) => {
-        return vaccineIds?.some((vaccineId) => {
-          return entity.instance.reference === `Immunization/${vaccineId}`
-        })
-      })
-    })
+    return aefis?.some((aefi) =>
+      aefi.resource.suspectEntity?.some((entity) =>
+        vaccineIds?.some(
+          (vaccineId) =>
+            entity.instance.reference === `Immunization/${vaccineId}`
+        )
+      )
+    )
   }
 
   return {
