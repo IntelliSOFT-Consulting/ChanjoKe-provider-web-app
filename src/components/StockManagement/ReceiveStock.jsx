@@ -206,7 +206,10 @@ const ReceiveStock = () => {
               { required: true, message: 'Please input the date received' },
             ]}
           >
-            <DatePicker className="w-full" />
+            <DatePicker 
+              className="w-full" 
+              format="DD-MM-YYYY"
+            />
           </Form.Item>
           <Form.Item
             label="Origin"

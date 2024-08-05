@@ -144,6 +144,7 @@ export default function PositiveAdjustments() {
               <DatePicker
                 placeholder="Date of Adjustment"
                 className="w-full"
+                format="DD-MM-YYYY"
               />
             </Form.Item>
           </div>
