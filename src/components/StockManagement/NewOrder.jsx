@@ -241,6 +241,7 @@ export default function NewOrder() {
               disabledDate={(current) => 
                 current && current > moment().subtract(1, 'days').startOf('days')
               }
+              format="DD-MM-YYYY"
             />
           </Form.Item>
 
@@ -255,6 +256,7 @@ export default function NewOrder() {
               className="w-full"
               placeholder="Date of This Order"
               onChange={(date) => setNextOrderDate(date)}
+              format="DD-MM-YYYY"
             />
           </Form.Item>
 
@@ -268,6 +270,7 @@ export default function NewOrder() {
               disabledDate={(current) => 
                 current && current < moment().startOf('days')
               }  
+              format="DD-MM-YYYY"
             />
           </Form.Item>
 
@@ -281,6 +284,7 @@ export default function NewOrder() {
               disabledDate={(current) => 
                 current && nextOrderDate ? current < nextOrderDate.startOf('days') : false
               }
+              format="DD-MM-YYYY"
             />
           </Form.Item>
         </div>

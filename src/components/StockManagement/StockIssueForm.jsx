@@ -29,7 +29,7 @@ export default function StockIssueForm({ form, onSubmit, InputTable }) {
           rules={[{ required: true, message: "Please enter issue date" }]}
           className="mb-0"
         >
-          <DatePicker className="w-full" placeholder="Issue date" />
+          <DatePicker className="w-full" placeholder="Issue date" format="DD-MM-YYYY" />
         </Form.Item>
       </div>
       <InputTable />

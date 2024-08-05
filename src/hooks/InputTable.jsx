@@ -81,6 +81,7 @@ export default function useInputTable({ columns, defaultData = [{}] }) {
               value={dayjs(values[index][column.dataIndex])}
               onChange={(date, dateString) => handleChange({ [column.dataIndex]: dateString }, index)}
               {...column}
+              format="DD-MM-YYYY"
             />
           </Form.Item>
         );
