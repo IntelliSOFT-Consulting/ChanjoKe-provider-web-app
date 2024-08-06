@@ -134,14 +134,25 @@ export default function Sidenav() {
   ])
 
   const handleItemClick = (clickedItem) => {
-    const updatedNavigation = navigation.map((item) => ({
-      ...item,
-      current: item.href === clickedItem.href,
-    }))
-
-    setNavigation(updatedNavigation)
-    setSidebarOpen(false)
-  }
+    const updatedNavigation = navigation.map((item) => {
+      if (item.children) {
+        return {
+          ...item,
+          children: item.children.map((child) => ({
+            ...child,
+            current: child.href === clickedItem.href,
+          })),
+        };
+      }
+      return {
+        ...item,
+        current: item.href === clickedItem.href,
+      };
+    });
+  
+    setNavigation(updatedNavigation);
+    setSidebarOpen(false);
+  };
 
   return (
     <>
