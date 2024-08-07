@@ -168,7 +168,7 @@ export default function Administer() {
         const appointmentNext = createNextVaccineAppointment(
           nextVaccines.nextContent?.map((vaccine) => ({
             ...vaccine,
-            dueDate: newScheduleDate?.format('YYYY-MM-DD'),
+            dueDate: newScheduleDate,
           })),
           clientID,
           user
@@ -188,9 +188,9 @@ export default function Administer() {
 
       await createAppointment(appointmentNext)
     }
-    window.location.assign(
-      `/client-details/${clientID}/routineVaccines?${vaccineType}`
-    )
+    // window.location.assign(
+    //   `/client-details/${clientID}/routineVaccines?${vaccineType}`
+    // )
   }
 
   return (

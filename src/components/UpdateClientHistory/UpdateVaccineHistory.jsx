@@ -56,10 +56,13 @@ export default function UpdateVaccineHistory() {
       return isRoutine && isPastDue && !isImmunized
     })
 
+    console.log(missedVaccines)
+
     const formattedVaccines = missedVaccines.map(formatRecommendationsToObject)
-    setMissedVaccinesList(formattedVaccines)
+    setMissedVaccinesList(formattedVaccines || [])
     return formattedVaccines
   }
+
 
   useEffect(() => {
     if (recommendations && immunizations) {
@@ -140,6 +143,7 @@ export default function UpdateVaccineHistory() {
                     })}
                     allowClear
                     size="large"
+                    disabled={!missedVaccinesList?.length}
                     showSearch
                     filterOption={(input, option) => {
                       return (
