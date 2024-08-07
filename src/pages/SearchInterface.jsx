@@ -52,7 +52,11 @@ export default function SearchInterface(props) {
       dataIndex: '',
       key: 'x',
       render: (_, record) => {
-        let link = `/client-details/${record.id}/${props.searchType === 'appointments' ? 'appointments' : 'routineVaccines'}`
+        let link = `/client-details/${record.id}/${
+          props.searchType === 'appointments'
+            ? 'appointments'
+            : 'routineVaccines'
+        }`
 
         switch (props.searchType) {
           case 'updateClient':
@@ -60,13 +64,11 @@ export default function SearchInterface(props) {
             break
         }
         return (
-        <Link
-          to={link}
-          className="text-[#163C94] font-semibold"
-        >
-          View
-        </Link>
-      )},
+          <Link to={link} className="text-[#163C94] font-semibold">
+            View
+          </Link>
+        )
+      },
     },
   ]
 
@@ -91,6 +93,9 @@ export default function SearchInterface(props) {
         if (data?.entry) {
           setResults(formatEntry(data.entry))
           setTotalItems(data.total)
+        } else {
+          setResults([])
+          setTotalItems(0)
         }
       } else {
         const data = await get(
@@ -100,6 +105,9 @@ export default function SearchInterface(props) {
         if (data?.entry) {
           setResults(formatEntry(data.entry))
           setTotalItems(data.total)
+        } else {
+          setResults([])
+          setTotalItems(0)
         }
       }
 
@@ -113,6 +121,9 @@ export default function SearchInterface(props) {
     if (data?.entry) {
       setResults(formatEntry(data.entry))
       setTotalItems(data.total)
+    } else {
+      setResults([])
+      setTotalItems(0)
     }
 
     setLoading(false)
@@ -143,6 +154,8 @@ export default function SearchInterface(props) {
     }
   }, [props.searchType])
 
+  console.log('results', results)
+
   return (
     <>
       <SelectDialog
@@ -161,7 +174,9 @@ export default function SearchInterface(props) {
       />
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
-        <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">{title}</div>
+        <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">
+          {title}
+        </div>
         <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
           {props.searchType === 'referrals' && (
             <Form layout="vertical" colon={true}>
@@ -257,11 +272,20 @@ export default function SearchInterface(props) {
 
           <div className="sm:hidden mt-5">
             {results.map((result) => (
-              <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
+              <div
+                key={result.id}
+                className="w-full grid grid-cols-5 gap-3 border border-1 border-gray-200"
+              >
                 <div className="py-5 pr-6 col-span-4">
-                  <div className="text-sm pl-5 leading-6 text-gray-900">{result.clientName}</div>
-                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">ID: <span className='font-bold'>{result.idNumber}</span></div>
-                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">{result.phoneNumber}</div>
+                  <div className="text-sm pl-5 leading-6 text-gray-900">
+                    {result.clientName}
+                  </div>
+                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
+                    ID: <span className="font-bold">{result.idNumber}</span>
+                  </div>
+                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
+                    {result.phoneNumber}
+                  </div>
                 </div>
                 <div className="py-5 max-w-auto right-5">
                   <div className="flex">
@@ -276,8 +300,7 @@ export default function SearchInterface(props) {
               </div>
             ))}
           </div>
-
-          </div>
+        </div>
       </div>
     </>
   )
