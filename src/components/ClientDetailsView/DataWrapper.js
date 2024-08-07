@@ -202,9 +202,50 @@ const createAppointment = (data, patientID, status) => {
   }
 }
 
+const createNextVaccineAppointment = (vaccines, patientId, user) => {
+  const nextVaccineDates = vaccines?.map((vaccine) => vaccine.dueDate)
+  const earliestDate = moment(
+    nextVaccineDates?.sort((a, b) => moment(a) - moment(b))?.[0]
+  )
+
+  return {
+    resourceType: 'Appointment',
+    status: 'booked',
+    description: vaccines?.map((vaccine) => vaccine?.vaccine).join(', '),
+    supportingInformation: [
+      {
+        reference: `Patient/${patientId}`,
+      },
+      {
+        doseNumber: vaccines?.map((vaccine) => vaccine?.doseNumber)?.join(', '),
+      },
+    ],
+    start: earliestDate.format('YYYY-MM-DD'),
+    end: earliestDate.add(14, 'days').format('YYYY-MM-DD'),
+    created: moment(Date.now()).format('YYYY-MM-DDTHH:mm:ssZ'),
+    participant: [
+      {
+        actor: {
+          reference: `Practitioner/${user?.fhirPractitionerId}`,
+        },
+      },
+      {
+        actor: {
+          reference: user.facility,
+        },
+      },
+      {
+        actor: {
+          reference: `Patient/${patientId}`,
+        },
+      },
+    ],
+  }
+}
 export {
   createVaccineImmunization,
   createAppointment,
   createImmunizationRecommendation,
   createVaccinationAppointment,
+  createNextVaccineAppointment,
 }

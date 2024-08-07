@@ -67,6 +67,7 @@ export default function Sidenav() {
     {
       name: 'Admin Management',
       icon: '',
+      href: '#',
       children: [
         { name: 'Users', href: '/admin-users' },
         { name: 'Facility', href: '/admin-add-facility' },
@@ -75,11 +76,18 @@ export default function Sidenav() {
     },
     {
       name: 'Vaccination Reports',
-      current: false,
       href: '/reports',
       icon: 'vaccinationReportLogo',
+      children: [
+        { name: 'MOH 710', href: '/reports/moh-710' },
+        { name: 'MOH 525', href: '/reports/moh-525' },
+      ],
     },
-    { name: 'Search Client', href: '/search/searchClient/n', icon: 'searchLogo' },
+    {
+      name: 'Search Client',
+      href: '/search/searchClient/n',
+      icon: 'searchLogo',
+    },
     {
       name: 'Register Client',
       href: '/register-client',
@@ -127,7 +135,7 @@ export default function Sidenav() {
         { name: 'New Order', href: '/stock-management/new-order' },
         { name: 'Received Orders', href: '/stock-management/received-orders' },
         { name: 'Sent Orders', href: '/stock-management/sent-orders' },
-        { name: 'Store Management', href: '/stock-management/administration'},
+        { name: 'Store Management', href: '/stock-management/administration' },
         { name: 'Ledger', href: '/stock-management/ledger' },
       ],
     },

@@ -51,6 +51,7 @@ import CampaignDetails from '../components/Campaigns/CampaignDetails'
 import CampaignSite from '../components/Campaigns/CampaignSite'
 import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 import OrderDetails from '../components/StockManagement/OrderDetails'
+import MOH710 from '../pages/MOH710'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -146,20 +147,21 @@ const router = createBrowserRouter([
             path: '/stock-management/administration',
             element: <Administration />,
           },
-          { 
-            path: '/stock-management/ledger', 
-            element: <Ledger /> 
+          {
+            path: '/stock-management/ledger',
+            element: <Ledger />,
           },
           {
             path: '/stock-management/order-details/:orderID',
             element: <OrderDetails />,
-          }
+          },
         ],
       },
       {
         path: '/reports',
         element: <VaccinationReports />,
       },
+      { path: '/reports/moh-710', element: <MOH710 /> },
       { path: '/profile', element: <Profile /> },
       {
         path: '/aefi-report/:clientID',
@@ -207,7 +209,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/edit-appointment/:appointmentID/:userID',
-        element: <EditAppointment />
+        element: <EditAppointment />,
       },
       {
         path: '/view-contraindication/:contraindicationID',
@@ -243,8 +245,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/campaign/:campaignID',
-        element: <CampaignDetails />
-      }
+        element: <CampaignDetails />,
+      },
     ],
   },
 
