@@ -4,7 +4,7 @@ import LoadingArrows from '../common/spinners/LoadingArrows'
 import empty from '../assets/empty.png'
 
 const useStyles = createUseStyles({
-  '@global': {
+  '@global':{
     '.ant-table': {
       borderRadius: '0px !important',
       '& .ant-table-container': {
@@ -13,13 +13,12 @@ const useStyles = createUseStyles({
           borderCollapse: 'collapse',
           borderColor: 'rgba(112, 112, 112,.2) !important',
           '& th': {
-            textAlign: 'left !important',
+            textAlign:(props) => !props.centered ? 'left !important' : 'center !important',
           },
           '& td, th, tr': {
             borderColor: 'rgba(112, 112, 112,.2) !important',
-
             '&::before': {
-              backgroundColor: 'rgba(112, 112, 112,.2) !important',
+              backgroundColor: '#EFF1F8 !important',
             },
           },
         },
@@ -27,7 +26,7 @@ const useStyles = createUseStyles({
           borderRadius: '0px !important',
           '& .ant-table-cell': {
             borderRadius: '0px !important',
-            backgroundColor: '#163C9412 !important',
+            backgroundColor: '#EFF1F8 !important',
           },
         },
       },
@@ -36,7 +35,7 @@ const useStyles = createUseStyles({
 })
 
 const DataTable = (props) => {
-  const classes = useStyles()
+  const classes = useStyles(props)
   return (
     <Table
       className={classes.root}
