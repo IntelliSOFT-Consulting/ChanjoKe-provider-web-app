@@ -188,9 +188,9 @@ export default function Administer() {
 
       await createAppointment(appointmentNext)
     }
-    // window.location.assign(
-    //   `/client-details/${clientID}/routineVaccines?${vaccineType}`
-    // )
+    window.location.assign(
+      `/client-details/${clientID}/routineVaccines?${vaccineType}`
+    )
   }
 
   return (
