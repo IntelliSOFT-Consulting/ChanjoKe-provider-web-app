@@ -23,11 +23,23 @@ import {
   getBodyWeight,
   updateVaccineDueDates,
 } from './administerController'
+import { createNextVaccineAppointment } from '../ClientDetailsView/DataWrapper'
 
 export default function Administer() {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [nextVaccines, setNextVaccines] = useState({})
   const [loading, setLoading] = useState(false)
+
+  const {
+    createImmunization,
+    updateImmunization,
+    getRecommendations,
+    updateRecommendations,
+  } = useVaccination()
+
+  const { createEncounter } = useEncounter()
+  const { createAppointment, getFacilityAppointments, facilityAppointments } =
+    useAppointment()
 
   const [form] = Form.useForm()
 
@@ -46,7 +58,7 @@ export default function Administer() {
 
   const { clientID } = useParams()
 
-  const findNextVaccines = () => {
+  const findNextVaccines = async () => {
     const keys = Object.keys(vaccineSchedules)
 
     const vaccineGroup = keys.find((group) =>
@@ -57,23 +69,16 @@ export default function Administer() {
 
     const indexOfKey = keys.indexOf(vaccineGroup)
 
+    await getFacilityAppointments(
+      vaccineSchedules[keys[indexOfKey + 1]]?.[0]?.dueDate
+    )
+
     setNextVaccines({
       nextGroup: keys[indexOfKey + 1],
       nextScheduleDate: vaccineSchedules[keys[indexOfKey + 1]]?.[0]?.dueDate,
       nextContent: vaccineSchedules[keys[indexOfKey + 1]],
     })
   }
-
-  const {
-    createImmunization,
-    updateImmunization,
-    getRecommendations,
-    updateRecommendations,
-  } = useVaccination()
-
-  const { createEncounter } = useEncounter()
-  const { getPatientAppointments, appointments } = useAppointment()
-  const [facilityAppointmentCount, setFacilityAppointmentCount] = useState([])
 
   const getWeight = async () => {
     const observation = await getLatestObservation(clientID)
@@ -89,7 +94,6 @@ export default function Administer() {
   }
 
   useEffect(() => {
-    getPatientAppointments(clientID)
     if (!selectedVaccines || selectedVaccines?.length === 0) {
       navigate(`/client-details/${clientID}/routineVaccines`)
     } else {
@@ -97,22 +101,6 @@ export default function Administer() {
       findNextVaccines()
     }
   }, [selectedVaccines])
-
-  useEffect(() => {
-    const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
-    const appointmentsToday = appointments.filter((appointment) =>
-      moment(moment(appointment.createdAt).format('YYYY-MM-DD')).isSame(
-        moment(),
-        'day'
-      )
-        ? appointment
-        : null
-    )
-    const facilityAppointments = appointmentsToday.filter(
-      (appointment) => appointment?.location === practitionerDetails?.facility
-    )
-    setFacilityAppointmentCount(facilityAppointments)
-  }, [appointments])
 
   const handleFormSubmit = async (values) => {
     setLoading(true)
@@ -176,9 +164,30 @@ export default function Administer() {
           newScheduleDate
         )
       )
+      if (!vaccineType) {
+        const appointmentNext = createNextVaccineAppointment(
+          nextVaccines.nextContent?.map((vaccine) => ({
+            ...vaccine,
+            dueDate: newScheduleDate?.format('YYYY-MM-DD'),
+          })),
+          clientID,
+          user
+        )
+
+        await createAppointment(appointmentNext)
+      }
     }
     setDialogOpen(false)
 
+    if (!vaccineType && newScheduleDate === previousScheduleDate) {
+      const appointmentNext = createNextVaccineAppointment(
+        nextVaccines.nextContent,
+        clientID,
+        user
+      )
+
+      await createAppointment(appointmentNext)
+    }
     window.location.assign(
       `/client-details/${clientID}/routineVaccines?${vaccineType}`
     )
@@ -208,11 +217,16 @@ export default function Administer() {
                   <Form.Item name="nextDueDate" label="Next Due Date">
                     <DatePicker
                       defaultValue={dayjs(nextVaccines?.nextScheduleDate)}
+                      onChange={async (date) => {
+                        await getFacilityAppointments(
+                          date?.format('YYYY-MM-DD')
+                        )
+                      }}
                       style={{ width: '100%' }}
                       disabledDate={(current) => {
                         return current && current < moment().endOf('day')
                       }}
-                      format='DD-MM-YYYY'
+                      format="DD-MM-YYYY"
                     />
                   </Form.Item>
 
@@ -222,7 +236,7 @@ export default function Administer() {
                     label="Number of Appointments"
                   >
                     <Input
-                      placeholder={facilityAppointmentCount.length}
+                      placeholder={facilityAppointments?.length || 0}
                       disabled
                     />
                   </Form.Item>
