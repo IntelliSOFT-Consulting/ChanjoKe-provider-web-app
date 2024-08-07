@@ -1,7 +1,7 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition, Disclosure } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import ProfileDropdown from './ProfileDropdown'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import AefiLogo from '../common/icons/aefiLogo'
@@ -61,6 +61,7 @@ const SidebarItem = ({ item, onItemClick }) => {
 export default function Sidenav() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [navigation, setNavigation] = useState([
     { name: 'Home', href: '/', current: true, icon: 'homeLogo' },
@@ -140,6 +141,26 @@ export default function Sidenav() {
       ],
     },
   ])
+
+  useEffect(() => {
+    const updatedNavigation = navigation.map((item) => {
+      if (item.children) {
+        return {
+          ...item,
+          children: item.children.map((child) => ({
+            ...child,
+            current: child.href === location.pathname,
+          })),
+        };
+      }
+      return {
+        ...item,
+        current: item.href === location.pathname,
+      };
+    });
+
+    setNavigation(updatedNavigation);
+  }, [location.pathname]);
 
   const handleItemClick = (clickedItem) => {
     const updatedNavigation = navigation.map((item) => {
