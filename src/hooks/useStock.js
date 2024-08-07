@@ -114,14 +114,17 @@ const useStock = () => {
     }
   }
 
-  const stockPayload = (values) => {
+  const stockPayload = (values, totalCount) => {
     const destinationFacility = user?.facility.split('/')[1]
+    const identifierFacility = values.facilityName.split(' ')[0].toUpperCase()
+    const identifierNumber = (totalCount + 1).toString().padStart(4, '0')
+
     return {
       resourceType: 'SupplyDelivery',
       identifier: [
         {
           system: "https://hl7.org/fhir/R4/supplydelivery-definitions",
-          value: '12345'
+          value: `${identifierFacility}-${identifierNumber}`,
         }
       ],
       basedOn: [
@@ -226,7 +229,9 @@ const useStock = () => {
 
   const receiveStock = async (data) => {
     setLoading(true)
-    const payload = stockPayload(data)
+    const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
+    const totalCount = totalResponse.total
+    const payload = stockPayload(data, totalCount)
     const response = await post(deliveryPath, payload)
     setLoading(false)
     return response
