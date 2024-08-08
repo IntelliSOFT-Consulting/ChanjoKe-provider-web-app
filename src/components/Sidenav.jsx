@@ -81,7 +81,7 @@ export default function Sidenav() {
       icon: 'vaccinationReportLogo',
       children: [
         { name: 'MOH 710', href: '/reports/moh-710' },
-        { name: 'MOH 525', href: '/reports/moh-525' },
+        // { name: 'MOH 525', href: '/reports/moh-525' },
       ],
     },
     {
