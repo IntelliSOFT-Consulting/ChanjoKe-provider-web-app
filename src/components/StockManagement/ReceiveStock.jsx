@@ -1,12 +1,20 @@
+import {
+  Button,
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  notification,
+  Select,
+} from 'antd'
 import React, { useEffect, useState } from 'react'
-import { Card, Button, Form, Input, Select, DatePicker, notification } from 'antd'
-import useInputTable from '../../hooks/InputTable'
 import { createUseStyles } from 'react-jss'
+import { useLocation, useNavigate } from 'react-router-dom'
+import useInputTable from '../../hooks/InputTable'
+import useInventory from '../../hooks/useInventory'
 import useStock from '../../hooks/useStock'
 import useVaccination from '../../hooks/useVaccination'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
-
-const { useForm } = Form
+import { useSelector } from 'react-redux'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -33,9 +41,15 @@ const useStyles = createUseStyles({
 
 const ReceiveStock = () => {
   const classes = useStyles()
-  const [form] = useForm()
-  const { receiveStock, loading, fetchActiveSupplyRequests, getSupplyRequestById, updaTeRequestStatus } = useStock()
-  const { getAllVaccines } = useVaccination()
+  const [form] = Form.useForm()
+  const {
+    receiveStock,
+    loading,
+    fetchActiveSupplyRequests,
+    getSupplyRequestById,
+    updaTeRequestStatus,
+  } = useStock()
+
   const [vaccineOptions, setVaccineOptions] = useState([])
   const [originOptions, setOriginOptions] = useState([])
   const [supplier, setSupplier] = useState('')
@@ -44,49 +58,59 @@ const ReceiveStock = () => {
   const [facilityName, setFacilityName] = useState('')
   const [facilityCode, setFacilityCode] = useState('')
 
-  const { id } = useParams()
+  const { user } = useSelector((state) => state.userInfo)
+
+  const { getInventory, inventory } = useInventory()
   const location = useLocation()
   const state = location.state || {}
-  const { orderNumber = '', origin = '', selectedOriginId = '', supplierId = '' } = state
+  const {
+    orderNumber = '',
+    origin = '',
+    selectedOriginId = '',
+    supplierId = '',
+  } = state
 
   const navigate = useNavigate()
 
+  const fetchOrigins = async () => {
+    try {
+      const origins = await fetchActiveSupplyRequests()
+      const formattedOrigins = origins.map((origin) => ({
+        value: origin.id,
+        label: origin.label,
+        id: origin.id,
+        key: origin.key,
+        identifier: origin.identifier,
+        supplier: origin.supplier,
+        authoredOn: origin.authoredOn,
+        facility: origin.facility,
+      }))
+      setOriginOptions(formattedOrigins)
+    } catch (error) {
+      console.log('Error fetching origins', error)
+    }
+  }
+
   useEffect(() => {
-    const fetchOrigins = async () => {
-      try {
-        const origins = await fetchActiveSupplyRequests()
-        const formattedOrigins = origins.map((origin) => ({
-          value: origin.id,
-          label: origin.label,
-          id: origin.id,
-          key: origin.key,
-          identifier: origin.identifier,
-          supplier: origin.supplier,
-          authoredOn: origin.authoredOn,
-          facility: origin.facility
-        }))
-        setOriginOptions(formattedOrigins)
-      }catch(error){
-        console.log("Error fetching origins", error)
-      }
-    }
     fetchOrigins()
-
+    getInventory(user.facility)
     form.setFieldsValue({ orderNumber, origin })
+  }, [])
 
-    if(selectedOriginId){
-      onOriginSelect(selectedOriginId, { supplier: supplierId } )
+  useEffect(() => {
+    if (selectedOriginId) {
+      onOriginSelect(selectedOriginId, { supplier: supplierId })
     }
-  }, [fetchActiveSupplyRequests, form, selectedOriginId, orderNumber, origin, supplierId])
+  }, [selectedOriginId, orderNumber, origin, supplierId])
 
-  const onOriginSelect = async(selectedOriginId, option) => {
-    try{
+  const onOriginSelect = async (selectedOriginId, option) => {
+    try {
       const supplyRequest = await getSupplyRequestById(selectedOriginId)
 
-      const vaccine = supplyRequest.itemCodeableConcept.coding.map((code => ({
+      const vaccine = supplyRequest.itemCodeableConcept.coding.map((code) => ({
         value: code.code,
-        label: code.display
-      })))
+        label: code.display,
+      }))
       setVaccineOptions(vaccine)
 
       form.setFieldsValue({ orderNumber: supplyRequest.identifier[0].value })
@@ -95,30 +119,30 @@ const ReceiveStock = () => {
       setAuthoredOn(option.authoredOn)
       setFacilityName(option.label)
       setFacilityCode(option.facility)
-    } catch(error){
+    } catch (error) {
       console.log(error)
     }
   }
 
-  const changeStatus = async(id) => {
-    try{
+  const changeStatus = async (id) => {
+    try {
       await updaTeRequestStatus(id, 'completed')
       notification.success({ message: 'Status changed to Received' })
-    }catch(error){
+    } catch (error) {
       console.log(error)
     }
   }
 
   const columns = [
-    { 
-      title: 'Vaccine/Diluents', 
-      dataIndex: 'vaccine', 
+    {
+      title: 'Vaccine/Diluents',
+      dataIndex: 'vaccine',
       type: 'select',
-      options: vaccineOptions
+      options: vaccineOptions,
     },
-    { 
-      title: 'Batch Number', 
-      dataIndex: 'batchNumber', 
+    {
+      title: 'Batch Number',
+      dataIndex: 'batchNumber',
       type: 'text',
     },
     { title: 'Expiry Date', dataIndex: 'expiryDate', type: 'date' },
@@ -146,7 +170,7 @@ const ReceiveStock = () => {
 
   const { InputTable, values: tableValues } = useInputTable({ columns })
 
-  const onSubmit = async(values) => {
+  const onSubmit = async (values) => {
     try {
       const combinedData = {
         ...values,
@@ -155,9 +179,9 @@ const ReceiveStock = () => {
         supplyRequestId: requestId,
         authoredOn: authoredOn,
         facilityName: facilityName,
-        facilityCode: facilityCode
+        facilityCode: facilityCode,
       }
-      
+
       localStorage.setItem('receiveData', JSON.stringify(combinedData))
 
       await receiveStock(combinedData)
@@ -169,7 +193,6 @@ const ReceiveStock = () => {
 
       navigate('/stock-management/received-orders')
       form.resetFields()
-
     } catch (error) {
       notification.error({
         message: 'Failed to receive stock',
@@ -191,7 +214,11 @@ const ReceiveStock = () => {
           >
             Cancel
           </Button>
-          <Button className={classes.btnPrimary} onClick={() => form.submit()} loading={loading}>
+          <Button
+            className={classes.btnPrimary}
+            onClick={() => form.submit()}
+            loading={loading}
+          >
             Save
           </Button>
         </div>,
@@ -206,10 +233,7 @@ const ReceiveStock = () => {
               { required: true, message: 'Please input the date received' },
             ]}
           >
-            <DatePicker 
-              className="w-full" 
-              format="DD-MM-YYYY"
-            />
+            <DatePicker className="w-full" format="DD-MM-YYYY" />
           </Form.Item>
           <Form.Item
             label="Origin"
@@ -221,7 +245,9 @@ const ReceiveStock = () => {
               showSearch
               allowClear
               filterOption={(input, option) =>
-                option.label ? option.label.toLowerCase().includes(input.toLowerCase()) : false
+                option.label
+                  ? option.label.toLowerCase().includes(input.toLowerCase())
+                  : false
               }
               options={originOptions}
               placeholder="Origin"
