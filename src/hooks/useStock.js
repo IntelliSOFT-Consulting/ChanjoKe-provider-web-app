@@ -27,7 +27,7 @@ const useStock = () => {
         {
           system: 'https://hl7.org/fhir/R4/supplyrequest-definitions',
           value: `${identifierFacility}-${identifierNumber}`,
-        }
+        },
       ],
       status: values.status || 'active',
       category: {
@@ -35,9 +35,9 @@ const useStock = () => {
           {
             code: 'central',
             display: 'Central Supply',
-            system: 'http://terminology.hl7.org/CodeSystem/supply-kind'
-          }
-        ]
+            system: 'http://terminology.hl7.org/CodeSystem/supply-kind',
+          },
+        ],
       },
       priority: 'routine',
       itemCodeableConcept: {
@@ -45,16 +45,16 @@ const useStock = () => {
           {
             code: values.vaccine,
             display: values.vaccine,
-          }
+          },
         ],
-        text: "Antigen"
+        text: 'Antigen',
       },
       itemReference: {
         reference: `Medication/${values.vaccine}`,
       },
       quantity: {
         value: values.quantity,
-        unit: 'doses'
+        unit: 'doses',
       },
       authoredOn: values.authoredOn,
       occurrenceDateTime: values.preferredPickupDate,
@@ -72,45 +72,45 @@ const useStock = () => {
       extension: [
         {
           url: 'http://example.org/fhir/StructureDefinition/level',
-          valueString: values.level
+          valueString: values.level,
         },
         {
           url: 'http://example.org/StructureDefinition/date-of-last-order',
-          valueDateTime: values.lastOrderDate
+          valueDateTime: values.lastOrderDate,
         },
         {
           url: 'http://example.org/StructureDefinition/expected-date-of-next-order',
-          valueDateTime: values.expectedDateOfNextOrder
+          valueDateTime: values.expectedDateOfNextOrder,
         },
         {
           url: 'http://example.org/StructureDefinition/total-population',
-          valueString: values.totalPopulation
+          valueString: values.totalPopulation,
         },
         {
           url: 'http://example.org/StructureDefinition/children',
-          valueString: values.children011Months
+          valueString: values.children011Months,
         },
         {
           url: 'http://example.org/StructureDefinition/pregnant-women',
-          valueString: values.pregnantWomen
+          valueString: values.pregnantWomen,
         },
         {
           url: 'http://example.org/StructureDefinition/doses-in-stock',
-          valueString: values.dosesInStock
+          valueString: values.dosesInStock,
         },
         {
           url: 'http://example.org/StructureDefinition/minimum',
-          valueString: values.minimumDoses
+          valueString: values.minimumDoses,
         },
         {
           url: 'http://example.org/StructureDefinition/maximum',
-          valueString: values.maximumDoses
+          valueString: values.maximumDoses,
         },
         {
           url: 'http://example.org/StructureDefinition/recommended-stock',
-          valueString: values.recommendedStock
-        }
-      ]
+          valueString: values.recommendedStock,
+        },
+      ],
     }
   }
 
@@ -123,39 +123,39 @@ const useStock = () => {
       resourceType: 'SupplyDelivery',
       identifier: [
         {
-          system: "https://hl7.org/fhir/R4/supplydelivery-definitions",
+          system: 'https://hl7.org/fhir/R4/supplydelivery-definitions',
           value: `${identifierFacility}-${identifierNumber}`,
-        }
+        },
       ],
       basedOn: [
         {
           reference: `SupplyRequest/${values.supplyRequestId}`,
-        }
+        },
       ],
       status: 'completed',
       type: {
         coding: [
           {
             system: 'http://terminology.hl7.org/CodeSystem/supply-item-type',
-            code: 'medication'
-          }
+            code: 'medication',
+          },
         ],
-        text: 'Vaccine'
+        text: 'Vaccine',
       },
       suppliedItem: {
         quantity: {
           value: values.quantity,
-          unit: 'doses'
+          unit: 'doses',
         },
         itemCodeableConcept: {
           coding: [
             {
               system: 'http://example.org/supply-items',
-              code: values.vaccine
-            }
+              code: values.vaccine,
+            },
           ],
-          text: "Vaccine"
-        }
+          text: 'Vaccine',
+        },
       },
       occurrenceDateTime: values.dateReceived,
       supplier: {
@@ -170,34 +170,34 @@ const useStock = () => {
       },
       extension: [
         {
-          url: "http://example.org/fhir/StructureDefinition/order-number",
-          valueString: values.orderNumber
+          url: 'http://example.org/fhir/StructureDefinition/order-number',
+          valueString: values.orderNumber,
         },
         {
           url: 'http://example.org/fhir/StructureDefinition/batch-number',
-          valueString: values.batchNumber
+          valueString: values.batchNumber,
         },
         {
           url: 'http://example.org/fhir/StructureDefinition/expiry-date',
-          valueDateTime: values.expiryDate
+          valueDateTime: values.expiryDate,
         },
         {
           url: 'http://example.org/fhir/StructureDefinition/stock-quantity',
-          valueString: values.stockQuantity
+          valueString: values.stockQuantity,
         },
         {
           url: 'http://example.org/fhir/StructureDefinition/vvm-status',
-          valueString: values.vvmStatus
+          valueString: values.vvmStatus,
         },
         {
           url: 'http://example.org/fhir/StructureDefinition/manufacturer-details',
-          valueString: values.manufacturerDetails
+          valueString: values.manufacturerDetails,
         },
         {
           url: 'http://example.org/fhir/StructureDefinition/date-received',
-          valueDateTime: values.authoredOn
-        }
-      ]
+          valueDateTime: values.authoredOn,
+        },
+      ],
     }
   }
 
@@ -229,10 +229,7 @@ const useStock = () => {
 
   const receiveStock = async (data) => {
     setLoading(true)
-    const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
-    const totalCount = totalResponse.total
-    const payload = stockPayload(data, totalCount)
-    const response = await post(deliveryPath, payload)
+    const response = await post(deliveryPath, data)
     setLoading(false)
     return response
   }
@@ -295,7 +292,7 @@ const useStock = () => {
 
   const myFacilityRequests = async (facility, page = 0) => {
     setLoading(true)
-    try{
+    try {
       const requester = user?.fhirPractitionerId
       const offset = getOffset(page)
       const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
@@ -304,16 +301,17 @@ const useStock = () => {
         `${supplyRequestPath}?requester=${requester}&_count=${totalCount}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
       )
 
-      const data = response?.entry?.map((entry, index) => {
-        const resource = entry.resource
-        if(resource.status === 'active'){
-          resource.status = 'Pending'
-        }else if(resource.status === 'completed'){
-          resource.status = 'Received'
-        }
+      const data =
+        response?.entry?.map((entry, index) => {
+          const resource = entry.resource
+          if (resource.status === 'active') {
+            resource.status = 'Pending'
+          } else if (resource.status === 'completed') {
+            resource.status = 'Received'
+          }
 
-        return resource
-      }) || []
+          return resource
+        }) || []
       setStock({
         data,
         total: response.total,
@@ -321,30 +319,31 @@ const useStock = () => {
       setLoading(false)
 
       return data
-    }catch(error){
+    } catch (error) {
       console.log(error)
     }
   }
 
   const fetchActiveSupplyRequests = useCallback(async () => {
     setLoading(true)
-    try{
+    try {
       const response = await myFacilityRequests()
       setLoading(false)
       const activeData = response?.filter((entry) => entry.status === 'Pending')
-      const data = activeData?.map((entry) => ({
-        id: entry.id,
-        key: entry.id,
-        label: entry.deliverTo.display,
-        value: entry.deliverTo.display,
-        identifier: entry.identifier[0].value,
-        supplier: entry.requester.reference.split('/')[1],
-        authoredOn: entry.authoredOn,
-        status: entry.status,
-        facility: entry.deliverTo.reference.split('/')[1],
-      })) || []
+      const data =
+        activeData?.map((entry) => ({
+          id: entry.id,
+          key: entry.id,
+          label: entry.deliverTo.display,
+          value: entry.deliverTo.display,
+          identifier: entry.identifier[0].value,
+          supplier: entry.requester.reference.split('/')[1],
+          authoredOn: entry.authoredOn,
+          status: entry.status,
+          facility: entry.deliverTo.reference.split('/')[1],
+        })) || []
       return data
-    } catch(error){
+    } catch (error) {
       setLoading(false)
       console.log(error)
     }
@@ -377,21 +376,21 @@ const useStock = () => {
 
   const requestStock = async (data) => {
     setLoading(true)
-    try{
+    try {
       const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
       const totalCount = totalResponse.total
       const payload = createPayload(data, totalCount)
       const response = await post(supplyRequestPath, payload)
       setLoading(false)
       return response
-    }catch(error){
+    } catch (error) {
       console.log(error)
     }
   }
 
   const updaTeRequestStatus = async (id, status) => {
     const request = await get(`${supplyRequestPath}/${id}`)
-    const updatedPayload = {...request, status: status}
+    const updatedPayload = { ...request, status: status }
     const response = await put(`${supplyRequestPath}/${id}`, updatedPayload)
     return response
   }
@@ -417,7 +416,7 @@ const useStock = () => {
     mySupplyRequests,
     getSupplyRequestById,
     updaTeRequestStatus,
-    fetchActiveSupplyRequests
+    fetchActiveSupplyRequests,
   }
 }
 

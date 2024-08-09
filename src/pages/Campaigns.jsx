@@ -8,9 +8,9 @@ const practitioner = JSON.parse(localStorage.getItem('practitioner'))
 const practitionerRole = practitioner?.practitionerRole
 
 export default function Campaigns() {
-
   const navigate = useNavigate()
-  const { loading, campaigns, campaignTotal, fetchCampaigns, updateCampaign } = useCampaigns()
+  const { loading, campaigns, campaignTotal, fetchCampaigns, updateCampaign } =
+    useCampaigns()
 
   const [activeTab, setActiveTab] = useState('1')
   const [currentPage, setCurrentPage] = useState(1)
@@ -36,70 +36,89 @@ export default function Campaigns() {
       title: 'Actions',
       dataIndex: '',
       key: 'x',
-      render: (_, record) => (
-        practitionerRole === 'ADMINISTRATOR' ?
-        <>
-          <Link
-            to={`/campaign/${record?.id}`}
-            className="text-[#163C94] font-semibold mr-4"
-          >
-            View
-          </Link>
-          { activeTab === '1' &&
-            <Popconfirm
-              title="Are you sure you want to archive this campaign?"
-              onConfirm={() => {
-                updateCampaign(record?.id, {
-                  id: record?.id,
-                  campaignName: record?.resource?.title,
-                  startDate: record?.resource?.period?.start,
-                  endDate: record?.resource?.period?.end,
-                  county: record?.resource?.category?.[0]?.coding?.[0]?.display,
-                  subCounty: record?.resource?.category?.[0]?.coding?.[1]?.display,
-                  ward: record?.resource?.category?.[0]?.coding?.[2]?.display,
-                  facility: record?.resource?.category?.[0]?.coding?.[3]?.display,
-                }, 'on-hold')
-                filterItems()
-              }}
-              okText="Yes"
-              cancelText="No">
-              <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
-                Archive
-              </button>
-            </Popconfirm>
-          }
+      render: (_, record) =>
+        practitionerRole === 'ADMINISTRATOR' ? (
+          <>
+            <Link
+              to={`/campaign/${record?.id}`}
+              className="text-[#163C94] font-semibold mr-4"
+            >
+              View
+            </Link>
+            {activeTab === '1' && (
+              <Popconfirm
+                title="Are you sure you want to archive this campaign?"
+                onConfirm={() => {
+                  updateCampaign(
+                    record?.id,
+                    {
+                      id: record?.id,
+                      campaignName: record?.resource?.title,
+                      startDate: record?.resource?.period?.start,
+                      endDate: record?.resource?.period?.end,
+                      county:
+                        record?.resource?.category?.[0]?.coding?.[0]?.display,
+                      subCounty:
+                        record?.resource?.category?.[0]?.coding?.[1]?.display,
+                      ward: record?.resource?.category?.[0]?.coding?.[2]
+                        ?.display,
+                      facility:
+                        record?.resource?.category?.[0]?.coding?.[3]?.display,
+                    },
+                    'on-hold'
+                  )
+                  filterItems()
+                }}
+                okText="Yes"
+                cancelText="No"
+              >
+                <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
+                  Archive
+                </button>
+              </Popconfirm>
+            )}
 
-          {activeTab === '2' &&
-            <Popconfirm
-              title="Are you sure you want to make this campaign active?"
-              onConfirm={() => {
-                updateCampaign(record?.id, {
-                  id: record?.id,
-                  campaignName: record?.resource?.title,
-                  startDate: record?.resource?.period?.start,
-                  endDate: record?.resource?.period?.end,
-                  county: record?.resource?.category?.[0]?.coding?.[0]?.display,
-                  subCounty: record?.resource?.category?.[0]?.coding?.[1]?.display,
-                  ward: record?.resource?.category?.[0]?.coding?.[2]?.display,
-                  facility: record?.resource?.category?.[0]?.coding?.[3]?.display,
-                }, 'active')
-                filterItems()
-              }}
-              okText="Yes"
-              cancelText="No">
-              <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
-                Unarchive
-              </button>
-            </Popconfirm>
-          }
-        </>:
-        <Link
-          to={`/campaign-site/${record?.id}`}
-          className="text-[#163C94] font-semibold"
-        >
-          {activeTab === '1' ? 'Select' : ''}
-        </Link>
-      ),
+            {activeTab === '2' && (
+              <Popconfirm
+                title="Are you sure you want to make this campaign active?"
+                onConfirm={() => {
+                  updateCampaign(
+                    record?.id,
+                    {
+                      id: record?.id,
+                      campaignName: record?.resource?.title,
+                      startDate: record?.resource?.period?.start,
+                      endDate: record?.resource?.period?.end,
+                      county:
+                        record?.resource?.category?.[0]?.coding?.[0]?.display,
+                      subCounty:
+                        record?.resource?.category?.[0]?.coding?.[1]?.display,
+                      ward: record?.resource?.category?.[0]?.coding?.[2]
+                        ?.display,
+                      facility:
+                        record?.resource?.category?.[0]?.coding?.[3]?.display,
+                    },
+                    'active'
+                  )
+                  filterItems()
+                }}
+                okText="Yes"
+                cancelText="No"
+              >
+                <button className={`px-2 py-1 text-[#163C94] font-semibold`}>
+                  Unarchive
+                </button>
+              </Popconfirm>
+            )}
+          </>
+        ) : (
+          <Link
+            to={`/campaign-site/${record?.id}`}
+            className="text-[#163C94] font-semibold"
+          >
+            {activeTab === '1' ? 'Select' : ''}
+          </Link>
+        ),
     },
   ]
 
@@ -113,10 +132,14 @@ export default function Campaigns() {
 
   const filterItems = () => {
     if (activeTab === '1') {
-      const activeCampaigns = campaigns?.filter((campaign) => campaign.status === 'active')
+      const activeCampaigns = campaigns?.filter(
+        (campaign) => campaign.status === 'active'
+      )
       setFilteredCampaigns(activeCampaigns)
     } else {
-      const archivedCampaigns = campaigns?.filter((campaign) => campaign.status === 'on-hold')
+      const archivedCampaigns = campaigns?.filter(
+        (campaign) => campaign.status === 'on-hold'
+      )
       setFilteredCampaigns(archivedCampaigns)
     }
   }
@@ -124,32 +147,31 @@ export default function Campaigns() {
   useEffect(() => {
     filterItems()
   }, [campaigns, activeTab])
-  
+
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
-        <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
-          <div className="text-3xl">Campaigns</div>
-          {practitionerRole === 'ADMINISTRATOR' && <div className="right-0">
-            <Button
-              type="primary"
-              onClick={() => navigate('/new-campaign/0')}
-              className="ml-4 font-semibold px-10"
-            >
-              New
-            </Button>
-          </div>
-          }
+      <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
+        <div className="text-3xl">Campaigns</div>
+        <div className="right-0">
+          <Button
+            type="primary"
+            onClick={() => navigate('/new-campaign/0')}
+            className="ml-4 font-semibold px-10"
+          >
+            New
+          </Button>
         </div>
-        <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
-
-          <div className="px-4 py-5 sm:p-6">
-            <Tabs
-              defaultActiveKey="1"
-              onChange={(key) => {
-                setActiveTab(key)
-                setCurrentPage(1)
-              }}
-              items={['Active Campaigns', 'Archived Campaigns'].map((item, index) => ({
+      </div>
+      <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
+        <div className="px-4 py-5 sm:p-6">
+          <Tabs
+            defaultActiveKey="1"
+            onChange={(key) => {
+              setActiveTab(key)
+              setCurrentPage(1)
+            }}
+            items={['Active Campaigns', 'Archived Campaigns'].map(
+              (item, index) => ({
                 key: (index + 1).toString(),
                 label: item,
                 children: (
@@ -208,33 +230,43 @@ export default function Campaigns() {
                     </div>
                   </div>
                 ),
-              }))}
-            />
-          </div>
+              })
+            )}
+          />
+        </div>
 
-          <div className="sm:hidden mt-5">
-            {campaigns.map((result) => (
-              <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
-                <div className="py-5 pr-6 col-span-4">
-                  <div className="text-sm pl-5 leading-6 text-gray-900">{result.campaignName}</div>
-                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">Duration: <span className='font-bold'>{result.campaignDuration}</span></div>
-                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">{result.dateCreated}</div>
+        <div className="sm:hidden mt-5">
+          {campaigns.map((result) => (
+            <div
+              key={result.id}
+              className="w-full grid grid-cols-5 gap-3 border border-1 border-gray-200"
+            >
+              <div className="py-5 pr-6 col-span-4">
+                <div className="text-sm pl-5 leading-6 text-gray-900">
+                  {result.campaignName}
                 </div>
-                <div className="py-5 max-w-auto right-5">
-                  <div className="flex">
-                    <a
-                      href={`/client-details/${result.id}/routineVaccines`}
-                      className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500"
-                    >
-                      View
-                    </a>
-                  </div>
+                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
+                  Duration:{' '}
+                  <span className="font-bold">{result.campaignDuration}</span>
+                </div>
+                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
+                  {result.dateCreated}
                 </div>
               </div>
-            ))}
-          </div>
-
-          </div>
+              <div className="py-5 max-w-auto right-5">
+                <div className="flex">
+                  <a
+                    href={`/client-details/${result.id}/routineVaccines`}
+                    className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500"
+                  >
+                    View
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+    </div>
   )
 }

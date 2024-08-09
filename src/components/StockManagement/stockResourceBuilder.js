@@ -1,5 +1,7 @@
 import moment from 'moment'
-import vaccines from '../data/vaccines'
+import { routineVaccines, nonRoutineVaccines } from '../../data/vaccineData'
+
+const vaccines = [...routineVaccines, ...nonRoutineVaccines]
 
 export const supplyRequestBuilder = (values) => {
   const { vaccine, quantity } = values
@@ -91,45 +93,127 @@ export const supplyRequestBuilder = (values) => {
 }
 
 export const supplyDeliveryBuilder = (values) => {
-  const { supplyRequest, quantity, user, status } = values
+  const { tableValues } = values
 
-  const resource = {
-    resourceType: 'SupplyDelivery',
-    status: status || 'in-progress',
-    basedOn: {
-      reference: supplyRequest,
-    },
-    occurrenceDateTime: moment().toISOString(),
-    suppliedItem: {
-      quantity: {
-        value: quantity,
-        unit: 'doses',
+  const resources = tableValues.map((tableValue) => {
+    const { vaccine, batchNumber, quantity, vvmStatus } = tableValue
+
+    const vaccineCode = vaccines.find(
+      (v) => v.vaccineName === vaccine
+    )?.vaccineCode
+
+    return {
+      resourceType: 'SupplyDelivery',
+      meta: {
+        tag: [
+          {
+            system:
+              'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/tags',
+            code: 'in-stock',
+            display: 'In Stock',
+          },
+        ],
       },
-      itemCodeableConcept: {
+      status: 'completed',
+      type: {
         coding: [
           {
             system:
-              'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/concepts',
-            code: 'vaccine',
-            display: 'Vaccine',
+              'http://terminology.hl7.org/CodeSystem/supplydelivery-status',
+            code: 'completed',
+            display: 'Completed',
           },
         ],
-        text: 'Vaccine',
       },
-    },
-    receiver: {
-      reference: `Practitioner/${user?.fhirPractitionerId}`,
-      text: `${user?.firstName} ${user?.lastName}`,
-    },
+      suppliedItem: {
+        quantity: {
+          value: quantity,
+          unit: 'doses',
+        },
+        itemCodeableConcept: {
+          coding: [
+            {
+              system:
+                'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/concepts',
+              code: vaccineCode,
+              display: vaccine,
+            },
+          ],
+          text: vaccine,
+        },
+        lotNumber: batchNumber,
+        extension: [
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-vvmStatus',
+            valueString: vvmStatus,
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-manufacturerDetails',
+            valueString: tableValue.manufacturerDetails,
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-expiryDate',
+            valueDateTime: moment(tableValue.expiryDate).toISOString(),
+          },
+          {
+            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-remainingQuantity',
+            valueQuantity: {
+              value: quantity,
+              unit: 'doses',
+            },
+          },
+        ],
+      },
+      occurrenceDateTime: moment(values.dateReceived).toISOString(),
+      supplier: {
+        reference: `Practitioner/${values.supplier}`,
+      },
+      destination: {
+        reference: `Location/${values.origin}`,
+        display: values.facilityName,
+      },
+      occurrencePeriod: {
+        start: moment(values.dateReceived).toISOString(),
+        end: moment(new Date()).toISOString(),
+      },
+      basedOn: {
+        reference: `SupplyRequest/${values.supplyRequestId}`,
+      },
+      receiver: [
+        {
+          reference: `Practitioner/${values.receiver}`,
+          display: values.receiverName,
+        },
+      ],
+      extension: [
+        {
+          url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-orderNumber',
+          valueString: values.orderNumber,
+        },
+      ],
+    }
+  })
 
-    destination: {
-      reference: user?.facility,
-      text: user?.facilityName,
-    },
-  }
-
-  return resource
+  return resources
 }
 
+export const inventoryItemUpdator = (supplyDeliveries, inventory) => {
+  const updatedInventory = { ...inventory }
+  const updatedItems = updatedInventory.extension[0].extension.map((item) => {
+    const updatedItem = { ...item }
+    const supplyDelivery = supplyDeliveries.find(
+      (sd) =>
+        sd.suppliedItem.itemCodeableConcept.text ===
+        item.extension[0].valueCodeableConcept.text
+    )
+    if (supplyDelivery) {
+      updatedItem.extension[1].valueQuantity.value +=
+        supplyDelivery.suppliedItem.quantity.value
+    }
+    return updatedItem
+  })
 
-export const inventoryItemBuilder = (values) => {}
+  updatedInventory.extension[0].extension = updatedItems
+
+  return updatedInventory
+}

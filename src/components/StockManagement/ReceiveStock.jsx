@@ -4,17 +4,20 @@ import {
   DatePicker,
   Form,
   Input,
+  InputNumber,
   notification,
   Select,
+  Tooltip,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
+import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import useInputTable from '../../hooks/InputTable'
 import useInventory from '../../hooks/useInventory'
 import useStock from '../../hooks/useStock'
-import useVaccination from '../../hooks/useVaccination'
-import { useSelector } from 'react-redux'
+import dayjs from 'dayjs'
+import Table from '../DataTable'
+import { inventoryItemUpdator, supplyDeliveryBuilder } from './stockResourceBuilder'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -52,6 +55,8 @@ const ReceiveStock = () => {
 
   const [vaccineOptions, setVaccineOptions] = useState([])
   const [originOptions, setOriginOptions] = useState([])
+  const [tableValues, setTableValues] = useState([{}])
+  const [isInvalid, setIsInvalid] = useState({})
   const [supplier, setSupplier] = useState('')
   const [requestId, setRequestId] = useState('')
   const [authoredOn, setAuthoredOn] = useState('')
@@ -60,7 +65,7 @@ const ReceiveStock = () => {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const { getInventory, inventory } = useInventory()
+  const { getInventory, updateInventory, createInventory, inventory } = useInventory()
   const location = useLocation()
   const state = location.state || {}
   const {
@@ -133,66 +138,262 @@ const ReceiveStock = () => {
     }
   }
 
+  const handleValidateTable = () => {
+    const mandatoryFields = ['vaccine', 'batchNumber', 'quantity', 'vvmStatus']
+    const invalid = mandatoryFields.reduce((acc, field) => {
+      if (!tableValues[tableValues.length - 1][field]) {
+        acc[field] = true
+      }
+      return acc
+    }, {})
+
+    if (Object.keys(invalid).length) {
+      setIsInvalid(invalid)
+      return false
+    }
+
+    return true
+  }
+
+  const handleAdd = () => {
+    if (!handleValidateTable()) return
+
+    setTableValues([...tableValues, {}])
+  }
+
   const columns = [
     {
       title: 'Vaccine/Diluents',
       dataIndex: 'vaccine',
-      type: 'select',
       options: vaccineOptions,
+      render: (text, record, index) => {
+        return (
+          <Tooltip title={!vaccineOptions.length ? 'Please select origin' : ''}>
+            <Select
+              options={vaccineOptions}
+              disabled={!vaccineOptions.length}
+              status={
+                index === tableValues.length - 1 && isInvalid.vaccine
+                  ? 'error'
+                  : ''
+              }
+              defaultValue={text}
+              className="w-full"
+              onChange={(value) => {
+                const newValues = [...tableValues]
+                newValues[index].vaccine = value
+
+                if (value) {
+                  setIsInvalid({
+                    ...isInvalid,
+                    vaccine: false,
+                  })
+                }
+              }}
+            />
+          </Tooltip>
+        )
+      },
     },
     {
       title: 'Batch Number',
       dataIndex: 'batchNumber',
-      type: 'text',
+      render: (text, record, index) => {
+        return (
+          <Input
+            defaultValue={text}
+            status={
+              index === tableValues.length - 1 && isInvalid.batchNumber
+                ? 'error'
+                : ''
+            }
+            className="w-full"
+            onChange={(e) => {
+              const newValues = [...tableValues]
+              newValues[index].batchNumber = e.target.value
+              if (e.target.value) {
+                setIsInvalid({
+                  ...isInvalid,
+                  batchNumber: false,
+                })
+              }
+            }}
+          />
+        )
+      },
     },
-    { title: 'Expiry Date', dataIndex: 'expiryDate', type: 'date' },
-    { title: 'Quantity', dataIndex: 'quantity', type: 'number' },
-    { title: 'Stock Quantity', dataIndex: 'stockQuantity', type: 'number' },
+    {
+      title: 'Expiry Date',
+      dataIndex: 'expiryDate',
+      render: (text, record, index) => {
+        return (
+          <DatePicker
+            defaultValue={text}
+            className="w-full"
+            disabled
+            onChange={(date) => {
+              const newValues = [...tableValues]
+              newValues[index].expiryDate = date
+            }}
+          />
+        )
+      },
+    },
+    {
+      title: 'Stock Quantity',
+      dataIndex: 'stockQuantity',
+      render: (text, record, index) => {
+        return (
+          <InputNumber
+            defaultValue={text}
+            disabled
+            onChange={(e) => {
+              const newValues = [...tableValues]
+              newValues[index].stockQuantity = e.target.value
+            }}
+            className="w-full"
+          />
+        )
+      },
+    },
+    {
+      title: 'Quantity',
+      dataIndex: 'quantity',
+      render: (text, record, index) => {
+        return (
+          <InputNumber
+            className="w-full"
+            status={
+              index === tableValues.length - 1 && isInvalid.quantity
+                ? 'error'
+                : ''
+            }
+            defaultValue={text}
+            onChange={(value) => {
+              const newValues = [...tableValues]
+              newValues[index].quantity = value
+              if (value) {
+                setIsInvalid({
+                  ...isInvalid,
+                  quantity: false,
+                })
+              }
+            }}
+          />
+        )
+      },
+    },
     {
       title: 'VVM Status',
       dataIndex: 'vvmStatus',
-      type: 'select',
-      options: [
-        // vaccine vial monitors
-        { value: 'Stage 1', label: 'Stage 1' },
-        { value: 'Stage 2', label: 'Stage 2' },
-        { value: 'Stage 3', label: 'Stage 3' },
-        { value: 'Stage 4', label: 'Stage 4' },
-      ],
+      render: (text, record, index) => {
+        return (
+          <Select
+            className="w-full"
+            status={
+              index === tableValues.length - 1 && isInvalid.vvmStatus
+                ? 'error'
+                : ''
+            }
+            options={[
+              { value: 'Stage 1', label: 'Stage 1' },
+              { value: 'Stage 2', label: 'Stage 2' },
+              { value: 'Stage 3', label: 'Stage 3' },
+              { value: 'Stage 4', label: 'Stage 4' },
+            ]}
+            allowClear
+            defaultValue={text}
+            onChange={(value) => {
+              const newValues = [...tableValues]
+              newValues[index].vvmStatus = value
+              if (value) {
+                setIsInvalid({
+                  ...isInvalid,
+                  vvmStatus: false,
+                })
+              }
+            }}
+          />
+        )
+      },
     },
     {
       title: 'Manufacturer Details',
       dataIndex: 'manufacturerDetails',
-      type: 'text',
+      render: (text, record, index) => {
+        return (
+          <Input
+            defaultValue={text}
+            className="w-full"
+            onChange={(e) => {
+              const newValues = [...tableValues]
+              newValues[index].manufacturerDetails = e.target.value
+            }}
+          />
+        )
+      },
     },
-    { title: 'Action', dataIndex: 'action', type: 'remove' },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: (text, record, index) => {
+        return (
+          <Button
+            type="link"
+            onClick={() => {
+              const newValues = [...tableValues]
+              newValues.splice(index, 1)
+              setTableValues(newValues)
+
+              setIsInvalid({})
+            }}
+            className="mr-2"
+            danger
+          >
+            Remove
+          </Button>
+        )
+      },
+    },
   ]
 
-  const { InputTable, values: tableValues } = useInputTable({ columns })
-
   const onSubmit = async (values) => {
+    if (!handleValidateTable()) return
     try {
       const combinedData = {
         ...values,
         supplier: supplier,
-        ...tableValues[0],
         supplyRequestId: requestId,
         authoredOn: authoredOn,
         facilityName: facilityName,
         facilityCode: facilityCode,
+        tableValues: tableValues,
+        receiver: user.fhirPractitionerId,
+        receiverName: user.firstName ? `${user.firstName} ${user.lastName}` : '',
       }
+      
+      const deliveries = supplyDeliveryBuilder(combinedData)
+      let currentInventory = await getInventory(user.facility)
+      if (!currentInventory) {
+        currentInventory = await createInventory()
+      }
+      const newIntentory = inventoryItemUpdator(deliveries, currentInventory)
 
-      localStorage.setItem('receiveData', JSON.stringify(combinedData))
+      await updateInventory(newIntentory)
 
-      await receiveStock(combinedData)
-      await changeStatus(requestId)
+      console.log({ deliveries, newIntentory })
+      // localStorage.setItem('receiveData', JSON.stringify(combinedData))
+
+      // await receiveStock(combinedData)
+      // await changeStatus(requestId)
+   
 
       notification.success({
         message: 'Stock received successfully',
       })
 
-      navigate('/stock-management/received-orders')
-      form.resetFields()
+      // navigate('/stock-management/received-orders')
+      // form.resetFields()
     } catch (error) {
       notification.error({
         message: 'Failed to receive stock',
@@ -218,13 +419,22 @@ const ReceiveStock = () => {
             className={classes.btnPrimary}
             onClick={() => form.submit()}
             loading={loading}
+            disabled={loading || Object.values(isInvalid).some(Boolean)}
           >
             Save
           </Button>
         </div>,
       ]}
     >
-      <Form layout="vertical" form={form} onFinish={onSubmit} className="p-4">
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={onSubmit}
+        className="p-4"
+        initialValues={{
+          dateReceived: dayjs(),
+        }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
           <Form.Item
             label="Date Received"
@@ -252,6 +462,14 @@ const ReceiveStock = () => {
               options={originOptions}
               placeholder="Origin"
               onSelect={onOriginSelect}
+              onClear={() => {
+                setVaccineOptions([])
+                setSupplier('')
+                setRequestId('')
+                setAuthoredOn('')
+                setFacilityName('')
+                setFacilityCode('')
+              }}
             />
           </Form.Item>
 
@@ -265,7 +483,28 @@ const ReceiveStock = () => {
             <Input placeholder="Order number" disabled />
           </Form.Item>
         </div>
-        <InputTable />
+        <Table
+          columns={columns}
+          dataSource={tableValues || []}
+          pagination={false}
+          size="small"
+        />
+        <div className="flex items-end flex-col">
+          {Object.values(isInvalid)?.filter(Boolean).length > 0 && (
+            <div className="bg-red-50 shadow p-2">
+              <p className="text-red-500 text-sm">
+                Please complete the form above to add item
+              </p>
+            </div>
+          )}
+
+          <Button
+            className="mt-4 !bg-green text-white hover:!text-white"
+            onClick={handleAdd}
+          >
+            Add Item
+          </Button>
+        </div>
       </Form>
     </Card>
   )
