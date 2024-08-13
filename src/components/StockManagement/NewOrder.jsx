@@ -1,12 +1,23 @@
-import { Card, Button, Form, Input, Select, DatePicker, notification } from 'antd'
-import { createUseStyles } from 'react-jss'
-import useInputTable from '../../hooks/InputTable'
-import useStock from '../../hooks/useStock'
-import { useLocations } from '../../hooks/useLocation'
-import useVaccination from '../../hooks/useVaccination'
-import { useEffect, useState } from 'react'
+import {
+  Button,
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  notification,
+  Select,
+} from 'antd'
 import moment from 'moment'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
+import { createUseStyles } from 'react-jss'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import useInventory from '../../hooks/useInventory'
+import { useLocations } from '../../hooks/useLocation'
+import useStock from '../../hooks/useStock'
+import NewOrderTable from './newOrder/NewOrderTable'
+import { supplyRequestBuilder } from './stockResourceBuilder'
 
 const { useForm } = Form
 
@@ -36,79 +47,115 @@ const useStyles = createUseStyles({
 export default function NewOrder() {
   const classes = useStyles()
   const [form] = useForm()
-  const { loading, requestStock } = useStock()
-  const { getAllVaccines } = useVaccination()
-  const [ vaccineOptions, setVaccineOptions ] = useState([])
-  const [ nextOrderDate, setNextOrderDate] = useState(null)
+  const [hasErrors, setHasErrors] = useState({})
+  const [nextOrderDate, setNextOrderDate] = useState(null)
+  const [tableData, setTableData] = useState([{}])
+
+  const { loading, createSupplyRequest, incomingSupplyRequests } = useStock()
+  const { user } = useSelector((state) => state.userInfo)
 
   const navigate = useNavigate()
 
-  const { 
+  const { getInventory, inventory } = useInventory()
+
+  const {
     counties,
     subCounties,
     facilities,
-    wards, 
-    handleCountyChange, 
+    wards,
+    handleCountyChange,
     handleSubCountyChange,
-    handleWardChange
+    handleWardChange,
   } = useLocations(form)
 
-
   useEffect(() => {
-    const fetchVaccines = async () => {
-      try {
-        const vaccines = await getAllVaccines()
-        setVaccineOptions(vaccines)
-      }catch(error){
-        console.log("Error fetching vaccines", error)
+    getInventory(user.facility)
+  }, [])
+
+  const handleValidate = () => {
+    const required = [
+      'vaccine',
+      'minimum',
+      'maximum',
+      'recommendedStock',
+      'quantity',
+    ]
+    if (!tableData?.length) {
+      setHasErrors({
+        empty: true,
+      })
+
+      return {
+        empty: true,
       }
     }
-    fetchVaccines()
-  }, [getAllVaccines])
+    const errors = tableData.reduce((acc, row, index) => {
+      const rowErrors = required.reduce((acc, field) => {
+        if (!row[field]) {
+          acc[field] = true
+        }
+        return acc
+      }, {})
 
-  const columns = [
-    { 
-      title: 'Antigen ', 
-      dataIndex: 'vaccine', 
-      type: 'select', 
-      options: vaccineOptions,
-    },
-    { title: 'Doses in Stock', dataIndex: 'dosesInStock', type: 'number' },
-    { title: 'Minimum', dataIndex: 'minimumDoses', type: 'number' },
-    { title: 'Maximum', dataIndex: 'maximumDoses', type: 'number' },
-    { title: 'Recommended Stock', dataIndex: 'recommendedStock', type: 'number' },
-    {
-      title: 'Ordered Amount',
-      dataIndex: 'quantity',
-      type: 'number',
-    },
-    { title: 'Action', dataIndex: 'action', type: 'remove' },
-  ]
-
-  const { InputTable, values: tableValues } = useInputTable({ columns })
-
-  const onSubmit = async(data) => {
-    try{
-      const combinedData = {
-        ...data, 
-        ...tableValues[0],
-        facilityName: form.getFieldValue('facilityName')
+      if (Object.keys(rowErrors).length) {
+        acc[index] = rowErrors
       }
 
-      localStorage.setItem('orderData', JSON.stringify(combinedData))
+      return acc
+    }, {})
 
-      const antigenData = JSON.parse(localStorage.getItem('orderData'))
+    setHasErrors(errors)
+    return errors
+  }
 
-      await requestStock(antigenData)
-      notification.success({
-        message: 'Order created successfully',
-      })
-      localStorage.removeItem('orderData')
-      localStorage.removeItem('formValues')
-      localStorage.removeItem('receiveData')
-      navigate('/stock-management/sent-orders')
-      form.resetFields()
-    }catch{
+  const onSubmit = async (data) => {
+    try {
+      const err = handleValidate()
+      if (!Object.values(err).length) {
+        const combinedData = {
+          ...data,
+          tableData,
+          deliverFrom: {
+            reference: form.getFieldValue('facility'),
+            display: form.getFieldValue('facilityName'),
+          },
+          requester: { reference: `Practitioner/${user.fhirPractitionerId}` },
+          deliverTo: {
+            reference: user.facility,
+            display: user.facilityName,
+          },
+        }
+
+        const payload = supplyRequestBuilder(combinedData)
+
+        const facilityRequests = await incomingSupplyRequests(
+          payload.deliverFrom.reference
+        )
+        const facilityKey = payload.deliverFrom.display
+        .replace(/\s/g, '')
+        .substring(0, 3).toUpperCase()
+
+        let identifier = [
+          {
+            system: 'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
+            value: `${facilityKey}-${(facilityRequests.length + 1).toString().padStart(4, '0')}`,
+          }
+        ]
+
+        payload.identifier = identifier
+
+        await createSupplyRequest(payload)
+
+        form.resetFields()
+
+        notification.success({
+          message: 'Order created successfully',
+        })
+
+        navigate('/stock-management/sent-orders')
+      }
+    } catch (err) {
+      console.log(err)
       notification.error({
         message: 'Error creating order',
       })
@@ -118,7 +165,9 @@ export default function NewOrder() {
   return (
     <Card
       className="mt-5"
-      title={<div className="text-xl font-semibold">Vaccine Ordering Sheet</div>}
+      title={
+        <div className="text-xl font-semibold">Vaccine Ordering Sheet</div>
+      }
       actions={[
         <div className="flex w-full justify-end px-6">
           <Button
@@ -136,20 +185,39 @@ export default function NewOrder() {
       ]}
     >
       <div className="bg-[#163c9412] p-3 mx-4">
-        <h3 className="text-[#707070] font-semibold text-base">Order Details</h3>
+        <h3 className="text-[#707070] font-semibold text-base">
+          Order Details
+        </h3>
       </div>
-      <Form layout="vertical" form={form} onFinish={onSubmit} className="p-4">
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={onSubmit}
+        className="p-4"
+        initialValues={{
+          authoredOn: dayjs(),
+          expectedDateOfNextOrder: dayjs().add(30, 'days'),
+        }}
+        autoComplete="off"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
           <Form.Item
             label="Level"
             name="level"
+            rules={[{ required: true, message: 'Please select the level' }]}
           >
-            <Input placeholder="Level" />
+            <Select
+              placeholder="Select Level"
+              options={[
+                { label: 'Central', value: 'Central' },
+                { label: 'Regional', value: 'Regional' },
+                { label: 'Sub-County', value: 'Sub-County' },
+                { label: 'Health Facility', value: 'Health Facility' },
+              ]}
+              allowClear
+            />
           </Form.Item>
-          <Form.Item
-            label="Name of County:"
-            name="nameOfCounty"
-          >
+          <Form.Item label="Name of County:" name="nameOfCounty">
             <Select
               onChange={(value) => handleCountyChange(value)}
               placeholder="Select County"
@@ -165,10 +233,7 @@ export default function NewOrder() {
             />
           </Form.Item>
 
-          <Form.Item
-            label="Sub-county"
-            name="subCounty"
-          >
+          <Form.Item label="Sub-county" name="subCounty">
             <Select
               onChange={(value) => handleSubCountyChange(value)}
               placeholder="Select Subcounty"
@@ -184,10 +249,7 @@ export default function NewOrder() {
             />
           </Form.Item>
 
-          <Form.Item
-            label='Ward'
-            name="ward"
-          >
+          <Form.Item label="Ward" name="ward">
             <Select
               onChange={(value) => handleWardChange(value)}
               placeholder="Select a Ward"
@@ -222,24 +284,24 @@ export default function NewOrder() {
                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
               onChange={(value) => {
-                const selectedFacility = facilities.find((facility) => facility.key === value);
+                const selectedFacility = facilities.find(
+                  (facility) => facility.key === value
+                )
                 form.setFieldsValue({
                   facility: selectedFacility ? selectedFacility.key : '',
-                  facilityName: selectedFacility ? selectedFacility.name : ''
-                });
+                  facilityName: selectedFacility ? selectedFacility.name : '',
+                })
               }}
             />
           </Form.Item>
 
-          <Form.Item
-            label="Date of Last Order:"
-            name="lastOrderDate"
-          >
-            <DatePicker 
-              className="w-full" 
-              placeholder="Date of Last Order" 
-              disabledDate={(current) => 
-                current && current > moment().subtract(1, 'days').startOf('days')
+          <Form.Item label="Date of Last Order:" name="lastOrderDate">
+            <DatePicker
+              className="w-full"
+              placeholder="Date of Last Order"
+              disabledDate={(current) =>
+                current &&
+                current > moment().subtract(1, 'days').startOf('days')
               }
               format="DD-MM-YYYY"
             />
@@ -248,28 +310,28 @@ export default function NewOrder() {
           <Form.Item
             label="Date of This Order:"
             name="authoredOn"
-            rules={[
-              { required: true, message: 'Please input the order date' },
-            ]}
+            rules={[{ required: true, message: 'Please input the order date' }]}
           >
-            <DatePicker 
+            <DatePicker
               className="w-full"
               placeholder="Date of This Order"
-              onChange={(date) => setNextOrderDate(date)}
+              onChange={(date) => {
+                form.setFieldValue(
+                  'expectedDateOfNextOrder',
+                  date.add(30, 'days')
+                )
+              }}
               format="DD-MM-YYYY"
             />
           </Form.Item>
 
-          <Form.Item
-            label="Preferred Pickup Date:"
-            name="preferredPickupDate"
-          >
-            <DatePicker 
-              className="w-full" 
+          <Form.Item label="Preferred Pickup Date:" name="preferredPickupDate">
+            <DatePicker
+              className="w-full"
               placeholder="Preferred Pickup Date"
-              disabledDate={(current) => 
+              disabledDate={(current) =>
                 current && current < moment().startOf('days')
-              }  
+              }
               format="DD-MM-YYYY"
             />
           </Form.Item>
@@ -278,11 +340,11 @@ export default function NewOrder() {
             label="Expected Date of Next Order:"
             name="expectedDateOfNextOrder"
           >
-            <DatePicker 
-              className="w-full" 
-              placeholder="Expected Date of Next Order" 
-              disabledDate={(current) => 
-                current && nextOrderDate ? current < nextOrderDate.startOf('days') : false
+            <DatePicker
+              className="w-full"
+              placeholder="Expected Date of Next Order"
+              disabledDate={(current) =>
+                current && current < moment().startOf('days')
               }
               format="DD-MM-YYYY"
             />
@@ -290,10 +352,7 @@ export default function NewOrder() {
         </div>
         <div className="border-2 mb-10"></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
-          <Form.Item
-            label="Total Population"
-            name="totalPopulation"
-          >
+          <Form.Item label="Total Population" name="totalPopulation">
             <Input placeholder="Total Population" />
           </Form.Item>
 
@@ -304,17 +363,23 @@ export default function NewOrder() {
             <Input placeholder="Children Aged 0-11 Months (under 1 year)" />
           </Form.Item>
 
-          <Form.Item
-            label="Pregnant Women"
-            name="pregnantWomen"
-          >
+          <Form.Item label="Pregnant Women" name="pregnantWomen">
             <Input placeholder="Pregnant Women" />
           </Form.Item>
         </div>
         <div className="bg-[#163c9412] p-3 mb-10">
-          <h3 className="text-[#707070] font-semibold text-base">Antigen Details</h3>
+          <h3 className="text-[#707070] font-semibold text-base">
+            Antigen Details
+          </h3>
         </div>
-        <InputTable />
+        <NewOrderTable
+          form={form}
+          tableData={tableData}
+          setTableData={setTableData}
+          inventory={inventory}
+          hasErrors={hasErrors}
+          handleValidate={handleValidate}
+        />
       </Form>
     </Card>
   )

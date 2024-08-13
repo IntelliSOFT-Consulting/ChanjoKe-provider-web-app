@@ -43,7 +43,7 @@ export const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 1',
     vaccineCode: 'IMDPT-1',
-    nhddCode: '50732',
+    nhddCode: '14676',
     diseaseTarget: 'DPT-HepB+Hib 1',
     doseNumber: '1',
     occurrenceDateTime: '',
@@ -117,7 +117,7 @@ export const routineVaccines = [
   {
     vaccineName: 'DPT-HepB+Hib 2',
     vaccineCode: 'IMDPT-2',
-    nhddCode: '18035',
+    nhddCode: '14676',
     diseaseTarget:
       'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
@@ -840,7 +840,7 @@ export const nonRoutineVaccines = [
   {
     vaccineName: 'Johnson & Johnson',
     vaccineCode: 'IMCOV-JnJ-0',
-    nhddCode: '16927',
+    nhddCode: '16537',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
@@ -1203,3 +1203,10 @@ export const nonRoutineVaccines = [
     },
   },
 ]
+
+export const allVaccines = [...routineVaccines, ...nonRoutineVaccines]
+
+export const vaccineOptions = allVaccines.map((vaccine) => ({
+  label: vaccine.vaccineName,
+  value: vaccine.vaccineCode,
+}))

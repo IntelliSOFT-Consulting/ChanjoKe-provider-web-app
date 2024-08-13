@@ -401,6 +401,7 @@ const ReceiveStock = () => {
     }
   }
 
+
   return (
     <Card
       className="mt-5"

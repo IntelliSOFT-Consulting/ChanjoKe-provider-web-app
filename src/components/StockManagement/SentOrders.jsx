@@ -1,11 +1,12 @@
-import { Card, Button, Table, Form, Select } from 'antd'
+import { Card, Button, Form, Select } from 'antd'
 import { createUseStyles } from 'react-jss'
 import { Link, useNavigate } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
 import { useEffect, useState } from 'react'
 import moment from 'moment'
 import usePaginatedQuery from '../../hooks/usePaginatedQuery'
-
+import { useSelector } from 'react-redux'
+import Table from '../DataTable'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -40,53 +41,76 @@ const useStyles = createUseStyles({
     fontWeight: 'bold',
   },
   statusReceived: {
-    color: '#186e03', 
+    color: '#186e03',
     fontWeight: 'bold',
   },
 })
 
-
-
 export default function SentOrders() {
   const classes = useStyles()
-  const { myFacilityRequests, updateRequestStatus } = useStock()
+  const {
+    myFacilityRequests,
+    updateRequestStatus,
+    outgoingSupplyRequests,
+    requests,
+  } = useStock()
   const [results, setResults] = useState([])
   const [filteredResults, setFilteredResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
   const { pageSize, handlePageChange } = usePaginatedQuery()
   const navigate = useNavigate()
 
-  const user = JSON.parse(localStorage.getItem('practitioner'))
+  const { user } = useSelector((state) => state.userInfo)
+
+  const fetchStock = async () => {
+    try {
+      const sentOrders = await outgoingSupplyRequests(user?.facility)
+      const formattedOrders = sentOrders?.map(formatOrder) || []
+
+      setResults(formattedOrders)
+      setFilteredResults(formattedOrders)
+      setTotalItems(formattedOrders.length)
+    } catch (error) {
+      console.error('Error fetching stock:', error)
+    }
+  }
+
+  const formatOrder = (order) => {
+    const vaccines = extractVaccines(order)
+
+    return {
+      id: order.id,
+      identifier: order.identifier?.[0]?.value,
+      date: moment(order.date).format('DD-MM-YYYY'),
+      facility: order.deliverTo?.display,
+      status: order.status,
+      vaccines: vaccines.join(', '),
+      supplier: order.deliverFrom?.display,
+    }
+  }
+
+  const extractVaccines = (order) => {
+    const vaccineExtension = order.extension?.find((item) =>
+      item.url.includes('supplyrequest-vaccine')
+    )
+
+    return (
+      vaccineExtension?.extension
+        ?.map(
+          (item) =>
+            item.extension?.find((ext) => ext.url === 'vaccine')
+              ?.valueCodeableConcept?.text
+        )
+        .filter(Boolean) || []
+    )
+  }
 
   useEffect(() => {
-    const fetchStock = async () => {
-      try {
-        const facility = JSON.parse(localStorage.getItem('practitioner')).facility
-        const sentOrders = await myFacilityRequests()
-        const formattedOrders = sentOrders.map((order) => ({
-          id: order.id,
-          identifier: order.identifier[0].value,
-          date: moment(order.date).format('DD-MM-YYYY'),
-          facility: order.deliverTo.display,
-          status: order.status,
-          quantity: order.quantity?.value,
-          products: order.itemCodeableConcept?.coding.length,
-          supplier: order.requester.reference.split('/')[1],
-        }))
-
-        setResults(formattedOrders)
-        setFilteredResults(formattedOrders)
-        setTotalItems(sentOrders.length)
-      } catch (error) {
-        console.log(error)
-      }   
-    }
-
     fetchStock()
   }, [])
 
   const handleStatusChange = (value) => {
-    if(value) {
+    if (value) {
       const filtered = results.filter((order) => order.status === value)
       setFilteredResults(filtered)
       setTotalItems(filtered.length)
@@ -109,8 +133,8 @@ export default function SentOrders() {
     },
     {
       title: 'Order Location',
-      dataIndex: 'facility',
-      key: 'facility',
+      dataIndex: 'supplier',
+      key: 'supplier',
     },
     {
       title: 'Status',
@@ -119,30 +143,23 @@ export default function SentOrders() {
       render: (status) => (
         <span
           className={
-            status === 'Pending'
-              ? classes.statusPending
-              : classes.statusReceived
+            status === 'active' ? classes.statusPending : classes.statusReceived
           }
         >
-          {status}
+          {status === 'active' ? 'Pending' : 'Received'}
         </span>
       ),
     },
     {
-      title: 'Quantity',
-      dataIndex: 'quantity',
-      key: 'quantity',
-    },
-    {
-      title: 'Products',
-      dataIndex: 'products',
-      key: 'products',
+      title: 'Antigens',
+      dataIndex: 'vaccines',
+      key: 'vaccines',
     },
     {
       title: 'Actions',
       dataIndex: '',
       key: 'x',
-      render: (record) => (
+      render: (_,record) => (
         <div className="flex items-center gap-10">
           <Link
             to={`/stock-management/order-details/${record.id}`}
@@ -151,13 +168,26 @@ export default function SentOrders() {
             View
           </Link>
           {record.status === 'Received' ? (
-            <Button type="link" disabled className='text-[#163C94] font-semibold p-0'>
+            <Button
+              type="link"
+              disabled
+              className="text-[#163C94] font-semibold p-0"
+            >
               Receive
             </Button>
           ) : (
             <Button
               // onClick={() => changeStatus(record.id)}
-              onClick={() => navigate(`/stock-management/receive-stock/${record.id}`, { state: { orderNumber: record.identifier, origin: record.facility, selectedOriginId: record.id, supplierId: record.supplier  } })}
+              onClick={() =>
+                navigate(`/stock-management/receive-stock/${record.id}`, {
+                  state: {
+                    orderNumber: record.identifier,
+                    origin: record.facility,
+                    selectedOriginId: record.id,
+                    supplierId: record.supplier,
+                  },
+                })
+              }
               className="text-[#163C94] font-semibold border-none p-0"
             >
               Receive
@@ -186,35 +216,32 @@ export default function SentOrders() {
           </div>
         }
       >
-        <div className="bg-[#163c9412] p-3 mx-4 my-5">
-          <h3 className="text-[#707070] font-semibold text-base">Order Details</h3>
-        </div>
-
         <Form layout="vertical" className="p-4 flex w-full justify-end">
           <Form.Item
-            label='Filter by Status'
+            label="Filter by Status"
             name="filterByStatus"
             className="w-1/4"
           >
-            <Select 
-              placeholder='Select Status'
-              className='w-full'
+            <Select
+              placeholder="Select Status"
+              className="w-full"
               allowClear
               onChange={handleStatusChange}
               options={[
-                { label: 'Pending', value: 'Pending' },
-                { label: 'Received', value: 'Received' },
+                { label: 'Pending', value: 'active' },
+                { label: 'Received', value: 'completed' },
               ]}
             />
           </Form.Item>
         </Form>
 
-        <div className='hidden sm:block sm:px-4 mb-10'>
-          <Table 
+        <div className="hidden sm:block sm:px-4 mb-10">
+          <Table
             columns={columns}
             dataSource={filteredResults}
             size="small"
             bordered
+            loading={!requests}
             className={classes.tableHeader}
             pagination={{
               pageSize: 12,
@@ -223,28 +250,40 @@ export default function SentOrders() {
               showTotal: (total) => `Total ${total} items`,
               total: totalItems - 1,
             }}
-            locale={{
-              emptyText: (
-                <div className="flex flex-col items-center justify-center">
-                  <p className="text-gray-400 text-sm my-2">
-                    No Sent Orders
-                  </p>
-                </div>
-              ),
-            }}
           />
         </div>
 
         <div className="sm:hidden mt-5">
-          {results.map((result) => (
-            <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
+          {results?.map((result) => (
+            <div
+              key={result.id}
+              className="w-full grid grid-cols-5 gap-3 border border-1 border-gray-200"
+            >
               <div className="py-5 pr-6 col-span-4">
-                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">ID: <span className='font-bold'>{result.identifier}</span></div>
-                <div className="text-sm pl-5 leading-6 text-gray-900">{result.date}</div>
-                <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">{result.facility}</div>
-                <div className={`text-sm pl-5 leading-6 font-semibold ${result.status === "Pending" ? "text-[#efd406]" : "text-[#186e03]"}`}>{result.status}</div>
-                <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">Quantity: <span className='font-bold'>{result.quantity}</span></div>
-                <div className="text-sm pl-5 leading-6 text-gray-900">Products: <span className='font-bold'>{result.products}</span></div>
+                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
+                  ID: <span className="font-bold">{result.identifier}</span>
+                </div>
+                <div className="text-sm pl-5 leading-6 text-gray-900">
+                  {result.date}
+                </div>
+                <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">
+                  {result.facility}
+                </div>
+                <div
+                  className={`text-sm pl-5 leading-6 font-semibold ${
+                    result.status === 'Pending'
+                      ? 'text-[#efd406]'
+                      : 'text-[#186e03]'
+                  }`}
+                >
+                  {result.status}
+                </div>
+                <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">
+                  Quantity: <span className="font-bold">{result.quantity}</span>
+                </div>
+                <div className="text-sm pl-5 leading-6 text-gray-900">
+                  Products: <span className="font-bold">{result.products}</span>
+                </div>
               </div>
               <div className="py-5 max-w-auto right-5">
                 <div className="flex flex-col items-start">
@@ -255,12 +294,28 @@ export default function SentOrders() {
                     View
                   </a>
                   {result.status === 'Received' ? (
-                    <Button type="link" disabled className='text-[#163C94] font-semibold p-0'>
+                    <Button
+                      type="link"
+                      disabled
+                      className="text-[#163C94] font-semibold p-0"
+                    >
                       Receive
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => navigate(`/stock-management/receive-stock/${result.id}`, { state: { orderNumber: result.identifier, origin: result.facility, selectedOriginId: result.id, supplierId: result.supplier } })}
+                      onClick={() =>
+                        navigate(
+                          `/stock-management/receive-stock/${result.id}`,
+                          {
+                            state: {
+                              orderNumber: result.identifier,
+                              origin: result.facility,
+                              selectedOriginId: result.id,
+                              supplierId: result.supplier,
+                            },
+                          }
+                        )
+                      }
                       className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500 border-none p-0"
                     >
                       Receive

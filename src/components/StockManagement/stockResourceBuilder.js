@@ -1,95 +1,153 @@
 import moment from 'moment'
-import { routineVaccines, nonRoutineVaccines } from '../../data/vaccineData'
-
-const vaccines = [...routineVaccines, ...nonRoutineVaccines]
+import { allVaccines } from '../../data/vaccineData'
 
 export const supplyRequestBuilder = (values) => {
-  const { vaccine, quantity } = values
+  const {
+    tableData,
+    level,
+    supplierName,
+    supplier,
+    lastOrderDate,
+    authoredOn,
+    preferredPickupDate,
+    expectedDateOfNextOrder,
+    totalPopulation,
+    pregnantWomen,
+  } = values
 
-  const vaccineCode = vaccines.find((v) => v.name === vaccine)?.code
+  const orderItems = tableData.map((tableValue) => {
+    const {
+      vaccine,
+      dosesInStock,
+      minimum,
+      maximum,
+      recommendedStock,
+      quantity,
+    } = tableValue
 
-  const category =
-    values.category === 'central'
-      ? {
-          coding: [
-            {
-              system:
-                'http://terminology.hl7.org/CodeSystem/supplyrequest-category',
-              code: 'central',
-              display: 'Central Stock Request',
-            },
-          ],
-        }
-      : {
-          coding: [
-            {
-              system:
-                'http://terminology.hl7.org/CodeSystem/supplyrequest-category',
-              code: 'facility',
-              display: 'Facility Stock Request',
-            },
-          ],
-        }
+    const vaccineName = allVaccines.find(
+      (v) => v.vaccineCode === vaccine
+    )?.vaccineName
 
-  const resource = {
-    resourceType: 'SupplyRequest',
-    status: values.status || 'in-progress',
-    category: category,
-    requester: {
-      reference: `Practitioner/${values.user?.fhirPractitionerId}`,
-      text: `${values.user?.firstName} ${values.user?.lastName}`,
-    },
-    itemCodeableConcept: {
-      coding: [
+    return {
+      url: 'http://example.org/fhir/StructureDefinition/supplyrequest-vaccine',
+      extension: [
         {
-          system:
-            'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/concepts',
-          code: vaccineCode,
-          display: vaccine,
+          url: 'vaccine',
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: 'http://example.org/vaccine-codes',
+                code: vaccine,
+              },
+            ],
+            text: vaccineName,
+          },
+        },
+        {
+          url: 'dosesInStock',
+          valueQuantity: {
+            value: dosesInStock,
+            unit: 'doses',
+          },
+        },
+        {
+          url: 'minimum',
+          valueQuantity: {
+            value: minimum,
+            unit: 'doses',
+          },
+        },
+        {
+          url: 'maximum',
+          valueQuantity: {
+            value: maximum,
+            unit: 'doses',
+          },
+        },
+        {
+          url: 'recommendedStock',
+          valueQuantity: {
+            value: recommendedStock,
+            unit: 'doses',
+          },
+        },
+        {
+          url: 'quantity',
+          valueQuantity: {
+            value: quantity,
+            unit: 'doses',
+          },
         },
       ],
-      text: vaccine,
-    },
-    quantity: {
-      value: quantity,
-      unit: 'doses',
-    },
-    occurrenceDateTime: moment(values.expectedDate).toISOString(),
-    authoredOn: moment().toISOString(),
-    reasonCode: values.reasonCode,
-    // extension: [
-    //   {
-    //     url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-expectedNextOrder',
-    //     valueDateTime: moment(values.expectedNextOrder).toISOString(),
-    //   },
-    //   {
-    //     url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-totalPopulation',
-    //     valueInteger: values.totalPopulation,
-    //   },
-    //   {
-    //     url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-children',
-    //     valueInteger: values.children,
-    //   },
-    //   {
-    //     url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-pregnantWomen',
-    //     valueInteger: values.pregnantWomen,
-    //   },
-    // ],
-  }
-
-  if (values.category === 'facility') {
-    resource.deliverFrom = {
-      reference: values.facilityFrom,
-      text: values.facilityFromName,
     }
+  })
 
-    resource.deliverTo = {
-      reference: values.user?.facility,
-      text: values.user?.facilityName,
-    }
+  return {
+    resourceType: 'SupplyRequest',
+    status: 'active',
+    meta: {
+      tag: [
+        {
+          system:
+            'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/tags',
+          code: 'order',
+          display: 'Order',
+        },
+      ],
+    },
+    occurrenceDateTime: moment().toISOString(),
+    deliverFrom: values.deliverFrom,
+    deliverTo: values.deliverTo,
+    requester: values.requester,
+    reasonCode: [
+      {
+        coding: [
+          {
+            system: 'http://snomed.info/sct',
+            code: '373066001',
+            display: 'Vaccine Supply',
+          },
+        ],
+        text: 'Vaccine Supply',
+      },
+    ],
+    occurrencePeriod: {
+      start: authoredOn?.toISOString(),
+      end: moment().toISOString(),
+    },
+    authoredOn: authoredOn?.toISOString(),
+    extension: [
+      {
+        url: 'http://example.org/fhir/StructureDefinition/supplyrequest-vaccine',
+        extension: orderItems,
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-level',
+        valueString: level,
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-lastOrderDate',
+        valueDateTime: lastOrderDate?.toISOString(),
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-preferredPickupDate',
+        valueDateTime: preferredPickupDate?.toISOString(),
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-expectedDateOfNextOrder',
+        valueDateTime: expectedDateOfNextOrder?.toISOString(),
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-totalPopulation',
+        valueInteger: totalPopulation,
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-pregnantWomen',
+        valueInteger: pregnantWomen,
+      },
+    ],
   }
-
-  return resource
 }
 
 export const supplyDeliveryBuilder = (values) => {
@@ -98,7 +156,7 @@ export const supplyDeliveryBuilder = (values) => {
   const resources = tableValues.map((tableValue) => {
     const { vaccine, batchNumber, quantity, vvmStatus } = tableValue
 
-    const vaccineCode = vaccines.find(
+    const vaccineCode = allVaccines.find(
       (v) => v.vaccineName === vaccine
     )?.vaccineCode
 
@@ -114,7 +172,8 @@ export const supplyDeliveryBuilder = (values) => {
           },
         ],
       },
-      status: 'completed',
+      identifier: [],
+      status: 'in-progress',
       type: {
         coding: [
           {
@@ -153,7 +212,7 @@ export const supplyDeliveryBuilder = (values) => {
           },
           {
             url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-expiryDate',
-            valueDateTime: moment(tableValue.expiryDate).toISOString(),
+            valueDateTime: tableValue.expiryDate?.toISOString(),
           },
           {
             url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-remainingQuantity',
@@ -164,31 +223,31 @@ export const supplyDeliveryBuilder = (values) => {
           },
         ],
       },
-      occurrenceDateTime: moment(values.dateReceived).toISOString(),
+      occurrenceDateTime: moment().toISOString(),
       supplier: {
         reference: `Practitioner/${values.supplier}`,
       },
       destination: {
-        reference: `Location/${values.origin}`,
-        display: values.facilityName,
+        reference: `Location/${tableValue.destination}`,
+        display: tableValue.facilityName,
       },
       occurrencePeriod: {
-        start: moment(values.dateReceived).toISOString(),
-        end: moment(new Date()).toISOString(),
+        start: values.dateIssued?.toISOString(),
+        end: moment().toISOString(),
       },
       basedOn: {
-        reference: `SupplyRequest/${values.supplyRequestId}`,
+        reference: `SupplyRequest/${tableValue.supplyRequestId}`,
       },
-      receiver: [
-        {
-          reference: `Practitioner/${values.receiver}`,
-          display: values.receiverName,
-        },
-      ],
+      // receiver: [
+      //   {
+      //     reference: `Practitioner/${values.receiver}`,
+      //     display: values.receiverName,
+      //   },
+      // ],
       extension: [
         {
           url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-orderNumber',
-          valueString: values.orderNumber,
+          valueString: tableValue.orderNumber,
         },
       ],
     }
@@ -216,4 +275,80 @@ export const inventoryItemUpdator = (supplyDeliveries, inventory) => {
   updatedInventory.extension[0].extension = updatedItems
 
   return updatedInventory
+}
+
+export const receiveAuditBuilder = (values, supplyDeliveries) => {
+  const { tableValues } = values
+
+  const discrepancies = tableValues
+    .map((tableValue) => {
+      const supplyDelivery = supplyDeliveries.find(
+        (sd) => sd.suppliedItem.itemCodeableConcept.text === tableValue.vaccine
+      )
+
+      if (supplyDelivery) {
+        const quantityExpected = supplyDelivery.suppliedItem.quantity.value
+        const quantityReceived = tableValue.quantity
+        const discrepancy = quantityExpected - quantityReceived
+
+        if (discrepancy !== 0) {
+          const discrepancyType = discrepancy > 0 ? 'excess' : 'shortage'
+          return {
+            resourceType: 'AuditEvent',
+            action: 'E',
+            recorded: moment().toISOString(),
+            outcomeDesc: `Vaccines received with ${discrepancyType} doses than expected`,
+            purposeOfEvent: [
+              {
+                coding: [
+                  {
+                    system:
+                      'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
+                    code: 'discrepancyType',
+                    display: 'Discrepancy Type',
+                  },
+                ],
+                text: discrepancyType,
+              },
+              {
+                coding: [
+                  {
+                    system:
+                      'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
+                    code: 'discrepancyValue',
+                    display: 'Discrepancy Value',
+                  },
+                ],
+                text: discrepancy,
+              },
+            ],
+            actor: {
+              reference: `Practitioner/${values.receiver}`,
+              display: values.receiverName,
+            },
+            source: {
+              observer: {
+                reference: `Location/${values.origin}`,
+                display: values.facilityName,
+              },
+            },
+            entity: [
+              {
+                what: {
+                  reference: `SupplyDelivery/${supplyDelivery.id}`,
+                  display: supplyDelivery.suppliedItem.itemCodeableConcept.text,
+                },
+                detail: {
+                  type: 'Quantity',
+                  value: discrepancy,
+                },
+              },
+            ],
+          }
+        }
+      }
+    })
+    .filter(Boolean)
+
+  return discrepancies
 }

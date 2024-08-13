@@ -3,6 +3,7 @@ import { Card, Button, Form, Tabs, Select, DatePicker, InputNumber } from 'antd'
 import useInputTable from '../../hooks/InputTable'
 import { createUseStyles } from 'react-jss'
 import StockIssueForm from './StockIssueForm'
+import SingleLocation from './issueStock/SingleLocation'
 
 const { useForm } = Form
 
@@ -70,21 +71,6 @@ const IssueStock = () => {
     <Card
       className="mt-5"
       title={<div className="text-xl font-semibold">Issue Stock</div>}
-      actions={[
-        <div className="flex w-full justify-end px-6">
-          <Button
-            type="primary"
-            className="mr-4"
-            onClick={() => form.resetFields()}
-            ghost
-          >
-            Cancel
-          </Button>
-          <Button className={classes.btnPrimary} onClick={() => form.submit()}>
-            Submit
-          </Button>
-        </div>,
-      ]}
     >
       <Tabs
         defaultActiveKey="1"
@@ -92,13 +78,7 @@ const IssueStock = () => {
           {
             key: '1',
             label: <div className="px-6 font-semibold">Single Location</div>,
-            children: (
-              <StockIssueForm
-                form={form}
-                onSubmit={onSubmit}
-                InputTable={InputTable}
-              />
-            ),
+            children: <SingleLocation />,
           },
           {
             key: '2',

@@ -18,7 +18,7 @@ export default function usePatient() {
           type: {
             coding: [
               {
-                system: 'http://hl7.org/fhir/administrative-identifier',
+                system: data.identificationType?.replace(/_/g, ' '),
                 code: 'identification_type',
                 display: data.identificationType,
                 value: data.identificationNumber,
@@ -26,7 +26,7 @@ export default function usePatient() {
             ],
             text: data.identificationNumber,
           },
-          system: 'identification_type',
+          system: 'http://hl7.org/fhir/administrative-identifier',
           value: data.identificationNumber,
         },
         {
