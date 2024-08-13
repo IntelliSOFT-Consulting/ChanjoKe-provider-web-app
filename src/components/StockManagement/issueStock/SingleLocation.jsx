@@ -11,15 +11,17 @@ import {
 import { useSelector } from 'react-redux'
 import Table from '../../DataTable'
 import useStock from '../../../hooks/useStock'
-import { locationOptions, formatSupplyRequestsToForm } from '../stockUtils'
+import { locationOptions, formatSupplyRequest } from '../stockUtils'
 import { supplyDeliveryBuilder } from '../stockResourceBuilder'
 import dayjs from 'dayjs'
 
 const { Option } = Select
 
 const SingleLocation = ({ vaccines = [] }) => {
+  const [selectedVaccine, setSelectedVaccine] = useState(null)
   const [orderItems, setOrderItems] = useState([{}])
-  const [formattedSupplyRequests, setFormattedSupplyRequests] = useState([])
+  const [tableErrors, setTableErrors] = useState({})
+
   const [form] = Form.useForm()
   const [api, contextHolder] = notification.useNotification()
 
@@ -35,14 +37,38 @@ const SingleLocation = ({ vaccines = [] }) => {
     incomingSupplyRequests(user?.facility, 0, 'active')
   }, [])
 
-  useEffect(() => {
-    if (requests?.data) {
-      setFormattedSupplyRequests(formatSupplyRequestsToForm(requests.data))
-    }
-  }, [requests])
+  const handleValidate = () => {
+    const errors = {}
+    const mandatoryFields = [
+      'vaccine',
+      'batchNumber',
+      'expiryDate',
+      'quantity',
+      'vvmStatus',
+    ]
+
+    orderItems.forEach((item, index) => {
+      mandatoryFields.forEach((field) => {
+        if (!item[field]) {
+          errors[index] = {
+            ...errors[index],
+            [field]: 'This field is required',
+          }
+        }
+      })
+    })
+
+    setTableErrors(errors)
+
+    return errors
+  }
 
   const handleSubmit = async (values) => {
     try {
+      const err = handleValidate()
+      if (Object.keys(err).length) {
+        return
+      }
       const selectedRequests = orderItems.map((item) => ({
         ...requests?.data?.find((request) => request.id === item.id),
         status: 'completed',
@@ -87,21 +113,14 @@ const SingleLocation = ({ vaccines = [] }) => {
   }
 
   const handleVaccineChange = (value, index) => {
+    const qty = selectedVaccine?.vaccines.find(
+      (vaccine) => vaccine.vaccine === value
+    )?.quantity
     const newOrderItems = [...orderItems]
-    const selectedData = formattedSupplyRequests.find(
-      (request) =>
-        request.vaccine === value &&
-        request.location === form.getFieldValue('location')
-    )
-
     newOrderItems[index] = {
       ...newOrderItems[index],
-      orderNumber: selectedData?.orderNumberLabel,
       vaccine: value,
-      quantity: selectedData?.quantity,
-      location: form.getFieldValue('location'),
-      id: selectedData?.id,
-      expiryDate: selectedData?.expiryDate,
+      quantity: qty,
     }
     setOrderItems(newOrderItems)
   }
@@ -120,13 +139,17 @@ const SingleLocation = ({ vaccines = [] }) => {
         <Select
           className="w-full"
           onChange={(value) => handleVaccineChange(value, index)}
-          options={orderItems[index].options}
+          options={selectedVaccine?.vaccines.map((vaccine) => ({
+            label: vaccine.vaccine,
+            value: vaccine.vaccine,
+          }))}
           placeholder="Select vaccine"
           allowClear
+          status={tableErrors[index.toString()]?.vaccine ? 'error' : 'success'}
         />
       ),
+      width: '10%',
     },
-    { title: 'Order Number', dataIndex: 'orderNumber' },
     {
       title: 'Batch Number',
       dataIndex: 'batchNumber',
@@ -137,6 +160,9 @@ const SingleLocation = ({ vaccines = [] }) => {
             handleInputChange(index, 'batchNumber', e.target.value)
           }
           placeholder="Enter batch number"
+          status={
+            tableErrors[index.toString()]?.batchNumber ? 'error' : 'success'
+          }
         />
       ),
     },
@@ -147,6 +173,9 @@ const SingleLocation = ({ vaccines = [] }) => {
         <DatePicker
           className="w-full"
           onChange={(value) => handleInputChange(index, 'expiryDate', value)}
+          status={
+            tableErrors[index.toString()]?.expiryDate ? 'error' : 'success'
+          }
         />
       ),
     },
@@ -156,8 +185,10 @@ const SingleLocation = ({ vaccines = [] }) => {
       render: (text, record, index) => (
         <InputNumber
           className="w-full"
+          value={record.quantity}
           onChange={(value) => handleInputChange(index, 'quantity', value)}
           placeholder="Enter quantity"
+          status={tableErrors[index.toString()]?.quantity ? 'error' : 'success'}
         />
       ),
     },
@@ -170,6 +201,9 @@ const SingleLocation = ({ vaccines = [] }) => {
           onChange={(value) => handleInputChange(index, 'vvmStatus', value)}
           placeholder="Select VVM status"
           allowClear
+          status={
+            tableErrors[index.toString()]?.vvmStatus ? 'error' : 'success'
+          }
         >
           {['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4'].map((stage) => (
             <Option key={stage.toLowerCase()} value={stage.toLowerCase()}>
@@ -194,18 +228,32 @@ const SingleLocation = ({ vaccines = [] }) => {
   ]
 
   const handleVaccineOptions = (location) => {
-    const request = formattedSupplyRequests.filter(
-      (request) => request.location === location
-    )
-    const options = request.map((request) => ({
-      label: request.vaccine,
-      value: request.vaccine,
-    }))
+    if (!location) {
+      setOrderItems([{}])
+      form.setFieldValue('orderNumber', null)
+      return setSelectedVaccine(null)
+    }
 
-    setOrderItems((prevItems) => [
-      ...prevItems.slice(0, -1),
-      { ...prevItems[prevItems.length - 1], options },
-    ])
+    const selectedRequest = requests?.data.find(
+      (request) => request.deliverTo?.reference === location
+    )
+
+    const selected = formatSupplyRequest(selectedRequest)
+
+    form.setFieldValue('orderNumber', selected.orderNumber)
+
+    setSelectedVaccine(selected)
+  }
+
+  const handleOrderNumberChange = (orderNumber) => {
+    const selectedRequest = requests?.data.find(
+      (request) => request.identifier?.[0]?.value === orderNumber
+    )
+
+    const selected = formatSupplyRequest(selectedRequest)
+    form.setFieldValue('location', selected.receiver)
+
+    setSelectedVaccine(selected)
   }
 
   return (
@@ -236,7 +284,10 @@ const SingleLocation = ({ vaccines = [] }) => {
             />
           </Form.Item>
           <Form.Item name="orderNumber" label="Order Number" allowClear>
-            <Input placeholder="Enter order number" />
+            <Input
+              placeholder="Enter order number"
+              onBlur={(e) => handleOrderNumberChange(e.target.value)}
+            />
           </Form.Item>
           <Form.Item
             name="dateIssued"
@@ -253,15 +304,28 @@ const SingleLocation = ({ vaccines = [] }) => {
           pagination={false}
           size="small"
         />
-        <div className="flex justify-end mt-4">
+        <div className="flex flex-col items-end">
+          {Object.keys(tableErrors).length > 0 && (
+            <p className="text-red-500 bg-red-50 p-2">
+              Please fill in all required fields to proceed
+            </p>
+          )}
           <Button
-            className="bg-green text-white hover:!text-white hover:!bg-green"
-            onClick={() =>
+            className="bg-green text-white hover:!text-white hover:!bg-green mt-4"
+            disabled={
+              !selectedVaccine ||
+              selectedVaccine?.vaccines?.length === orderItems?.length
+            }
+            onClick={() => {
+              const err = handleValidate()
+              if (Object.keys(err).length) {
+                return
+              }
               setOrderItems([
                 ...orderItems,
                 { options: orderItems[orderItems.length - 1].options || [] },
               ])
-            }
+            }}
           >
             ADD
           </Button>

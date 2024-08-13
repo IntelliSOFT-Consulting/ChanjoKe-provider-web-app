@@ -32,18 +32,28 @@ export const orderNumberOptions = (supplyRequests) => {
     .filter((order) => order?.label)
 }
 
-export const formatSupplyRequestsToForm = (supplyRequests) => {
-  return supplyRequests?.map((request) => ({
-    id: request.id,
-    location: request.deliverTo?.reference,
-    dateIssued: request.occurrenceDateTime
-      ? dayjs(request.occurrenceDateTime)
-      : null,
-    orderNumber: request?.id,
-    orderNumberLabel: request?.identifier?.[0]?.value,
-    vaccine: request.itemCodeableConcept?.coding?.[0]?.display,
-    quantity: request.quantity?.value,
-  }))
+export const formatSupplyRequest = (supplyRequest) => {
+  const vaccines = supplyRequest.extension?.find((item) =>
+    item.url.includes('supplyrequest-vaccine')
+  )?.extension
+
+  console.log('vaccines', vaccines)
+
+  return {
+    id: supplyRequest.id,
+    orderNumber: supplyRequest?.identifier?.[0]?.value,
+    orderDate: dayjs(supplyRequest?.authoredOn),
+    status: supplyRequest?.status,
+    supplier: supplyRequest?.deliverFrom?.reference,
+    receiver: supplyRequest?.deliverTo?.reference,
+    vaccines: vaccines?.map((item) => {
+      const vaccine = item.extension?.find((ext) => ext.url === 'vaccine')
+        ?.valueCodeableConcept?.text
+      const quantity = item.extension?.find((ext) => ext.url === 'quantity')
+        ?.valueQuantity?.value
+      return { vaccine, quantity }
+    }),
+  }
 }
 
 export const updateSupplyRequest = async (values, supplyRequests) => {
