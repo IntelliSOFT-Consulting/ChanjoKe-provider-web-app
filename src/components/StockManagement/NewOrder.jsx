@@ -352,8 +352,8 @@ export default function NewOrder() {
         </div>
         <div className="border-2 mb-10"></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
-          <Form.Item label="Total Population" name="totalPopulation">
-            <Input placeholder="Total Population" />
+          <Form.Item label="Catchment Population" name="totalPopulation">
+            <Input placeholder="Catchment Population" />
           </Form.Item>
 
           <Form.Item

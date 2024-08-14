@@ -94,7 +94,7 @@ export default function NonRoutineVaccines({
       textClass: 'text-center',
     },
     {
-      btnText: 'Contraindicate',
+      btnText: 'Reschedule',
       url: `/add-contraindication/${patientData?.id}`,
       bgClass: 'bg-[#163C94] text-white',
       textClass: 'text-center',
@@ -191,10 +191,10 @@ export default function NonRoutineVaccines({
                 : text === 'Not Administered' || isDeceased
                 ? 'red'
                 : missed &&
-                  text !== 'Contraindicated' &&
+                  text !== 'Rescheduled' &&
                   text !== 'Not Administered'
                 ? 'red'
-                : text === 'Contraindicated'
+                : text === 'Rescheduled'
                 ? 'yellow'
                 : 'gray'
             }
@@ -205,8 +205,8 @@ export default function NonRoutineVaccines({
               ? 'Deceased'
               : text === 'Not Administered'
               ? 'Not Administered'
-              : text === 'Contraindicated'
-              ? 'Contraindicated'
+              : text === 'Rescheduled'
+              ? 'Rescheduled'
               : missed && text !== 'entered-in-error' && hasCompletedSeries
               ? moment().isAfter(record.dueDate)
                 ? 'Due'
@@ -228,7 +228,7 @@ export default function NonRoutineVaccines({
               const url =
                 record.status === 'completed'
                   ? `/view-vaccination/${record?.id}`
-                  : record.status === 'Contraindicated'
+                  : record.status === 'Rescheduled'
                   ? `/view-contraindication/${record?.id}`
                   : `/view-not-administered/${record?.id}`
               navigate(url)

@@ -14,6 +14,10 @@ import useStock from '../../../hooks/useStock'
 import { locationOptions, formatSupplyRequest } from '../stockUtils'
 import { supplyDeliveryBuilder } from '../stockResourceBuilder'
 import dayjs from 'dayjs'
+import { manufacturerOptions } from '../../../data/options/clientDetails'
+import { usePractitioner } from '../../../hooks/usePractitioner'
+import { titleCase } from '../../../utils/methods'
+import { useMeta } from '../../../hooks/useMeta'
 
 const { Option } = Select
 
@@ -26,15 +30,19 @@ const SingleLocation = ({ vaccines = [] }) => {
   const [api, contextHolder] = notification.useNotification()
 
   const { user } = useSelector((state) => state.userInfo)
+
   const {
     incomingSupplyRequests,
     createSupplyDelivery,
     updateSupplyRequest,
     requests,
   } = useStock()
+  const { getPractitionerRoles } = usePractitioner()
+
+  const { deleteTags } = useMeta()
 
   useEffect(() => {
-    incomingSupplyRequests(user?.facility, 0, 'active')
+    incomingSupplyRequests(user?.facility, 0, 'active', 'order')
   }, [])
 
   const handleValidate = () => {
@@ -69,36 +77,61 @@ const SingleLocation = ({ vaccines = [] }) => {
       if (Object.keys(err).length) {
         return
       }
-      const selectedRequests = orderItems.map((item) => ({
-        ...requests?.data?.find((request) => request.id === item.id),
-        status: 'completed',
-      }))
+      const selectedRequest = requests?.data.find(
+        (request) => selectedVaccine?.id === request.id
+      )
 
-      await Promise.all(selectedRequests.map(updateSupplyRequest))
+      const orderTag = selectedRequest.meta?.tag
+      await deleteTags(`SupplyRequest/${selectedRequest.id}`, orderTag)
+
+      selectedRequest.meta = {
+        ...selectedRequest.meta,
+        tag: [
+          {
+            system:
+              'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/tags',
+            code: 'dispatched',
+            display: 'Dispatched',
+          },
+        ],
+      }
+
+      await updateSupplyRequest(selectedRequest)
+
+      const roleDetails = await getPractitionerRoles(user?.fhirPractitionerId)
+      const role = roleDetails?.find(
+        (item) => item.resourceType === 'PractitionerRole'
+      )
+
+      const roleName = role?.code?.[0]?.coding?.[0]?.code
 
       const deliveryData = {
         ...values,
         user,
+        supplier: {
+          reference: `PractitionerRole/${role.id}`,
+          display: titleCase(roleName),
+        },
+        basedOn: [
+          {
+            reference: `SupplyRequest/${selectedRequest.id}`,
+          },
+        ],
+        destination: selectedRequest.deliverFrom,
         tableValues: orderItems.map((item) => {
-          const resourceItem = selectedRequests.find(
-            (request) => request.id === item.id
-          )
           return {
             ...item,
-            destination: resourceItem?.deliverTo?.reference,
-            facilityName: resourceItem?.deliverTo?.display,
-            supplyRequestId: item.id,
           }
         }),
-        supplier: user?.fhirPractitionerId,
       }
 
-      const supplyDeliveries = supplyDeliveryBuilder(deliveryData)
-      await Promise.all(supplyDeliveries.map(createSupplyDelivery))
+      const supplyDelivery = supplyDeliveryBuilder(deliveryData)
+
+      await createSupplyDelivery(supplyDelivery)
 
       form.resetFields()
       setOrderItems([{}])
-      incomingSupplyRequests(user?.facility, 0, 'active')
+      await incomingSupplyRequests(user?.facility, 0, 'active', 'order')
       api.success({
         message: 'Stock issued successfully',
         description:
@@ -135,7 +168,7 @@ const SingleLocation = ({ vaccines = [] }) => {
     {
       title: 'Vaccine',
       dataIndex: 'vaccine',
-      render: (text, record, index) => (
+      render: (_text, record, index) => (
         <Select
           className="w-full"
           onChange={(value) => handleVaccineChange(value, index)}
@@ -143,6 +176,7 @@ const SingleLocation = ({ vaccines = [] }) => {
             label: vaccine.vaccine,
             value: vaccine.vaccine,
           }))}
+          value={record.vaccine}
           placeholder="Select vaccine"
           allowClear
           status={tableErrors[index.toString()]?.vaccine ? 'error' : 'success'}
@@ -153,12 +187,13 @@ const SingleLocation = ({ vaccines = [] }) => {
     {
       title: 'Batch Number',
       dataIndex: 'batchNumber',
-      render: (text, record, index) => (
+      render: (_text, record, index) => (
         <Input
           className="w-full"
           onChange={(e) =>
             handleInputChange(index, 'batchNumber', e.target.value)
           }
+          value={record.batchNumber}
           placeholder="Enter batch number"
           status={
             tableErrors[index.toString()]?.batchNumber ? 'error' : 'success'
@@ -169,20 +204,21 @@ const SingleLocation = ({ vaccines = [] }) => {
     {
       title: 'Expiry Date',
       dataIndex: 'expiryDate',
-      render: (text, record, index) => (
+      render: (_text, record, index) => (
         <DatePicker
           className="w-full"
           onChange={(value) => handleInputChange(index, 'expiryDate', value)}
           status={
             tableErrors[index.toString()]?.expiryDate ? 'error' : 'success'
           }
+          value={record.expiryDate || null}
         />
       ),
     },
     {
       title: 'Quantity',
       dataIndex: 'quantity',
-      render: (text, record, index) => (
+      render: (_text, record, index) => (
         <InputNumber
           className="w-full"
           value={record.quantity}
@@ -195,12 +231,13 @@ const SingleLocation = ({ vaccines = [] }) => {
     {
       title: 'VVM Status',
       dataIndex: 'vvmStatus',
-      render: (text, record, index) => (
+      render: (_text, record, index) => (
         <Select
           className="w-full"
           onChange={(value) => handleInputChange(index, 'vvmStatus', value)}
           placeholder="Select VVM status"
           allowClear
+          value={record.vvmStatus}
           status={
             tableErrors[index.toString()]?.vvmStatus ? 'error' : 'success'
           }
@@ -216,12 +253,22 @@ const SingleLocation = ({ vaccines = [] }) => {
     {
       title: 'Manufacturer Details',
       dataIndex: 'manufacturerDetails',
-      render: (text, record, index) => (
-        <Input
-          onChange={(e) =>
-            handleInputChange(index, 'manufacturerDetails', e.target.value)
+      render: (_text, record, index) => (
+        <Select
+          className="w-full"
+          onChange={(value) =>
+            handleInputChange(index, 'manufacturerDetails', value)
           }
-          placeholder="Enter manufacturer details"
+          placeholder="Select Manufacturer"
+          allowClear
+          value={record.manufacturerDetails}
+          status={
+            tableErrors[index.toString()]?.manufacturerDetails
+              ? 'error'
+              : 'success'
+          }
+          showSearch
+          options={manufacturerOptions}
         />
       ),
     },

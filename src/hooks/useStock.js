@@ -232,13 +232,19 @@ const useStock = () => {
     return response
   }
 
-  const incomingSupplyRequests = async (facility, page = 0, status = null) => {
+  const incomingSupplyRequests = async (
+    facility,
+    page = 0,
+    status = null,
+    meta = 'order'
+  ) => {
     setLoading(true)
     const offset = getOffset(page)
     const statusFilter = status ? `&status=${status}` : ''
+    const metaFilter = meta ? `&_tag=${meta}` : ''
     const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
     const response = await get(
-      `${supplyRequestPath}?_list=${facility}${statusFilter}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+      `${supplyRequestPath}?_list=${facility}${statusFilter}${metaFilter}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
     )
     const data =
       response?.entry
@@ -253,13 +259,19 @@ const useStock = () => {
     return data
   }
 
-  const outgoingSupplyRequests = async (facility, page = 0, status = null) => {
+  const outgoingSupplyRequests = async (
+    facility,
+    page = 0,
+    status = null,
+    meta = null
+  ) => {
     setLoading(true)
     const offset = getOffset(page)
     const statusFilter = status ? `&status=${status}` : ''
+    const metaFilter = meta ? `&_tag=${meta}` : ''
     const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
     const response = await get(
-      `${supplyRequestPath}?subject=${facility}${statusFilter}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+      `${supplyRequestPath}?subject=${facility}${statusFilter}${metaFilter}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
     )
     const data = response?.entry?.map((entry) => entry.resource) || []
 

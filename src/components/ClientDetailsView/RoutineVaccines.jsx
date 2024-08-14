@@ -128,7 +128,7 @@ export default function RoutineVaccines({
       textClass: 'text-center',
     },
     {
-      btnText: 'Contraindicate',
+      btnText: 'Reschedule',
       url: `/add-contraindication/${patientData?.id}`,
       bgClass: 'bg-[#163C94] text-white',
       textClass: 'text-center',
@@ -157,7 +157,7 @@ export default function RoutineVaccines({
           record.statusReason?.coding?.[0]?.display
         } until ${record.dueDate.format('DD-MM-YYYY')}`
       case 'entered-in-error':
-        return `Vaccine contraindicated, to be administered on ${record.dueDate.format(
+        return `Vaccine rescheduled, to be administered on ${record.dueDate.format(
           'DD-MM-YYYY'
         )}`
       case 'Due':
@@ -187,11 +187,10 @@ export default function RoutineVaccines({
               value={record.vaccine}
               defaultChecked={completed}
               disabled={
-                completed || isDeceased ||
+                completed ||
+                isDeceased ||
                 (locked &&
-                  !['Contraindicated', 'Not Administered'].includes(
-                    record.status
-                  ))
+                  !['Rescheduled', 'Not Administered'].includes(record.status))
               }
               onChange={() => handleCheckBox(record)}
             />
@@ -237,10 +236,10 @@ export default function RoutineVaccines({
                 : text === 'Not Administered' || isDeceased
                 ? 'red'
                 : missed &&
-                  text !== 'Contraindicated' &&
+                  text !== 'Rescheduled' &&
                   text !== 'Not Administered'
                 ? 'red'
-                : text === 'Contraindicated'
+                : text === 'Rescheduled'
                 ? 'yellow'
                 : 'gray'
             }
@@ -251,8 +250,8 @@ export default function RoutineVaccines({
               ? 'Deceased'
               : text === 'Not Administered'
               ? 'Not Administered'
-              : text === 'Contraindicated'
-              ? 'Contraindicated'
+              : text === 'Rescheduled'
+              ? 'Rescheduled'
               : missed && text !== 'entered-in-error'
               ? 'Missed'
               : moment().isAfter(record.dueDate)
@@ -274,7 +273,7 @@ export default function RoutineVaccines({
               const url =
                 record.status === 'completed'
                   ? `/view-vaccination/${record?.id}`
-                  : record.status === 'Contraindicated'
+                  : record.status === 'Rescheduled'
                   ? `/view-contraindication/${record?.id}`
                   : `/view-not-administered/${record?.id}`
               navigate(url)

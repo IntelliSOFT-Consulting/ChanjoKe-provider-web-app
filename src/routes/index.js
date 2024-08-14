@@ -29,7 +29,7 @@ import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
 import PositiveAdjustments from '../components/StockManagement/PositiveAdjustments'
 import NegativeAdjustments from '../components/StockManagement/NegativeAdjustments'
-import VVMStatusChange from '../components/StockManagement/VVMStatusChange'
+import Wastage from '../components/StockManagement/Wastage'
 import NewOrder from '../components/StockManagement/NewOrder'
 import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
 import SentOrders from '../components/StockManagement/SentOrders'
@@ -134,8 +134,8 @@ const router = createBrowserRouter([
             element: <NegativeAdjustments />,
           },
           {
-            path: '/stock-management/vvm-status',
-            element: <VVMStatusChange />,
+            path: '/stock-management/wastage',
+            element: <Wastage />,
           },
           { path: '/stock-management/new-order', element: <NewOrder /> },
           {

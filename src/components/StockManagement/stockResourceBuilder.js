@@ -5,8 +5,6 @@ export const supplyRequestBuilder = (values) => {
   const {
     tableData,
     level,
-    supplierName,
-    supplier,
     lastOrderDate,
     authoredOn,
     preferredPickupDate,
@@ -19,6 +17,7 @@ export const supplyRequestBuilder = (values) => {
     const {
       vaccine,
       dosesInStock,
+      consumedLastMonth,
       minimum,
       maximum,
       recommendedStock,
@@ -48,6 +47,13 @@ export const supplyRequestBuilder = (values) => {
           url: 'dosesInStock',
           valueQuantity: {
             value: dosesInStock,
+            unit: 'doses',
+          },
+        },
+        {
+          url: 'consumedLastMonth',
+          valueQuantity: {
+            value: consumedLastMonth || 0,
             unit: 'doses',
           },
         },
@@ -153,107 +159,88 @@ export const supplyRequestBuilder = (values) => {
 export const supplyDeliveryBuilder = (values) => {
   const { tableValues } = values
 
-  const resources = tableValues.map((tableValue) => {
-    const { vaccine, batchNumber, quantity, vvmStatus } = tableValue
+  const dispatchedItems = tableValues.map((tableValue) => {
+    const { vaccine, batchNumber, quantity, vvmStatus, manufacturerDetails } =
+      tableValue
 
     const vaccineCode = allVaccines.find(
       (v) => v.vaccineName === vaccine
     )?.vaccineCode
 
     return {
-      resourceType: 'SupplyDelivery',
-      meta: {
-        tag: [
-          {
-            system:
-              'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/tags',
-            code: 'in-stock',
-            display: 'In Stock',
-          },
-        ],
-      },
-      identifier: [],
-      status: 'in-progress',
-      type: {
-        coding: [
-          {
-            system:
-              'http://terminology.hl7.org/CodeSystem/supplydelivery-status',
-            code: 'completed',
-            display: 'Completed',
-          },
-        ],
-      },
-      suppliedItem: {
-        quantity: {
-          value: quantity,
-          unit: 'doses',
-        },
-        itemCodeableConcept: {
-          coding: [
-            {
-              system:
-                'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/concepts',
-              code: vaccineCode,
-              display: vaccine,
-            },
-          ],
-          text: vaccine,
-        },
-        lotNumber: batchNumber,
-        extension: [
-          {
-            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-vvmStatus',
-            valueString: vvmStatus,
-          },
-          {
-            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-manufacturerDetails',
-            valueString: tableValue.manufacturerDetails,
-          },
-          {
-            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-expiryDate',
-            valueDateTime: tableValue.expiryDate?.toISOString(),
-          },
-          {
-            url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-remainingQuantity',
-            valueQuantity: {
-              value: quantity,
-              unit: 'doses',
-            },
-          },
-        ],
-      },
-      occurrenceDateTime: moment().toISOString(),
-      supplier: {
-        reference: `Practitioner/${values.supplier}`,
-      },
-      destination: {
-        reference: `Location/${tableValue.destination}`,
-        display: tableValue.facilityName,
-      },
-      occurrencePeriod: {
-        start: values.dateIssued?.toISOString(),
-        end: moment().toISOString(),
-      },
-      basedOn: {
-        reference: `SupplyRequest/${tableValue.supplyRequestId}`,
-      },
-      // receiver: [
-      //   {
-      //     reference: `Practitioner/${values.receiver}`,
-      //     display: values.receiverName,
-      //   },
-      // ],
+      url: 'http://example.org/fhir/StructureDefinition/supplydelivery-vaccine',
       extension: [
         {
-          url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-orderNumber',
-          valueString: tableValue.orderNumber,
+          url: 'vaccine',
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: 'http://example.org/vaccine-codes',
+                code: vaccineCode,
+              },
+            ],
+            text: vaccine,
+          },
+        },
+        {
+          url: 'batchNumber',
+          valueString: batchNumber,
+        },
+        {
+          url: 'quantity',
+          valueQuantity: {
+            value: quantity,
+            unit: 'doses',
+          },
+        },
+        {
+          url: 'vvmStatus',
+          valueCodeableConcept: {
+            coding: [
+              {
+                system: 'http://example.org/vvm-status',
+                code: vvmStatus,
+              },
+            ],
+            text: vvmStatus,
+          },
+        },
+        {
+          url: 'manufacturerDetails',
+          valueString: manufacturerDetails,
         },
       ],
     }
   })
 
-  return resources
+  return {
+    resourceType: 'SupplyDelivery',
+    meta: {
+      tag: [
+        {
+          system:
+            'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/tags',
+          code: 'in-stock',
+          display: 'In Stock',
+        },
+      ],
+    },
+    status: 'in-progress',
+    destination: values.destination,
+    occurrenceDateTime: moment().toISOString(),
+    basedOn: values.basedOn,
+    occurrencePeriod: {
+      start: values.dateIssued?.toISOString(),
+      end: moment().toISOString(),
+    },
+    supplier: values.supplier,
+    extension: [
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplydelivery-level',
+        extension: dispatchedItems,
+      },
+    ],
+  }
 }
 
 export const inventoryItemUpdator = (supplyDeliveries, inventory) => {

@@ -121,21 +121,21 @@ export default function Sidenav() {
       href: '/stock-management',
       icon: '',
       children: [
-        { name: 'Receive Stock', href: '/stock-management/receive-stock' },
+        { name: 'New Order', href: '/stock-management/new-order' },
+        { name: 'Sent Orders', href: '/stock-management/sent-orders' },
         { name: 'Issue Stock', href: '/stock-management/issue-stock' },
-        { name: 'Stock Count', href: '/stock-management/stock-count' },
+        { name: 'Receive Stock', href: '/stock-management/receive-stock' },
+        { name: 'Received Orders', href: '/stock-management/received-orders' },
         {
-          name: 'Positive Adjustment',
+          name: 'Received from another facility',
           href: '/stock-management/positive-adjustment',
         },
         {
-          name: 'Negative Adjustment',
+          name: 'Shared with another facility',
           href: '/stock-management/negative-adjustment',
         },
-        { name: 'VVM Status Change', href: '/stock-management/vvm-status' },
-        { name: 'New Order', href: '/stock-management/new-order' },
-        { name: 'Received Orders', href: '/stock-management/received-orders' },
-        { name: 'Sent Orders', href: '/stock-management/sent-orders' },
+        { name: 'Stock Count', href: '/stock-management/stock-count' },
+        { name: 'Wastage', href: '/stock-management/wastage' },
         { name: 'Store Management', href: '/stock-management/administration' },
         { name: 'Ledger', href: '/stock-management/ledger' },
       ],
@@ -151,16 +151,16 @@ export default function Sidenav() {
             ...child,
             current: child.href === location.pathname,
           })),
-        };
+        }
       }
       return {
         ...item,
         current: item.href === location.pathname,
-      };
-    });
+      }
+    })
 
-    setNavigation(updatedNavigation);
-  }, [location.pathname]);
+    setNavigation(updatedNavigation)
+  }, [location.pathname])
 
   const handleItemClick = (clickedItem) => {
     const updatedNavigation = navigation.map((item) => {
@@ -171,17 +171,17 @@ export default function Sidenav() {
             ...child,
             current: child.href === clickedItem.href,
           })),
-        };
+        }
       }
       return {
         ...item,
         current: item.href === clickedItem.href,
-      };
-    });
-  
-    setNavigation(updatedNavigation);
-    setSidebarOpen(false);
-  };
+      }
+    })
+
+    setNavigation(updatedNavigation)
+    setSidebarOpen(false)
+  }
 
   return (
     <>

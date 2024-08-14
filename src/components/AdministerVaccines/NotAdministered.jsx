@@ -39,14 +39,14 @@ export default function NotAdministered() {
   }, [selectedVaccines])
 
   const fhirReasons = [
-    { label: 'Immunity', value: 'IMMUNE' },
-    { label: 'Medical precaution', value: 'MEDPREC' },
-    { name: 'Product out of stock', value: 'OSTOCK' },
-    { name: 'Patient objection', value: 'PATOBJ' },
-    { label: 'Caregiver refusal', value: 'PHILISOP' },
-    { label: 'Religious objection', value: 'RELIG' },
-    { label: 'Cold Chain Break', value: 'VACEFF' },
-    { label: 'Expired Product', value: 'VACSAF' },
+    { label: 'Immunity', value: 'Immunity' },
+    { label: 'Medical precaution', value: 'Medical precaution' },
+    { label: 'Vaccine out of stock', value: 'Vaccine out of stock' },
+    { name: 'Patient objection', value: 'Patient objection' },
+    { label: 'Caregiver refusal', value: 'Caregiver refusal' },
+    { label: 'Religious objection', value: 'Religious objection' },
+    { label: 'Cold Chain Break', value: 'Cold Chain Break' },
+    { label: 'VVM change', value: 'VVM change' },
   ]
 
   function handleDialogClose() {

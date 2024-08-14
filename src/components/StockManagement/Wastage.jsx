@@ -17,7 +17,7 @@ const useStyles = createUseStyles({
   },
 })
 
-export default function VVMStatusChange() {
+export default function Wastage() {
 
   const [vaccineOptions, setVaccineOptions] = useState([])
 
@@ -69,7 +69,7 @@ export default function VVMStatusChange() {
       type: 'select',
     },
     {
-      title: 'Quantity',
+      title: 'Quantity Wasted',
       dataIndex: 'quantity',
       type: 'number',
     },

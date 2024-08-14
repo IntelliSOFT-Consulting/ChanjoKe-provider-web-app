@@ -113,7 +113,7 @@ export default function ReceivedOrders() {
       },
     },
     {
-      title: 'Location',
+      title: 'Issued to',
       dataIndex: 'deliverTo',
       key: 'deliverTo',
       className: {

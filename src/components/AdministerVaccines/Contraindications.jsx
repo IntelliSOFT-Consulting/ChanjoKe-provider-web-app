@@ -55,7 +55,7 @@ export default function Contraindications() {
       }))
 
     values.notVaccinatedReason = values.contraindicationDetails
-    values.reasonCode = 'Contraindicated'
+    values.reasonCode = 'Rescheduled'
 
     const vaccineResources = createImmunizationResource(
       values,
@@ -97,13 +97,13 @@ export default function Contraindications() {
     <>
       <ConfirmDialog
         open={isDialogOpen}
-        description={`Contraindication saved successfully`}
+        description={`Rescheduled successfully`}
         onClose={handleDialogClose}
       />
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
         <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
-          Contraindications
+          Reschedule
         </div>
         <div className="px-4 py-5 sm:p-6">
           {selectedVaccines?.length > 0 && (
@@ -120,7 +120,7 @@ export default function Contraindications() {
             >
               <div>
                 <Form.Item
-                  label="Vaccines to Contraindicate"
+                  label="Vaccines to Reschedule"
                   name="vaccinesToContraindicate"
                   rules={[
                     { required: true, message: 'Please select a vaccine' },
@@ -149,7 +149,7 @@ export default function Contraindications() {
                             )
                             ?.join(', ')
                           return Promise.reject(
-                            `${vaccineNames} already contraindicated, the next due date(s) is ${nextDueDates}`
+                            `${vaccineNames} already rescheduled, the next due date(s) is ${nextDueDates}`
                           )
                         }
                         return Promise.resolve()
@@ -159,7 +159,7 @@ export default function Contraindications() {
                 >
                   <Select
                     mode="tags"
-                    placeholder="Select vaccines to contraindicate"
+                    placeholder="Select vaccines to reschedule"
                     style={{ width: '100%' }}
                     options={selectedVaccines?.map((vaccine) => ({
                       label: vaccine.vaccineName,
@@ -172,18 +172,18 @@ export default function Contraindications() {
 
               <div>
                 <Form.Item
-                  label="Contraindication Details"
+                  label="Reschedule Details"
                   name="contraindicationDetails"
                   rules={[
                     {
                       required: true,
-                      message: 'Please enter contraindication details',
+                      message: 'Please enter reschedule details',
                     },
                   ]}
                 >
                   <Input.TextArea
                     rows={4}
-                    placeholder="Enter Contraindications"
+                    placeholder="Enter reschedule details"
                   />
                 </Form.Item>
 
@@ -220,7 +220,7 @@ export default function Contraindications() {
             Cancel
           </Button>
           <Popconfirm
-            title="Are you sure you want to contraindicate the selected vaccines?"
+            title="Are you sure you want to reschedule the selected vaccines?"
             onConfirm={() => {
               form.submit()
             }}
@@ -233,7 +233,7 @@ export default function Contraindications() {
               loading={loading}
               disabled={loading}
             >
-              Contraindicate
+              Reschedule
             </Button>
           </Popconfirm>
         </div>

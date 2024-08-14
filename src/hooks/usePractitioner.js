@@ -7,7 +7,7 @@ import { useLocations } from './useLocation'
 const roleRoute = '/hapi/fhir/PractitionerRole'
 const practitionerRoute = '/hapi/fhir/Practitioner'
 
-export const usePractitioner = ({ pageSize = 12 }) => {
+export const usePractitioner = () => {
   const [practitioners, setPractitioners] = useState([])
   const [total, setTotal] = useState(0)
   const [archivedPractitioners, setArchivedPractitioners] = useState([])
@@ -317,6 +317,14 @@ export const usePractitioner = ({ pageSize = 12 }) => {
     return true
   }
 
+  const getPractitionerRoles = async (practitionerId) => {
+    const response = await get(
+      `${roleRoute}?practitioner=${practitionerId}&_include=PractitionerRole:practitioner&_include=PractitionerRole:location`
+    )
+    const roles = response.entry.map((entry) => entry.resource)
+    return roles
+  }
+
   return {
     practitioners,
     fetchPractitioners,
@@ -331,5 +339,6 @@ export const usePractitioner = ({ pageSize = 12 }) => {
     handleCreatePractitioner,
     handleUpdatePractitioner,
     handleArchivePractitioner,
+    getPractitionerRoles,
   }
 }

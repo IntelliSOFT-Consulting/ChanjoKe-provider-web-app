@@ -77,6 +77,10 @@ const NewOrderTable = ({
       ),
     },
     {
+      title: 'Consumed last month',
+      dataIndex: 'consumedLastMonth',
+    },
+    {
       title: 'Minimum',
       dataIndex: 'minimum',
       render: (value, _, index) => (
@@ -129,21 +133,26 @@ const NewOrderTable = ({
       ),
     },
     {
-      title: 'Action',
+      title: null,
       dataIndex: 'action',
+      hidden: tableData.length === 1,
       render: (_, __, index) => (
-        <Button
-          type="link"
-          disabled={index === 0}
-          onClick={() => {
-            const newData = [...tableData]
-            newData.splice(index, 1)
-            setTableData(newData)
-          }}
-          danger
-        >
-          Remove
-        </Button>
+        <>
+          {index > 0 && (
+            <Button
+              type="link"
+              disabled={index === 0}
+              onClick={() => {
+                const newData = [...tableData]
+                newData.splice(index, 1)
+                setTableData(newData)
+              }}
+              danger
+            >
+              Delete
+            </Button>
+          )}
+        </>
       ),
     },
   ]
