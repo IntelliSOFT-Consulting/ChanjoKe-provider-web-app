@@ -136,7 +136,7 @@ export default function Sidenav() {
         },
         { name: 'Stock Count', href: '/stock-management/stock-count' },
         { name: 'Wastage', href: '/stock-management/wastage' },
-        { name: 'Store Management', href: '/stock-management/administration' },
+    
         { name: 'Ledger', href: '/stock-management/ledger' },
       ],
     },

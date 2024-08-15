@@ -35,6 +35,7 @@ import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
 import SentOrders from '../components/StockManagement/SentOrders'
 import Administration from '../components/StockManagement/Administration'
 import Ledger from '../components/StockManagement/Ledger'
+import BatchSummary from '../components/StockManagement/BatchSummary'
 import UpdateClientHistory from '../components/UpdateClientHistory/updateClientHistory'
 import Administer from '../components/AdministerVaccines/Administer'
 import Contraindications from '../components/AdministerVaccines/Contraindications'
@@ -150,6 +151,10 @@ const router = createBrowserRouter([
           {
             path: '/stock-management/ledger',
             element: <Ledger />,
+          },
+          {
+            path: '/stock-management/ledger/:vaccine',
+            element: <BatchSummary />,
           },
           {
             path: '/stock-management/order-details/:orderID',
