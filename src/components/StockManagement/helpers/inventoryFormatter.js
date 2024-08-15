@@ -4,28 +4,29 @@ export const formatInventoryToTable = (inventoryReport) => {
   const formattedReport = []
 
   const inventoryItems = inventoryReport.extension?.find((ext) =>
-    ext?.url?.includes('inventory-items')
+    ext.url.includes('inventory-items')
   )
 
   if (!inventoryItems || !inventoryItems.extension) {
     return formattedReport
   }
 
-
   inventoryItems.extension.forEach((vaccineExt) => {
-    const vaccine = vaccineExt.extension?.[0]?.valueCodeableConcept?.text
+    const vaccine = vaccineExt.extension?.find(
+      (ext) =>
+        ext.url ===
+        `https://example.org/fhir/StructureDefinition/${ext.valueCodeableConcept?.text}`
+    )?.valueCodeableConcept?.text
 
     if (!vaccine) return
 
-    const batches = vaccineExt.extension?.find((ext) => ext.url === 'batches')
-      ?.extension?.[0]?.extension
+    const batches = vaccineExt.extension?.find(
+      (ext) => ext.url === 'batches'
+    )?.extension
 
     if (!batches) return
 
-    batches?.forEach((batchExt) => {
-      const batch = batchExt.extension
-      if (!batch) return
-
+    batches.forEach((batchExt) => {
       const batchData = {
         vaccine,
         batchNumber: '',
@@ -35,7 +36,7 @@ export const formatInventoryToTable = (inventoryReport) => {
         expiryDate: '',
       }
 
-      batch?.forEach((detail) => {
+      batchExt.extension.forEach((detail) => {
         switch (detail.url) {
           case 'batchNumber':
             batchData.batchNumber = detail.valueString

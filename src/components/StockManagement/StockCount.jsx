@@ -53,8 +53,6 @@ export default function StockCount() {
 
   const { createAudit } = useAudit()
 
-  console.log('batchOptions', batchOptions)
-
   const classes = useStyles()
 
   useEffect(() => {

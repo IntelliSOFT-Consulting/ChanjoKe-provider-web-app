@@ -293,149 +293,73 @@ export const inventoryItemBuilder = (facility) => {
   })
 }
 
+const createBatchExtension = (vaccine) => ({
+  url: 'batch',
+  extension: [
+    {
+      url: 'batchNumber',
+      valueString: vaccine.batchNumber,
+    },
+    {
+      url: 'expiryDate',
+      valueDateTime: dayjs(vaccine.expiryDate, 'DD-MM-YYYY').toISOString(),
+    },
+    {
+      url: 'quantity',
+      valueQuantity: {
+        value: vaccine.quantity,
+        unit: 'vials',
+      },
+    },
+    {
+      url: 'vvmStatus',
+      valueCodeableConcept: {
+        coding: [
+          {
+            system: 'http://example.org/vvm-status',
+            code: vaccine.vvmStatus,
+          },
+        ],
+        text: vaccine.vvmStatus,
+      },
+    },
+    {
+      url: 'manufacturerDetails',
+      valueString: vaccine.manufacturerDetails,
+    },
+  ],
+})
+
 const createVaccineExtension = (vaccine, prevVaccines) => {
-  if (prevVaccines?.length > 0) {
-    const prevVaccine = prevVaccines.find(
-      (pv) =>
-        pv.url ===
-        `https://example.org/fhir/StructureDefinition/${vaccine.vaccine?.replace(
-          /\s/g,
-          '-'
-        )}`
+  const vaccineUrl = `https://example.org/fhir/StructureDefinition/${vaccine.vaccine.replace(
+    /\s/g,
+    '-'
+  )}`
+
+  let existingVaccine = prevVaccines?.find((pv) => pv.url === vaccineUrl)
+
+  let batchExtensions =
+    existingVaccine?.extension?.find((ext) => ext.url === 'batches')
+      ?.extension || []
+
+  const batchIndex = batchExtensions.findIndex((batch) =>
+    batch.extension.some(
+      (ext) =>
+        ext.url === 'batchNumber' && ext.valueString === vaccine.batchNumber
     )
+  )
 
-    if (prevVaccine) {
-      const batches = prevVaccine.extension.find((ext) => ext.url === 'batches')
-        ?.extension[0]
-
-      if (batches) {
-        const updatedBatches = batches.extension.filter((batch) => {
-          const quantity = batch?.extension?.find(
-            (ext) => ext.url === 'quantity'
-          )
-
-          return quantity.valueQuantity.value > 0
-        })
-
-        // check if batch already exists in the list and update the quantity
-        const batchExists = updatedBatches.findIndex((batch) =>
-          batch.extension.find(
-            (ext) =>
-              ext.url === 'batchNumber' &&
-              ext.valueString === vaccine.batchNumber
-          )
-        )
-
-        if (batchExists > -1) {
-          updatedBatches[batchExists] = {
-            url: 'batch',
-            extension: [
-              {
-                url: 'batchNumber',
-                valueString: vaccine.batchNumber,
-              },
-              {
-                url: 'expiryDate',
-                valueDateTime: dayjs(
-                  vaccine.expiryDate,
-                  'DD-MM-YYYY'
-                ).toISOString(),
-              },
-              {
-                url: 'quantity',
-                valueQuantity: {
-                  value: vaccine.quantity,
-                  unit: 'vials',
-                },
-              },
-              {
-                url: 'vvmStatus',
-                valueCodeableConcept: {
-                  coding: [
-                    {
-                      system: 'http://example.org/vvm-status',
-                      code: vaccine.vvmStatus,
-                    },
-                  ],
-                  text: vaccine.vvmStatus,
-                },
-              },
-              {
-                url: 'manufacturerDetails',
-                valueString: vaccine.manufacturerDetails,
-              },
-            ],
-          }
-        } else {
-          updatedBatches.push({
-            url: 'batch',
-            extension: [
-              {
-                url: 'batchNumber',
-                valueString: vaccine.batchNumber,
-              },
-              {
-                url: 'expiryDate',
-                valueDateTime: dayjs(
-                  vaccine.expiryDate,
-                  'DD-MM-YYYY'
-                ).toISOString(),
-              },
-              {
-                url: 'quantity',
-                valueQuantity: {
-                  value: vaccine.quantity,
-                  unit: 'vials',
-                },
-              },
-              {
-                url: 'vvmStatus',
-                valueCodeableConcept: {
-                  coding: [
-                    {
-                      system: 'http://example.org/vvm-status',
-                      code: vaccine.vvmStatus,
-                    },
-                  ],
-                  text: vaccine.vvmStatus,
-                },
-              },
-              {
-                url: 'manufacturerDetails',
-                valueString: vaccine.manufacturerDetails,
-              },
-            ],
-          })
-        }
-        return {
-          url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
-          extension: [
-            {
-              url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
-              valueCodeableConcept: {
-                coding: [
-                  {
-                    system: 'http://example.org/vaccine-codes',
-                    code: vaccine.vaccine,
-                  },
-                ],
-                text: vaccine.vaccine,
-              },
-            },
-            {
-              url: 'batches',
-              extension: updatedBatches,
-            },
-          ],
-        }
-      }
-    }
+  if (batchIndex > -1) {
+    batchExtensions[batchIndex] = createBatchExtension(vaccine)
+  } else {
+    batchExtensions.push(createBatchExtension(vaccine))
   }
+
   return {
-    url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
+    url: vaccineUrl,
     extension: [
       {
-        url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
+        url: vaccineUrl,
         valueCodeableConcept: {
           coding: [
             {
@@ -448,52 +372,10 @@ const createVaccineExtension = (vaccine, prevVaccines) => {
       },
       {
         url: 'batches',
-        extension: [
-          {
-            url: 'batches',
-            extension: [
-              {
-                url: 'batch',
-                extension: [
-                  {
-                    url: 'batchNumber',
-                    valueString: vaccine.batchNumber,
-                  },
-                  {
-                    url: 'expiryDate',
-                    valueDateTime: dayjs(
-                      vaccine.expiryDate,
-                      'DD-MM-YYYY'
-                    ).toISOString(),
-                  },
-                  {
-                    url: 'quantity',
-                    valueQuantity: {
-                      value: vaccine.quantity,
-                      unit: 'vials',
-                    },
-                  },
-                  {
-                    url: 'vvmStatus',
-                    valueCodeableConcept: {
-                      coding: [
-                        {
-                          system: 'http://example.org/vvm-status',
-                          code: vaccine.vvmStatus,
-                        },
-                      ],
-                      text: vaccine.vvmStatus,
-                    },
-                  },
-                  {
-                    url: 'manufacturerDetails',
-                    valueString: vaccine.manufacturerDetails,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        extension: batchExtensions.filter((batch) => {
+          const quantity = batch.extension.find((ext) => ext.url === 'quantity')
+          return quantity.valueQuantity.value > 0
+        }),
       },
     ],
   }
@@ -504,45 +386,46 @@ export const inventoryReportBuilder = (
   prevInventoryReport,
   facility
 ) => {
-  const inventoryReport = {
+  const inventoryItemsUrl =
+    'http://example.org/fhir/StructureDefinition/inventory-items'
+
+  return {
     resourceType: 'Basic',
+    id: prevInventoryReport?.id || undefined,
+    meta: prevInventoryReport?.meta || undefined,
     identifier: [
       {
         value: 'inventory-report',
       },
     ],
     created: moment().toISOString(),
-    code: [
-      {
-        coding: [
-          {
-            system: 'http://example.org/vaccine-codes',
-            code: 'inventory-report',
-            display: 'Inventory Report',
-          },
-        ],
-        text: 'Inventory Report',
-      },
-    ],
+    code: {
+      coding: [
+        {
+          system: 'http://example.org/vaccine-codes',
+          code: 'inventory-report',
+          display: 'Inventory Report',
+        },
+      ],
+      text: 'Inventory Report',
+    },
     extension: [
       {
-        url: 'http://example.org/fhir/StructureDefinition/inventory-items',
-        extension: [
-          ...newSupplies.map((supply) =>
-            createVaccineExtension(
-              supply,
-              prevInventoryReport?.extension[0].extension
-            )
-          ),
-        ],
+        url: inventoryItemsUrl,
+        extension: newSupplies.map((supply) =>
+          createVaccineExtension(
+            supply,
+            prevInventoryReport?.extension?.find(
+              (ext) => ext.url === inventoryItemsUrl
+            )?.extension
+          )
+        ),
       },
     ],
     subject: {
       reference: facility,
     },
   }
-
-  return inventoryReport
 }
 
 export const inventoryItemUpdate = (
