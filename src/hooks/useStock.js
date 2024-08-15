@@ -11,6 +11,7 @@ const supplyRequestPath = '/hapi/fhir/SupplyRequest'
 const useStock = () => {
   const [stock, setStock] = useState([])
   const [requests, setRequests] = useState(null)
+  const [requestItem, setRequestItem] = useState(null)
   const [deliveries, setDeliveries] = useState(null)
   const [stockItem, setStockItem] = useState({})
   const [loading, setLoading] = useState(false)
@@ -20,104 +21,6 @@ const useStock = () => {
   const { fetchLocationsByIds } = useLocations({})
 
   const { get, post, put } = useApiRequest()
-
-  const createPayload = (values, totalCount) => {
-    const identifierFacility = values.facilityName.split(' ')[0].toUpperCase()
-    const identifierNumber = (totalCount + 1).toString().padStart(4, '0')
-    const destinationFacility = user?.facility.split('/')[1]
-
-    return {
-      resourceType: 'SupplyRequest',
-      identifier: [
-        {
-          system: 'https://hl7.org/fhir/R4/supplyrequest-definitions',
-          value: `${identifierFacility}-${identifierNumber}`,
-        },
-      ],
-      status: values.status || 'active',
-      category: {
-        coding: [
-          {
-            code: 'central',
-            display: 'Central Supply',
-            system: 'http://terminology.hl7.org/CodeSystem/supply-kind',
-          },
-        ],
-      },
-      priority: 'routine',
-      itemCodeableConcept: {
-        coding: [
-          {
-            code: values.vaccine,
-            display: values.vaccine,
-          },
-        ],
-        text: 'Antigen',
-      },
-      itemReference: {
-        reference: `Medication/${values.vaccine}`,
-      },
-      quantity: {
-        value: values.quantity,
-        unit: 'doses',
-      },
-      authoredOn: values.authoredOn,
-      occurrenceDateTime: values.preferredPickupDate,
-      requester: {
-        reference: `Practitioner/${user?.fhirPractitionerId}`,
-      },
-      deliverFrom: {
-        reference: `Location/${destinationFacility}`,
-        display: user?.facilityName,
-      },
-      deliverTo: {
-        reference: `Location/${values.facility}`,
-        display: values.facilityName,
-      },
-      extension: [
-        {
-          url: 'http://example.org/fhir/StructureDefinition/level',
-          valueString: values.level,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/date-of-last-order',
-          valueDateTime: values.lastOrderDate,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/expected-date-of-next-order',
-          valueDateTime: values.expectedDateOfNextOrder,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/total-population',
-          valueString: values.totalPopulation,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/children',
-          valueString: values.children011Months,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/pregnant-women',
-          valueString: values.pregnantWomen,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/doses-in-stock',
-          valueString: values.dosesInStock,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/minimum',
-          valueString: values.minimumDoses,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/maximum',
-          valueString: values.maximumDoses,
-        },
-        {
-          url: 'http://example.org/StructureDefinition/recommended-stock',
-          valueString: values.recommendedStock,
-        },
-      ],
-    }
-  }
 
   const getStock = async (page = 0, facility = null) => {
     setLoading(true)
@@ -233,6 +136,19 @@ const useStock = () => {
     setLoading(true)
     const response = await put(inventoryPath, data)
     setLoading(false)
+    return response
+  }
+
+  const getLastOrderRequest = async () => {
+    const orderRequests = await get(supplyRequestPath, {
+      params: {
+        _sort: '-_lastUpdated',
+        _count: 1,
+      },
+    })
+
+    const response = orderRequests?.entry?.[0]?.resource
+    setRequestItem(response)
     return response
   }
 
@@ -415,20 +331,6 @@ const useStock = () => {
     return response
   }
 
-  const requestStock = async (data) => {
-    setLoading(true)
-    try {
-      const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
-      const totalCount = totalResponse.total
-      const payload = createPayload(data, totalCount)
-      const response = await post(supplyRequestPath, payload)
-      setLoading(false)
-      return response
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   const updaTeRequestStatus = async (id, status) => {
     const request = await get(`${supplyRequestPath}/${id}`)
     const updatedPayload = { ...request, status: status }
@@ -442,6 +344,8 @@ const useStock = () => {
     requests,
     deliveries,
     loading,
+    requestItem,
+    getLastOrderRequest,
     incomingSupplyRequests,
     outgoingSupplyRequests,
     getStock,
@@ -455,8 +359,6 @@ const useStock = () => {
     viewStockLedger,
     adjustVVMStatus,
     updateStockCount,
-    requestStock,
-    createPayload,
     myFacilityRequests,
     mySupplyRequests,
     getSupplyRequestById,

@@ -19,8 +19,11 @@ import {
   inventoryItemBuilder,
   inventoryReportBuilder,
   inventoryItemUpdate,
-} from './stockResourceBuilder'
-import { deliveriesLocations, formatDeliveryToTable } from './stockUtils'
+} from './helpers/stockResourceBuilder'
+import {
+  deliveriesLocations,
+  formatDeliveryToTable,
+} from './helpers/stockUtils'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
 
 const useStyles = createUseStyles({
@@ -76,9 +79,12 @@ const ReceiveStock = () => {
 
     getInventoryItems()
     getInventoryReport()
-
-    form.setFieldsValue({ orderNumber, origin })
   }, [])
+  useEffect(() => {
+    if (deliveries?.data?.length > 0) {
+      form.setFieldsValue({ orderNumber, origin })
+    }
+  }, [deliveries])
 
   const onSubmit = async () => {
     setSaving(true)

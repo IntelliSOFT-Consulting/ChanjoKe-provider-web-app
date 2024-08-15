@@ -17,7 +17,7 @@ import useInventory from '../../hooks/useInventory'
 import { useLocations } from '../../hooks/useLocation'
 import useStock from '../../hooks/useStock'
 import NewOrderTable from './newOrder/NewOrderTable'
-import { supplyRequestBuilder } from './stockResourceBuilder'
+import { supplyRequestBuilder } from './helpers/stockResourceBuilder'
 
 const { useForm } = Form
 
@@ -48,29 +48,47 @@ export default function NewOrder() {
   const classes = useStyles()
   const [form] = useForm()
   const [hasErrors, setHasErrors] = useState({})
-  const [nextOrderDate, setNextOrderDate] = useState(null)
+  const [subCounty, setSubCounty] = useState(null)
   const [tableData, setTableData] = useState([{}])
 
-  const { loading, createSupplyRequest, incomingSupplyRequests } = useStock()
+  const {
+    loading,
+    createSupplyRequest,
+    incomingSupplyRequests,
+    getLastOrderRequest,
+    requestItem,
+  } = useStock()
   const { user } = useSelector((state) => state.userInfo)
 
   const navigate = useNavigate()
 
-  const { getInventory, inventory } = useInventory()
+  const { getInventoryItems, inventoryItems } = useInventory()
 
-  const {
-    counties,
-    subCounties,
-    facilities,
-    wards,
-    handleCountyChange,
-    handleSubCountyChange,
-    handleWardChange,
-  } = useLocations(form)
+  const { getLocationByCode } = useLocations(form)
+
+  const getSubCounty = async () => {
+    const facility = user.facility
+    const ward = await getLocationByCode(facility?.split('/')[1])
+
+    const subCounty = await getLocationByCode(ward?.[0].parent)
+    setSubCounty(subCounty?.[0])
+
+    form.setFieldValue('facility', subCounty?.[0].key)
+    return subCounty?.[0]
+  }
 
   useEffect(() => {
-    getInventory(user.facility)
+    getInventoryItems()
+    getSubCounty()
+    getLastOrderRequest()
   }, [])
+
+  useEffect(() => {
+    if (requestItem) {
+      const { occurrenceDateTime } = requestItem
+      form.setFieldValue('lastOrderDate', dayjs(occurrenceDateTime))
+    }
+  }, [requestItem])
 
   const handleValidate = () => {
     const required = [
@@ -116,8 +134,8 @@ export default function NewOrder() {
           ...data,
           tableData,
           deliverFrom: {
-            reference: form.getFieldValue('facility'),
-            display: form.getFieldValue('facilityName'),
+            reference: subCounty?.key,
+            display: subCounty?.name,
           },
           requester: { reference: `Practitioner/${user.fhirPractitionerId}` },
           deliverTo: {
@@ -132,14 +150,18 @@ export default function NewOrder() {
           payload.deliverFrom.reference
         )
         const facilityKey = payload.deliverFrom.display
-        .replace(/\s/g, '')
-        .substring(0, 3).toUpperCase()
+          .replace(/\s/g, '')
+          .substring(0, 3)
+          .toUpperCase()
 
         let identifier = [
           {
-            system: 'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
-            value: `${facilityKey}-${(facilityRequests.length + 1).toString().padStart(4, '0')}`,
-          }
+            system:
+              'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
+            value: `${facilityKey}-${(facilityRequests.length + 1)
+              .toString()
+              .padStart(4, '0')}`,
+          },
         ]
 
         payload.identifier = identifier
@@ -197,6 +219,7 @@ export default function NewOrder() {
         initialValues={{
           authoredOn: dayjs(),
           expectedDateOfNextOrder: dayjs().add(30, 'days'),
+          level: 'Sub-County',
         }}
         autoComplete="off"
       >
@@ -209,90 +232,17 @@ export default function NewOrder() {
             <Select
               placeholder="Select Level"
               options={[
-                { label: 'Central', value: 'Central' },
-                { label: 'Regional', value: 'Regional' },
+                // { label: 'Central', value: 'Central' },
+                // { label: 'Regional', value: 'Regional' },
                 { label: 'Sub-County', value: 'Sub-County' },
-                { label: 'Health Facility', value: 'Health Facility' },
+                // { label: 'Health Facility', value: 'Health Facility' },
               ]}
               allowClear
             />
           </Form.Item>
-          <Form.Item label="Name of County:" name="nameOfCounty">
-            <Select
-              onChange={(value) => handleCountyChange(value)}
-              placeholder="Select County"
-              options={counties?.map((county) => ({
-                value: county.key,
-                label: county.name,
-              }))}
-              allowClear
-              showSearch
-              filterOption={(input, option) =>
-                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            />
-          </Form.Item>
 
-          <Form.Item label="Sub-county" name="subCounty">
-            <Select
-              onChange={(value) => handleSubCountyChange(value)}
-              placeholder="Select Subcounty"
-              options={subCounties?.map((subCounty) => ({
-                value: subCounty.key,
-                label: subCounty.name,
-              }))}
-              allowClear
-              showSearch
-              filterOption={(input, option) =>
-                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            />
-          </Form.Item>
-
-          <Form.Item label="Ward" name="ward">
-            <Select
-              onChange={(value) => handleWardChange(value)}
-              placeholder="Select a Ward"
-              options={wards?.map((ward) => ({
-                value: ward.key,
-                label: ward.name,
-              }))}
-              allowClear
-              showSearch
-              filterOption={(input, option) =>
-                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Order Location"
-            name="facility"
-            rules={[
-              { required: true, message: 'Please input the order location' },
-            ]}
-          >
-            <Select
-              placeholder="Select Order Location"
-              options={facilities?.map((facility) => ({
-                value: facility.key,
-                label: facility.name,
-              }))}
-              allowClear
-              showSearch
-              filterOption={(input, option) =>
-                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-              onChange={(value) => {
-                const selectedFacility = facilities.find(
-                  (facility) => facility.key === value
-                )
-                form.setFieldsValue({
-                  facility: selectedFacility ? selectedFacility.key : '',
-                  facilityName: selectedFacility ? selectedFacility.name : '',
-                })
-              }}
-            />
+          <Form.Item label="Order Location" name="facility">
+            <Input disabled />
           </Form.Item>
 
           <Form.Item label="Date of Last Order:" name="lastOrderDate">
@@ -376,7 +326,7 @@ export default function NewOrder() {
           form={form}
           tableData={tableData}
           setTableData={setTableData}
-          inventory={inventory}
+          inventoryItems={inventoryItems}
           hasErrors={hasErrors}
           handleValidate={handleValidate}
         />

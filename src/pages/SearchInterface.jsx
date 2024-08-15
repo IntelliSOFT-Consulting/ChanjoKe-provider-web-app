@@ -154,8 +154,6 @@ export default function SearchInterface(props) {
     }
   }, [props.searchType])
 
-  console.log('results', results)
-
   return (
     <>
       <SelectDialog

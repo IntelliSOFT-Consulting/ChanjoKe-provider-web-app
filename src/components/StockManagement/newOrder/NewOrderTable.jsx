@@ -1,12 +1,10 @@
-import { useState } from 'react'
-import { Select, InputNumber, Button } from 'antd'
+import { Button, InputNumber, Select } from 'antd'
+import { uniqueVaccineOptions } from '../../../data/vaccineData'
 import Table from '../../DataTable'
-import { vaccineOptions } from '../../../data/vaccineData'
 
-const getVaccineQuantity = (inventory, vaccineCode) => {
-  const inventoryItem = inventory?.extension[0]
-  const vaccineInventory = inventoryItem?.extension?.find((ext) =>
-    ext.url?.includes(vaccineCode)
+const getVaccineQuantity = (inventory, vaccine) => {
+  const vaccineInventory = inventory?.find(
+    (item) => item.identifier?.[0]?.value === vaccine
   )
   return vaccineInventory?.extension?.find((ext) => ext.url === 'quantity')
     ?.valueQuantity?.value
@@ -31,7 +29,7 @@ const InputColumn = ({
 )
 
 const NewOrderTable = ({
-  inventory,
+  inventoryItems,
   tableData,
   setTableData,
   hasErrors,
@@ -50,11 +48,11 @@ const NewOrderTable = ({
       render: (_, record, index) => (
         <Select
           style={{ width: '100%' }}
-          options={vaccineOptions}
+          options={uniqueVaccineOptions}
           placeholder="Select Antigen"
           status={hasErrors?.[index.toString()]?.vaccine ? 'error' : 'default'}
           onChange={(value) => {
-            const qty = getVaccineQuantity(inventory, value)
+            const qty = getVaccineQuantity(inventoryItems, value)
             handleChange(index, 'vaccine', value)
             handleChange(index, 'dosesInStock', qty)
           }}

@@ -11,8 +11,8 @@ import {
 import { useSelector } from 'react-redux'
 import Table from '../../DataTable'
 import useStock from '../../../hooks/useStock'
-import { locationOptions, formatSupplyRequest } from '../stockUtils'
-import { supplyDeliveryBuilder } from '../stockResourceBuilder'
+import { locationOptions, formatSupplyRequest } from '../helpers/stockUtils'
+import { supplyDeliveryBuilder } from '../helpers/stockResourceBuilder'
 import dayjs from 'dayjs'
 import { manufacturerOptions } from '../../../data/options/clientDetails'
 import { usePractitioner } from '../../../hooks/usePractitioner'
@@ -130,8 +130,13 @@ const SingleLocation = ({ vaccines = [] }) => {
         user,
         supplier: {
           reference: `PractitionerRole/${role.id}`,
-          display: titleCase(roleName),
+          display: `${titleCase(roleName)}/${
+            selectedRequest.deliverFrom.reference
+          }`,
         },
+        identifier: [{
+          value: selectedRequest.deliverFrom.reference,
+        }],
         basedOn: [
           {
             reference: `SupplyRequest/${selectedRequest.id}`,

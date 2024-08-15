@@ -5,6 +5,7 @@ import { convertLocations } from '../utils/formatter'
 const fhirRoute = '/hapi/fhir/Location'
 
 export const useLocations = (form) => {
+  const [locations, setLocations] = useState(null)
   const [counties, setCounties] = useState([])
   const [subCounties, setSubCounties] = useState([])
   const [wards, setWards] = useState([])
@@ -26,6 +27,14 @@ export const useLocations = (form) => {
     const url = `${fhirRoute}?_id=${code}`
     const response = await get(url)
     return convertLocations(response)
+  }
+
+  const getLocationsBylevel = async (level) => {
+    const url = `${fhirRoute}?type=${level}&_count=700`
+    const response = await get(url)
+    const data = convertLocations(response)
+    setLocations(data)
+    return data
   }
 
   const fetchCounties = async () => {
@@ -80,6 +89,7 @@ export const useLocations = (form) => {
     subCounties,
     wards,
     facilities,
+    locations,
     fetchLocations,
     getLocationByCode,
     fetchCounties,
@@ -90,5 +100,6 @@ export const useLocations = (form) => {
     handleSubCountyChange,
     handleWardChange,
     fetchLocationsByIds,
+    getLocationsBylevel,
   }
 }
