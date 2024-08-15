@@ -1,6 +1,6 @@
 import moment from 'moment'
 import dayjs from 'dayjs'
-import { allVaccines, uniqueVaccines } from '../../data/vaccineData'
+import { allVaccines, uniqueVaccines } from '../../../data/vaccineData'
 
 export const supplyRequestBuilder = (values) => {
   const {
@@ -25,10 +25,6 @@ export const supplyRequestBuilder = (values) => {
       quantity,
     } = tableValue
 
-    const vaccineName = allVaccines.find(
-      (v) => v.vaccineCode === vaccine
-    )?.vaccineName
-
     return {
       url: 'http://example.org/fhir/StructureDefinition/supplyrequest-vaccine',
       extension: [
@@ -38,10 +34,10 @@ export const supplyRequestBuilder = (values) => {
             coding: [
               {
                 system: 'http://example.org/vaccine-codes',
-                code: vaccine,
+                code: vaccine?.replace(/\s/g, '-'),
               },
             ],
-            text: vaccineName,
+            text: vaccine,
           },
         },
         {
@@ -235,11 +231,12 @@ export const supplyDeliveryBuilder = (values) => {
           display: 'In Stock',
         },
         {
-          code: values.user?.location,
-          display: values.user?.location,
+          code: values.user?.facility,
+          display: values.user?.facility,
         },
       ],
     },
+    identifier: values.identifier,
     status: 'in-progress',
     destination: values.destination,
     occurrenceDateTime: moment().toISOString(),
@@ -309,51 +306,107 @@ const createVaccineExtension = (vaccine, prevVaccines) => {
 
     if (prevVaccine) {
       const batches = prevVaccine.extension.find((ext) => ext.url === 'batches')
+        ?.extension[0]
 
       if (batches) {
-        const updatedBatches = batches.extension.filter(
-          (batch) => batch.extension[2].valueQuantity.value !== 0
+        const updatedBatches = batches.extension.filter((batch) => {
+          const quantity = batch?.extension?.find(
+            (ext) => ext.url === 'quantity'
+          )
+
+          return quantity.valueQuantity.value > 0
+        })
+
+        // check if batch already exists in the list and update the quantity
+        const batchExists = updatedBatches.findIndex((batch) =>
+          batch.extension.find(
+            (ext) =>
+              ext.url === 'batchNumber' &&
+              ext.valueString === vaccine.batchNumber
+          )
         )
 
-        updatedBatches.push({
-          url: 'batch',
-          extension: [
-            {
-              url: 'batchNumber',
-              valueString: vaccine.batchNumber,
-            },
-            {
-              url: 'expiryDate',
-              valueDateTime: dayjs(
-                vaccine.expiryDate,
-                'DD-MM-YYYY'
-              ).toISOString(),
-            },
-            {
-              url: 'quantity',
-              valueQuantity: {
-                value: vaccine.quantity,
-                unit: 'doses',
+        if (batchExists > -1) {
+          updatedBatches[batchExists] = {
+            url: 'batch',
+            extension: [
+              {
+                url: 'batchNumber',
+                valueString: vaccine.batchNumber,
               },
-            },
-            {
-              url: 'vvmStatus',
-              valueCodeableConcept: {
-                coding: [
-                  {
-                    system: 'http://example.org/vvm-status',
-                    code: vaccine.vvmStatus,
-                  },
-                ],
-                text: vaccine.vvmStatus,
+              {
+                url: 'expiryDate',
+                valueDateTime: dayjs(
+                  vaccine.expiryDate,
+                  'DD-MM-YYYY'
+                ).toISOString(),
               },
-            },
-            {
-              url: 'manufacturerDetails',
-              valueString: vaccine.manufacturerDetails,
-            },
-          ],
-        })
+              {
+                url: 'quantity',
+                valueQuantity: {
+                  value: vaccine.quantity,
+                  unit: 'vials',
+                },
+              },
+              {
+                url: 'vvmStatus',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'http://example.org/vvm-status',
+                      code: vaccine.vvmStatus,
+                    },
+                  ],
+                  text: vaccine.vvmStatus,
+                },
+              },
+              {
+                url: 'manufacturerDetails',
+                valueString: vaccine.manufacturerDetails,
+              },
+            ],
+          }
+        } else {
+          updatedBatches.push({
+            url: 'batch',
+            extension: [
+              {
+                url: 'batchNumber',
+                valueString: vaccine.batchNumber,
+              },
+              {
+                url: 'expiryDate',
+                valueDateTime: dayjs(
+                  vaccine.expiryDate,
+                  'DD-MM-YYYY'
+                ).toISOString(),
+              },
+              {
+                url: 'quantity',
+                valueQuantity: {
+                  value: vaccine.quantity,
+                  unit: 'vials',
+                },
+              },
+              {
+                url: 'vvmStatus',
+                valueCodeableConcept: {
+                  coding: [
+                    {
+                      system: 'http://example.org/vvm-status',
+                      code: vaccine.vvmStatus,
+                    },
+                  ],
+                  text: vaccine.vvmStatus,
+                },
+              },
+              {
+                url: 'manufacturerDetails',
+                valueString: vaccine.manufacturerDetails,
+              },
+            ],
+          })
+        }
         return {
           url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
           extension: [
@@ -417,7 +470,7 @@ const createVaccineExtension = (vaccine, prevVaccines) => {
                     url: 'quantity',
                     valueQuantity: {
                       value: vaccine.quantity,
-                      unit: 'doses',
+                      unit: 'vials',
                     },
                   },
                   {
@@ -492,7 +545,11 @@ export const inventoryReportBuilder = (
   return inventoryReport
 }
 
-export const inventoryItemUpdate = (suppliedVaccines, inventoryItems) => {
+export const inventoryItemUpdate = (
+  suppliedVaccines,
+  inventoryItems,
+  type = 'add'
+) => {
   return inventoryItems.map((inventoryItem) => {
     const getVaccine = suppliedVaccines.find(
       (vaccine) => vaccine.vaccine === inventoryItem.identifier[0].value
@@ -506,8 +563,10 @@ export const inventoryItemUpdate = (suppliedVaccines, inventoryItems) => {
             url: 'quantity',
             valueQuantity: {
               value:
-                inventoryItem.extension[0].valueQuantity.value +
-                getVaccine.quantity,
+                type === 'add'
+                  ? inventoryItem.extension[0].valueQuantity.value +
+                    getVaccine.quantity
+                  : getVaccine.quantity,
               unit: 'vials',
             },
           },
@@ -518,78 +577,70 @@ export const inventoryItemUpdate = (suppliedVaccines, inventoryItems) => {
   })
 }
 
-export const receiveAuditBuilder = (values, supplyDeliveries) => {
-  const { tableValues } = values
-
-  const discrepancies = tableValues
-    .map((tableValue) => {
-      const supplyDelivery = supplyDeliveries.find(
-        (sd) => sd.suppliedItem.itemCodeableConcept.text === tableValue.vaccine
-      )
-
-      if (supplyDelivery) {
-        const quantityExpected = supplyDelivery.suppliedItem.quantity.value
-        const quantityReceived = tableValue.quantity
-        const discrepancy = quantityExpected - quantityReceived
-
-        if (discrepancy !== 0) {
-          const discrepancyType = discrepancy > 0 ? 'excess' : 'shortage'
-          return {
-            resourceType: 'AuditEvent',
-            action: 'E',
-            recorded: moment().toISOString(),
-            outcomeDesc: `Vaccines received with ${discrepancyType} doses than expected`,
-            purposeOfEvent: [
-              {
-                coding: [
-                  {
-                    system:
-                      'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
-                    code: 'discrepancyType',
-                    display: 'Discrepancy Type',
-                  },
-                ],
-                text: discrepancyType,
-              },
-              {
-                coding: [
-                  {
-                    system:
-                      'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
-                    code: 'discrepancyValue',
-                    display: 'Discrepancy Value',
-                  },
-                ],
-                text: discrepancy,
-              },
-            ],
-            actor: {
-              reference: `Practitioner/${values.receiver}`,
-              display: values.receiverName,
-            },
-            source: {
-              observer: {
-                reference: `Location/${values.origin}`,
-                display: values.facilityName,
-              },
-            },
-            entity: [
-              {
-                what: {
-                  reference: `SupplyDelivery/${supplyDelivery.id}`,
-                  display: supplyDelivery.suppliedItem.itemCodeableConcept.text,
-                },
-                detail: {
-                  type: 'Quantity',
-                  value: discrepancy,
-                },
-              },
-            ],
-          }
-        }
-      }
-    })
-    .filter(Boolean)
-
-  return discrepancies
+export const receiveAuditBuilder = (
+  vaccines,
+  inventoryReport,
+  user,
+  type = 'count'
+) => {
+  const auditTypes = {
+    count: 'Stock Count',
+    receipt: 'Received from other facility',
+    shared: 'Shared with other facility',
+    wastage: 'Wastage',
+  }
+  return {
+    resourceType: 'AuditEvent',
+    action: 'U',
+    recorded: moment().toISOString(),
+    outcomeDesc: auditTypes[type],
+    type: {
+      coding: [
+        {
+          system: 'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
+          code: type,
+          display: auditTypes[type],
+        },
+      ],
+      text: auditTypes[type],
+    },
+    agent: {
+      type: {
+        coding: [
+          {
+            system:
+              'http://terminology.hl7.org/CodeSystem/audit-event-agent-type',
+            code: 'humanuser',
+            display: 'Human User',
+          },
+        ],
+        text: 'Human User',
+      },
+      who: {
+        reference: `Practitioner/${user.fhirPractitionerId}`,
+      },
+      location: {
+        reference: `Location/${user.facility}`,
+        display: user.facilityName,
+      },
+      requestor: true,
+    },
+    source: {
+      observer: {
+        reference: `Practitioner/${user.fhirPractitionerId}`,
+      },
+    },
+    entity: [
+      {
+        what: {
+          reference: `Basic/${inventoryReport.id}`,
+          display: 'Inventory Report',
+        },
+        detail: {
+          type: auditTypes[type],
+          value: JSON.stringify(vaccines),
+        },
+      },
+    ],
+  }
 }
