@@ -68,6 +68,13 @@ export const useLocations = (form) => {
     form.setFieldValue('facility', '')
   }
 
+  const fetchLocationsByIds = async (ids) => {
+    if (!ids?.length) return []
+    const url = `${fhirRoute}?_id=${ids.join(',')}&_count=70`
+    const response = await get(url)
+    return convertLocations(response)
+  }
+
   return {
     counties,
     subCounties,
@@ -82,5 +89,6 @@ export const useLocations = (form) => {
     handleCountyChange,
     handleSubCountyChange,
     handleWardChange,
+    fetchLocationsByIds,
   }
 }

@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { getOffset } from '../utils/methods'
 import { useSelector } from 'react-redux'
+import { useLocations } from './useLocation'
 
 const inventoryPath = '/hapi/fhir/InventoryItem'
 const deliveryPath = '/hapi/fhir/SupplyDelivery'
@@ -10,10 +11,13 @@ const supplyRequestPath = '/hapi/fhir/SupplyRequest'
 const useStock = () => {
   const [stock, setStock] = useState([])
   const [requests, setRequests] = useState(null)
+  const [deliveries, setDeliveries] = useState(null)
   const [stockItem, setStockItem] = useState({})
   const [loading, setLoading] = useState(false)
 
   const { user } = useSelector((state) => state.userInfo)
+
+  const { fetchLocationsByIds } = useLocations({})
 
   const { get, post, put } = useApiRequest()
 
@@ -171,7 +175,7 @@ const useStock = () => {
 
   const receiveStock = async (data) => {
     setLoading(true)
-    const response = await post(deliveryPath, data)
+    const response = await put(deliveryPath, data)
     setLoading(false)
     return response
   }
@@ -278,6 +282,42 @@ const useStock = () => {
     setRequests({
       data,
       total: totalResponse.total,
+    })
+    setLoading(false)
+
+    return data
+  }
+
+  const getIncomingDeliveries = async (
+    facility,
+    status = 'in-progress',
+    page = 0
+  ) => {
+    setLoading(true)
+    const paging = page ? `&_offset=${page}&_count=12` : '&_count=1000'
+    const statusFilter = status ? `&status=${status}` : ''
+    const response = await get(
+      `${deliveryPath}?_tag=${facility}${statusFilter}${paging}`
+    )
+
+    const supplierIds =
+      response.entry?.map((entry) =>
+        entry.resource.identifier?.[0]?.value?.replace('Location/', '')
+      ) || []
+    const suppliers = await fetchLocationsByIds(supplierIds)
+
+    const data =
+      response?.entry?.map((entry) => ({
+        ...entry.resource,
+        origin: suppliers.find(
+          (supplier) =>
+            supplier.key ===
+            entry.resource.identifier?.[0]?.value?.replace('Location/', '')
+        )?.name,
+      })) || []
+    setDeliveries({
+      data,
+      total: response.total,
     })
     setLoading(false)
 
@@ -400,6 +440,7 @@ const useStock = () => {
     stock,
     stockItem,
     requests,
+    deliveries,
     loading,
     incomingSupplyRequests,
     outgoingSupplyRequests,
@@ -425,6 +466,7 @@ const useStock = () => {
     updateSupplyRequest,
     createSupplyDelivery,
     updateSupplyDelivery,
+    getIncomingDeliveries,
   }
 }
 

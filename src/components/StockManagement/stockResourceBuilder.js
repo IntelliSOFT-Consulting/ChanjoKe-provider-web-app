@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { allVaccines } from '../../data/vaccineData'
+import dayjs from 'dayjs'
+import { allVaccines, uniqueVaccines } from '../../data/vaccineData'
 
 export const supplyRequestBuilder = (values) => {
   const {
@@ -160,8 +161,14 @@ export const supplyDeliveryBuilder = (values) => {
   const { tableValues } = values
 
   const dispatchedItems = tableValues.map((tableValue) => {
-    const { vaccine, batchNumber, quantity, vvmStatus, manufacturerDetails } =
-      tableValue
+    const {
+      vaccine,
+      batchNumber,
+      expiryDate,
+      quantity,
+      vvmStatus,
+      manufacturerDetails,
+    } = tableValue
 
     const vaccineCode = allVaccines.find(
       (v) => v.vaccineName === vaccine
@@ -185,6 +192,10 @@ export const supplyDeliveryBuilder = (values) => {
         {
           url: 'batchNumber',
           valueString: batchNumber,
+        },
+        {
+          url: 'expiryDate',
+          valueDateTime: expiryDate?.toISOString(),
         },
         {
           url: 'quantity',
@@ -223,6 +234,10 @@ export const supplyDeliveryBuilder = (values) => {
           code: 'in-stock',
           display: 'In Stock',
         },
+        {
+          code: values.user?.location,
+          display: values.user?.location,
+        },
       ],
     },
     status: 'in-progress',
@@ -243,25 +258,264 @@ export const supplyDeliveryBuilder = (values) => {
   }
 }
 
-export const inventoryItemUpdator = (supplyDeliveries, inventory) => {
-  const updatedInventory = { ...inventory }
-  const updatedItems = updatedInventory.extension[0].extension.map((item) => {
-    const updatedItem = { ...item }
-    const supplyDelivery = supplyDeliveries.find(
-      (sd) =>
-        sd.suppliedItem.itemCodeableConcept.text ===
-        item.extension[0].valueCodeableConcept.text
-    )
-    if (supplyDelivery) {
-      updatedItem.extension[1].valueQuantity.value +=
-        supplyDelivery.suppliedItem.quantity.value
+export const inventoryItemBuilder = (facility) => {
+  return uniqueVaccines.map((vaccine) => {
+    return {
+      resourceType: 'Basic',
+      code: [
+        {
+          coding: [
+            {
+              system: 'http://example.org/vaccine-codes',
+              code: 'inventory-item',
+              display: 'Inventory Item',
+            },
+          ],
+          text: vaccine,
+        },
+      ],
+      created: moment().toISOString(),
+      identifier: [
+        {
+          value: vaccine,
+        },
+      ],
+      extension: [
+        {
+          url: 'quantity',
+          valueQuantity: {
+            value: 0,
+            unit: 'vials',
+          },
+        },
+      ],
+      subject: {
+        reference: facility,
+      },
     }
-    return updatedItem
   })
+}
 
-  updatedInventory.extension[0].extension = updatedItems
+const createVaccineExtension = (vaccine, prevVaccines) => {
+  if (prevVaccines?.length > 0) {
+    const prevVaccine = prevVaccines.find(
+      (pv) =>
+        pv.url ===
+        `https://example.org/fhir/StructureDefinition/${vaccine.vaccine?.replace(
+          /\s/g,
+          '-'
+        )}`
+    )
 
-  return updatedInventory
+    if (prevVaccine) {
+      const batches = prevVaccine.extension.find((ext) => ext.url === 'batches')
+
+      if (batches) {
+        const updatedBatches = batches.extension.filter(
+          (batch) => batch.extension[2].valueQuantity.value !== 0
+        )
+
+        updatedBatches.push({
+          url: 'batch',
+          extension: [
+            {
+              url: 'batchNumber',
+              valueString: vaccine.batchNumber,
+            },
+            {
+              url: 'expiryDate',
+              valueDateTime: dayjs(
+                vaccine.expiryDate,
+                'DD-MM-YYYY'
+              ).toISOString(),
+            },
+            {
+              url: 'quantity',
+              valueQuantity: {
+                value: vaccine.quantity,
+                unit: 'doses',
+              },
+            },
+            {
+              url: 'vvmStatus',
+              valueCodeableConcept: {
+                coding: [
+                  {
+                    system: 'http://example.org/vvm-status',
+                    code: vaccine.vvmStatus,
+                  },
+                ],
+                text: vaccine.vvmStatus,
+              },
+            },
+            {
+              url: 'manufacturerDetails',
+              valueString: vaccine.manufacturerDetails,
+            },
+          ],
+        })
+        return {
+          url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
+          extension: [
+            {
+              url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
+              valueCodeableConcept: {
+                coding: [
+                  {
+                    system: 'http://example.org/vaccine-codes',
+                    code: vaccine.vaccine,
+                  },
+                ],
+                text: vaccine.vaccine,
+              },
+            },
+            {
+              url: 'batches',
+              extension: updatedBatches,
+            },
+          ],
+        }
+      }
+    }
+  }
+  return {
+    url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
+    extension: [
+      {
+        url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccine}`,
+        valueCodeableConcept: {
+          coding: [
+            {
+              system: 'http://example.org/vaccine-codes',
+              code: vaccine.vaccine,
+            },
+          ],
+          text: vaccine.vaccine,
+        },
+      },
+      {
+        url: 'batches',
+        extension: [
+          {
+            url: 'batches',
+            extension: [
+              {
+                url: 'batch',
+                extension: [
+                  {
+                    url: 'batchNumber',
+                    valueString: vaccine.batchNumber,
+                  },
+                  {
+                    url: 'expiryDate',
+                    valueDateTime: dayjs(
+                      vaccine.expiryDate,
+                      'DD-MM-YYYY'
+                    ).toISOString(),
+                  },
+                  {
+                    url: 'quantity',
+                    valueQuantity: {
+                      value: vaccine.quantity,
+                      unit: 'doses',
+                    },
+                  },
+                  {
+                    url: 'vvmStatus',
+                    valueCodeableConcept: {
+                      coding: [
+                        {
+                          system: 'http://example.org/vvm-status',
+                          code: vaccine.vvmStatus,
+                        },
+                      ],
+                      text: vaccine.vvmStatus,
+                    },
+                  },
+                  {
+                    url: 'manufacturerDetails',
+                    valueString: vaccine.manufacturerDetails,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }
+}
+
+export const inventoryReportBuilder = (
+  newSupplies,
+  prevInventoryReport,
+  facility
+) => {
+  const inventoryReport = {
+    resourceType: 'Basic',
+    identifier: [
+      {
+        value: 'inventory-report',
+      },
+    ],
+    created: moment().toISOString(),
+    code: [
+      {
+        coding: [
+          {
+            system: 'http://example.org/vaccine-codes',
+            code: 'inventory-report',
+            display: 'Inventory Report',
+          },
+        ],
+        text: 'Inventory Report',
+      },
+    ],
+    extension: [
+      {
+        url: 'http://example.org/fhir/StructureDefinition/inventory-items',
+        extension: [
+          ...newSupplies.map((supply) =>
+            createVaccineExtension(
+              supply,
+              prevInventoryReport?.extension[0].extension
+            )
+          ),
+        ],
+      },
+    ],
+    subject: {
+      reference: facility,
+    },
+  }
+
+  return inventoryReport
+}
+
+export const inventoryItemUpdate = (suppliedVaccines, inventoryItems) => {
+  return inventoryItems.map((inventoryItem) => {
+    const getVaccine = suppliedVaccines.find(
+      (vaccine) => vaccine.vaccine === inventoryItem.identifier[0].value
+    )
+
+    if (getVaccine) {
+      return {
+        ...inventoryItem,
+        extension: [
+          {
+            url: 'quantity',
+            valueQuantity: {
+              value:
+                inventoryItem.extension[0].valueQuantity.value +
+                getVaccine.quantity,
+              unit: 'vials',
+            },
+          },
+        ],
+      }
+    }
+    return inventoryItem
+  })
 }
 
 export const receiveAuditBuilder = (values, supplyDeliveries) => {

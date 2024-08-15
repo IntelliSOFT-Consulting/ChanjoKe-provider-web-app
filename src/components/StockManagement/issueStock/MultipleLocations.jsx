@@ -18,7 +18,6 @@ import { manufacturerOptions } from '../../../data/options/clientDetails'
 import { usePractitioner } from '../../../hooks/usePractitioner'
 import { titleCase } from '../../../utils/methods'
 import { useMeta } from '../../../hooks/useMeta'
-import { useLocation, useNavigate } from 'react-router-dom'
 
 const { Option } = Select
 
@@ -31,9 +30,6 @@ const SingleLocation = ({ vaccines = [] }) => {
   const [api, contextHolder] = notification.useNotification()
 
   const { user } = useSelector((state) => state.userInfo)
-
-  const { state } = useLocation()
-  const navigate = useNavigate()
 
   const {
     incomingSupplyRequests,
@@ -48,22 +44,6 @@ const SingleLocation = ({ vaccines = [] }) => {
   useEffect(() => {
     incomingSupplyRequests(user?.facility, 0, 'active', 'order')
   }, [])
-
-  useEffect(() => {
-    if (state?.order && requests?.data) {
-      const selectedRequest = requests?.data.find(
-        (request) => state?.order?.id === request.id
-      )
-
-      const selected = formatSupplyRequest(selectedRequest)
-      form.setFieldsValue({
-        location: selected.receiver,
-        orderNumber: selected.orderNumber,
-      })
-
-      setSelectedVaccine(selected)
-    }
-  }, [state, requests])
 
   const handleValidate = () => {
     const errors = {}
@@ -135,7 +115,6 @@ const SingleLocation = ({ vaccines = [] }) => {
         basedOn: [
           {
             reference: `SupplyRequest/${selectedRequest.id}`,
-            display: selectedRequest.identifier?.[0]?.value,
           },
         ],
         destination: selectedRequest.deliverFrom,
@@ -158,9 +137,6 @@ const SingleLocation = ({ vaccines = [] }) => {
         description:
           'Stock has been issued successfully, awaiting delivery to the selected location.',
       })
-
-      // navigate('/stock-management/sent-orders') after 1.5s
-      navigate('/stock-management', { state: {} })
     } catch (error) {
       api.error({
         message: 'Error issuing stock',
@@ -177,7 +153,7 @@ const SingleLocation = ({ vaccines = [] }) => {
     newOrderItems[index] = {
       ...newOrderItems[index],
       vaccine: value,
-      orderedQuantity: qty,
+      quantity: qty,
     }
     setOrderItems(newOrderItems)
   }
@@ -240,14 +216,7 @@ const SingleLocation = ({ vaccines = [] }) => {
       ),
     },
     {
-      title: 'Ordered Quantity',
-      dataIndex: 'orderedQuantity',
-      render: (text) => (
-        <InputNumber className="w-full" disabled value={text} />
-      ),
-    },
-    {
-      title: 'Issued Quantity',
+      title: 'Quantity',
       dataIndex: 'quantity',
       render: (_text, record, index) => (
         <InputNumber

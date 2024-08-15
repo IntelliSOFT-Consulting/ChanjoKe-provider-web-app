@@ -7,12 +7,10 @@ export const routineVaccines = [
     nhddCode: '10517',
     diseaseTarget: 'Tuberculosis',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
     description: 'routine',
     adminRange: { start: 0, end: 1794, unit: 'days' },
-    dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'bOPV',
@@ -20,12 +18,10 @@ export const routineVaccines = [
     nhddCode: '54379',
     diseaseTarget: 'Polio',
     doseNumber: '0',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'at_birth',
     description: 'routine',
     adminRange: { start: 0, end: 14, unit: 'days' },
-    dueDate: (dob, _) => moment(dob).format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'OPV I',
@@ -33,12 +29,10 @@ export const routineVaccines = [
     nhddCode: '54377',
     diseaseTarget: 'Polio',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
     description: 'routine',
     adminRange: { start: 42, end: 1825, unit: 'days' },
-    dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'DPT-HepB+Hib 1',
@@ -46,12 +40,10 @@ export const routineVaccines = [
     nhddCode: '14676',
     diseaseTarget: 'DPT-HepB+Hib 1',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
     description: 'routine',
     adminRange: { start: 42, end: 1825, unit: 'days' },
-    dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'PCV10 1',
@@ -59,7 +51,6 @@ export const routineVaccines = [
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
     description: 'routine',
@@ -68,7 +59,6 @@ export const routineVaccines = [
       end: 1825,
       unit: 'days',
     },
-    dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'Rotavirus 1',
@@ -76,7 +66,6 @@ export const routineVaccines = [
     nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_weeks',
     description: 'routine',
@@ -84,7 +73,6 @@ export const routineVaccines = [
       start: 42,
       end: 365,
     },
-    dueDate: (dob, _) => moment(dob).add(42, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'OPV II',
@@ -92,7 +80,6 @@ export const routineVaccines = [
     nhddCode: '54377',
     diseaseTarget: 'Polio',
     doseNumber: '2',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
     description: 'routine',
@@ -103,16 +90,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMPO-OPV-I',
     dependencyPeriod: 28,
-    dueDate: (dob, opv1) => {
-      const date =
-        opv1?.status === 'completed'
-          ? opv1.occurrenceDateTime
-            ? moment(opv1.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(70, 'days')
-          : moment(dob).add(70, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'DPT-HepB+Hib 2',
@@ -121,7 +98,6 @@ export const routineVaccines = [
     diseaseTarget:
       'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
     description: 'routine',
@@ -132,16 +108,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMDPT-1',
     dependencyPeriod: 28,
-    dueDate: (dob, dpt1) => {
-      const date =
-        dpt1?.status === 'completed'
-          ? dpt1.occurrenceDateTime
-            ? moment(dpt1.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(70, 'days')
-          : moment(dob).add(70, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'PCV10 2',
@@ -149,7 +115,6 @@ export const routineVaccines = [
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
     doseNumber: '2',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
     description: 'routine',
@@ -160,16 +125,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMPCV10-1',
     dependencyPeriod: 28,
-    dueDate: (dob, pcv1) => {
-      const date =
-        pcv1?.status === 'completed'
-          ? pcv1.occurrenceDateTime
-            ? moment(pcv1.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(70, 'days')
-          : moment(dob).add(70, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'Rotavirus 2',
@@ -177,7 +132,6 @@ export const routineVaccines = [
     nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
     doseNumber: '2',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '10_weeks',
     description: 'routine',
@@ -188,16 +142,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMROTA-1',
     dependencyPeriod: 28,
-    dueDate: (dob, rota1) => {
-      const date =
-        rota1?.status === 'completed'
-          ? rota1.occurrenceDateTime
-            ? moment(rota1.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(70, 'days')
-          : moment(dob).add(70, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'OPV III',
@@ -205,7 +149,6 @@ export const routineVaccines = [
     nhddCode: '54377',
     diseaseTarget: 'Polio',
     doseNumber: '3',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
     description: 'routine',
@@ -216,16 +159,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMPO-OPV-II',
     dependencyPeriod: 28,
-    dueDate: (dob, opv2) => {
-      const date =
-        opv2?.status === 'completed'
-          ? opv2.occurrenceDateTime
-            ? moment(opv2.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(98, 'days')
-          : moment(dob).add(98, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'DPT-HepB+Hib 3',
@@ -234,7 +167,6 @@ export const routineVaccines = [
     diseaseTarget:
       'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '3',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
     description: 'routine',
@@ -245,16 +177,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMDPT-2',
     dependencyPeriod: 28,
-    dueDate: (dob, dpt2) => {
-      const date =
-        dpt2?.status === 'completed'
-          ? dpt2.occurrenceDateTime
-            ? moment(dpt2.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(98, 'days')
-          : moment(dob).add(98, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'PCV10 3',
@@ -262,7 +184,6 @@ export const routineVaccines = [
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
     doseNumber: '3',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
     description: 'routine',
@@ -273,16 +194,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMPCV10-2',
     dependencyPeriod: 28,
-    dueDate: (dob, pcv2) => {
-      const date =
-        pcv2?.status === 'completed'
-          ? pcv2.occurrenceDateTime
-            ? moment(pcv2.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(98, 'days')
-          : moment(dob).add(98, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'IPV',
@@ -290,7 +201,6 @@ export const routineVaccines = [
     nhddCode: '3549',
     diseaseTarget: 'Polio',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
     description: 'routine',
@@ -299,7 +209,6 @@ export const routineVaccines = [
       end: 1825,
       unit: 'days',
     },
-    dueDate: (dob, _) => moment(dob).add(98, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'Rotavirus 3',
@@ -307,7 +216,6 @@ export const routineVaccines = [
     nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
     doseNumber: '3',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '14_weeks',
     description: 'routine',
@@ -318,16 +226,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMROTA-2',
     dependencyPeriod: 28,
-    dueDate: (dob, rota2) => {
-      const date =
-        rota2?.status === 'completed'
-          ? rota2.occurrenceDateTime
-            ? moment(rota2.occurrenceDateTime).add(28, 'days')
-            : moment(dob).add(98, 'days')
-          : moment(dob).add(98, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'Vitamin A 1st Dose',
@@ -335,7 +233,6 @@ export const routineVaccines = [
     nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_months',
     description: 'routine',
@@ -344,7 +241,6 @@ export const routineVaccines = [
       end: 1825,
       unit: 'days',
     },
-    dueDate: (dob, _) => moment(dob).add(180, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'Measles-Rubella',
@@ -352,7 +248,6 @@ export const routineVaccines = [
     nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_months',
     description: 'routine',
@@ -365,7 +260,6 @@ export const routineVaccines = [
       HIVStatus: 'Positive',
       outbreak: true,
     },
-    dueDate: (dob, _) => moment(dob).add(180, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 1)',
@@ -373,7 +267,6 @@ export const routineVaccines = [
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '6_months',
     description: 'routine',
@@ -382,7 +275,6 @@ export const routineVaccines = [
       end: 1825,
       unit: 'days',
     },
-    dueDate: (dob, _) => moment(dob).add(180, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 2)',
@@ -390,7 +282,6 @@ export const routineVaccines = [
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '7_months',
     description: 'routine',
@@ -401,16 +292,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMMALA-1',
     dependencyPeriod: 30,
-    dueDate: (dob, malaria1) => {
-      const date =
-        malaria1?.status === 'completed'
-          ? malaria1.occurrenceDateTime
-            ? moment(malaria1.occurrenceDateTime).add(30, 'days')
-            : moment(dob).add(210, 'days')
-          : moment(dob).add(210, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'Measles-Rubella 1st Dose',
@@ -418,7 +299,6 @@ export const routineVaccines = [
     nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '9_months',
     description: 'routine',
@@ -427,7 +307,6 @@ export const routineVaccines = [
       end: 1825,
       unit: 'days',
     },
-    dueDate: (dob, _) => moment(dob).add(270, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'Yellow Fever',
@@ -435,7 +314,6 @@ export const routineVaccines = [
     nhddCode: '1002',
     diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '9_months',
     description: 'routine',
@@ -444,7 +322,6 @@ export const routineVaccines = [
       end: 5475,
       unit: 'days',
     },
-    dueDate: (dob, _) => moment(dob).add(270, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 3)',
@@ -452,7 +329,6 @@ export const routineVaccines = [
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '9_months',
     description: 'routine',
@@ -463,16 +339,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMMALA-2',
     dependencyPeriod: 30,
-    dueDate: (dob, malaria2) => {
-      const date =
-        malaria2?.status === 'completed'
-          ? malaria2.occurrenceDateTime
-            ? moment(malaria2.occurrenceDateTime).add(30, 'days')
-            : moment(dob).add(270, 'days')
-          : moment(dob).add(270, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'Vitamin A 2nd Dose',
@@ -480,7 +346,6 @@ export const routineVaccines = [
     nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '12_months',
     description: 'routine',
@@ -491,16 +356,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMVIT-1',
     dependencyPeriod: 180,
-    dueDate: (dob, vit1) => {
-      const date =
-        vit1?.status === 'completed'
-          ? vit1.occurrenceDateTime
-            ? moment(vit1.occurrenceDateTime).add(180, 'days')
-            : moment(dob).add(360, 'days')
-          : moment(dob).add(360, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'Albendazole 1st Dose',
@@ -508,7 +363,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '12_months',
     description: 'routine',
@@ -524,7 +378,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '2',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '18_months',
     description: 'routine',
@@ -542,7 +395,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '3',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '24_months',
     description: 'routine',
@@ -561,7 +413,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '4',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'Deworming',
     description: 'routine',
@@ -579,7 +430,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '5',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'Deworming',
     description: 'routine',
@@ -597,7 +447,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '6',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'Deworming',
     description: 'routine',
@@ -615,7 +464,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '7',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'Deworming',
     description: 'routine',
@@ -633,7 +481,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '8',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'Deworming',
     description: 'routine',
@@ -651,7 +498,6 @@ export const routineVaccines = [
     nhddCode: '11742',
     diseaseTarget: 'Worms',
     doseNumber: '9',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'Deworming',
     description: 'routine',
@@ -669,7 +515,6 @@ export const routineVaccines = [
     nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '18_months',
     description: 'routine',
@@ -680,16 +525,6 @@ export const routineVaccines = [
     },
     dependentVaccine: 'IMMEAS-1',
     dependencyPeriod: 180,
-    dueDate: (dob, measles1) => {
-      const date =
-        measles1?.status === 'completed'
-          ? measles1.occurrenceDateTime
-            ? moment(measles1.occurrenceDateTime).add(180, 'days')
-            : moment(dob).add(540, 'days')
-          : moment(dob).add(540, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'Vitamin A 3rd Dose',
@@ -697,7 +532,6 @@ export const routineVaccines = [
     nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '18_months',
     adminRange: {
@@ -708,16 +542,6 @@ export const routineVaccines = [
     dependentVaccine: 'IMVIT-2',
     description: 'routine',
     dependencyPeriod: 180,
-    dueDate: (dob, vit2) => {
-      const date =
-        vit2?.status === 'completed'
-          ? vit2.occurrenceDateTime
-            ? moment(vit2.occurrenceDateTime).add(180, 'days')
-            : moment(dob).add(540, 'days')
-          : moment(dob).add(540, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'RTS/AS01 (Malaria Vaccine - 4)',
@@ -725,7 +549,6 @@ export const routineVaccines = [
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: '24_months',
     adminRange: {
@@ -736,16 +559,6 @@ export const routineVaccines = [
     dependentVaccine: 'IMMALA-3',
     description: 'routine',
     dependencyPeriod: 180,
-    dueDate: (dob, malaria3) => {
-      const date =
-        malaria3?.status === 'completed'
-          ? malaria3.occurrenceDateTime
-            ? moment(malaria3.occurrenceDateTime).add(180, 'days')
-            : moment(dob).add(720, 'days')
-          : moment(dob).add(720, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
 ]
 
@@ -756,7 +569,6 @@ export const nonRoutineVaccines = [
     nhddCode: '29659',
     diseaseTarget: 'Human Papillomavirus',
     doseNumber: '1',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'HPV',
     description: 'non-routine',
@@ -768,7 +580,6 @@ export const nonRoutineVaccines = [
     constraints: {
       gender: 'Male',
     },
-    dueDate: (dob, _) => moment(dob).add(3650, 'days').format('DD-MM-YYYY'),
   },
   {
     vaccineName: 'HPV Vaccine 2',
@@ -776,7 +587,6 @@ export const nonRoutineVaccines = [
     nhddCode: '29659',
     diseaseTarget: 'Human Papillomarivus',
     doseNumber: '2',
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'HPV',
     description: 'non-routine',
@@ -790,16 +600,6 @@ export const nonRoutineVaccines = [
     },
     dependentVaccine: 'IMHPV-1',
     dependencyPeriod: 182,
-    dueDate: (dob, hpv1) => {
-      const date =
-        hpv1?.status === 'completed'
-          ? hpv1.occurrenceDateTime
-            ? moment(hpv1.occurrenceDateTime).add(180, 'days')
-            : moment(dob).add(3830, 'days')
-          : moment(dob).add(3830, 'days')
-
-      return date.format('DD-MM-YYYY')
-    },
   },
   {
     vaccineName: 'AstraZeneca',
@@ -808,7 +608,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     description: 'non-routine',
@@ -825,7 +624,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-ASTR-1',
@@ -844,7 +642,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     description: 'non-routine',
@@ -861,7 +658,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     description: 'non-routine',
@@ -878,7 +674,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-PFIZER-1',
@@ -897,7 +692,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     description: 'non-routine',
@@ -914,7 +708,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-MOD-1',
@@ -933,7 +726,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     description: 'non-routine',
@@ -950,7 +742,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-SINO-1',
@@ -969,7 +760,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Tetanus',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
     description: 'non-routine',
@@ -986,7 +776,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Tetanus',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-1',
@@ -1005,7 +794,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Tetanus',
     doseNumber: '3',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-2',
@@ -1024,7 +812,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Tetanus',
     doseNumber: '4',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-3',
@@ -1043,7 +830,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Tetanus',
     doseNumber: '5',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'tetanus',
     dependentVaccine: 'IMTD-4',
@@ -1062,7 +848,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Yellow Fever',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'yellow_fever',
     description: 'non-routine',
@@ -1080,7 +865,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Rabies',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
     description: 'non-routine',
@@ -1097,7 +881,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Rabies',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-1',
@@ -1116,7 +899,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Rabies',
     doseNumber: '3',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-2',
@@ -1135,7 +917,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Rabies',
     doseNumber: '4',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-3',
@@ -1154,7 +935,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Rabies',
     doseNumber: '5',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'rabies',
     dependentVaccine: 'IMRABIES-RABIES-4',
@@ -1173,7 +953,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Influenza',
     doseNumber: '1',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'influenza',
     description: 'non-routine',
@@ -1190,7 +969,6 @@ export const nonRoutineVaccines = [
     diseaseTarget: 'Influenza',
     doseNumber: '2',
     dueDate: null,
-    occurrenceDateTime: '',
     status: 'upcoming',
     category: 'influenza',
     dependentVaccine: 'IMINFLU-1',
@@ -1206,7 +984,37 @@ export const nonRoutineVaccines = [
 
 export const allVaccines = [...routineVaccines, ...nonRoutineVaccines]
 
+export const uniqueVaccines = [
+  'BCG',
+  'bOPV',
+  'OPV',
+  'DPT-HepB+Hib',
+  'PCV10',
+  'Rotavirus',
+  'IPV',
+  'Vitamin A',
+  'Measles-Rubella',
+  'RTS/AS01 (Malaria Vaccine)',
+  'Yellow Fever',
+  'Albendazole',
+  'HPV Vaccine',
+  'AstraZeneca',
+  'Johnson & Johnson',
+  'Pfizer/BioNTech',
+  'Moderna',
+  'Sinopharm',
+  'Tetanus',
+  'Yellow Fever',
+  'Rabies',
+  'Influenza',
+]
+
 export const vaccineOptions = allVaccines.map((vaccine) => ({
   label: vaccine.vaccineName,
   value: vaccine.vaccineCode,
+}))
+
+export const uniqueVaccineOptions = uniqueVaccines.map((vaccine) => ({
+  label: vaccine,
+  value: vaccine,
 }))

@@ -7,7 +7,7 @@ const server = axios.create({
   headers: {
     'Cache-Control': 'no-cache',
     'Content-Type': 'application/json',
-  }
+  },
 })
 
 server.interceptors.response.use(
@@ -16,7 +16,11 @@ server.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      message.error(error.response.status === 401 ? 'Unauthorized: Incorrect credentials' : error.response.data.error)
+      message.error(
+        error.response.status === 401
+          ? 'Unauthorized: Incorrect credentials'
+          : error.response.data.error
+      )
     } else {
       message.error('Network Error')
     }
@@ -29,9 +33,13 @@ export const useApiRequest = () => {
   const abortController = new AbortController()
   const navigate = useNavigate()
 
-  const get = async (url) => {
+  const get = async (url, params = {}) => {
     try {
-      const response = await server.get(url, { signal: abortController.signal })
+      const response = await server.get(
+        url,
+        { params: params?.params },
+        { signal: abortController.signal }
+      )
       return response.data
     } catch (error) {
       if (error?.response?.status === 401) {

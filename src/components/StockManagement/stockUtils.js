@@ -37,8 +37,6 @@ export const formatSupplyRequest = (supplyRequest) => {
     item.url.includes('supplyrequest-vaccine')
   )?.extension
 
-  console.log('vaccines', vaccines)
-
   return {
     id: supplyRequest.id,
     orderNumber: supplyRequest?.identifier?.[0]?.value,
@@ -65,4 +63,50 @@ export const updateSupplyRequest = async (values, supplyRequests) => {
   }
 
   return supplyRequests
+}
+
+export const deliveriesLocations = (supplyDeliveries) => {
+  return supplyDeliveries
+    ?.map((delivery) => ({
+      label: delivery.origin,
+      value: delivery.origin,
+    }))
+    .filter((location) => location?.label)
+}
+
+export const formatDeliveryToTable = (supplyDelivery) => {
+  const vaccines = supplyDelivery.extension[0].extension.map((item) => {
+    const vaccine = item.extension.find((ext) => ext.url === 'vaccine')
+      ?.valueCodeableConcept?.text
+    const batchNumber = item.extension.find(
+      (ext) => ext.url === 'batchNumber'
+    )?.valueString
+    const quantity = item.extension.find((ext) => ext.url === 'quantity')
+      ?.valueQuantity?.value
+    const vvmStatus = item.extension.find((ext) => ext.url === 'vvmStatus')
+      ?.valueCodeableConcept?.text
+    const manufacturerDetails = item.extension.find(
+      (ext) => ext.url === 'manufacturerDetails'
+    )?.valueString
+    const expiryDate = item.extension.find(
+      (ext) => ext.url === 'expiryDate'
+    )?.valueDateTime
+    return {
+      vaccine,
+      batchNumber,
+      quantity,
+      vvmStatus,
+      manufacturerDetails,
+      expiryDate: dayjs(expiryDate).format('DD-MM-YYYY'),
+    }
+  })
+
+  return {
+    id: supplyDelivery.id,
+    location: supplyDelivery.origin,
+    destination: supplyDelivery.destination?.display,
+    vaccines,
+    status: supplyDelivery.status,
+    orderNumber: supplyDelivery.basedOn?.[0]?.display || 'N/A',
+  }
 }

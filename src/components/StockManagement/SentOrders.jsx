@@ -156,10 +156,10 @@ export default function SentOrders() {
       key: 'vaccines',
     },
     {
-      title: 'Actions',
+      title: null,
       dataIndex: '',
       key: 'x',
-      render: (_,record) => (
+      render: (_, record) => (
         <div className="flex items-center gap-10">
           <Link
             to={`/stock-management/order-details/${record.id}`}
@@ -167,32 +167,6 @@ export default function SentOrders() {
           >
             View
           </Link>
-          {record.status === 'Received' ? (
-            <Button
-              type="link"
-              disabled
-              className="text-[#163C94] font-semibold p-0"
-            >
-              Receive
-            </Button>
-          ) : (
-            <Button
-              // onClick={() => changeStatus(record.id)}
-              onClick={() =>
-                navigate(`/stock-management/receive-stock/${record.id}`, {
-                  state: {
-                    orderNumber: record.identifier,
-                    origin: record.facility,
-                    selectedOriginId: record.id,
-                    supplierId: record.supplier,
-                  },
-                })
-              }
-              className="text-[#163C94] font-semibold border-none p-0"
-            >
-              Receive
-            </Button>
-          )}
         </div>
       ),
     },

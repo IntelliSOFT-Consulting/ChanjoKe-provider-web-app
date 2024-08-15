@@ -1,9 +1,12 @@
-import { Card, Button, Form, Table, DatePicker } from 'antd'
+import { Button, Card, DatePicker, Form } from 'antd'
+import moment from 'moment'
+import { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
-import { useEffect, useState } from 'react'
-import moment from 'moment'
+import { toTitleCase } from '../../utils/formatter'
+import Table from '../DataTable'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -36,55 +39,57 @@ const useStyles = createUseStyles({
   },
   columnText: {
     color: '#707070',
-  }
+  },
 })
 
 export default function ReceivedOrders() {
   const classes = useStyles()
 
-  const { mySupplyRequests } = useStock()
+  const { incomingSupplyRequests, requests, loading } = useStock()
   const [results, setResults] = useState([])
   const [filteredResults, setFilteredResults] = useState([])
   const [filter, setFilter] = useState('')
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const facility = JSON.parse(localStorage.getItem('practitioner')).facility
-        const receivedOrders = await mySupplyRequests(facility)
-        console.log(receivedOrders)
-        const formattedOrders = receivedOrders.map((order) => ({
-          id: order.id,
-          key: order.id,
-          orderNumber: order.extension[0].valueString,
-          authoredOn: moment(order.extension[5]?.valueDateTime).format('DD-MM-YYYY'),
-          // authoredOn: order.extension[5]?.valueDateTime,
-          occurenceDateTime: moment(order.occurrenceDateTime).format('DD-MM-YYYY'),
-          // deliverTo: order.destination?.reference.split('/')[1],
-          deliverTo: order.destination?.display,
-          products: order.suppliedItem.itemCodeableConcept?.coding.length,
-          status: order.status
-        }))
-        console.log(formattedOrders)
-        setResults(formattedOrders)
-        setFilteredResults(formattedOrders)
-      } catch(error) {
-        console.log(error)
-      }
-    }
+  const { user } = useSelector((state) => state.userInfo)
 
-    fetchOrders()
+  useEffect(() => {
+    if (requests?.data?.length) {
+      const formattedOrders = requests.data.map((order) => ({
+        id: order.id,
+        key: order.id,
+        orderNumber: order?.identifier[0]?.value,
+        authoredOn: moment(order.extension[5]?.valueDateTime).format(
+          'DD-MM-YYYY'
+        ),
+        occurenceDateTime: moment(order.occurrenceDateTime).format(
+          'DD-MM-YYYY'
+        ),
+        deliverTo: toTitleCase(order.deliverTo?.display),
+        products:
+          order?.extension?.find((item) =>
+            item.url.includes('supplyrequest-vaccine')
+          )?.extension?.length || 0,
+        status: order.status,
+      }))
+      setResults(formattedOrders)
+      setFilteredResults(formattedOrders)
+    }
+  }, [requests])
+
+  useEffect(() => {
+    incomingSupplyRequests(user.facility)
   }, [])
 
   const handleDateChange = (date, dateString) => {
     setFilter(dateString)
-    if(dateString) {
-      const filtered = results.filter((order) => order.occurenceDateTime === dateString)
+    if (dateString) {
+      const filtered = results.filter(
+        (order) => order.occurenceDateTime === dateString
+      )
       setFilteredResults(filtered)
     } else {
       setFilteredResults(results)
     }
-
   }
 
   const columns = [
@@ -93,7 +98,7 @@ export default function ReceivedOrders() {
       dataIndex: 'orderNumber',
       key: 'orderNumber',
       className: {
-        [classes.columnText]: true
+        [classes.columnText]: true,
       },
     },
     {
@@ -101,15 +106,7 @@ export default function ReceivedOrders() {
       dataIndex: 'authoredOn',
       key: 'authoredOn',
       className: {
-        [classes.columnText]: true
-      },
-    },
-    {
-      title: 'Received Date',
-      dataIndex: 'occurenceDateTime',
-      key: 'occurenceDateTime',
-      className: {
-        [classes.columnText]: true
+        [classes.columnText]: true,
       },
     },
     {
@@ -117,7 +114,7 @@ export default function ReceivedOrders() {
       dataIndex: 'deliverTo',
       key: 'deliverTo',
       className: {
-        [classes.columnText]: true
+        [classes.columnText]: true,
       },
     },
     {
@@ -125,103 +122,88 @@ export default function ReceivedOrders() {
       dataIndex: 'products',
       key: 'products',
       className: {
-        [classes.columnText]: true
+        [classes.columnText]: true,
       },
     },
     {
-      title: 'Action',
-      render: (record) => <Link 
-        to={`/stock-management/order-details/${record.id}`} 
-        className="text-[#163C94] font-semibold">
-          View
-        </Link>,
-    }
+      title: null,
+      render: (record) => (
+        <div className="flex justify-between items-center">
+          <Link
+            to={`/stock-management/order-details/${record.id}`}
+            className="text-[#163C94] font-semibold"
+          >
+            View
+          </Link>
+
+          <Link
+            to={`/stock-management/issue-stock`}
+            state={{ order: record }}
+            className="text-green font-semibold hover:!text-green"
+          >
+            Issue Stock
+          </Link>
+        </div>
+      ),
+    },
   ]
 
   return (
-    <>
-      <Card
-        className="mt-5"
-        title={
-          <div className="text-xl font-semibold flex justify-between items-center">
-            Received Orders
-            <Button
-              type="primary"
-              htmlType="submit"
-              className={classes.btnPrimary}
-            >
-              Add New
-            </Button>
-          </div>
-        }
-      >
-        <div className="bg-[#163c9412] p-3 mx-4 my-5">
-          <h3 className="text-[#707070] font-semibold text-base">Order Details</h3>
-        </div>
-
-        <Form layout="vertical" className="p-4 flex w-full justify-end">
-          <Form.Item
-            label='Filter by Date'
-            name="filterByDate"
-            className="w-1/4"
+    <Card
+      className="mt-5"
+      title={
+        <div className="text-xl font-semibold flex justify-between items-center">
+          Received Orders
+          <Button
+            type="primary"
+            htmlType="submit"
+            className={classes.btnPrimary}
           >
-            <DatePicker 
-              placeholder="Filter by Date"
-              className='w-full'
-              onChange={handleDateChange}
-              format='DD-MM-YYYY'
-            />
-          </Form.Item>
-        </Form>
+            Add New
+          </Button>
+        </div>
+      }
+    >
+      <div className="bg-[#163c9412] p-3 mx-4 my-5">
+        <h3 className="text-[#707070] font-semibold text-base">
+          Order Details
+        </h3>
+      </div>
 
-        <div className='hidden sm:block sm:px-4 mb-10 text-[#707070]'>
-          <Table 
-            columns={columns}
-            dataSource={filteredResults}
-            size="small"
-            bordered
-            className={classes.tableHeader}
-            pagination={{
-              pageSize: 12,
-              showSizeChanger: false,
-              hideOnSinglePage: true,
-              showTotal: (total) => `Total ${total} items`,
-            }}
-            locale={{
-              emptyText: (
-                <div className="flex flex-col items-center justify-center">
-                  <p className="text-gray-400 text-sm my-2">
-                    No Received Orders
-                  </p>
-                </div>
-              ),
-            }}
+      <Form layout="vertical" className="p-4 flex w-full justify-end">
+        <Form.Item label="Filter by Date" name="filterByDate" className="w-1/4">
+          <DatePicker
+            placeholder="Filter by Date"
+            className="w-full"
+            onChange={handleDateChange}
+            format="DD-MM-YYYY"
           />
-        </div>
+        </Form.Item>
+      </Form>
 
-        <div className='sm:hidden mt-5 px-4 mb-10'>
-          {results.map((result) => (
-            <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
-              <div className='py-5 px-4 col-span-4'>
-                <div className='text-xs'>Order Number: <span className="font-semibold text-gray-800">{result.id}</span></div>
-                <div className='text-xs'>Order Date: <span className="font-semibold text-gray-800">{result.authoredOn}</span></div>
-                <div className='text-xs'>Received Date: <span className="font-semibold text-gray-800">{result.occurenceDateTime}</span></div>
-                <div className='text-xs'>Location: <span className="font-semibold text-gray-800">{result.deliverTo}</span></div>
-                <div className='text-xs'>Products: <span className="font-semibold text-gray-800">{result.products}</span></div>
+      <div className="hidden sm:block sm:px-4 mb-10 text-[#707070]">
+        <Table
+          columns={columns}
+          dataSource={filteredResults}
+          loading={loading}
+          size="small"
+          bordered
+          className={classes.tableHeader}
+          pagination={{
+            pageSize: 12,
+            showSizeChanger: false,
+            hideOnSinglePage: true,
+            showTotal: (total) => `Total ${total} items`,
+          }}
+          locale={{
+            emptyText: (
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-gray-400 text-sm my-2">No Received Orders</p>
               </div>
-
-              <div className="py-5 px-4">
-                <Link 
-                  to={`stock-management/order-details/${result.id}`}
-                  className="text-[#163C94] font-semibold text-sm"
-                >
-                  View
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </>
+            ),
+          }}
+        />
+      </div>
+    </Card>
   )
 }

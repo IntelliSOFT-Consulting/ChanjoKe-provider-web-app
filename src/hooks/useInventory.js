@@ -1,81 +1,31 @@
 import { useState } from 'react'
-import { useApiRequest } from '../api/useApiRequest'
-import { routineVaccines, nonRoutineVaccines } from '../data/vaccineData'
 import { useSelector } from 'react-redux'
+import { useApiRequest } from '../api/useApiRequest'
 
 const ENDPOINT = '/hapi/fhir/Basic'
-const INVENTORY_IDENTIFIER = 'vaccine-inventory'
-const INVENTORY_ITEMS_URL =
-  'http://example.org/fhir/StructureDefinition/inventory-items'
-
-const createVaccineExtension = (vaccine) => ({
-  url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccineCode}`,
-  extension: [
-    {
-      url: `https://example.org/fhir/StructureDefinition/${vaccine.vaccineCode}`,
-      valueCodeableConcept: {
-        coding: [
-          {
-            system: 'http://example.org/vaccine-codes',
-            code: vaccine.vaccineCode,
-          },
-        ],
-        text: vaccine.vaccineName,
-      },
-    },
-    {
-      url: 'quantity',
-      valueQuantity: {
-        value: 0,
-        unit: 'doses',
-        system: 'http://unitsofmeasure.org',
-        code: 'dose',
-      },
-    },
-    {
-      url: 'http://example.org/fhir/StructureDefinition/dose-number',
-      valueInteger: vaccine.doseNumber ? Number(vaccine.doseNumber) : 1,
-    },
-  ],
-})
-
-const createDefaultInventory = (facility) => ({
-  resourceType: 'Basic',
-  identifier: [
-    {
-      system: 'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
-      value: INVENTORY_IDENTIFIER,
-    },
-  ],
-  extension: [
-    {
-      url: INVENTORY_ITEMS_URL,
-      extension: [...routineVaccines, ...nonRoutineVaccines].map(
-        createVaccineExtension
-      ),
-    },
-  ],
-  subject: {
-    reference: facility,
-  },
-})
 
 export default function useInventory() {
-  const [inventory, setInventory] = useState(null)
+  const [inventoryReport, setInventoryReport] = useState(null)
+  const [inventoryItems, setInventoryItems] = useState([])
+
   const { user } = useSelector((state) => state.userInfo)
   const { get, post, put } = useApiRequest()
 
-  const createInventory = async () => {
-    const response = await post(ENDPOINT, createDefaultInventory(user.facility))
-    setInventory(response)
+  const createInventory = async (data) => {
+    const response = await post(ENDPOINT, data)
     return response
   }
 
-  const getInventory = async (facility) => {
-    const response = await get(ENDPOINT, { params: { subject: facility } })
+  const getInventoryItems = async () => {
+    const response = await get(ENDPOINT, {
+      params: {
+        subject: user.facility,
+        code: 'inventory-item',
+      },
+    })
 
-    const inventoryData = response?.entry?.[0]?.resource
-    setInventory(inventoryData)
+    const inventoryData = response?.entry?.map((entry) => entry.resource) || []
+    setInventoryItems(inventoryData)
     return inventoryData
   }
 
@@ -83,5 +33,27 @@ export default function useInventory() {
     await put(`${ENDPOINT}/${data.id}`, data)
   }
 
-  return { inventory, createInventory, getInventory, updateInventory }
+  const getInventoryReport = async () => {
+    const response = await get(ENDPOINT, {
+      params: {
+        subject: user.facility,
+        code: 'inventory-report',
+        _sort: '-created',
+        _count: 1,
+      },
+    })
+
+    const report = response?.entry?.[0]?.resource || null
+    setInventoryReport(report)
+    return report
+  }
+
+  return {
+    createInventory,
+    getInventoryItems,
+    updateInventory,
+    getInventoryReport,
+    inventoryItems,
+    inventoryReport,
+  }
 }
