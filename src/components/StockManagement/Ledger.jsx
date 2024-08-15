@@ -1,51 +1,63 @@
-import { Card, Button, Table, Form, Select } from 'antd'
-import { createUseStyles } from 'react-jss'
-import { Link, useNavigate } from 'react-router-dom'
-import useStock from '../../hooks/useStock'
+import { Button, Card, Select } from 'antd'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
-import usePaginatedQuery from '../../hooks/usePaginatedQuery'
-
-
-const useStyles = createUseStyles({
-  btnSuccess: {
-    backgroundColor: '#169416',
-    borderColor: '#169416',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#169416',
-      borderColor: '#169416',
-      color: 'white',
-    },
-  },
-  btnPrimary: {
-    backgroundColor: '#163C94',
-    borderColor: '#163C94',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#163C94 !important',
-      borderColor: '#163C94',
-      color: 'white !important',
-    },
-    fontWeight: '600',
-  },
-  tableHeader: {
-    '& .ant-table-thead > tr > th': {
-      backgroundColor: '#163C9412',
-      color: '#707070',
-    },
-  }
-})
+import { uniqueVaccineOptions } from '../../data/vaccineData'
+import useInventory from '../../hooks/useInventory'
+import Table from '../DataTable'
+import { getVaccineBatches } from './helpers/stockUtils'
+import { Link } from 'react-router-dom'
 
 export default function Ledger() {
-  const classes = useStyles()
-  const [totalItems, setTotalItems] = useState(0)
-  const [results, setResults] = useState([])
+  const [allData, setAllData] = useState(null)
+  const [results, setResults] = useState(null)
+
+  const {
+    getInventoryItems,
+    getInventoryReport,
+    inventoryItems,
+    inventoryReport,
+  } = useInventory()
+
+  useEffect(() => {
+    getInventoryItems()
+    getInventoryReport()
+  }, [])
+
+  const formatResults = (data) => {
+    return data.map((item) => ({
+      id: item.id,
+      vaccine: item?.code?.text,
+      type: 'Dose',
+      batches: getVaccineBatches(item?.code?.text, inventoryReport)?.length,
+      currentBalance: item?.extension?.[0]?.valueQuantity?.value,
+      lastTransactionDate: dayjs(item?.meta?.lastUpdated).format('DD-MM-YYYY'),
+    }))
+  }
+
+  useEffect(() => {
+    if (inventoryItems && inventoryReport) {
+      const formatted = formatResults(inventoryItems)
+      setResults(formatted)
+      setAllData(formatted)
+    }
+  }, [inventoryItems, inventoryReport])
+
+  const handleFilter = (vaccine) => {
+    if (vaccine === 'All' || !vaccine) {
+      setResults(allData)
+      return
+    }
+
+    const filtered = allData.filter((item) => item.vaccine === vaccine)
+    setResults(filtered)
+  }
 
   const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
+      render: (_, _record, index) => index + 1,
     },
     {
       title: 'Product',
@@ -76,20 +88,13 @@ export default function Ledger() {
       title: 'Actions',
       dataIndex: '',
       key: 'x',
-      render: (record) => (
-        <div className="flex items-center gap-10">
-          <Link
-            className="text-[#163C94] font-semibold"
-          >
-            Ledger
-          </Link>
-          
-          <Button
-            className="text-[#163C94] font-semibold border-none p-0"
-          >
-            Batch Summary
-          </Button>
-        </div>
+      render: (_text, record) => (
+        <Link
+          to={`/stock-management/ledger/${record?.vaccine}`}
+          className="text-[#163C94] font-semibold border-none p-0"
+        >
+          Batch Summary
+        </Link>
       ),
     },
   ]
@@ -104,82 +109,31 @@ export default function Ledger() {
           </div>
         }
       >
-        <div className="bg-[#163c9412] p-3 mx-4 my-5">
-          <h3 className="text-[#707070] font-semibold text-base">Product Summary</h3>
+        <div className="flex justify-between items-center px-4 my-4">
+          <Select
+            placeholder="Select Status"
+            className="w-full md:w-1/2"
+            placement="Filter by Vaccine"
+            allowClear
+            onChange={handleFilter}
+            options={uniqueVaccineOptions}
+            showSearch
+          />
         </div>
 
-        <Form layout="vertical" className="p-4 flex w-full justify-end">
-          <Form.Item
-            label='Filter'
-            name="filterByStatus"
-            className="w-1/4"
-          >
-            <Select 
-              placeholder='Select Status'
-              className='w-full'
-              allowClear
-              // onChange={handleStatusChange}
-              options={[
-                { label: 'Option 1', value: 'Option 1' },
-                { label: 'Option 2', value: 'Option 2' },
-              ]}
-            />
-          </Form.Item>
-        </Form>
-
-        <div className='hidden sm:block sm:px-4 mb-10'>
-          <Table 
+        <div className="px-4 mb-10 overflow-x-auto">
+          <Table
             columns={columns}
             dataSource={results}
             size="small"
             bordered
-            className={classes.tableHeader}
             pagination={{
               pageSize: 12,
               showSizeChanger: false,
               hideOnSinglePage: true,
-              showTotal: (total) => `Total ${total} items`,
-              total: totalItems - 1,
             }}
-            locale={{
-              emptyText: (
-                <div className="flex flex-col items-center justify-center">
-                  <p className="text-gray-400 text-sm my-2">
-                    No Sent Orders
-                  </p>
-                </div>
-              ),
-            }}
+            loading={!results}
           />
-        </div>
-
-        <div className="sm:hidden mt-5">
-          {results.map((result) => (
-            <div key={result.id} className='w-full grid grid-cols-5 gap-3 border border-1 border-gray-200'>
-              <div className="py-5 pr-6 col-span-4">
-                <div className="pl-5 text-xs text-gray-800">ID: <span className='font-bold'>{result.id}</span></div>
-                <div className="text-sm pl-5 text-gray-900">{result.vaccine}</div>
-                <div className="pl-5 text-sm text-gray-800">Type: <span className='font-semibold'>{result.type}</span></div>
-                <div className="text-sm pl-5">Batches: <span className='font-semibold'>{result.batches}</span></div>
-                <div className="pl-5 text-sm text-gray-800">Current Balance: <span className='font-semibold'>{result.currentBalance}</span></div>
-                <div className="text-sm pl-5 text-gray-900">Last Transaction Date: <span className='font-semibold'>{result.lastTransactionDate}</span></div>
-              </div>
-              <div className="py-5 max-w-auto right-5">
-                <div className="flex flex-col items-start">
-                  <a
-                    className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                  >
-                    Ledger
-                  </a>
-                  <Button
-                    className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500 border-none p-0"
-                  >
-                    Batch Summary
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </Card>
     </>

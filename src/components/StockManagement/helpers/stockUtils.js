@@ -110,3 +110,70 @@ export const formatDeliveryToTable = (supplyDelivery) => {
     orderNumber: supplyDelivery.basedOn?.[0]?.display || 'N/A',
   }
 }
+
+export const getVaccineBatches = (vaccineName, inventoryReport) => {
+  const vaccineBatches = []
+
+  const inventoryItems = inventoryReport.extension?.find((ext) =>
+    ext.url.includes('inventory-items')
+  )
+
+  if (!inventoryItems || !inventoryItems.extension) {
+    return vaccineBatches
+  }
+
+  inventoryItems.extension.forEach((vaccineExt) => {
+    const vaccine = vaccineExt.extension?.find(
+      (ext) =>
+        ext.url ===
+        `https://example.org/fhir/StructureDefinition/${vaccineName}`
+    )?.valueCodeableConcept?.text
+
+    if (vaccine !== vaccineName) return
+
+    const batches = vaccineExt.extension?.find(
+      (ext) => ext.url === 'batches'
+    )?.extension
+
+    if (!batches) return
+
+    batches.forEach((batchExt) => {
+      const batchData = {
+        vaccine: vaccineName,
+        batchNumber: '',
+        expiryDate: '',
+        vvmStatus: '',
+        manufacturerDetails: '',
+        quantity: 0,
+        type: 'Dose',
+        date: dayjs(inventoryReport.created).format('DD-MM-YYYY'),
+      }
+
+      batchExt.extension.forEach((detail) => {
+        switch (detail.url) {
+          case 'batchNumber':
+            batchData.batchNumber = detail.valueString
+            break
+          case 'expiryDate':
+            batchData.expiryDate = detail.valueDateTime
+              ? dayjs(detail.valueDateTime).format('DD-MM-YYYY')
+              : ''
+            break
+          case 'quantity':
+            batchData.quantity = detail.valueQuantity.value
+            break
+          case 'vvmStatus':
+            batchData.vvmStatus = detail.valueCodeableConcept.text
+            break
+          case 'manufacturerDetails':
+            batchData.manufacturerDetails = detail.valueString
+            break
+        }
+      })
+
+      vaccineBatches.push(batchData)
+    })
+  })
+
+  return vaccineBatches
+}
