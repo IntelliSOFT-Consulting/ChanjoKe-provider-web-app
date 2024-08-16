@@ -18,6 +18,8 @@ import { useLocations } from '../../hooks/useLocation'
 import useStock from '../../hooks/useStock'
 import NewOrderTable from './newOrder/NewOrderTable'
 import { supplyRequestBuilder } from './helpers/stockResourceBuilder'
+import LoadingArrows from '../../common/spinners/LoadingArrows'
+import { titleCase } from '../../utils/methods'
 
 const { useForm } = Form
 
@@ -134,7 +136,7 @@ export default function NewOrder() {
           ...data,
           tableData,
           deliverFrom: {
-            reference: subCounty?.key,
+            reference: `Location/${subCounty?.key}`,
             display: subCounty?.name,
           },
           requester: { reference: `Practitioner/${user.fhirPractitionerId}` },
@@ -188,7 +190,11 @@ export default function NewOrder() {
     <Card
       className="mt-5"
       title={
-        <div className="text-xl font-semibold">Vaccine Ordering Sheet</div>
+        <div className="text-xl font-semibold">
+          {`New Order for ${titleCase(user.facilityName)} (${
+            user?.facility?.split('/')[1]
+          })`}
+        </div>
       }
       actions={[
         <div className="flex w-full justify-end px-6">
@@ -206,131 +212,144 @@ export default function NewOrder() {
         </div>,
       ]}
     >
-      <div className="bg-[#163c9412] p-3 mx-4">
-        <h3 className="text-[#707070] font-semibold text-base">
-          Order Details
-        </h3>
-      </div>
-      <Form
-        layout="vertical"
-        form={form}
-        onFinish={onSubmit}
-        className="p-4"
-        initialValues={{
-          authoredOn: dayjs(),
-          expectedDateOfNextOrder: dayjs().add(30, 'days'),
-          level: 'Sub-County',
-        }}
-        autoComplete="off"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
-          <Form.Item
-            label="Level"
-            name="level"
-            rules={[{ required: true, message: 'Please select the level' }]}
-          >
-            <Select
-              placeholder="Select Level"
-              options={[
-                // { label: 'Central', value: 'Central' },
-                // { label: 'Regional', value: 'Regional' },
-                { label: 'Sub-County', value: 'Sub-County' },
-                // { label: 'Health Facility', value: 'Health Facility' },
-              ]}
-              allowClear
-            />
-          </Form.Item>
-
-          <Form.Item label="Order Location" name="facility">
-            <Input disabled />
-          </Form.Item>
-
-          <Form.Item label="Date of Last Order:" name="lastOrderDate">
-            <DatePicker
-              className="w-full"
-              placeholder="Date of Last Order"
-              disabledDate={(current) =>
-                current &&
-                current > moment().subtract(1, 'days').startOf('days')
-              }
-              format="DD-MM-YYYY"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Date of This Order:"
-            name="authoredOn"
-            rules={[{ required: true, message: 'Please input the order date' }]}
-          >
-            <DatePicker
-              className="w-full"
-              placeholder="Date of This Order"
-              onChange={(date) => {
-                form.setFieldValue(
-                  'expectedDateOfNextOrder',
-                  date.add(30, 'days')
-                )
-              }}
-              format="DD-MM-YYYY"
-            />
-          </Form.Item>
-
-          <Form.Item label="Preferred Pickup Date:" name="preferredPickupDate">
-            <DatePicker
-              className="w-full"
-              placeholder="Preferred Pickup Date"
-              disabledDate={(current) =>
-                current && current < moment().startOf('days')
-              }
-              format="DD-MM-YYYY"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Expected Date of Next Order:"
-            name="expectedDateOfNextOrder"
-          >
-            <DatePicker
-              className="w-full"
-              placeholder="Expected Date of Next Order"
-              disabledDate={(current) =>
-                current && current < moment().startOf('days')
-              }
-              format="DD-MM-YYYY"
-            />
-          </Form.Item>
+      {loading || !setSubCounty ? (
+        <div className="flex justify-center items-center h-96">
+          <LoadingArrows />
         </div>
-        <div className="border-2 mb-10"></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
-          <Form.Item label="Catchment Population" name="totalPopulation">
-            <Input placeholder="Catchment Population" />
-          </Form.Item>
-
-          <Form.Item
-            label="Children Aged 0-11 Months (under 1 year)"
-            name="childrenAged0-11Months"
+      ) : (
+        <>
+          <div className="bg-[#163c9412] p-3 mx-4">
+            <h3 className="text-[#707070] font-semibold text-base">
+              Order Details
+            </h3>
+          </div>
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={onSubmit}
+            className="p-4"
+            initialValues={{
+              authoredOn: dayjs(),
+              expectedDateOfNextOrder: dayjs().add(30, 'days'),
+              level: 'Sub-County',
+            }}
+            autoComplete="off"
           >
-            <Input placeholder="Children Aged 0-11 Months (under 1 year)" />
-          </Form.Item>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
+              <Form.Item
+                label="Level"
+                name="level"
+                rules={[{ required: true, message: 'Please select the level' }]}
+              >
+                <Select
+                  placeholder="Select Level"
+                  options={[
+                    // { label: 'Central', value: 'Central' },
+                    // { label: 'Regional', value: 'Regional' },
+                    { label: 'Sub-County', value: 'Sub-County' },
+                    // { label: 'Health Facility', value: 'Health Facility' },
+                  ]}
+                  allowClear
+                />
+              </Form.Item>
 
-          <Form.Item label="Pregnant Women" name="pregnantWomen">
-            <Input placeholder="Pregnant Women" />
-          </Form.Item>
-        </div>
-        <div className="bg-[#163c9412] p-3 mb-10">
-          <h3 className="text-[#707070] font-semibold text-base">
-            Antigen Details
-          </h3>
-        </div>
-        <NewOrderTable
-          form={form}
-          tableData={tableData}
-          setTableData={setTableData}
-          inventoryItems={inventoryItems}
-          hasErrors={hasErrors}
-          handleValidate={handleValidate}
-        />
-      </Form>
+              <Form.Item label="Order Location" name="facility">
+                <Input disabled />
+              </Form.Item>
+
+              <Form.Item label="Date of Last Order:" name="lastOrderDate">
+                <DatePicker
+                  className="w-full"
+                  placeholder="Date of Last Order"
+                  disabledDate={(current) =>
+                    current &&
+                    current > moment().subtract(1, 'days').startOf('days')
+                  }
+                  format="DD-MM-YYYY"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Date of This Order:"
+                name="authoredOn"
+                rules={[
+                  { required: true, message: 'Please input the order date' },
+                ]}
+              >
+                <DatePicker
+                  className="w-full"
+                  placeholder="Date of This Order"
+                  onChange={(date) => {
+                    form.setFieldValue(
+                      'expectedDateOfNextOrder',
+                      date.add(30, 'days')
+                    )
+                  }}
+                  format="DD-MM-YYYY"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Preferred Pickup Date:"
+                name="preferredPickupDate"
+              >
+                <DatePicker
+                  className="w-full"
+                  placeholder="Preferred Pickup Date"
+                  disabledDate={(current) =>
+                    current && current < moment().startOf('days')
+                  }
+                  format="DD-MM-YYYY"
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Expected Date of Next Order:"
+                name="expectedDateOfNextOrder"
+              >
+                <DatePicker
+                  className="w-full"
+                  placeholder="Expected Date of Next Order"
+                  disabledDate={(current) =>
+                    current && current < moment().startOf('days')
+                  }
+                  format="DD-MM-YYYY"
+                />
+              </Form.Item>
+            </div>
+            <div className="border-2 mb-10"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
+              <Form.Item label="Catchment Population" name="totalPopulation">
+                <Input placeholder="Catchment Population" />
+              </Form.Item>
+
+              <Form.Item
+                label="Children Aged 0-11 Months (under 1 year)"
+                name="childrenAged0-11Months"
+              >
+                <Input placeholder="Children Aged 0-11 Months (under 1 year)" />
+              </Form.Item>
+
+              <Form.Item label="Pregnant Women" name="pregnantWomen">
+                <Input placeholder="Pregnant Women" />
+              </Form.Item>
+            </div>
+            <div className="bg-[#163c9412] p-3 mb-10">
+              <h3 className="text-[#707070] font-semibold text-base">
+                Antigen Details
+              </h3>
+            </div>
+            <NewOrderTable
+              form={form}
+              tableData={tableData}
+              setTableData={setTableData}
+              inventoryItems={inventoryItems}
+              hasErrors={hasErrors}
+              handleValidate={handleValidate}
+            />
+          </Form>
+        </>
+      )}
     </Card>
   )
 }
