@@ -282,7 +282,7 @@ export const inventoryItemBuilder = (facility) => {
           url: 'quantity',
           valueQuantity: {
             value: 0,
-            unit: 'vials',
+            unit: 'doses',
           },
         },
       ],
@@ -293,42 +293,47 @@ export const inventoryItemBuilder = (facility) => {
   })
 }
 
-const createBatchExtension = (vaccine) => ({
-  url: 'batch',
-  extension: [
-    {
-      url: 'batchNumber',
-      valueString: vaccine.batchNumber,
-    },
-    {
-      url: 'expiryDate',
-      valueDateTime: dayjs(vaccine.expiryDate, 'DD-MM-YYYY').toISOString(),
-    },
-    {
-      url: 'quantity',
-      valueQuantity: {
-        value: vaccine.quantity,
-        unit: 'vials',
+const createBatchExtension = (vaccine) => {
+  if (vaccine.quantity === undefined || isNaN(vaccine.quantity)) {
+    return null
+  }
+  return {
+    url: 'batch',
+    extension: [
+      {
+        url: 'batchNumber',
+        valueString: vaccine.batchNumber,
       },
-    },
-    {
-      url: 'vvmStatus',
-      valueCodeableConcept: {
-        coding: [
-          {
-            system: 'http://example.org/vvm-status',
-            code: vaccine.vvmStatus,
-          },
-        ],
-        text: vaccine.vvmStatus,
+      {
+        url: 'expiryDate',
+        valueDateTime: dayjs(vaccine.expiryDate, 'DD-MM-YYYY').toISOString(),
       },
-    },
-    {
-      url: 'manufacturerDetails',
-      valueString: vaccine.manufacturerDetails,
-    },
-  ],
-})
+      {
+        url: 'quantity',
+        valueQuantity: {
+          value: vaccine.quantity,
+          unit: 'doses',
+        },
+      },
+      {
+        url: 'vvmStatus',
+        valueCodeableConcept: {
+          coding: [
+            {
+              system: 'http://example.org/vvm-status',
+              code: vaccine.vvmStatus,
+            },
+          ],
+          text: vaccine.vvmStatus,
+        },
+      },
+      {
+        url: 'manufacturerDetails',
+        valueString: vaccine.manufacturerDetails,
+      },
+    ],
+  }
+}
 
 const createVaccineExtension = (vaccine, prevVaccines) => {
   const vaccineUrl = `https://example.org/fhir/StructureDefinition/${vaccine.vaccine.replace(
@@ -349,10 +354,14 @@ const createVaccineExtension = (vaccine, prevVaccines) => {
     )
   )
 
-  if (batchIndex > -1) {
-    batchExtensions[batchIndex] = createBatchExtension(vaccine)
-  } else {
-    batchExtensions.push(createBatchExtension(vaccine))
+  const newBatchExtension = createBatchExtension(vaccine)
+
+  if (newBatchExtension) {
+    if (batchIndex > -1) {
+      batchExtensions[batchIndex] = newBatchExtension
+    } else {
+      batchExtensions.push(newBatchExtension)
+    }
   }
 
   return {
@@ -438,7 +447,7 @@ export const inventoryItemUpdate = (
       (vaccine) => vaccine.vaccine === inventoryItem.identifier[0].value
     )
 
-    if (getVaccine) {
+    if (getVaccine && getVaccine.quantity >= 0) {
       return {
         ...inventoryItem,
         extension: [
@@ -450,7 +459,7 @@ export const inventoryItemUpdate = (
                   ? inventoryItem.extension[0].valueQuantity.value +
                     getVaccine.quantity
                   : getVaccine.quantity,
-              unit: 'vials',
+              unit: 'doses',
             },
           },
         ],
@@ -463,7 +472,7 @@ export const inventoryItemUpdate = (
 export const receiveAuditBuilder = (
   vaccines,
   inventoryReport,
-  user,
+  values,
   type = 'count'
 ) => {
   const auditTypes = {
@@ -478,14 +487,9 @@ export const receiveAuditBuilder = (
     recorded: moment().toISOString(),
     outcomeDesc: auditTypes[type],
     type: {
-      coding: [
-        {
-          system: 'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
-          code: type,
-          display: auditTypes[type],
-        },
-      ],
-      text: auditTypes[type],
+      system: 'http://terminology.hl7.org/CodeSystem/audit-event-purpose',
+      code: type,
+      display: auditTypes[type],
     },
     agent: {
       type: {
@@ -499,29 +503,32 @@ export const receiveAuditBuilder = (
         ],
         text: 'Human User',
       },
-      who: {
-        reference: `Practitioner/${user.fhirPractitionerId}`,
+      location: values.receiver || {
+        reference: `Location/${values.facility}`,
+        display: values.facilityName,
       },
-      location: {
-        reference: `Location/${user.facility}`,
-        display: user.facilityName,
-      },
+      name: values.agentName || values.facilityName,
       requestor: true,
     },
     source: {
       observer: {
-        reference: `Practitioner/${user.fhirPractitionerId}`,
+        reference: `Practitioner/${values.fhirPractitionerId}`,
+      },
+      site: {
+        reference: `Location/${values.facility}`,
+        display: values.facilityName,
       },
     },
     entity: [
       {
+        description: values.description || '',
         what: {
           reference: `Basic/${inventoryReport.id}`,
           display: 'Inventory Report',
         },
         detail: {
           type: auditTypes[type],
-          value: JSON.stringify(vaccines),
+          valueString: JSON.stringify(vaccines),
         },
       },
     ],

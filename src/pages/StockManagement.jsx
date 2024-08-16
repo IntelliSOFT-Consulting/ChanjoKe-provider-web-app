@@ -1,77 +1,101 @@
-import { useState, useEffect } from "react";
-import IssueStockLogo from "../common/icons/issueStockLogo";
-import OrderStockLogo from "../common/icons/orderStockLogo";
-import ReceiveStockLogo from "../common/icons/receiveStockLogo";
-import StockLedgerLogo from "../common/icons/stockLedgerLogo";
-import FormState from "../utils/formState";
-import { Link } from "react-router-dom";
-import DataTable from "../components/DataTable";
-import { Input } from "antd";
-
-const results = [
-  { id: "", name: "BCG", batchNumber: "AG8998HH88", quantity: "30" },
-  { id: "", name: "OPV 1", batchNumber: "UU8090DDD4", quantity: "20" },
-  { id: "", name: "BCG", batchNumber: "77TYD66767", quantity: "30" },
-];
+import { useState, useEffect } from 'react'
+import IssueStockLogo from '../common/icons/issueStockLogo'
+import OrderStockLogo from '../common/icons/orderStockLogo'
+import ReceiveStockLogo from '../common/icons/receiveStockLogo'
+import StockLedgerLogo from '../common/icons/stockLedgerLogo'
+import useInventory from '../hooks/useInventory'
+import { Link } from 'react-router-dom'
+import DataTable from '../components/DataTable'
+import { Input } from 'antd'
+import Table from '../components/DataTable'
+import dayjs from 'dayjs'
+import { render } from '@testing-library/react'
 
 export default function StockManagement() {
-  const [data, setData] = useState(null);
+  const [allData, setAllData] = useState(null)
+  const [results, setResults] = useState(null)
+
+  const { getInventoryItems, inventoryItems } = useInventory()
+
+  const formatResults = (data) => {
+    return data.map((item) => ({
+      id: item.id,
+      vaccine: item?.code?.text,
+      type: 'Dose',
+      quantity: item?.extension?.[0]?.valueQuantity?.value,
+      lastTransactionDate: dayjs(item?.meta?.lastUpdated).format('DD-MM-YYYY'),
+    }))
+  }
 
   useEffect(() => {
-    // Fetch stock data
-    setData(results);
-  }, []);
+    getInventoryItems()
+  }, [])
+
+  useEffect(() => {
+    if (inventoryItems) {
+      const formatted = formatResults(inventoryItems)
+      setResults(formatted)
+      setAllData(formatted)
+    }
+  }, [inventoryItems])
+
   const iconComponents = {
     IssueStockLogo,
     OrderStockLogo,
     ReceiveStockLogo,
     StockLedgerLogo,
-  };
+  }
 
   const stats = [
-    { name: "Receive Stock", icon: "ReceiveStockLogo", href: "receive-stock" },
-    { name: "Order Stock", icon: "OrderStockLogo", href: "new-order" },
-    { name: "Issue Stock", icon: "IssueStockLogo", href: "issue-stock" },
-    { name: "Stock Ledger", icon: "StockLedgerLogo", href: "ledger" },
-  ];
+    { name: 'Receive Stock', icon: 'ReceiveStockLogo', href: 'receive-stock' },
+    { name: 'Order Stock', icon: 'OrderStockLogo', href: 'new-order' },
+    { name: 'Issue Stock', icon: 'IssueStockLogo', href: 'issue-stock' },
+    { name: 'Stock Ledger', icon: 'StockLedgerLogo', href: 'ledger' },
+  ]
 
-  const tHeaders = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Batch Number", dataIndex: "batchNumber", key: "batchNumber" },
-    { title: "Quantity", dataIndex: "quantity", key: "quantity" },
+  const columns = [
     {
-      title: "Actions",
-      dataIndex: "actions",
-      key: "actions",
-      render: (_, _record) => <Link to="/">View</Link>,
+      title: '',
+      dataIndex: 'id',
+      key: 'id',
+      render: (_, _record, index) => index + 1,
     },
-  ];
+    { title: 'Vaccine', dataIndex: 'vaccine', key: 'vaccine' },
+    { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
+  ]
 
-  const handleSearch = (e) => {
-    const matched = results.filter((result) => {
-      return (
-        result.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        result.batchNumber.toLowerCase().includes(e.target.value.toLowerCase())
-      );
-    });
-    setData(matched);
-  };
+  const handleSearch = (vaccine) => {
+    if (!vaccine) {
+      setResults(allData)
+      return
+    }
+
+    const filtered = allData.filter((item) =>
+      item.vaccine?.toLowerCase().includes(vaccine.toLowerCase())
+    )
+    setResults(filtered)
+  }
 
   return (
     <div>
       <dl className="mx-auto max-w-7xl px-6 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-4 py-12 rounded-lg shadow-lg border bg-white">
         {stats.map((item) => {
-          const IconComponent = iconComponents[item.icon];
+          const IconComponent = iconComponents[item.icon]
           return (
             <Link
               to={item.href}
               key={item.name}
               className="overflow-hidden grid justify-items-center text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-primary"
             >
-              <IconComponent height="50" width="50" fillColor="#292929" className="h-12 block mx-auto mb-5" />
+              <IconComponent
+                height="50"
+                width="50"
+                fillColor="#292929"
+                className="h-12 block mx-auto mb-5"
+              />
               <dt className="truncate mt-5 text-dark">{item.name}</dt>
             </Link>
-          );
+          )
         })}
       </dl>
 
@@ -79,25 +103,34 @@ export default function StockManagement() {
         <div className="px-4 py-5 sm:p-6">
           <div className="flex mb-6">
             <div className="col-span-3 absolute top-0 left-0 bg-primary">
-              <div className="px-8 text-white font-semibold py-2">Current Stock</div>
+              <div className="px-8 text-white font-semibold py-2">
+                Current Stock
+              </div>
             </div>
             <div className="w-1/2 ml-auto mt-8">
-              <Input placeholder="Search" onChange={handleSearch} allowClear />
+              <Input.Search
+                placeholder="Search"
+                onChange={(e) => handleSearch(e.target.value)}
+                allowClear
+                className="w-full"
+              />
             </div>
           </div>
 
-          {data && (
-            <DataTable
-              columns={tHeaders}
-              loading={!data}
-              dataSource={data}
-              align="center"
-              size="small"
-              pagination={data?.length > 5 ? { pageSize: 5 } : false}
-            />
-          )}
+          <Table
+            columns={columns}
+            dataSource={results}
+            loading={!results}
+            size="small"
+            bordered
+            pagination={{
+              pageSize: 12,
+              showSizeChanger: false,
+              hideOnSinglePage: true,
+            }}
+          />
         </div>
       </div>
     </div>
-  );
+  )
 }

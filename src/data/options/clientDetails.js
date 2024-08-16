@@ -36,3 +36,46 @@ export const manufacturerOptions = [
   { label: 'Sinovac Biotech', value: 'Sinovac Biotech' },
   { label: 'Biovac Institute', value: 'Biovac Institute' },
 ]
+
+export const reasons = [
+  {
+    label: 'High Demand',
+    value: 'High Demand',
+  },
+  {
+    label: 'Stock Shortage',
+    value: 'Stock Shortage',
+  },
+  {
+    label: 'Inventory Discrepancy',
+    value: 'Inventory Discrepancy',
+  },
+  {
+    label: 'Cold Chain Failure',
+    value: 'Cold Chain Failure',
+  },
+  {
+    label: 'Supply Chain Delay',
+    value: 'Supply Chain Delay',
+  },
+  {
+    label: 'Emergency Situation',
+    value: 'Emergency Situation',
+  },
+  {
+    label: 'New Vaccination Campaign',
+    value: 'New Vaccination Campaign',
+  },
+  {
+    label: 'Expired Stock',
+    value: 'Expired Stock',
+  },
+  {
+    label: 'Vaccine Wastage',
+    value: 'Vaccine Wastage',
+  },
+  {
+    label: 'Population Growth',
+    value: 'Population Growth',
+  },
+]
