@@ -5,7 +5,8 @@ import {
   Form,
   InputNumber,
   Select,
-  notification
+  notification,
+  Tag,
 } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
@@ -173,12 +174,13 @@ export default function NegativeAdjustments() {
                   batch.batchNumber === vaccine.batchNumber
               )}
             >
-              {vaccine?.vaccine}
+              {vaccine?.vaccine} -{' '}
+              <Tag color="blue">{vaccine?.batchNumber}</Tag>
             </Select.Option>
           ))}
         </Select>
       ),
-      width: '20%',
+      width: 250,
     },
     {
       title: 'Batch Number',

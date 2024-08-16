@@ -292,11 +292,12 @@ export const inventoryItemBuilder = (facility) => {
     }
   })
 }
-
 const createBatchExtension = (vaccine) => {
+  // Only create batch extension if quantity is provided and is a number
   if (vaccine.quantity === undefined || isNaN(vaccine.quantity)) {
     return null
   }
+
   return {
     url: 'batch',
     extension: [
@@ -311,8 +312,8 @@ const createBatchExtension = (vaccine) => {
       {
         url: 'quantity',
         valueQuantity: {
-          value: vaccine.quantity,
-          unit: 'doses',
+          value: Number(vaccine.quantity),
+          unit: 'vials',
         },
       },
       {
@@ -335,7 +336,7 @@ const createBatchExtension = (vaccine) => {
   }
 }
 
-const createVaccineExtension = (vaccine, prevVaccines) => {
+const updateOrCreateVaccineExtension = (vaccine, prevVaccines) => {
   const vaccineUrl = `https://example.org/fhir/StructureDefinition/${vaccine.vaccine.replace(
     /\s/g,
     '-'
@@ -347,19 +348,27 @@ const createVaccineExtension = (vaccine, prevVaccines) => {
     existingVaccine?.extension?.find((ext) => ext.url === 'batches')
       ?.extension || []
 
-  const batchIndex = batchExtensions.findIndex((batch) =>
-    batch.extension.some(
-      (ext) =>
-        ext.url === 'batchNumber' && ext.valueString === vaccine.batchNumber
-    )
-  )
+  // Filter out batches with quantity <= 0
+  batchExtensions = batchExtensions.filter((batch) => {
+    const quantity = batch.extension.find((ext) => ext.url === 'quantity')
+    return quantity && quantity.valueQuantity.value > 0
+  })
 
   const newBatchExtension = createBatchExtension(vaccine)
 
   if (newBatchExtension) {
-    if (batchIndex > -1) {
-      batchExtensions[batchIndex] = newBatchExtension
+    const existingBatchIndex = batchExtensions.findIndex((batch) =>
+      batch.extension.some(
+        (ext) =>
+          ext.url === 'batchNumber' && ext.valueString === vaccine.batchNumber
+      )
+    )
+
+    if (existingBatchIndex > -1) {
+      // Update existing batch
+      batchExtensions[existingBatchIndex] = newBatchExtension
     } else {
+      // Add new batch
       batchExtensions.push(newBatchExtension)
     }
   }
@@ -381,10 +390,7 @@ const createVaccineExtension = (vaccine, prevVaccines) => {
       },
       {
         url: 'batches',
-        extension: batchExtensions.filter((batch) => {
-          const quantity = batch.extension.find((ext) => ext.url === 'quantity')
-          return quantity.valueQuantity.value > 0
-        }),
+        extension: batchExtensions,
       },
     ],
   }
@@ -397,6 +403,32 @@ export const inventoryReportBuilder = (
 ) => {
   const inventoryItemsUrl =
     'http://example.org/fhir/StructureDefinition/inventory-items'
+
+  let prevVaccines =
+    prevInventoryReport?.extension?.find((ext) => ext.url === inventoryItemsUrl)
+      ?.extension || []
+
+  // Process new supplies
+  newSupplies.forEach((supply) => {
+    const vaccineIndex = prevVaccines.findIndex(
+      (pv) =>
+        pv.url ===
+        `https://example.org/fhir/StructureDefinition/${supply.vaccine.replace(
+          /\s/g,
+          '-'
+        )}`
+    )
+
+    if (vaccineIndex > -1) {
+      // Update existing vaccine
+      prevVaccines[vaccineIndex] = updateOrCreateVaccineExtension(supply, [
+        prevVaccines[vaccineIndex],
+      ])
+    } else {
+      // Add new vaccine
+      prevVaccines.push(updateOrCreateVaccineExtension(supply, []))
+    }
+  })
 
   return {
     resourceType: 'Basic',
@@ -421,14 +453,7 @@ export const inventoryReportBuilder = (
     extension: [
       {
         url: inventoryItemsUrl,
-        extension: newSupplies.map((supply) =>
-          createVaccineExtension(
-            supply,
-            prevInventoryReport?.extension?.find(
-              (ext) => ext.url === inventoryItemsUrl
-            )?.extension
-          )
-        ),
+        extension: prevVaccines,
       },
     ],
     subject: {

@@ -211,6 +211,7 @@ export default function StockCount() {
             updatedBatches[index] = {
               ...updatedBatches[index],
               physicalCount: value,
+              difference: value - updatedBatches[index].quantity,
             }
             setEditedBatches(updatedBatches)
           }}
@@ -218,9 +219,9 @@ export default function StockCount() {
       ),
     },
     {
-      title: 'VVM Status',
-      dataIndex: 'vvmStatus',
-      type: 'select',
+      title: 'Difference',
+      dataIndex: 'difference',
+      key: 'difference',
     },
     {
       title: null,
