@@ -231,8 +231,8 @@ export const supplyDeliveryBuilder = (values) => {
           display: 'In Stock',
         },
         {
-          code: values.user?.facility,
-          display: values.user?.facility,
+          code: values.destination?.reference,
+          display: values.destination?.display,
         },
       ],
     },

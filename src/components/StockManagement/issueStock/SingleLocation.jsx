@@ -7,6 +7,8 @@ import {
   Select,
   DatePicker,
   notification,
+  Tag,
+  Popconfirm,
 } from 'antd'
 import { useSelector } from 'react-redux'
 import Table from '../../DataTable'
@@ -116,34 +118,27 @@ const SingleLocation = ({ vaccines = [] }) => {
         ],
       }
 
-      await updateSupplyRequest(selectedRequest)
-
-      const roleDetails = await getPractitionerRoles(user?.fhirPractitionerId)
-      const role = roleDetails?.find(
-        (item) => item.resourceType === 'PractitionerRole'
-      )
-
-      const roleName = role?.code?.[0]?.coding?.[0]?.code
-
       const deliveryData = {
         ...values,
         user,
         supplier: {
-          reference: `PractitionerRole/${role.id}`,
-          display: `${titleCase(roleName)}/${
+          reference: `Practitioner/${user?.fhirPractitionerId}`,
+          display: `${titleCase(user?.practitionerRole)}/${
             selectedRequest.deliverFrom.reference
           }`,
         },
-        identifier: [{
-          value: selectedRequest.deliverFrom.reference,
-        }],
+        identifier: [
+          {
+            value: selectedRequest.deliverFrom.reference,
+          },
+        ],
         basedOn: [
           {
             reference: `SupplyRequest/${selectedRequest.id}`,
             display: selectedRequest.identifier?.[0]?.value,
           },
         ],
-        destination: selectedRequest.deliverFrom,
+        destination: selectedRequest.deliverTo,
         tableValues: orderItems.map((item) => {
           return {
             ...item,
@@ -154,6 +149,7 @@ const SingleLocation = ({ vaccines = [] }) => {
       const supplyDelivery = supplyDeliveryBuilder(deliveryData)
 
       await createSupplyDelivery(supplyDelivery)
+      await updateSupplyRequest(selectedRequest)
 
       form.resetFields()
       setOrderItems([{}])
@@ -164,9 +160,12 @@ const SingleLocation = ({ vaccines = [] }) => {
           'Stock has been issued successfully, awaiting delivery to the selected location.',
       })
 
-      // navigate('/stock-management/sent-orders') after 1.5s
-      navigate('/stock-management', { state: {} })
+      // navigate to stock management page after 1 second
+      setTimeout(() => {
+        navigate('/stock-management', { state: {} })
+      }, 1000)
     } catch (error) {
+      console.log(error)
       api.error({
         message: 'Error issuing stock',
         description: 'An error occurred while issuing stock. Please try again.',
@@ -364,7 +363,14 @@ const SingleLocation = ({ vaccines = [] }) => {
               filterOption={(input, option) =>
                 option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
-            />
+            >
+              {locationOptions(requests?.data)?.map((location) => (
+                <Option key={location.value} value={location.value}>
+                  <Tag color="blue">({location.value?.split('/')[1]})</Tag>
+                  {location.label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item name="orderNumber" label="Order Number" allowClear>
             <Input
@@ -417,9 +423,14 @@ const SingleLocation = ({ vaccines = [] }) => {
           <Button className="mr-4" onClick={() => form.resetFields()}>
             Cancel
           </Button>
-          <Button type="primary" onClick={() => form.submit()}>
-            Submit
-          </Button>
+          <Popconfirm
+            title="Are you sure you want to submit?"
+            onConfirm={() => form.submit()}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="primary">Submit</Button>
+          </Popconfirm>
         </div>
       </Form>
       {contextHolder}
