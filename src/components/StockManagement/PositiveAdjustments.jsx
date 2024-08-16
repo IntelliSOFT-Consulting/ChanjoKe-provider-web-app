@@ -1,19 +1,12 @@
-import {
-  Button,
-  Card,
-  DatePicker,
-  InputNumber,
-  Form,
-  Select,
-  notification,
-} from 'antd'
+import { Button, Card, DatePicker, Form, Select, notification } from 'antd'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { reasons } from '../../data/options/clientDetails'
 import { useAudit } from '../../hooks/useAudit'
 import useInventory from '../../hooks/useInventory'
 import Table from '../DataTable'
-import { formatInventoryToTable } from './helpers/inventoryFormatter'
 import {
   inventoryItemUpdate,
   inventoryReportBuilder,
@@ -22,44 +15,64 @@ import {
 
 export default function PositiveAdjustments() {
   const [batchOptions, setBatchOptions] = useState(null)
-  const [editedBatches, setEditedBatches] = useState([{}])
+  const [editedBatches, setEditedBatches] = useState(null)
+  const [locations, setLocations] = useState(null)
 
   const [api, contextHolder] = notification.useNotification()
+
+  const [form] = Form.useForm()
 
   const { user } = useSelector((state) => state.userInfo)
 
   const navigate = useNavigate()
 
-  const {
-    getInventoryReport,
-    getInventoryItems,
-    updateInventory,
-    inventoryReport,
-  } = useInventory()
+  const { getInventoryReport, getInventoryItems, updateInventory } =
+    useInventory()
 
-  const { createAudit, getAudits, audits } = useAudit()
+  const { createAudit, updateAudit, getAudits, audits } = useAudit()
 
   useEffect(() => {
     getInventoryReport()
-    getAudits({ type: 'shared', 'agent-name': user.facilityName })
+    getAudits({ type: 'shared', 'agent-name': user.facilityName, action: 'U' })
   }, [])
 
-  useEffect(() => {
-    if (inventoryReport) {
-      const formattedInventory = formatInventoryToTable(inventoryReport)
-      setBatchOptions(formattedInventory)
-    }
-  }, [inventoryReport])
-
   const addIssuedBatches = () => {
-    if (audits?.length) {
-      const auditData = audits[0]
-      const issuedBatches = auditData?.entity?.[0].detail?.valueString
-        ? JSON.parse(auditData?.entity?.[0].detail?.valueString)
-        : []
-      setEditedBatches(issuedBatches)
-    }
+    if (!audits?.length) return
+
+    const locationOptions = []
+    const batches = audits
+      .map((auditData) => {
+        const location = auditData?.agent?.[0]?.location
+
+        if (location) {
+          locationOptions.push({
+            label: location.display,
+            value: location.reference,
+          })
+        }
+
+        const issuedBatches = auditData?.entity?.[0]?.detail?.[0]?.valueString
+        const parsed = issuedBatches ? JSON.parse(issuedBatches) : []
+        return parsed.map((batch) => ({
+          ...batch,
+          sharedQuantity: batch.quantity,
+          quantity: 0,
+          facilityName: location.display,
+          facility: location.reference,
+          reason: auditData?.entity?.[0]?.description,
+        }))
+      })
+      ?.flat()
+
+    setLocations(locationOptions)
+    setBatchOptions(batches)
   }
+
+  useEffect(() => {
+    if (audits?.length) {
+      addIssuedBatches()
+    }
+  }, [audits])
 
   const countPerVaccine = (vaccines) => {
     const removeSelected = batchOptions.filter(
@@ -69,11 +82,11 @@ export default function PositiveAdjustments() {
     const vaccinesToCount = [...vaccines, ...removeSelected]
     const vaccineCounts = vaccinesToCount.reduce((acc, curr) => {
       if (acc[curr.vaccine]) {
-        acc[curr.vaccine].quantity -= curr.quantityWasted
+        acc[curr.vaccine].quantity += curr.sharedQuantity
       } else {
         acc[curr.vaccine] = {
           ...curr,
-          quantity: curr.quantity - curr.quantityWasted,
+          quantity: curr.quantity + curr.sharedQuantity,
         }
       }
       return acc
@@ -91,7 +104,7 @@ export default function PositiveAdjustments() {
       const formattedCount = editedBatches.map((batch) => ({
         ...batch,
         previousQuantity: batch.quantity,
-        quantity: batch.quantity - batch.quantityWasted,
+        quantity: batch.quantity + batch.sharedQuantity,
       }))
 
       const updatedReport = inventoryReportBuilder(
@@ -121,6 +134,11 @@ export default function PositiveAdjustments() {
       await createAudit(audit)
       await updateInventory(updatedReport)
 
+      await updateAudit({
+        ...audits[0],
+        action: 'R',
+      })
+
       setEditedBatches([{}])
 
       getInventoryReport()
@@ -141,37 +159,6 @@ export default function PositiveAdjustments() {
     {
       title: 'Vaccine/Diluents',
       dataIndex: 'vaccine',
-      render: (record, _, index) => (
-        <Select
-          defaultValue={record}
-          className="w-full"
-          onSelect={(value) => {
-            const vaccineBatch = batchOptions.find(
-              (v) => v.batchNumber === value
-            )
-
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index] = vaccineBatch
-            setEditedBatches(updatedBatches)
-          }}
-          placeholder="Select Vaccine"
-        >
-          {batchOptions?.map((vaccine) => (
-            <Select.Option
-              key={vaccine.batchNumber}
-              value={vaccine.batchNumber}
-              disabled={editedBatches.some(
-                (batch) =>
-                  batch.vaccine === vaccine.vaccine &&
-                  batch.batchNumber === vaccine.batchNumber
-              )}
-            >
-              {vaccine?.vaccine}
-            </Select.Option>
-          ))}
-        </Select>
-      ),
-      width: '20%',
     },
     {
       title: 'Batch Number',
@@ -180,38 +167,15 @@ export default function PositiveAdjustments() {
     {
       title: 'Expiry Date',
       dataIndex: 'expiryDate',
-      disabled: true,
     },
     {
       title: 'Received Quantity',
-      dataIndex: 'quantity',
-      render: (text) => (
-        <InputNumber
-          defaultValue={text}
-          className="w-full"
-          onChange={(value, _record, index) => {
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index].quantityWasted = value
-            setEditedBatches(updatedBatches)
-          }}
-          min={0}
-        />
-      ),
+      dataIndex: 'sharedQuantity',
     },
 
     {
       title: 'VVM Status',
       dataIndex: 'vvmStatus',
-      type: 'select',
-    },
-    {
-      title: null,
-      hidden: editedBatches?.length <= 1,
-      render: (record) => (
-        <Button type="link" danger>
-          Delete
-        </Button>
-      ),
     },
   ]
 
@@ -227,24 +191,68 @@ export default function PositiveAdjustments() {
         actions={[
           <div className="flex w-full justify-end px-6">
             <Button className="mr-4">Cancel</Button>
-            <Button type="primary">Submit</Button>
+            <Button type="primary" onClick={() => form.submit()}>
+              Submit
+            </Button>
           </div>,
         ]}
       >
-        <Form layout="vertical" className="p-5">
+        <Form
+          layout="vertical"
+          className="p-5"
+          onFinish={handleSubmit}
+          form={form}
+          initialValues={{
+            date: dayjs(),
+          }}
+        >
           <div className="grid grid-cols-3 gap-10 mb-6">
-            <Form.Item label="Reason For Adjustment">
-              <Select placeholder="Reason for Adjustment" />
+            <Form.Item
+              label="Origin"
+              name="location"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select the origin of the stock',
+                },
+              ]}
+            >
+              <Select
+                placeholder="Origin"
+                options={locations}
+                onChange={(value) => {
+                  const selectedBatches = batchOptions.filter(
+                    (batch) => batch.facility === value
+                  )
+                  form.setFieldValue('reason', selectedBatches[0]?.reason)
+                  setEditedBatches(selectedBatches)
+                }}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Reason For Adjustment"
+              name="reason"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select a reason for adjustment',
+                },
+              ]}
+            >
+              <Select placeholder="Reason for Adjustment" options={reasons} />
             </Form.Item>
 
-            <Form.Item label="Origin">
-              <div className="flex gap-1">
-                <Select placeholder="Origin" />
-                <Select placeholder="Location" />
-              </div>
-            </Form.Item>
-
-            <Form.Item label="Date of Adjustment" className="w-full">
+            <Form.Item
+              label="Date of Adjustment"
+              className="w-full"
+              name="date"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please select the date of adjustment',
+                },
+              ]}
+            >
               <DatePicker
                 placeholder="Date of Adjustment"
                 className="w-full"
@@ -254,27 +262,12 @@ export default function PositiveAdjustments() {
           </div>
           <div className="p-5">
             <Table
-              loading={!batchOptions}
+              loading={!audits}
               columns={columns}
               size="small"
               dataSource={editedBatches || []}
               pagination={false}
             />
-
-            <div className="flex justify-end mt-5">
-              <Button
-                className="!bg-green !text-white hover:!bg-green hover:!border-green hover:!text-white"
-                disabled={
-                  !batchOptions?.length ||
-                  editedBatches?.length === batchOptions?.length ||
-                  editedBatches?.some((batch) => !batch.quantityWasted) ||
-                  editedBatches?.some((batch) => !batch.reason) ||
-                  editedBatches?.some((batch) => !batch.wastageType)
-                }
-              >
-                Add Row
-              </Button>
-            </div>
           </div>
           {contextHolder}
         </Form>
