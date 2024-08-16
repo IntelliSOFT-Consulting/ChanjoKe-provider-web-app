@@ -17,10 +17,15 @@ export const useLocations = (form) => {
     fetchCounties()
   }, [])
 
-  const fetchLocations = async (partof) => {
-    const url = `${fhirRoute}?partof=${partof}&_count=70`
+  const fetchLocations = async (partof, type = null) => {
+    const typeQuery = type ? `&type=${type}` : ''
+    const url = `${fhirRoute}?partof=${partof}&_count=70${typeQuery}`
     const response = await get(url)
-    return convertLocations(response)
+    const convertedLocations = convertLocations(response)
+    if (type) {
+      setLocations(convertedLocations)
+    }
+    return convertedLocations
   }
 
   const getLocationByCode = async (code) => {

@@ -20,19 +20,6 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useAudit } from '../../hooks/useAudit'
 
-const useStyles = createUseStyles({
-  btnPrimary: {
-    backgroundColor: '#163C94',
-    borderColor: '#163C94',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#163C94 !important',
-      borderColor: '#163C94',
-      color: 'white !important',
-    },
-  },
-})
-
 const wastageReasons = {
   Open: [
     {
@@ -68,13 +55,10 @@ export default function Wastage() {
     getInventoryReport,
     getInventoryItems,
     updateInventory,
-    inventoryItems,
     inventoryReport,
   } = useInventory()
 
   const { createAudit } = useAudit()
-
-  const classes = useStyles()
 
   useEffect(() => {
     getInventoryReport()
@@ -320,7 +304,6 @@ export default function Wastage() {
                   !editedBatches?.every((batch) => batch.reason) ||
                   !editedBatches?.every((batch) => batch.wastageType)
                 }
-                className={classes.btnPrimary}
               >
                 Submit
               </Button>
