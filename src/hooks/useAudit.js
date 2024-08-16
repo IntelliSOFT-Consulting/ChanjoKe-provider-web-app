@@ -17,9 +17,8 @@ export const useAudit = () => {
     const response = await get(endpoint, {
       params,
     })
-    const data = response?.entry?.map((entry) => entry.resource)
+    const data = response?.entry?.map((entry) => entry.resource) || []
     setAudits(data)
-
     return data
   }
 
