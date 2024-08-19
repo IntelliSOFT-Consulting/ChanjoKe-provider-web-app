@@ -88,7 +88,7 @@ export default function CaregiverDetails({
       <h3 className="text-xl font-medium mb-6">
         {`${caregiverType(caregiveRelationship)} Details`} {caregiveRelationship}
       </h3>
-      <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254', caregiverRelationship: 'parent' }}>
+      <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
         <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
           <Form.Item
             name="caregiverRelationship"
