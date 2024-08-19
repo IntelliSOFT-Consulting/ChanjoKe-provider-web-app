@@ -4,6 +4,7 @@ import { titleCase } from '../utils/methods'
 
 export default function Profile() {
   const { user } = useSelector((state) => state.userInfo)
+  const userDetails = JSON.parse(localStorage.getItem('user'))
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
       <div className="px-4 text-xl font-semibold py-2 sm:px-6">Profile</div>
@@ -15,8 +16,8 @@ export default function Profile() {
           labelStyle={{ fontWeight: 'bold', color: '#163C94' }}
           size="small"
         >
-          <Descriptions.Item label="Name">{`${user?.firstName} ${user?.lastName}`}</Descriptions.Item>
-          <Descriptions.Item label="Email">{user?.email}</Descriptions.Item>
+          <Descriptions.Item label="Name">{`${userDetails?.firstName} ${userDetails?.lastName}`}</Descriptions.Item>
+          <Descriptions.Item label="Email">{userDetails?.email}</Descriptions.Item>
           <Descriptions.Item label="Phone Number">
             {user?.phone}
           </Descriptions.Item>
@@ -31,6 +32,9 @@ export default function Profile() {
           </Descriptions.Item>
           <Descriptions.Item label="Facility Attached">
             {titleCase(user?.facilityName)}
+          </Descriptions.Item>
+          <Descriptions.Item label="Location">
+            {titleCase(user?.location)}
           </Descriptions.Item>
         </Descriptions>
       </div>

@@ -176,7 +176,10 @@ export default function ClientDetails() {
     if (value) form.setFieldValue(name, titleCase(value))
   }
 
-  const caregiverType = () => {
+  const caregiverType = (val) => {
+    if (val === 'kin') {
+      return 'Next of Kin'
+    }
     if (form.getFieldValue('years') >= 18) {
       return 'Next of Kin'
     }
@@ -457,7 +460,6 @@ export default function ClientDetails() {
                 label="Identification Number"
                 rules={[
                   {
-                    required: true,
                     message: 'Please input identifier number',
                   },
                   {

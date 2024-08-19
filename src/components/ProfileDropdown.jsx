@@ -10,6 +10,7 @@ export default function ProfileDropdown() {
   const dispatch = useDispatch()
 
   const { user } = useSelector((state) => state.userInfo)
+  const userDetails = JSON.parse(localStorage.getItem('user'))
 
   return (
     <Menu as="div" className="relative">
@@ -18,7 +19,7 @@ export default function ProfileDropdown() {
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Open user menu</span>
           <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-            {`${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}`}
+            {`${userDetails.firstName?.charAt(0)}${userDetails.lastName?.charAt(0)}`}
           </div>
         </Menu.Button>
       </div>
