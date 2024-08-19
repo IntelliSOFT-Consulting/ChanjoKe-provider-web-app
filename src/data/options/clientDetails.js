@@ -4,6 +4,11 @@ export const caregiverTypes = [
   { id: 3, label: 'Guardian', value: 'Guardian' },
 ]
 
+export const caregiverRelationships = [
+  { id: 1, label: 'Next of Kin', value: 'kin' },
+  { id: 2, label: 'Parent/Guardian', value: 'parent'}
+]
+
 export const identificationOptions = [
   {
     label: 'Birth Notification Number',
