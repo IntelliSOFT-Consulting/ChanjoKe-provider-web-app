@@ -19,7 +19,7 @@ export default function ProfileDropdown() {
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Open user menu</span>
           <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-            {`${userDetails.firstName?.charAt(0)}${userDetails.lastName?.charAt(0)}`}
+            {`${userDetails?.firstName?.charAt(0)}${userDetails?.lastName?.charAt(0)}`}
           </div>
         </Menu.Button>
       </div>
