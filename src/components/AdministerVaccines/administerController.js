@@ -259,3 +259,47 @@ export const updateVaccineDueDates = (
 
   return recommendation
 }
+
+export const updateInventoryReport = (inventoryReport, vaccineBatches) => {
+  vaccineBatches.forEach(({ vaccine, batchNumber }) => {
+    inventoryReport.extension.forEach((inventoryExtension) => {
+      if (
+        inventoryExtension.url ===
+        'http://example.org/fhir/StructureDefinition/inventory-items'
+      ) {
+        inventoryExtension.extension.forEach((vaccineExtension) => {
+          const vaccineCode = vaccineExtension.extension.find((ext) =>
+            vaccine?.startsWith(ext?.valueCodeableConcept?.text)
+          )
+
+          if (vaccineCode) {
+            const batchExtension = vaccineCode.extension.find(
+              (ext) => ext.url === 'batches'
+            )
+            if (batchExtension) {
+              const batch = batchExtension.extension.find((ext) =>
+                ext.extension.find(
+                  (e) =>
+                    e.url === 'batchNumber' && e.valueString === batchNumber
+                )
+              )
+              if (batch) {
+                const quantityExtension = batch.extension.find(
+                  (e) => e.url === 'quantity'
+                )
+                if (
+                  quantityExtension &&
+                  quantityExtension.valueQuantity.value > 0
+                ) {
+                  quantityExtension.valueQuantity.value -= 1
+                }
+              }
+            }
+          }
+        })
+      }
+    })
+  })
+
+  return inventoryReport
+}
