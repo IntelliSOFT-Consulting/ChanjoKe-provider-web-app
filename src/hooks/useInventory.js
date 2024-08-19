@@ -16,11 +16,12 @@ export default function useInventory() {
     return response
   }
 
-  const getInventoryItems = async () => {
+  const getInventoryItems = async (params={}) => {
     const response = await get(ENDPOINT, {
       params: {
         subject: user.facility,
         code: 'inventory-item',
+        ...params,
       },
     })
 

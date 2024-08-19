@@ -12,6 +12,7 @@ import {
   updateVaccineDueDates,
 } from '../AdministerVaccines/administerController'
 import usePatient from '../../hooks/usePatient'
+import { MinusCircleOutlined } from '@ant-design/icons'
 
 export default function UpdateVaccineHistory() {
   const navigate = useNavigate()
@@ -56,13 +57,10 @@ export default function UpdateVaccineHistory() {
       return isRoutine && isPastDue && !isImmunized
     })
 
-    console.log(missedVaccines)
-
     const formattedVaccines = missedVaccines.map(formatRecommendationsToObject)
     setMissedVaccinesList(formattedVaccines || [])
     return formattedVaccines
   }
-
 
   useEffect(() => {
     if (recommendations && immunizations) {
@@ -75,30 +73,39 @@ export default function UpdateVaccineHistory() {
   }
 
   const handleFinish = async (values) => {
-    values.description = 'Late vaccination entry.'
-    values.occurrence = new Date(
-      values.dateOfLastDose?.format('YYYY-MM-DD')
-    ).toISOString()
-    const selectedVaccine = missedVaccinesList.find(
-      (vaccine) => vaccine.vaccine === values.vaccineType
+    let drafrRecommendations = { ...recommendations }
+    const lateVaccines = await Promise.all(
+      values.vaccines.map(async (item) => {
+        item.description = 'Late vaccination entry.'
+        item.occurrence = new Date(
+          item.dateOfLastDose?.format('YYYY-MM-DD')
+        ).toISOString()
+        const selectedVaccine = missedVaccinesList.find(
+          (vaccine) => vaccine.vaccine === item.vaccineType
+        )
+
+        selectedVaccine.status = 'completed'
+        const resource = createImmunizationResource(
+          item,
+          [selectedVaccine],
+          { id: clientID },
+          user
+        )
+
+        const response = await createImmunization(resource[0])
+
+        const updatedDueDates = updateVaccineDueDates(recommendations, [
+          selectedVaccine,
+        ])
+
+        drafrRecommendations = updatedDueDates
+
+        return response
+      })
     )
+    await updateRecommendations(drafrRecommendations)
 
-    selectedVaccine.status = 'completed'
-    const resource = createImmunizationResource(
-      values,
-      [selectedVaccine],
-      { id: clientID },
-      user
-    )
-
-    const response = await createImmunization(resource[0])
-
-    const updatedDueDates = updateVaccineDueDates(recommendations, [
-      selectedVaccine,
-    ])
-
-    await updateRecommendations(updatedDueDates)
-    if (response) {
+    if (lateVaccines) {
       setDialogOpen(true)
 
       const timeout = setTimeout(() => {
@@ -121,79 +128,118 @@ export default function UpdateVaccineHistory() {
       />
 
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
-        <div className="px-4 text-2xl font-semibold py-5 sm:px-6">
+        <div className="px-4 text-2xl font-semibold py-3 sm:px-6">
           Update Vaccine History
         </div>
 
         {missedVaccinesList ? (
-          <Form layout="vertical" onFinish={handleFinish}>
-            <div className="px-4 py-5 sm:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
-                <Form.Item
-                  label="Vaccine Type"
-                  rules={[
-                    { required: true, message: 'Please select a vaccine' },
-                  ]}
-                  name="vaccineType"
-                >
-                  <Select
-                    placeholder="Select a vaccine"
-                    options={missedVaccinesList?.map((vaccine) => {
-                      return { label: vaccine.vaccine, value: vaccine.vaccine }
-                    })}
-                    allowClear
-                    size="large"
-                    disabled={!missedVaccinesList?.length}
-                    showSearch
-                    filterOption={(input, option) => {
-                      return (
-                        option.label
-                          .toLowerCase()
-                          .indexOf(input.toLowerCase()) >= 0
-                      )
-                    }}
-                  />
-                </Form.Item>
+          <Form
+            layout="vertical"
+            onFinish={handleFinish}
+            initialValues={{
+              vaccines: [
+                { vaccineType: '', dateOfLastDose: '', placeOfVaccination: '' },
+              ],
+            }}
+          >
+            <Form.List name="vaccines">
+              {(fields, { add, remove }) => (
+                <div className="px-4 py-2 sm:p-6">
+                  {fields.map(({ key, name, ...restField }) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative border-b mb-2">
+                      <Form.Item
+                        label="Vaccine Type"
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Please select a vaccine',
+                          },
+                        ]}
+                        name={[name, 'vaccineType']}
+                      >
+                        <Select
+                          placeholder="Select a vaccine"
+                          options={missedVaccinesList?.map((vaccine) => {
+                            return {
+                              label: vaccine.vaccine,
+                              value: vaccine.vaccine,
+                            }
+                          })}
+                          allowClear
+                          disabled={!missedVaccinesList?.length}
+                          showSearch
+                          filterOption={(input, option) => {
+                            return (
+                              option.label
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                            )
+                          }}
+                        />
+                      </Form.Item>
 
-                <Form.Item
-                  label="Date of last dose"
-                  rules={[{ required: true, message: 'Please select a date' }]}
-                  name="dateOfLastDose"
-                >
-                  <DatePicker
-                    placeholder="Select a date"
-                    allowClear
-                    size="large"
-                    className="w-full"
-                    disabledDate={(current) =>
-                      (current && current > moment().endOf('day')) ||
-                      current < moment(patient?.birthDate).startOf('day')
-                    }
-                  />
-                </Form.Item>
+                      <Form.Item
+                        label="Date of last dose"
+                        rules={[
+                          { required: true, message: 'Please select a date' },
+                        ]}
+                        name={[name, 'dateOfLastDose']}
+                      >
+                        <DatePicker
+                          placeholder="Select a date"
+                          allowClear
+                          className="w-full"
+                          disabledDate={(current) =>
+                            (current && current > moment().endOf('day')) ||
+                            current < moment(patient?.birthDate).startOf('day')
+                          }
+                        />
+                      </Form.Item>
 
-                <Form.Item
-                  label="Place of Vaccination"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please select a place of vaccination',
-                    },
-                  ]}
-                  name="placeOfVaccination"
-                >
-                  <Select
-                    placeholder="Select a place of vaccination"
-                    options={[
-                      { label: 'Facility', value: 'facility' },
-                      { label: 'Outreach', value: 'outreach' },
-                    ]}
-                    allowClear
-                    size="large"
-                  />
-                </Form.Item>
-              </div>
-            </div>
+                      <Form.Item
+                        label="Place of Vaccination"
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Please select a place of vaccination',
+                          },
+                        ]}
+                        name={[name, 'placeOfVaccination']}
+                      >
+                        <Select
+                          placeholder="Select a place of vaccination"
+                          options={[
+                            { label: 'Facility', value: 'facility' },
+                            { label: 'Outreach', value: 'outreach' },
+                          ]}
+                          allowClear
+                        />
+                      </Form.Item>
+                      <Button
+                        onClick={() => remove(name)}
+                        type="link"
+                        icon={<MinusCircleOutlined />}
+                        className="absolute top-0 -right-5 md:-right-7 "
+                        danger
+                      />
+                    </div>
+                  ))}
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="primary"
+                      onClick={() => add()}
+                      disabled={
+                        !missedVaccinesList?.length ||
+                        missedVaccinesList?.length === fields.length
+                      }
+                    >
+                      Add Vaccine
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Form.List>
             <div className="px-4 py-4 sm:px-6 flex justify-end">
               <Button
                 onClick={() => navigate(-1)}

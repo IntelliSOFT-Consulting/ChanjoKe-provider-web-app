@@ -20,6 +20,28 @@ export const usePractitioner = () => {
 
   const { get, post, put } = useApiRequest()
 
+  const availableLocation = (values) => {
+    const { county, subCounty, ward, facility } = values
+
+    const availableLocation = facility || ward || subCounty || county || '0'
+
+    if (facility) {
+      return {
+        address: {
+          use: 'work',
+          line: values.facility ? [values.facility] : [''],
+          city: ward,
+          district: subCounty,
+          state: county,
+          country: 'Kenya',
+        },
+        location: {
+          reference: `Location/${availableLocation}`,
+        },
+      }
+    }
+  }
+
   const fetchPractitioners = async (name = '', isActive = true, page = 0) => {
     setLoading(true)
     const query = `${name ? `name=${name}` : ''}&active=${isActive}`
@@ -68,13 +90,7 @@ export const usePractitioner = () => {
           ],
         },
       ],
-      location: [
-        {
-          reference: values.facility
-            ? `Location/${values.facility}`
-            : user.facility,
-        },
-      ],
+      location: [availableLocation(values)?.location],
     }
     const response = await post(roleRoute, practitionerRole)
     return response
@@ -107,32 +123,29 @@ export const usePractitioner = () => {
           value: values.email,
         },
       ],
-      address: [
-        {
-          use: 'home',
-          line: [''],
-          city: values.subCounty,
-          district: values.county,
-          state: values.level,
-          country: 'Kenya',
-        },
-      ],
+      address: [availableLocation(values)?.address],
     }
+
+    await post('/auth/provider/register', {
+      idNumber: values.idNumber,
+      password: passwordGenerator(8),
+      email: values.email,
+      role: values.roleGroup,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      facility:
+        values.facility ||
+        values.ward ||
+        values.subCounty ||
+        values.county ||
+        '0',
+      phone: values.phoneNumber,
+    })
 
     const response = await post(practitionerRoute, practitioner)
 
     if (response) {
       await handleCreatePractitionerRole(values, response)
-      await post('/auth/provider/register', {
-        idNumber: values.idNumber,
-        password: passwordGenerator(8),
-        email: values.email,
-        role: values.roleGroup,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        facility: values.facility,
-        phone: values.phoneNumber,
-      })
     }
 
     return response
@@ -325,6 +338,11 @@ export const usePractitioner = () => {
     return roles
   }
 
+  const searchPractitioner = async (params) => {
+    const response = await get(practitionerRoute, { params })
+    return response?.entry?.map((entry) => entry.resource)
+  }
+
   return {
     practitioners,
     fetchPractitioners,
@@ -340,5 +358,6 @@ export const usePractitioner = () => {
     handleUpdatePractitioner,
     handleArchivePractitioner,
     getPractitionerRoles,
+    searchPractitioner,
   }
 }

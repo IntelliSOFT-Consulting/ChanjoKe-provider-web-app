@@ -55,6 +55,8 @@ export const formatInventoryToTable = (inventoryReport) => {
           case 'manufacturerDetails':
             batchData.manufacturerDetails = detail.valueString
             break
+          default:
+            break
         }
       })
 
@@ -63,4 +65,17 @@ export const formatInventoryToTable = (inventoryReport) => {
   })
 
   return formattedReport
+}
+
+export const vaccineInventory = (vaccine, inventory) => {
+  console.log({ vaccine, inventory })
+  const data = inventory?.filter(
+    (item) =>
+      vaccine?.startsWith(item.vaccine[0]) && vaccine?.includes(item.vaccine)
+  )
+  return data?.sort((a, b) => {
+    return dayjs(a.expiryDate, 'DD-MM-YYYY').diff(
+      dayjs(b.expiryDate, 'DD-MM-YYYY')
+    )
+  })
 }

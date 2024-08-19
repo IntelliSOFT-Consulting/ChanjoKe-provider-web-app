@@ -14,6 +14,23 @@ import DefaulterTracingLogo from '../common/icons/defaulterTracingLogo'
 import SearchLogo from '../common/icons/searchLogo'
 import AppointmentLogo from '../common/icons/appointmentLogo'
 import ReferralIcon from '../common/icons/referralLogo'
+import {
+  FormOutlined,
+  FallOutlined,
+  DotChartOutlined,
+  ContainerOutlined,
+  DatabaseOutlined,
+  PlusCircleOutlined,
+  MinusCircleOutlined,
+  SelectOutlined,
+  SignatureOutlined,
+  ReconciliationOutlined,
+  UsergroupAddOutlined,
+  BankOutlined,
+  SoundOutlined,
+  BarChartOutlined,
+  TruckOutlined,
+} from '@ant-design/icons'
 
 const iconComponents = {
   aefiLogo: AefiLogo,
@@ -32,7 +49,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const SidebarItem = ({ item, onItemClick }) => {
+const SidebarItem = ({ item, onItemClick, child = false }) => {
   const IconComponent = iconComponents[item.icon]
 
   return (
@@ -41,16 +58,22 @@ const SidebarItem = ({ item, onItemClick }) => {
       onClick={() => onItemClick(item)}
       className={classNames(
         item.current ? 'bg-gray-50 text-[#163C94]' : 'hover:bg-gray-50]',
-        'flex rounded-md py-2 pr-2 pl-5 text-normal leading-6 font-normal my-5'
+        `flex rounded-md py-2 pr-2 pl-5 text-md leading-6 font-normal ${
+          child ? 'ml-6 text-sm' : 'my-4'
+        }`
       )}
     >
-      {IconComponent && (
-        <span className="mr-2">
-          <IconComponent
-            width="24"
-            height="24"
-            fillColor={item.current ? '#163C94' : '#000000'}
-          />
+      {item.icon && (
+        <span className={`mr-2`}>
+          {child ? (
+            <span className="text-gray-500">{item.icon}</span>
+          ) : (
+            <IconComponent
+              width="24"
+              height="24"
+              fillColor={item.current ? '#163C94' : '#000000'}
+            />
+          )}
         </span>
       )}
       {item.name}
@@ -70,9 +93,13 @@ export default function Sidenav() {
       icon: '',
       href: '#',
       children: [
-        { name: 'Users', href: '/admin-users' },
-        { name: 'Facility', href: '/admin-add-facility' },
-        { name: 'Campaigns', href: '/campaigns' },
+        { name: 'Users', href: '/admin-users', icon: <UsergroupAddOutlined /> },
+        {
+          name: 'Facility',
+          href: '/admin-add-facility',
+          icon: <BankOutlined />,
+        },
+        { name: 'Campaigns', href: '/campaigns', icon: <SoundOutlined /> },
       ],
     },
     {
@@ -80,8 +107,12 @@ export default function Sidenav() {
       href: '/reports',
       icon: 'vaccinationReportLogo',
       children: [
-        { name: 'MOH 710', href: '/reports/moh-710' },
-        // { name: 'MOH 525', href: '/reports/moh-525' },
+        {
+          name: 'MOH 710',
+          href: '/reports/moh-710',
+          icon: <BarChartOutlined />,
+        },
+        // { name: 'MOH 525', href: '/reports/moh-525', icon: <DotChartOutlined /> },
       ],
     },
     {
@@ -121,23 +152,57 @@ export default function Sidenav() {
       href: '/stock-management',
       icon: '',
       children: [
-        { name: 'New Order', href: '/stock-management/new-order' },
-        { name: 'Sent Orders', href: '/stock-management/sent-orders' },
-        { name: 'Issue Stock', href: '/stock-management/issue-stock' },
-        { name: 'Receive Stock', href: '/stock-management/receive-stock' },
-        { name: 'Received Orders', href: '/stock-management/received-orders' },
+        {
+          name: 'New Order',
+          href: '/stock-management/new-order',
+          icon: <FormOutlined />,
+        },
+        {
+          name: 'Sent Orders',
+          href: '/stock-management/sent-orders',
+          icon: <SelectOutlined />,
+        },
+        {
+          name: 'Issue Stock',
+          href: '/stock-management/issue-stock',
+          icon: <TruckOutlined />,
+        },
+        {
+          name: 'Receive Stock',
+          href: '/stock-management/receive-stock',
+          icon: <FallOutlined />,
+        },
+        {
+          name: 'Received Orders',
+          href: '/stock-management/received-orders',
+          icon: <SignatureOutlined />,
+        },
         {
           name: 'Received from another facility',
           href: '/stock-management/positive-adjustment',
+          icon: <PlusCircleOutlined />,
         },
         {
           name: 'Shared with another facility',
           href: '/stock-management/negative-adjustment',
+          icon: <MinusCircleOutlined />,
         },
-        { name: 'Stock Count', href: '/stock-management/stock-count' },
-        { name: 'Wastage', href: '/stock-management/wastage' },
-    
-        { name: 'Ledger', href: '/stock-management/ledger' },
+        {
+          name: 'Stock Count',
+          href: '/stock-management/stock-count',
+          icon: <DatabaseOutlined />,
+        },
+        {
+          name: 'Wastage',
+          href: '/stock-management/wastage',
+          icon: <ReconciliationOutlined />,
+        },
+
+        {
+          name: 'Ledger',
+          href: '/stock-management/ledger',
+          icon: <ContainerOutlined />,
+        },
       ],
     },
   ])
@@ -366,6 +431,7 @@ export default function Sidenav() {
                                   <SidebarItem
                                     onItemClick={handleItemClick}
                                     item={subItem}
+                                    child={true}
                                     width="24"
                                     height="24"
                                   />

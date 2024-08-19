@@ -79,3 +79,98 @@ export const reasons = [
     value: 'Population Growth',
   },
 ]
+
+export const roleGroups = [
+  {
+    label: 'Administrator',
+    value: 'ADMINISTRATOR',
+    creators: ['ADMINISTRATOR'],
+    locations: ['COUNTRY'],
+  },
+  {
+    label: 'National System Administrator',
+    value: 'NATIONAL_SYSTEM_ADMINISTRATOR',
+    creators: ['ADMINISTRATOR'],
+    locations: ['COUNTRY'],
+  },
+  {
+    label: 'County System Administrator',
+    value: 'COUNTY_SYSTEM_ADMINISTRATOR',
+    creators: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR'],
+    locations: ['COUNTY'],
+  },
+  {
+    label: 'Sub-County System Administrator',
+    value: 'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+    creators: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+    ],
+    locations: ['SUB-COUNTY',],
+  },
+  {
+    label: 'Sub-County Store Manager',
+    value: 'SUB_COUNTY_STORE_MANAGER',
+    creators: [],
+    locations: ['SUB-COUNTY'],
+  },
+  {
+    label: 'Facility System Administrator',
+    value: 'FACILITY_SYSTEM_ADMINISTRATOR',
+    creators: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+      'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+    ],
+    locations: ['FACILITY'],
+  },
+  {
+    label: 'Facility Store Manager',
+    value: 'FACILITY_STORE_MANAGER',
+    creators: [],
+    locations: ['FACILITY'],
+  },
+  {
+    label: 'Clerk',
+    value: 'CLERK',
+    creators: ['ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+    locations: ['FACILITY'],
+  },
+  {
+    label: 'Doctor',
+    value: 'DOCTOR',
+    creators: ['ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+    locations: ['FACILITY'],
+  },
+  {
+    label: 'Lab Technician',
+    value: 'LAB_TECHNICIAN',
+    creators: ['ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR', 'DOCTOR'],
+    locations: ['FACILITY'],
+  },
+  {
+    label: 'Nurse',
+    value: 'NURSE',
+    creators: [
+      'ADMINISTRATOR',
+      'FACILITY_SYSTEM_ADMINISTRATOR',
+      'DOCTOR',
+      'LAB_TECHNICIAN',
+    ],
+    locations: ['FACILITY'],
+  },
+  {
+    label: 'Pharmacist',
+    value: 'PHARMACIST',
+    creators: [
+      'ADMINISTRATOR',
+      'FACILITY_SYSTEM_ADMINISTRATOR',
+      'DOCTOR',
+      'LAB_TECHNICIAN',
+      'NURSE',
+    ],
+    locations: ['FACILITY'],
+  },
+]
