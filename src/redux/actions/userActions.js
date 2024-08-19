@@ -68,6 +68,8 @@ export const login = (values) => async (dispatch) => {
         payload: user,
       })
 
+      console.log({ user, response, auth })
+
       JSON.stringify(localStorage.setItem('practitioner', JSON.stringify(user)))
     }
   } catch (error) {
