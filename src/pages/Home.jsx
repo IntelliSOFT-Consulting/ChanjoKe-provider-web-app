@@ -42,7 +42,7 @@ const stats = [
     icon: StockManagementIcon,
     href: 'stock-management',
   },
-  { name: 'Referrals', icon: ReferralIcon, href: 'referrals' },
+  { name: 'Community Referrals', icon: ReferralIcon, href: 'referrals' },
   { name: 'Campaigns', icon: ReferralIcon, href: 'campaigns' },
 ]
 
@@ -70,7 +70,7 @@ export default function Home() {
     },
     {
       id: 2,
-      name: 'Referrals',
+      name: 'Community Referrals',
       stat: '0',
       icon: ReferralIcon,
       change: '',

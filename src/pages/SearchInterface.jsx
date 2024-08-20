@@ -150,7 +150,7 @@ export default function SearchInterface(props) {
       setTitle('Appointments')
     }
     if (props.searchType === 'referrals') {
-      setTitle('Referrals')
+      setTitle('Community Referrals')
     }
   }, [props.searchType])
 
