@@ -8,7 +8,7 @@ const tabs = [
   { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
   { name: 'Non Routine Vaccines', id: 'nonRoutineVaccines', href: '#', current: false },
   { name: 'Appointments', id: 'appointments', href: '#', current: false },
-  { name: 'Referrals', id: 'referrals', href: '#', current: false },
+  { name: 'Community Referrals', id: 'referrals', href: '#', current: false },
 ]
 
 function classNames(...classes) {

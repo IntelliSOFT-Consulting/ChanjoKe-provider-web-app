@@ -141,7 +141,7 @@ export default function Sidenav() {
       icon: 'appointmentLogo',
     },
     { name: 'AEFI', href: '/search/aefi/n', icon: 'aefiLogo' },
-    { name: 'Referrals', href: '/referrals', icon: 'referralIcon' },
+    { name: 'Community Referrals', href: '/referrals', icon: 'referralIcon' },
     {
       name: 'Defaulter Tracing',
       href: '/defaulter-tracing',

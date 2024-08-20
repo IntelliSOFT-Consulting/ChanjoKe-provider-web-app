@@ -132,7 +132,7 @@ export default function Referrals() {
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5 full-width">
       <div className="flex flex-wrap bg-[#f9fafb00] items-center gap-6 px-10 sm:flex-nowrap sm:px-10 lg:px-10 shadow">
-        <div className="text-2xl font-semibold py-5">Referrals</div>
+        <div className="text-2xl font-semibold py-5">Community Referrals</div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 mx-7 px-10 py-10">
