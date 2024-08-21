@@ -19,6 +19,8 @@ export default function UpdateVaccineHistory() {
   const [missedVaccinesList, setMissedVaccinesList] = useState(null)
   const [isDialogOpen, setDialogOpen] = useState(false)
 
+  const [form] = Form.useForm()
+
   const { clientID } = useParams()
   const { user } = useSelector((state) => state.userInfo)
 
@@ -135,10 +137,11 @@ export default function UpdateVaccineHistory() {
         {missedVaccinesList ? (
           <Form
             layout="vertical"
+            form={form}
             onFinish={handleFinish}
             initialValues={{
               vaccines: [
-                { vaccineType: '', dateOfLastDose: '', placeOfVaccination: '' },
+                { vaccineType: null, dateOfLastDose: null, placeOfVaccination: null },
               ],
             }}
           >
@@ -159,12 +162,6 @@ export default function UpdateVaccineHistory() {
                       >
                         <Select
                           placeholder="Select a vaccine"
-                          options={missedVaccinesList?.map((vaccine) => {
-                            return {
-                              label: vaccine.vaccine,
-                              value: vaccine.vaccine,
-                            }
-                          })}
                           allowClear
                           disabled={!missedVaccinesList?.length}
                           showSearch
@@ -175,7 +172,22 @@ export default function UpdateVaccineHistory() {
                                 .indexOf(input.toLowerCase()) >= 0
                             )
                           }}
-                        />
+                        >
+                          {missedVaccinesList?.map((vaccine) => {
+                            const values = form.getFieldValue('vaccines')
+                            const hasBeenSelected = values?.some(
+                              (v) => v?.vaccineType === vaccine?.vaccine
+                            )
+                            return (
+                              <Select.Option
+                                value={vaccine.vaccine}
+                                disabled={hasBeenSelected}
+                              >
+                                {vaccine.vaccine}
+                              </Select.Option>
+                            )
+                          })}
+                        </Select>
                       </Form.Item>
 
                       <Form.Item
@@ -257,7 +269,7 @@ export default function UpdateVaccineHistory() {
             </div>
           </Form>
         ) : (
-          <div className="my-10 mx-auto flex justify-center">
+          <div className="mx-auto flex justify-center h-56 items-center">
             <LoadingArrows />
           </div>
         )}
