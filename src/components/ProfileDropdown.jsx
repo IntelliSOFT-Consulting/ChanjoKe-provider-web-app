@@ -2,7 +2,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { logout } from '../redux/actions/userActions'
+import { logout } from '../redux/slices/userSlice'
 
 const classNames = (...classes) => classes.filter(Boolean).join(' ')
 
@@ -18,7 +18,9 @@ export default function ProfileDropdown() {
           <span className="absolute -inset-1.5" />
           <span className="sr-only">Open user menu</span>
           <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-            {`${user?.firstName?.charAt(0) || 'J'}${user?.lastName?.charAt(0) || 'D'}`}
+            {`${user?.firstName?.charAt(0) || 'J'}${
+              user?.lastName?.charAt(0) || 'D'
+            }`}
           </div>
         </Menu.Button>
       </div>
