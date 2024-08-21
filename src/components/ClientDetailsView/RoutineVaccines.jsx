@@ -1,13 +1,20 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { Badge, Button, Checkbox, FloatButton, Tag, Tooltip } from 'antd'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  FloatButton,
+  Tag,
+  Tooltip,
+  Popconfirm,
+} from 'antd'
 import dayjs from 'dayjs'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
-import SelectDialog from '../../common/dialog/SelectDialog'
 import Loader from '../../common/spinners/LoadingArrows'
 import useAefi from '../../hooks/useAefi'
 import useVaccination from '../../hooks/useVaccination'
@@ -40,7 +47,7 @@ export default function RoutineVaccines({
 
   const { updateImmunization } = useVaccination()
 
-  const {selectedVaccines } = useSelector((state) => state.vaccineSchedules)
+  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
 
   const { getAefis, loading: loadingAefis, aefis } = useAefi()
@@ -370,9 +377,20 @@ export default function RoutineVaccines({
                         )
 
                         const color = colorCodeVaccines(categoryvaccines)
+
+                        console.log({ aefis })
+
+                        const vaccineAefisCount = aefis?.filter((aefi) =>
+                          categoryvaccines?.find((vaccine) =>
+                            aefi?.resource?.suspectEntity?.[0]?.instance?.reference?.includes(
+                              vaccine.immunizationId
+                            )
+                          )
+                        )?.length
+
                         return (
                           <>
-                            <dt>
+                            <dt className="relative">
                               <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
                                 <div className="flex w-full justify-between px-10">
                                   <span>
@@ -387,24 +405,7 @@ export default function RoutineVaccines({
                                     </span>
                                   </span>
                                   <span>
-                                    {open ? (
-                                      <Button
-                                        to="/aefi-report"
-                                        className="text-[#163C94]"
-                                        disabled={['gray', 'red'].includes(
-                                          color
-                                        )}
-                                        onClick={() => {
-                                          dispatch(
-                                            setSelectedVaccines(administered)
-                                          )
-                                          setSelectAefi(true)
-                                        }}
-                                        type="link"
-                                      >
-                                        AEFIs
-                                      </Button>
-                                    ) : (
+                                    {!open && (
                                       <PlusSmallIcon
                                         className="h-6 w-6"
                                         aria-hidden="true"
@@ -413,6 +414,35 @@ export default function RoutineVaccines({
                                   </span>
                                 </div>
                               </Disclosure.Button>
+                              {open && (
+                                <Popconfirm
+                                  title="Please select an action"
+                                  onConfirm={() => {
+                                    dispatch(setSelectedVaccines(administered))
+                                    navigate(
+                                      `/aefi-report/${selectedVaccines?.[0]?.id}`
+                                    )
+                                  }}
+                                  onCancel={() => {
+                                    dispatch(setSelectedVaccines(administered))
+                                    navigate(
+                                      `/aefi-details/${selectedVaccines?.[0]?.id}`
+                                    )
+                                  }}
+                                  okText="Record AEFI"
+                                  cancelText="view AEFIs"
+                                  className="absolute right-0 -top-2"
+                                >
+                                  <Button
+                                    to="/aefi-report"
+                                    className="text-[#163C94] absolute"
+                                    disabled={['gray', 'red'].includes(color)}
+                                    type="link"
+                                  >
+                                    AEFIs ({vaccineAefisCount})
+                                  </Button>
+                                </Popconfirm>
+                              )}
                             </dt>
                             <Disclosure.Panel
                               as="dd"
@@ -439,20 +469,6 @@ export default function RoutineVaccines({
             <Loader />
           </div>
         )}
-        <SelectDialog
-          open={selectAefi}
-          onClose={setSelectAefi}
-          title="Select AEFI"
-          description="Please select an action"
-          btnTwo={{
-            text: 'View AEFIs',
-            url: `/aefi-details/${selectedVaccines?.[0]?.id}`,
-          }}
-          btnOne={{
-            text: 'Report AEFI',
-            url: `/aefi-report/${selectedVaccines?.[0]?.id}`,
-          }}
-        />
       </div>
     </>
   )

@@ -101,6 +101,7 @@ export const formatRecommendationsToObject = (recommendation) => {
     id: recommendation.id,
     reasonCode: recommendation.reasonCode,
     type: recommendation.description,
+    immunizationId: recommendation.immunizationId,
   }
 }
 
@@ -140,6 +141,7 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
       recommendation.statusReason = getVaccine.statusReason
       recommendation.id = getVaccine.id
       recommendation.reasonCode = getVaccine.reasonCode
+      recommendation.immunizationId = getVaccine.id
     }
 
     const category =
