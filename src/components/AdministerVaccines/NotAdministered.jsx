@@ -19,7 +19,6 @@ export default function NotAdministered() {
 
   const {
     createImmunization,
-    updateImmunization,
     getRecommendations,
     updateRecommendations,
   } = useVaccination()
@@ -27,7 +26,7 @@ export default function NotAdministered() {
   const [form] = Form.useForm()
 
   const currentPatient = useSelector((state) => state.currentPatient)
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
 
   const { clientID } = useParams()

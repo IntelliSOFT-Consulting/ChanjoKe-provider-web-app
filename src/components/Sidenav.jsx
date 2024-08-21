@@ -112,7 +112,7 @@ export default function Sidenav() {
           href: '/reports/moh-710',
           icon: <BarChartOutlined />,
         },
-        // { name: 'MOH 525', href: '/reports/moh-525', icon: <DotChartOutlined /> },
+        { name: 'MOH 525', href: '/reports/moh-525', icon: <DotChartOutlined /> },
       ],
     },
     {

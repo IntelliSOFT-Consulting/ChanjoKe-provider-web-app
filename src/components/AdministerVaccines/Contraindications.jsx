@@ -18,15 +18,16 @@ export default function Contraindications() {
 
   const { clientID } = useParams()
 
-  const currentPatient = useSelector((state) => state.currentPatient)
+  const { currentPatient } = useSelector((state) => state.currentPatient)
 
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const { selectedVaccines } = useSelector(
+    (state) => state.vaccineSchedules
+  )
 
   const { user } = useSelector((state) => state.userInfo)
 
   const {
     createImmunization,
-    updateImmunization,
     getRecommendations,
     updateRecommendations,
   } = useVaccination()

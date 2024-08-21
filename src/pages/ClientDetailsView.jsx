@@ -15,8 +15,8 @@ import Table from '../components/DataTable'
 import useObservations from '../hooks/useObservations'
 import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
-import { setCurrentPatient } from '../redux/actions/patientActions'
-import { setVaccineSchedules } from '../redux/actions/vaccineActions'
+import { setCurrentPatient } from '../redux/slices/patientSlice'
+import { setVaccineSchedules } from '../redux/slices/vaccineSlice'
 
 export default function ClientDetailsView() {
   const [patientData, setPatientData] = useState(null)
