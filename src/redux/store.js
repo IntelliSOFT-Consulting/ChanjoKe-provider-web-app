@@ -1,28 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { thunk } from 'redux-thunk'
-import { setCurrentPatientReducer } from './reducers/patientReducer'
-import {
-  setSelectedVaccinesReducer,
-  setVaccineSchedulesReducer,
-} from './reducers/vaccineReducers'
-import { loginReducer } from './reducers/userReducers'
-
-const practitioner = localStorage.getItem('practitioner')
-
-const initialState = practitioner
-  ? { userInfo: { user: JSON.parse(practitioner) } }
-  : {}
+import patientReducer from './slices/patientSlice'
+import userReducer from './slices/userSlice'
+import vaccinesReducer from './slices/vaccineSlice'
 
 const reducer = {
-  currentPatient: setCurrentPatientReducer,
-  selectedVaccines: setSelectedVaccinesReducer,
-  userInfo: loginReducer,
-  vaccineSchedules: setVaccineSchedulesReducer,
+  currentPatient: patientReducer,
+  userInfo: userReducer,
+  vaccineSchedules: vaccinesReducer,
 }
 
-export const store = configureStore({
+export default configureStore({
   reducer,
-  preloadedState: initialState,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 })
-export default store

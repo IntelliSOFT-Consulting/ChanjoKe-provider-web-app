@@ -128,7 +128,7 @@ export default function useAefi() {
 
   const currentPatient = useSelector((state) => state.currentPatient)
   const { user } = useSelector((state) => state.userInfo)
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const {selectedVaccines } = useSelector((state) => state.vaccineSchedules)
 
   const { clientID } = useParams()
 

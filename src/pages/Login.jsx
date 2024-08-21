@@ -5,7 +5,7 @@ import { createUseStyles } from 'react-jss'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import MOHLogo from '../assets/moh-logo.png'
-import { login } from '../redux/actions/userActions'
+import { login } from '../redux/slices/userSlice'
 
 const useStyles = createUseStyles({
   selector: {

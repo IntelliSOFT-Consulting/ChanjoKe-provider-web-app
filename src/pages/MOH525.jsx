@@ -1,15 +1,16 @@
-import { Button, Card, DatePicker, Form, Table } from 'antd'
-import { useEffect, useState } from 'react'
-
+import { Button, Card, DatePicker, Form } from 'antd'
 import moment from 'moment'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useReports } from '../hooks/useReports'
+import Table from '../components/DataTable'
+import { render } from '@testing-library/react'
 
-export default function MOH710() {
+export default function MOH525() {
   const [dates, setDates] = useState([])
   const [form] = Form.useForm()
 
-  const { moh710, getMoh710 } = useReports()
+  const { moh525, getMoh525 } = useReports()
 
   const { user } = useSelector((state) => state.userInfo)
 
@@ -33,7 +34,7 @@ export default function MOH710() {
     }
 
     setDates(dates)
-    getMoh710({
+    getMoh525({
       facility_code: user.facility?.split('/')[1],
       start_date: moment(dates[0], 'DD-MM-YYYY').format('YYYY-MM-DD'),
       end_date: moment(dates[dates.length - 1], 'DD-MM-YYYY').format(
@@ -44,7 +45,7 @@ export default function MOH710() {
 
   useEffect(() => {
     handleDates()
-    getMoh710({
+    getMoh525({
       facility_code: user.facility?.split('/')[1],
       start_date: moment().startOf('month').format('YYYY-MM-DD'),
       end_date: moment().format('YYYY-MM-DD'),
@@ -62,55 +63,77 @@ export default function MOH710() {
 
   const columns = [
     {
-      title: 'Antigen',
-      dataIndex: 'antigen',
-      key: 'antigen',
-      fixed: 'left',
-    },
-    {
-      title: 'Age',
-      dataIndex: 'ageGroup',
-      key: 'ageGroup',
-      fixed: 'left',
-    },
-    {
       title: 'Date',
-      children: dates.map((date) => {
-        const key = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
-        return {
-          title: date,
-          dataIndex: key,
-          key,
-          render: (_, record) => {
-            console.log('date', date)
-            console.log('record', record[key])
-            return record?.[key]?.total || 0
-          },
-        }
-      }),
+      dataIndex: 'Date',
+      key: 'Date',
     },
     {
-      title: 'Total Static',
-      dataIndex: 'facility_count',
-      key: 'facility_count',
-      fixed: 'right',
+      title: 'Serial No (MOH510)',
+      dataIndex: 'Serial No (MOH510)',
+      key: 'Serial No (MOH510)',
     },
     {
-      title: 'Total Outreach',
-      dataIndex: 'outreach_count',
-      key: 'outreach_count',
-      fixed: 'right',
+      title: "Child's No",
+      dataIndex: "Child's No",
+      key: "Child's No",
     },
     {
-      title: 'Grand Total',
-      dataIndex: 'total',
-      key: 'total',
-      fixed: 'right',
+      title: 'Name of the Child',
+      dataIndex: 'Name of the Child',
+      key: 'Name of the Child',
+      render: (text) => (
+        <span className="capitalize">{text?.replace('None ', '')}</span>
+      ),
+    },
+    {
+      title: 'Sex (F/M)',
+      dataIndex: 'Sex (F/M)',
+      key: 'Sex (F/M)',
+    },
+    {
+      title: 'Age in Months of the Child',
+      dataIndex: 'Age in Months of the Child',
+      key: 'Age in Months of the Child',
+    },
+    {
+      title: 'Name of Parent/Caregiver',
+      dataIndex: 'Name of Parent/Caregiver',
+      key: 'Name of Parent/Caregiver',
+    },
+    {
+      title: 'Telephone No.',
+      dataIndex: 'Telephone No.',
+      key: 'Telephone No.',
+    },
+    {
+      title: 'Name of Village/Estate/Landmark',
+      dataIndex: 'Name of Village/Estate/Landmark',
+      key: 'Name of Village/Estate/Landmark',
+    },
+    {
+      title: 'Vaccines Missed',
+      dataIndex: 'Vaccines Missed',
+      key: 'Vaccines Missed',
+    },
+    {
+      title: 'Traced (YES/NO)',
+      dataIndex: 'Traced (YES/NO)',
+      key: 'Traced (YES/NO)',
+    },
+    {
+      title: 'Outcome',
+      dataIndex: 'Outcome',
+      key: 'Outcome',
+    },
+    {
+      title: 'Remarks',
+      dataIndex: 'Remarks',
+      key: 'Remarks',
     },
   ]
 
   return (
-    <Card title="MOH 710" className="mt-5">
+    <Card title="MOH 525" className="mt-5">
       <div className="px-4 font-semibold py-5 sm:px-6">
         <Form
           layout="vertical"
@@ -132,12 +155,12 @@ export default function MOH710() {
         <div className="mt-5 overflow-x-auto">
           <Table
             columns={columns}
-            loading={!moh710}
             size="small"
             scroll={{ x: 'max-content' }}
             centered
             bordered
-            dataSource={moh710}
+            dataSource={moh525}
+            loading={!moh525}
             pagination={{
               pageSize: 12,
               hideOnSinglePage: true,

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
-import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
+import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed } from '../../utils/validate'
 import Table from '../DataTable'
@@ -32,7 +32,7 @@ export default function NonRoutineVaccines({
   const [isDeceased, setIsDeceased] = useState(false)
 
   const navigate = useNavigate()
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
 
   const dispatch = useDispatch()

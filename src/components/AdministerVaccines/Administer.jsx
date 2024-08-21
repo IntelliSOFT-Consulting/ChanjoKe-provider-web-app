@@ -6,12 +6,11 @@ import {
   InputNumber,
   Popconfirm,
   Select,
-  Radio,
 } from 'antd'
 import dayjs from 'dayjs'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useEncounter from '../../hooks/useEncounter'
@@ -24,6 +23,7 @@ import {
   updateVaccineDueDates,
 } from './administerController'
 import { createNextVaccineAppointment } from '../ClientDetailsView/DataWrapper'
+import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 
 export default function Administer() {
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -49,12 +49,15 @@ export default function Administer() {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
-  const vaccineSchedules = useSelector((state) => state.vaccineSchedules)
+  const { selectedVaccines, vaccineSchedules } = useSelector(
+    (state) => state.vaccineSchedules
+  )
 
   const { getLatestObservation, createObservation } = useObservations()
 
   const navigate = useNavigate()
+
+  const dispatch = useDispatch()
 
   const { clientID } = useParams()
 
@@ -105,7 +108,10 @@ export default function Administer() {
   const handleFormSubmit = async (values) => {
     setLoading(true)
 
-    const selected = selectedVaccines.map((vaccine, index) => {
+    const selected = selectedVaccines.map((item, index) => {
+      const vaccine = { ...item }
+      console.log('vaccine', vaccine)
+      console.log('values', values)
       vaccine.batchNumber = values.vaccines[index].batchNumber
       vaccine.status = 'completed'
 
@@ -188,9 +194,9 @@ export default function Administer() {
 
       await createAppointment(appointmentNext)
     }
-    window.location.assign(
-      `/client-details/${clientID}/routineVaccines?${vaccineType}`
-    )
+
+    dispatch(setSelectedVaccines([]))
+    navigate(`/client-details/${clientID}/routineVaccines?${vaccineType}`)
   }
 
   return (

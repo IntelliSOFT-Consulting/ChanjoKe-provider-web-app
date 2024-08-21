@@ -11,8 +11,8 @@ import SelectDialog from '../../common/dialog/SelectDialog'
 import Loader from '../../common/spinners/LoadingArrows'
 import useAefi from '../../hooks/useAefi'
 import useVaccination from '../../hooks/useVaccination'
-import { setCurrentPatient } from '../../redux/actions/patientActions'
-import { setSelectedVaccines } from '../../redux/actions/vaccineActions'
+import { setCurrentPatient } from '../../redux/slices/patientSlice'
+import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
@@ -40,7 +40,7 @@ export default function RoutineVaccines({
 
   const { updateImmunization } = useVaccination()
 
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const {selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
 
   const { getAefis, loading: loadingAefis, aefis } = useAefi()

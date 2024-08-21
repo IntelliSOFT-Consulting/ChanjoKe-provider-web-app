@@ -62,12 +62,14 @@ export default function CreateAEFI() {
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
-  const selectedVaccines = useSelector((state) => state.selectedVaccines)
+  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
 
   const earliestDueDate = selectedVaccines?.reduce((acc, vaccine) => {
     const administeredDate = vaccine.administeredDate
     if (acc === null) return administeredDate
-    return administeredDate.isSameOrBefore(acc) ? administeredDate?.format('YYYY-MM-DD') : acc
+    return administeredDate.isSameOrBefore(acc)
+      ? administeredDate?.format('YYYY-MM-DD')
+      : acc
   }, null)
 
   useEffect(() => {
@@ -134,7 +136,9 @@ export default function CreateAEFI() {
           <ConfirmDialog
             open={showModal}
             description="AEFI has been successfully submitted"
-            onConfirm={() => navigate(`/client-details/${currentPatient.id}/routineVaccines`)}
+            onConfirm={() =>
+              navigate(`/client-details/${currentPatient.id}/routineVaccines`)
+            }
             onClose={() => setShowModal(false)}
           />
           <Form
@@ -301,7 +305,11 @@ export default function CreateAEFI() {
                     },
                   ]}
                 >
-                  <Select size="large" options={aefiOutcomes} placeholder="Select AEFI Outcome" />
+                  <Select
+                    size="large"
+                    options={aefiOutcomes}
+                    placeholder="Select AEFI Outcome"
+                  />
                 </Form.Item>
               </div>
             </div>

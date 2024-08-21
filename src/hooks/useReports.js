@@ -6,6 +6,7 @@ const path = '/reports/api'
 export const useReports = () => {
   const [defaulters, setDefaulters] = useState(null)
   const [moh710, setMoh710] = useState(null)
+  const [moh525, setMoh525] = useState(null)
 
   const { get } = useApiRequest()
 
@@ -28,10 +29,23 @@ export const useReports = () => {
     return response
   }
 
+  const getMoh525 = async (filters) => {
+    const queryString = Object.entries(filters)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&')
+
+    const response = await get(`${path}/moh_525_report?${queryString}`)
+    setMoh525(response)
+    return response
+  }
+
   return {
     defaulters,
     moh710,
     getDefaulterList,
     getMoh710,
+    getMoh525,
+    moh525,
   }
 }

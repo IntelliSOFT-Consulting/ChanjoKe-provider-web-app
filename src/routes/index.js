@@ -53,6 +53,7 @@ import CampaignSite from '../components/Campaigns/CampaignSite'
 import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 import OrderDetails from '../components/StockManagement/OrderDetails'
 import MOH710 from '../pages/MOH710'
+import MOH525 from '../pages/MOH525'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -167,6 +168,7 @@ const router = createBrowserRouter([
         element: <VaccinationReports />,
       },
       { path: '/reports/moh-710', element: <MOH710 /> },
+      { path: '/reports/moh-525', element: <MOH525 /> },
       { path: '/profile', element: <Profile /> },
       {
         path: '/aefi-report/:clientID',
