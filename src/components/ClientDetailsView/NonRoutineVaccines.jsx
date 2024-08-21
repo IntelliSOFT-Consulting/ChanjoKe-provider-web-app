@@ -15,7 +15,6 @@ import useVaccination from '../../hooks/useVaccination'
 import moment from 'moment'
 import DeleteModal from './DeleteModal'
 import useAefi from '../../hooks/useAefi'
-import { getDeceasedStatus } from './clientDetailsController'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -29,7 +28,6 @@ export default function NonRoutineVaccines({
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [selectAefi, setSelectAefi] = useState(false)
   const [immunizationToDelete, setImmunizationToDelete] = useState(null)
-  const [isDeceased, setIsDeceased] = useState(false)
 
   const navigate = useNavigate()
   const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
@@ -43,12 +41,6 @@ export default function NonRoutineVaccines({
   useEffect(() => {
     getAefis()
   }, [])
-
-  useEffect(() => {
-    if (aefis) {
-      setIsDeceased(getDeceasedStatus(aefis))
-    }
-  }, [aefis])
 
   const deleteImmunization = async (id, reason) => {
     const immunization = immunizations?.find((entry) => entry.id === id)
@@ -130,7 +122,7 @@ export default function NonRoutineVaccines({
             disabled={
               !isQualified(allVaccines, record) ||
               outGrown(record?.lastDate) ||
-              isDeceased
+              patientDetails?.deceased
             }
             onChange={() => handleCheckBox(record)}
           />
@@ -188,7 +180,7 @@ export default function NonRoutineVaccines({
             color={
               text === 'completed'
                 ? 'green'
-                : text === 'Not Administered' || isDeceased
+                : text === 'Not Administered' || patientDetails?.deceased
                 ? 'red'
                 : missed &&
                   text !== 'Rescheduled' &&
@@ -201,8 +193,6 @@ export default function NonRoutineVaccines({
           >
             {text === 'completed'
               ? 'Administered'
-              : text !== 'completed' && isDeceased
-              ? 'Deceased'
               : text === 'Not Administered'
               ? 'Not Administered'
               : text === 'Rescheduled'

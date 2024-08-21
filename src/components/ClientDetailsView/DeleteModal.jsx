@@ -37,6 +37,7 @@ const DeleteModal = ({ immunization, onCancel, onOk }) => {
             showSearch
             allowClear
             onChange={(value) => setIsOther(value === 'Other')}
+            placeholder="Select a reason"
           >
             {reasons.map((reason) => (
               <Select.Option key={reason} value={reason}>
@@ -50,17 +51,13 @@ const DeleteModal = ({ immunization, onCancel, onOk }) => {
             name="otherReason"
             label="Other reason"
             rules={[
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (getFieldValue('reason') === 'Other' && !value) {
-                    return Promise.reject('Please provide a reason')
-                  }
-                  return Promise.resolve()
-                },
-              }),
+              {
+                required: true,
+                message: 'Please provide a reason',
+              },
             ]}
           >
-            <Input.Textarea rows={3} placeholder="Please provide a reason" />
+            <Input.TextArea  placeholder="Please provide a reason" />
           </Form.Item>
         )}
       </Form>

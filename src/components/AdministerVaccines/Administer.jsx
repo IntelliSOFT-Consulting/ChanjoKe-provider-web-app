@@ -119,7 +119,7 @@ export default function Administer() {
     const vaccineResources = createImmunizationResource(
       values,
       selected,
-      currentPatient?.currentPatient,
+      currentPatient,
       user
     )
 
