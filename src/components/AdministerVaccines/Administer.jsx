@@ -110,8 +110,6 @@ export default function Administer() {
 
     const selected = selectedVaccines.map((item, index) => {
       const vaccine = { ...item }
-      console.log('vaccine', vaccine)
-      console.log('values', values)
       vaccine.batchNumber = values.vaccines[index].batchNumber
       vaccine.status = 'completed'
 
@@ -121,7 +119,7 @@ export default function Administer() {
     const vaccineResources = createImmunizationResource(
       values,
       selected,
-      currentPatient,
+      currentPatient?.currentPatient,
       user
     )
 
