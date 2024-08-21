@@ -45,7 +45,7 @@ export default function Administer() {
 
   const [nexVaccineForm] = Form.useForm()
 
-  const currentPatient = useSelector((state) => state.currentPatient)
+  const { currentPatient } = useSelector((state) => state.currentPatient)
 
   const { user } = useSelector((state) => state.userInfo)
 

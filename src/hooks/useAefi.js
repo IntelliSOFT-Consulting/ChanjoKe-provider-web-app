@@ -126,7 +126,7 @@ export default function useAefi() {
 
   const { post, get } = useApiRequest()
 
-  const currentPatient = useSelector((state) => state.currentPatient)
+  const {currentPatient} = useSelector((state) => state.currentPatient)
   const { user } = useSelector((state) => state.userInfo)
   const {selectedVaccines } = useSelector((state) => state.vaccineSchedules)
 

@@ -1,5 +1,5 @@
 import { WarningTwoTone } from '@ant-design/icons'
-import { Button } from 'antd'
+import { Button, Tag } from 'antd'
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -85,8 +85,15 @@ export default function ClientDetailsView() {
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
-        <div className="flex justify-between px-4 text-2xl py-5 sm:px-6">
-          <div className="text-3xl">Client Details</div>
+        <div className="flex justify-between items-center px-4 text-2xl py-2 sm:px-6">
+          <div className="text-xl">
+          Client Details
+          {patientData?.deceased && (
+            <Tag color="red" className="ml-2">
+              Deceased
+            </Tag>
+          )}
+          </div>
           <div className="right-0">
             <Button
               onClick={() => navigate(`/client-records/${patient?.id}`)}
@@ -94,13 +101,17 @@ export default function ClientDetailsView() {
             >
               View Client Details
             </Button>
-            <Button
-              type="primary"
-              onClick={() => navigate(`/update-vaccine-history/${patient?.id}`)}
-              className="ml-4 font-semibold"
-            >
-              Update vaccine history
-            </Button>
+            {!patientData?.deceased && (
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/update-vaccine-history/${patient?.id}`)
+                }
+                className="ml-4 font-semibold"
+              >
+                Update vaccine history
+              </Button>
+            )}
           </div>
         </div>
 

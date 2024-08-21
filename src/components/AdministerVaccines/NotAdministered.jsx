@@ -1,14 +1,14 @@
-import { Button, DatePicker, Form, Select, Popconfirm } from 'antd'
+import { Button, DatePicker, Form, Popconfirm, Select } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import useVaccination from '../../hooks/useVaccination'
 import {
   createImmunizationResource,
   updateVaccineDueDates,
 } from './administerController'
-import useVaccination from '../../hooks/useVaccination'
 
 export default function NotAdministered() {
   const [loading, setLoading] = useState(false)
@@ -17,17 +17,15 @@ export default function NotAdministered() {
 
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const {
-    createImmunization,
-    getRecommendations,
-    updateRecommendations,
-  } = useVaccination()
+  const { createImmunization, getRecommendations, updateRecommendations } =
+    useVaccination()
 
   const [form] = Form.useForm()
 
-  const currentPatient = useSelector((state) => state.currentPatient)
+  const { currentPatient } = useSelector((state) => state.currentPatient)
   const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
+
 
   const { clientID } = useParams()
 
@@ -46,6 +44,7 @@ export default function NotAdministered() {
     { label: 'Religious objection', value: 'Religious objection' },
     { label: 'Cold Chain Break', value: 'Cold Chain Break' },
     { label: 'VVM change', value: 'VVM change' },
+    { label: 'Contraindication', value: 'Contradiction' },
   ]
 
   function handleDialogClose() {

@@ -15,6 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useAefi from '../../hooks/useAefi'
 import AEFIPreview from './AEFIPreview'
+import usePatient from '../../hooks/usePatient'
 
 export default function CreateAEFI() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -24,7 +25,9 @@ export default function CreateAEFI() {
   const [isTreatmentGiven, setIsTreatmentGiven] = useState(false)
   const [isSpecimenCollected, setIsSpecimenCollected] = useState(false)
 
-  const currentPatient = useSelector((state) => state.currentPatient)
+  const { updatePatient } = usePatient()
+
+  const { currentPatient } = useSelector((state) => state.currentPatient)
 
   const { clientID } = useParams()
 
@@ -86,6 +89,10 @@ export default function CreateAEFI() {
     setLoading(true)
 
     await submitAefi(values)
+    if (values.aefiOutcome === 'Died') {
+      const updatedPatient = { ...currentPatient, deceasedBoolean: true }
+      await updatePatient(updatedPatient.id, updatedPatient)
+    }
     setShowModal(true)
     const timer = setTimeout(() => {
       setShowModal(false)
