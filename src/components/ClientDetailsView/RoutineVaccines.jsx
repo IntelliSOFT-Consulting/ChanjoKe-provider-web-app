@@ -90,30 +90,39 @@ export default function RoutineVaccines({
   }
 
   const statusMessage = (record, locked = false) => {
-    if (patientDetails?.deceased && record.status !== 'completed')
+    if (patientDetails?.deceased && record.status !== 'completed') {
       return 'Patient is deceased'
+    }
+
+    if (record.contraindicated) {
+      return 'Vaccine contraindicated'
+    }
+
+    const formatDate = (date) => date.format('DD-MM-YYYY')
 
     const messages = {
       completed: 'Vaccine already administered',
       'not-done': `Vaccine not administered because of ${
         record.statusReason?.coding?.[0]?.display
-      } until ${record.dueDate.format('DD-MM-YYYY')}`,
-      'entered-in-error': `Vaccine rescheduled, to be administered on ${record.dueDate.format(
-        'DD-MM-YYYY'
+      } until ${formatDate(record.dueDate)}`,
+      'entered-in-error': `Vaccine rescheduled, to be administered on ${formatDate(
+        record.dueDate
       )}`,
       Due: () => {
-        if (locked && record.dueDate?.isAfter(dayjs()))
+        if (locked && record.dueDate?.isAfter(dayjs())) {
           return 'Vaccination date not yet due'
+        }
         if (
-          datePassed(record.status, record?.dueDate?.format('YYYY-MM-DD')) &&
+          datePassed(record.status, record.dueDate?.format('YYYY-MM-DD')) &&
           locked
-        )
+        ) {
           return 'Vaccine missed'
+        }
         return ''
       },
     }
 
-    return typeof messages[record.status] === 'function'
+    return messages[record.status] instanceof Function
       ? messages[record.status]()
       : messages[record.status] || ''
   }
@@ -124,25 +133,25 @@ export default function RoutineVaccines({
       dataIndex: 'vaccine',
       key: 'vaccine',
       render: (_text, record) => {
-        const completed = record.status === 'completed'
-        const locked = lockVaccine(record.dueDate, record.lastDate)
-        const disabled =
-          completed ||
+        const isCompleted = record.status === 'completed';
+        const isLocked = lockVaccine(record.dueDate, record.lastDate);
+        const isDisabled =
+          isCompleted ||
           patientDetails?.deceased ||
-          (locked &&
-            !['Rescheduled', 'Not Administered'].includes(record.status))
-
+          (isLocked && !['Rescheduled', 'Not Administered'].includes(record.status)) ||
+          record.contraindicated;
+  
         return (
-          <Tooltip title={statusMessage(record, locked)} color="#163c94">
+          <Tooltip title={statusMessage(record, isLocked)} color="#163c94">
             <Checkbox
               name={record.vaccine}
               value={record.vaccine}
-              defaultChecked={completed}
-              disabled={disabled}
+              defaultChecked={isCompleted}
+              disabled={isDisabled}
               onChange={() => handleCheckBox(record)}
             />
           </Tooltip>
-        )
+        );
       },
       width: '5%',
     },
@@ -174,32 +183,25 @@ export default function RoutineVaccines({
       dataIndex: 'status',
       key: 'status',
       render: (text, record) => {
-        const missed = datePassed(text, record?.dueDate?.format('YYYY-MM-DD'))
-        const color =
-          text === 'completed'
-            ? 'green'
-            : text === 'Not Administered' || patientDetails?.deceased
-            ? 'red'
-            : missed && text !== 'Rescheduled' && text !== 'Not Administered'
-            ? 'red'
-            : text === 'Rescheduled'
-            ? 'yellow'
-            : 'gray'
-
-        const status =
-          text === 'completed'
-            ? 'Administered'
-            : text === 'Not Administered'
-            ? 'Not Administered'
-            : text === 'Rescheduled'
-            ? 'Rescheduled'
-            : missed && text !== 'entered-in-error'
-            ? 'Missed'
-            : moment().isAfter(record.dueDate)
-            ? 'Due'
-            : 'Upcoming'
-
-        return <Tag color={color}>{status}</Tag>
+        const isMissed = datePassed(text, record?.dueDate?.format('YYYY-MM-DD'));
+        const statusColor = (() => {
+          if (text === 'completed') return 'green';
+          if (text === 'Not Administered' || patientDetails?.deceased) return 'red';
+          if (isMissed && text !== 'Rescheduled' && text !== 'Not Administered') return 'red';
+          if (text === 'Rescheduled') return 'yellow';
+          return 'gray';
+        })();
+  
+        const statusText = (() => {
+          if (text === 'completed') return 'Administered';
+          if (text === 'Not Administered') return record.contraindicated ? 'Contraindicated' : 'Not Administered';
+          if (text === 'Rescheduled') return 'Rescheduled';
+          if (isMissed && text !== 'entered-in-error') return 'Missed';
+          if (moment().isAfter(record.dueDate)) return 'Due';
+          return 'Upcoming';
+        })();
+  
+        return <Tag color={statusColor}>{statusText}</Tag>;
       },
     },
     {
@@ -212,11 +214,11 @@ export default function RoutineVaccines({
             disabled={record.status === 'Due'}
             onClick={() => {
               const urls = {
-                completed: `/view-vaccination/${record?.id}`,
-                Rescheduled: `/view-contraindication/${record?.id}`,
-                default: `/view-not-administered/${record?.id}`,
-              }
-              navigate(urls[record.status] || urls.default)
+                completed: `/view-vaccination/${record.id}`,
+                Rescheduled: `/view-contraindication/${record.id}`,
+                default: `/view-not-administered/${record.id}`,
+              };
+              navigate(urls[record.status] || urls.default);
             }}
             type="link"
             className="font-bold text=[#173C94]"
@@ -224,9 +226,7 @@ export default function RoutineVaccines({
             View
           </Button>
           {record.status === 'completed' &&
-            user?.practitionerRole
-              ?.toLowerCase()
-              ?.includes('administrator') && (
+            user?.practitionerRole?.toLowerCase()?.includes('administrator') && (
               <Button
                 type="link"
                 danger
@@ -238,7 +238,8 @@ export default function RoutineVaccines({
         </div>
       ),
     },
-  ]
+  ];
+  
 
   const renderCategoryVaccines = (category) => {
     const categoryvaccines = routineVaccines[category]

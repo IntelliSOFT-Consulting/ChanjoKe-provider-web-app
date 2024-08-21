@@ -104,7 +104,7 @@ export default function Sidenav() {
     },
     {
       name: 'Vaccination Reports',
-      href: '/reports',
+      href: '#',
       icon: 'vaccinationReportLogo',
       children: [
         {

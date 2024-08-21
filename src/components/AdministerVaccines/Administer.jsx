@@ -194,7 +194,7 @@ export default function Administer() {
     }
 
     dispatch(setSelectedVaccines([]))
-    navigate(`/client-details/${clientID}/routineVaccines?${vaccineType}`)
+    navigate(-1)
   }
 
   return (

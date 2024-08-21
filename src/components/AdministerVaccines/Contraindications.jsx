@@ -20,17 +20,12 @@ export default function Contraindications() {
 
   const { currentPatient } = useSelector((state) => state.currentPatient)
 
-  const { selectedVaccines } = useSelector(
-    (state) => state.vaccineSchedules
-  )
+  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const {
-    createImmunization,
-    getRecommendations,
-    updateRecommendations,
-  } = useVaccination()
+  const { createImmunization, getRecommendations, updateRecommendations } =
+    useVaccination()
 
   const [form] = Form.useForm()
 
@@ -82,13 +77,11 @@ export default function Contraindications() {
     )
 
     if (responses) {
-      const vaccineType =
-        selectedVaccines[0].type === 'non-routine' ? 'type=non-routine' : ''
       setDialogOpen(true)
       setLoading(false)
       const time = setTimeout(() => {
         setDialogOpen(false)
-        window.location.href = `/client-details/${clientID}/vaccines?${vaccineType}`
+        navigate(-1)
       }, 1500)
       return () => clearTimeout(time)
     }

@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react'
-import SearchIcon from '../assets/search.svg'
-import RegisterClientIcon from '../assets/register-client.svg'
-import UpdateClientHistoryIcon from '../assets/update-client-history.svg'
-import AdministerVaccineIcon from '../assets/post-treatment.svg'
-import AefiIcon from '../assets/aefi.svg'
-import ReferralIcon from '../assets/note-add.svg'
-import AppointmentIcon from '../assets/appointments.svg'
-import StockManagementIcon from '../assets/stock-management.svg'
-import { Link } from 'react-router-dom'
-import useVaccination from '../hooks/useVaccination'
+import moment from 'moment'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import AefiIcon from '../assets/aefi.svg'
+import AppointmentIcon from '../assets/appointments.svg'
+import ReferralIcon from '../assets/note-add.svg'
+import AdministerVaccineIcon from '../assets/post-treatment.svg'
+import RegisterClientIcon from '../assets/register-client.svg'
+import SearchIcon from '../assets/search.svg'
+import StockManagementIcon from '../assets/stock-management.svg'
+import UpdateClientHistoryIcon from '../assets/update-client-history.svg'
 import LoadingArrows from '../common/spinners/LoadingArrows'
 import useAppointment from '../hooks/useAppointment'
-import moment from 'moment'
+import useReferral from '../hooks/useReferral'
+import useVaccination from '../hooks/useVaccination'
 
 const stats = [
   { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient/n' },
@@ -51,12 +52,14 @@ export default function Home() {
 
   const { getFacilityImmunizations, immunizations } = useVaccination()
   const { getFacilityAppointments, facilityAppointments } = useAppointment()
+  const { getReferralsToFacility, referrals } = useReferral()
 
   const today = moment().format('YYYY-MM-DD')
 
   useEffect(() => {
     getFacilityImmunizations(user?.facility, `&date=gt${today}`)
     getFacilityAppointments(today)
+    getReferralsToFacility(user?.facility, 0, today)
   }, [user?.facility])
 
   const statsTwo = [
@@ -71,7 +74,7 @@ export default function Home() {
     {
       id: 2,
       name: 'Community Referrals',
-      stat: '0',
+      stat: referrals?.total || 0,
       icon: ReferralIcon,
       change: '',
       changeType: 'increase',
@@ -85,7 +88,6 @@ export default function Home() {
       changeType: 'increase',
     },
   ]
-  const totalVaccines = immunizations?.length || 0
 
   return (
     <>

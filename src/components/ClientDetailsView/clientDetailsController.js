@@ -102,6 +102,7 @@ export const formatRecommendationsToObject = (recommendation) => {
     reasonCode: recommendation.reasonCode,
     type: recommendation.description,
     immunizationId: recommendation.immunizationId,
+    contraindicated: recommendation.contraindicated,
   }
 }
 
@@ -134,6 +135,7 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
     }, null)
 
     if (getVaccine) {
+      const contraindicated = getVaccine.statusReason?.text === 'Contraindication'
       const statusCode = getVaccine.reasonCode?.[0]?.text
       recommendation.status =
         getVaccine.status === 'completed' ? 'completed' : statusCode
@@ -142,6 +144,7 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
       recommendation.id = getVaccine.id
       recommendation.reasonCode = getVaccine.reasonCode
       recommendation.immunizationId = getVaccine.id
+      recommendation.contraindicated = contraindicated
     }
 
     const category =

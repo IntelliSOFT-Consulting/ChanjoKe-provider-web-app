@@ -1,9 +1,9 @@
 import { Button, Card, DatePicker, Form, Table } from 'antd'
 import { useEffect, useState } from 'react'
-
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useReports } from '../hooks/useReports'
+import dayjs from 'dayjs'
 
 export default function MOH710() {
   const [dates, setDates] = useState([])
@@ -117,9 +117,18 @@ export default function MOH710() {
           form={form}
           className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 items-end"
           onFinish={handleFilter}
+          initialValues={{
+            date: [dayjs().startOf('month'), dayjs()],
+          }}
         >
           <Form.Item label="Date" name="date" className="m-0">
-            <DatePicker.RangePicker className="w-full" />
+            <DatePicker.RangePicker
+              className="w-full"
+              format="DD-MM-YYYY"
+              disabledDate={(current) =>
+                current && current > moment().endOf('day')
+              }
+            />
           </Form.Item>
 
           <Form.Item className="m-0">

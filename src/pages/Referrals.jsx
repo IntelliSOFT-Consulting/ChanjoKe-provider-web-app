@@ -1,12 +1,11 @@
+import { Button, DatePicker, Form, Input } from 'antd'
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { Button, Form, Input, DatePicker } from 'antd'
-import Table from '../components/DataTable'
-import useReferral from '../hooks/useReferral'
-import usePatient from '../hooks/usePatient'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import Table from '../components/DataTable'
+import usePatient from '../hooks/usePatient'
+import useReferral from '../hooks/useReferral'
 import { debounce } from '../utils/methods'
-import { data } from 'autoprefixer'
 
 export default function Referrals() {
   const [referralData, setReferralData] = useState(null)

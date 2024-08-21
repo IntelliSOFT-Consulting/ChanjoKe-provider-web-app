@@ -11,17 +11,18 @@ const useReferral = () => {
 
   const { get } = useApiRequest()
 
-  const getReferralsToFacility = async (facility, page = 0) => {
+  const getReferralsToFacility = async (facility, page = 0, date=null) => {
     setLoading(true)
     const facilityCode = facility?.replace(/Location\//g, '')
     const offset = getOffset(page)
+    const dateFilter = date ? `&authored=${date}` : ''
     const response = await get(
-      `${path}?performer=${facilityCode}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+      `${path}?performer=${facilityCode}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated${dateFilter}`
     )
     const data = response?.entry?.map((entry) => entry.resource) || []
     setReferrals({
       data,
-      total: response.total,
+      total: response?.total,
     })
     setLoading(false)
 

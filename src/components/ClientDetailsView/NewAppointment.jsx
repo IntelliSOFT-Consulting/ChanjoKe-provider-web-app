@@ -233,8 +233,8 @@ export default function NewAppointment() {
                           classID="text-black text-6xl"
                         />
                         <div className="ml-2 text-sm">
-                          This client is not currently eligible for any routine
-                          vaccines.
+                          This client does not have any available vaccines to
+                          schedule an appointment at this time.
                         </div>
                       </div>
                     )}

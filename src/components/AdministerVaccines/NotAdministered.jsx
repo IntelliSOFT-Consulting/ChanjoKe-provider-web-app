@@ -12,6 +12,7 @@ import {
 
 export default function NotAdministered() {
   const [loading, setLoading] = useState(false)
+  const [contraindicated, setContraindicated] = useState(false)
 
   const navigate = useNavigate()
 
@@ -25,7 +26,6 @@ export default function NotAdministered() {
   const { currentPatient } = useSelector((state) => state.currentPatient)
   const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
-
 
   const { clientID } = useParams()
 
@@ -44,7 +44,8 @@ export default function NotAdministered() {
     { label: 'Religious objection', value: 'Religious objection' },
     { label: 'Cold Chain Break', value: 'Cold Chain Break' },
     { label: 'VVM change', value: 'VVM change' },
-    { label: 'Contraindication', value: 'Contradiction' },
+    { label: 'Contraindication', value: 'Contraindication' },
+    { label: 'Other', value: 'Other' },
   ]
 
   function handleDialogClose() {
@@ -63,7 +64,6 @@ export default function NotAdministered() {
         status: 'not-done',
       }))
 
-    values.notVaccinatedReason = values.notVaccinatedReason
     values.reasonCode = 'Not Administered'
 
     const vaccineResources = createImmunizationResource(
@@ -73,30 +73,29 @@ export default function NotAdministered() {
       user
     )
 
-    const recommendation = await getRecommendations(clientID)
-
     const responses = await Promise.all(
       vaccineResources.map(async (resource) => {
         return await createImmunization(resource)
       })
     )
 
-    await updateRecommendations(
-      updateVaccineDueDates(
-        recommendation,
-        selected,
-        values.nextVaccinationDate?.format('YYYY-MM-DD')
+    if (values.notVaccinatedReason !== 'Contraindication') {
+      const recommendation = await getRecommendations(clientID)
+      await updateRecommendations(
+        updateVaccineDueDates(
+          recommendation,
+          selected,
+          values.nextVaccinationDate?.format('YYYY-MM-DD')
+        )
       )
-    )
+    }
 
     if (responses) {
       setDialogOpen(true)
       setLoading(false)
-      const vaccineType =
-        selectedVaccines[0].type === 'non-routine' ? 'type=non-routine' : ''
       const time = setTimeout(() => {
         setDialogOpen(false)
-        window.location.href = `/client-details/${clientID}/vaccines?${vaccineType}`
+        navigate(-1)
       }, 1500)
       return () => clearTimeout(time)
     }
@@ -182,30 +181,39 @@ export default function NotAdministered() {
                     options={fhirReasons}
                     showSearch
                     size="large"
+                    onChange={(value) => {
+                      if (value === 'Contraindication') {
+                        setContraindicated(true)
+                      } else {
+                        setContraindicated(false)
+                      }
+                    }}
                   />
                 </Form.Item>
 
-                <Form.Item
-                  label="Next Vaccination Date"
-                  name="nextVaccinationDate"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Please enter next vaccination date',
-                    },
-                  ]}
-                >
-                  <DatePicker
-                    size="large"
-                    style={{ width: '100%' }}
-                    format="DD-MM-YYYY"
-                    disabledDate={(current) =>
-                      current &&
-                      (current < moment().startOf('day') ||
-                        current > moment().add(14, 'days').startOf('day'))
-                    }
-                  />
-                </Form.Item>
+                {!contraindicated && (
+                  <Form.Item
+                    label="Next Vaccination Date"
+                    name="nextVaccinationDate"
+                    rules={[
+                      {
+                        required: true,
+                        message: 'Please enter next vaccination date',
+                      },
+                    ]}
+                  >
+                    <DatePicker
+                      size="large"
+                      style={{ width: '100%' }}
+                      format="DD-MM-YYYY"
+                      disabledDate={(current) =>
+                        current &&
+                        (current < moment().startOf('day') ||
+                          current > moment().add(14, 'days').startOf('day'))
+                      }
+                    />
+                  </Form.Item>
+                )}
               </div>
             </Form>
           )}
