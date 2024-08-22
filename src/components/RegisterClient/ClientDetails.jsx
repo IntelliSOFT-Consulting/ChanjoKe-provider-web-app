@@ -7,20 +7,18 @@ import {
   Input,
   InputNumber,
   Radio,
-  Select
+  Select,
 } from 'antd'
 import dayjs from 'dayjs'
 import localeDate from 'dayjs/plugin/localeData'
 import weekdays from 'dayjs/plugin/weekday'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
 import { countryCodes } from '../../data/countryCodes'
 import { identificationOptions } from '../../data/options/clientDetails'
-import useEncounter from '../../hooks/useEncounter'
 import { useLocations } from '../../hooks/useLocation'
 import usePatient from '../../hooks/usePatient'
 import useVaccination from '../../hooks/useVaccination'
@@ -57,8 +55,6 @@ export default function ClientDetails() {
 
   const { clientID } = useParams()
 
-  const { user } = useSelector((state) => state.userInfo)
-
   useEffect(() => {
     if (clientID) {
       setIsDocumentTypeSelected(true)
@@ -68,7 +64,6 @@ export default function ClientDetails() {
   const navigate = useNavigate()
 
   const { createPatient, checkPatientExists } = usePatient()
-  const { createEncounter } = useEncounter()
   const {
     counties,
     subCounties,
@@ -124,16 +119,10 @@ export default function ClientDetails() {
       (county) => county.key === values.county
     )?.name
     values.clientID = clientID
+
     const patient = await createPatient(values)
 
-    let encounter
     if (!clientID) {
-      encounter = await createEncounter(
-        patient.id,
-        user?.fhirPractitionerId,
-        user?.facility?.replace('Location/', '')
-      )
-
       await createRecommendations(patient)
     }
     await createRecommendations(patient, 'update')
@@ -243,7 +232,6 @@ export default function ClientDetails() {
                   placeholder="First Name"
                   autoComplete="off"
                   onBlur={() => capitalize('firstName')}
-                  size="large"
                 />
               </Form.Item>
 
@@ -252,7 +240,6 @@ export default function ClientDetails() {
                   placeholder="Middle Name"
                   autoComplete="off"
                   onBlur={() => capitalize('middleName')}
-                  size="large"
                 />
               </Form.Item>
 
@@ -270,7 +257,6 @@ export default function ClientDetails() {
                   placeholder="Last Name"
                   autoComplete="off"
                   onBlur={() => capitalize('lastName')}
-                  size="large"
                 />
               </Form.Item>
 
@@ -385,7 +371,6 @@ export default function ClientDetails() {
               >
                 <Form.Item name="years" label="Years">
                   <InputNumber
-                    size="large"
                     placeholder="Years"
                     max={99}
                     min={0}
@@ -395,7 +380,6 @@ export default function ClientDetails() {
                 </Form.Item>
                 <Form.Item name="months" label="Months">
                   <InputNumber
-                    size="large"
                     placeholder="Months"
                     min={0}
                     onChange={calculateDob}
@@ -404,7 +388,6 @@ export default function ClientDetails() {
                 </Form.Item>
                 <Form.Item name="weeks" label="Weeks">
                   <InputNumber
-                    size="large"
                     placeholder="Weeks"
                     min={0}
                     className="w-full"
@@ -442,7 +425,6 @@ export default function ClientDetails() {
               >
                 <Select
                   disabled={!idOptions?.length}
-                  size="large"
                   placeholder="Select Identification Type"
                   onChange={(value) => {
                     if (value) {
@@ -485,6 +467,10 @@ export default function ClientDetails() {
                   label="Phone Number"
                   rules={[
                     {
+                      required: true,
+                      message: 'Please input phone number',
+                    },
+                    {
                       validator: (_, value) => {
                         if (value) {
                           if (!/^\d{9}$/.test(value)) {
@@ -500,7 +486,6 @@ export default function ClientDetails() {
                     addonBefore={
                       <Form.Item name="phoneCode" noStyle>
                         <Select
-                          size="large"
                           style={{ width: 120 }}
                           showSearch
                           options={countryCodes}
@@ -520,7 +505,6 @@ export default function ClientDetails() {
                       }
                       form.setFieldValue('phoneNumber', e.target.value)
                     }}
-                    size="large"
                   />
                 </Form.Item>
               )}

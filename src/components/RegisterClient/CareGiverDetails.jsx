@@ -1,5 +1,16 @@
-import { Button, Form, Input, Select, Popconfirm, InputNumber } from 'antd'
-import { caregiverTypes, caregiverRelationships } from '../../data/options/clientDetails'
+import {
+  Button,
+  Form,
+  Input,
+  Select,
+  Popconfirm,
+  InputNumber,
+  Radio,
+} from 'antd'
+import {
+  caregiverTypes,
+  caregiverRelationships,
+} from '../../data/options/clientDetails'
 import { countryCodes } from '../../data/countryCodes'
 import Table from '../DataTable'
 import { titleCase } from '../../utils/methods'
@@ -20,6 +31,12 @@ export default function CaregiverDetails({
   const [caregiveRelationship, setCaregiverRelationship] = useState('parent')
 
   const columns = [
+    {
+      title: 'Relationship with client',
+      dataIndex: 'caregiverRelationship',
+      key: 'caregiverRelationship',
+      width: 100,
+    },
     {
       title:
         caregiverType() === 'Caregiver'
@@ -86,7 +103,8 @@ export default function CaregiverDetails({
   return (
     <div>
       <h3 className="text-xl font-medium mb-6">
-        {`${caregiverType(caregiveRelationship)} Details`} {caregiveRelationship}
+        {`${caregiverType(caregiveRelationship)} Details`}{' '}
+        {caregiveRelationship}
       </h3>
       <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
         <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
@@ -109,7 +127,7 @@ export default function CaregiverDetails({
               allowClear
             />
           </Form.Item>
-        
+
           <Form.Item
             name="caregiverType"
             label={
@@ -120,7 +138,9 @@ export default function CaregiverDetails({
             rules={[
               {
                 required: true,
-                message: `Please select the ${caregiverType(caregiveRelationship)} type`,
+                message: `Please select the ${caregiverType(
+                  caregiveRelationship
+                )} type`,
               },
             ]}
           >
@@ -139,7 +159,9 @@ export default function CaregiverDetails({
             rules={[
               {
                 required: true,
-                message: `Please input the ${caregiverType(caregiveRelationship)} name`,
+                message: `Please input the ${caregiverType(
+                  caregiveRelationship
+                )} name`,
               },
             ]}
           >
@@ -158,11 +180,13 @@ export default function CaregiverDetails({
             label={`${caregiverType(caregiveRelationship)} ID Number`}
             rules={[
               {
-                message: `Please input the ${caregiverType(caregiveRelationship)} ID number`,
+                message: `Please input the ${caregiverType(
+                  caregiveRelationship
+                )} ID number`,
               },
               {
-                required: caregiveRelationship === 'kin' ? true : false 
-              }
+                required: caregiveRelationship === 'kin',
+              },
             ]}
           >
             <Input
@@ -184,7 +208,7 @@ export default function CaregiverDetails({
                 pattern: /^(\+?)([0-9]{7,15})$/,
                 message: 'Please enter a valid phone number!',
               },
-              { required: caregiveRelationship === 'kin' ? true : false }
+              { required: caregiveRelationship === 'kin' },
             ]}
             className="mb-0"
           >

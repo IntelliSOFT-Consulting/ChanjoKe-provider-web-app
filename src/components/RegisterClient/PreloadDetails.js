@@ -39,8 +39,9 @@ export default function PreloadDetails({
     const county = patient.address[0].district
     const subCounty = patient.address[0]?.line?.[1]
     const ward = patient.address[0]?.line?.[2]
-    const townCenter = patient.address[0]?.line?.[3]
-    const estateOrHouseNo = patient.address[0]?.line?.[4]
+    const communityUnit = patient.address[0]?.line?.[3]
+    const townCenter = patient.address[0]?.line?.[4]
+    const estateOrHouseNo = patient.address[0]?.line?.[5]
     const estimatedAge = patient.multipleBirthBoolean === true
     const caregiverIds =
       patient.caregiver?.filter(
@@ -48,6 +49,7 @@ export default function PreloadDetails({
       ) || []
     const caregivers = patient.contact.map((caregiver, index) => {
       return {
+        caregiverRelationship: caregiver.relationship[0].coding?.[0]?.code,
         caregiverType: caregiver.relationship[0].coding?.[0]?.display,
         caregiverName: caregiver.name?.text,
         phoneCode: caregiver.telecom[0].value?.slice(0, -9) || '+254',
@@ -83,6 +85,7 @@ export default function PreloadDetails({
       county,
       subCounty,
       ward,
+      communityUnit,
       townCenter,
       estateOrHouseNo,
       caregivers,

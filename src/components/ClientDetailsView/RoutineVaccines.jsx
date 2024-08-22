@@ -24,10 +24,7 @@ import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import DeleteModal from './DeleteModal'
-import {
-  colorCodeVaccines,
-  isCovidQualified
-} from './vaccineController'
+import { colorCodeVaccines, isCovidQualified } from './vaccineController'
 
 export default function RoutineVaccines({
   userCategory,
@@ -259,13 +256,14 @@ export default function RoutineVaccines({
       (vaccine) => vaccine.status === 'completed'
     )
     const color = colorCodeVaccines(categoryvaccines)
-    const vaccineAefisCount = aefis?.filter((aefi) =>
-      categoryvaccines?.find((vaccine) =>
-        aefi?.resource?.suspectEntity?.[0]?.instance?.reference?.includes(
-          vaccine.immunizationId
+    const vaccineAefisCount =
+      aefis?.filter((aefi) =>
+        categoryvaccines?.find((vaccine) =>
+          aefi?.resource?.suspectEntity?.[0]?.instance?.reference?.includes(
+            vaccine.immunizationId
+          )
         )
-      )
-    )?.length
+      )?.length || 0
 
     return (
       <Disclosure

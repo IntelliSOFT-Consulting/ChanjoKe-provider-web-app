@@ -111,6 +111,7 @@ export default function usePatient() {
             data.countyName,
             data.subCounty,
             data.ward,
+            data.communityUnit,
             data.townCenter,
             data.estateOrHouseNo,
           ]?.filter(Boolean),
@@ -122,6 +123,7 @@ export default function usePatient() {
           text: [
             data.estateOrHouseNo,
             data.townCenter,
+            data.communityUnit,
             data.ward,
             data.subCounty,
             data.county,
@@ -137,7 +139,7 @@ export default function usePatient() {
               coding: [
                 {
                   system: 'http://terminology.hl7.org/CodeSystem/v2-0131',
-                  code: caregiver.caregiverType,
+                  code: caregiver.caregiverRelationship,
                   display: caregiver.caregiverType,
                 },
               ],
