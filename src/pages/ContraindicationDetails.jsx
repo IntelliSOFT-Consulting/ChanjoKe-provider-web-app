@@ -63,6 +63,8 @@ const ContraindicationDetails = ({ notAdministered }) => {
         imm?.reasonCode?.[0]?.text === 'Not Administered' &&
         imm?.statusReason?.text === 'Contraindication'
           ? 'Contraindication'
+          : imm?.reasonCode?.[0]?.text === 'Rescheduled'
+          ? 'Rescheduled'
           : 'Not Done'
 
       const disease = recommendations?.recommendation?.find(
@@ -137,6 +139,8 @@ const ContraindicationDetails = ({ notAdministered }) => {
           {notAdministered &&
           immunization?.statusReason?.text === 'Contraindication'
             ? 'Contraindications'
+            : immunization?.reasonCode?.[0]?.text === 'Rescheduled'
+            ? 'Rescheduled'
             : 'Not Administered'}
         </div>
       </div>
