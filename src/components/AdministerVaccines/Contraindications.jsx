@@ -105,7 +105,7 @@ export default function Contraindications() {
               onFinish={handleFormSubmit}
               form={form}
               layout="vertical"
-              className="grid grid-cols-2 gap-36 px-6 gap-10"
+              className="grid grid-cols-2 px-6 gap-10"
               initialValues={{
                 vaccinesToContraindicate: selectedVaccines?.map(
                   (vaccine) => vaccine.vaccineId
@@ -159,7 +159,6 @@ export default function Contraindications() {
                       label: vaccine.vaccineName,
                       value: vaccine.vaccineId,
                     }))}
-                    size="large"
                   />
                 </Form.Item>
               </div>
@@ -192,7 +191,6 @@ export default function Contraindications() {
                   ]}
                 >
                   <DatePicker
-                    size="large"
                     style={{ width: '100%' }}
                     format="DD-MM-YYYY"
                     disabledDate={(current) =>

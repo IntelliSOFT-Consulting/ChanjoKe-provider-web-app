@@ -163,7 +163,6 @@ export default function NotAdministered() {
                       value: vaccine.vaccineId,
                     }))}
                     showSearch
-                    size="large"
                   />
                 </Form.Item>
               </div>
@@ -180,7 +179,6 @@ export default function NotAdministered() {
                     placeholder="Select a Reason"
                     options={fhirReasons}
                     showSearch
-                    size="large"
                     onChange={(value) => {
                       if (value === 'Contraindication') {
                         setContraindicated(true)
@@ -203,7 +201,6 @@ export default function NotAdministered() {
                     ]}
                   >
                     <DatePicker
-                      size="large"
                       style={{ width: '100%' }}
                       format="DD-MM-YYYY"
                       disabledDate={(current) =>
