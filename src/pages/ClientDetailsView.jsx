@@ -75,7 +75,6 @@ export default function ClientDetailsView() {
     }
   }, [immunizations, recommendations, observations])
 
-  console.log('routineVaccines', routineVaccines)
 
   const tHeaders = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
