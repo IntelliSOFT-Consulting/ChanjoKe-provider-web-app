@@ -64,6 +64,7 @@ export default function ClientDetailsView() {
         recommendations?.recommendation,
         immunizations
       )
+
       setRoutineVaccines(groupedVaccines.routine)
       setNonRoutineVaccines(groupedVaccines.non_routine)
       dispatch(setVaccineSchedules(groupedVaccines.routine))
@@ -73,6 +74,8 @@ export default function ClientDetailsView() {
       setObservationsData(formatWeightData(observations, patient?.birthDate))
     }
   }, [immunizations, recommendations, observations])
+
+  console.log('routineVaccines', routineVaccines)
 
   const tHeaders = [
     { title: 'Name', dataIndex: 'name', key: 'name' },

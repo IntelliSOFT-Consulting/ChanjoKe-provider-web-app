@@ -11,16 +11,43 @@ export const isEligibleForVaccine = (vaccine) => {
 }
 
 const receivedDose = (vaccinesSchedule, doseNumber) => {
-  const given = vaccinesSchedule.find(
+  return vaccinesSchedule.some(
     (item) => item.doseNumber === doseNumber && item.status === 'completed'
   )
 }
 
 export const isQualified = (vaccinesSchedule, vaccine) => {
-  const vaccineSeries = vaccinesSchedule.filter((item) =>
-    vaccine.vaccine === 'Covid 19 (SARS-CoV-2)'
-      ? item.vaccine === 'Covid 19 (SARS-CoV-2)'
-      : item.nhddCode === vaccine.nhddCode
+  if (vaccine.disease === 'Covid 19 (SARS-CoV-2)') {
+    const covidVaccines = vaccinesSchedule.filter(
+      (item) => item.disease === 'Covid 19 (SARS-CoV-2)'
+    )
+
+    const maxCompletedDose = Math.max(
+      ...covidVaccines
+        .filter((v) => v.status === 'completed')
+        .map((v) => v.doseNumber),
+      0
+    )
+
+    if (vaccine.doseNumber <= maxCompletedDose) {
+      return false
+    }
+
+    const sameVaccineBrand = covidVaccines.filter(
+      (v) => v.vaccineId.split('-')[2] === vaccine.vaccineId.split('-')[2]
+    )
+    const maxCompletedDoseForBrand = Math.max(
+      ...sameVaccineBrand
+        .filter((v) => v.status === 'completed')
+        .map((v) => v.doseNumber),
+      0
+    )
+
+    return vaccine.doseNumber === maxCompletedDoseForBrand + 1
+  }
+
+  const vaccineSeries = vaccinesSchedule.filter(
+    (item) => item.nhddCode === vaccine.nhddCode
   )
 
   const isSameDoseCompleted = vaccineSeries?.some(
