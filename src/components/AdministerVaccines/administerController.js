@@ -94,6 +94,18 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
       }
     }
 
+    if(values.otherReason) {
+      resource.reasonCode.push({
+        coding: [
+          {
+            code: 'details',
+            display: 'Details',
+          },
+        ],
+        text: values.otherReason,
+      })
+    }
+
     return resource
   })
 }

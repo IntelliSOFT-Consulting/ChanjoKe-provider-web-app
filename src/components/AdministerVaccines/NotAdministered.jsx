@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Popconfirm, Select } from 'antd'
+import { Button, DatePicker, Form, Input, Popconfirm, Select } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -13,6 +13,7 @@ import {
 export default function NotAdministered() {
   const [loading, setLoading] = useState(false)
   const [contraindicated, setContraindicated] = useState(false)
+  const [otherReason, setOtherReason] = useState(false)
 
   const navigate = useNavigate()
 
@@ -182,12 +183,42 @@ export default function NotAdministered() {
                     onChange={(value) => {
                       if (value === 'Contraindication') {
                         setContraindicated(true)
+                      } else if (value === 'Other') {
+                        setContraindicated(false)
+                        setOtherReason(true)
                       } else {
                         setContraindicated(false)
                       }
                     }}
                   />
                 </Form.Item>
+                {(contraindicated || otherReason) && (
+                  <Form.Item
+                    name="otherReason"
+                    label={
+                      contraindicated
+                        ? 'Reason for contraindication'
+                        : 'Other reason'
+                    }
+                    rules={[
+                      {
+                        required: true,
+                        message: contraindicated
+                          ? 'Contraindication reason is required'
+                          : 'Please specify other reason',
+                      },
+                    ]}
+                  >
+                    <Input.TextArea
+                      rows={3}
+                      placeholder={
+                        contraindicated
+                          ? 'Enter contraindication reason'
+                          : 'Specify other reason'
+                      }
+                    />
+                  </Form.Item>
+                )}
 
                 {!contraindicated && (
                   <Form.Item
