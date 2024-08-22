@@ -120,9 +120,10 @@ export default function NonRoutineVaccines({
             defaultChecked={completed}
             className="tooltip"
             disabled={
-              !isQualified(allVaccines, record) ||
-              outGrown(record?.lastDate) ||
-              patientDetails?.deceased
+              (!isQualified(allVaccines, record) ||
+                outGrown(record?.lastDate) ||
+                patientDetails?.deceased) &&
+              record.status !== 'Rescheduled'
             }
             onChange={() => handleCheckBox(record)}
           />

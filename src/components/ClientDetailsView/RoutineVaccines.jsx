@@ -5,9 +5,9 @@ import {
   Button,
   Checkbox,
   FloatButton,
+  Popconfirm,
   Tag,
   Tooltip,
-  Popconfirm,
 } from 'antd'
 import dayjs from 'dayjs'
 import moment from 'moment'
@@ -24,7 +24,10 @@ import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import DeleteModal from './DeleteModal'
-import { colorCodeVaccines, isQualified } from './vaccineController'
+import {
+  colorCodeVaccines,
+  isCovidQualified
+} from './vaccineController'
 
 export default function RoutineVaccines({
   userCategory,
@@ -142,7 +145,7 @@ export default function RoutineVaccines({
           (isLocked &&
             !['Rescheduled', 'Not Administered'].includes(record.status)) ||
           record.contraindicated ||
-          !isQualified(allVaccines, record)
+          !isCovidQualified(allVaccines, record)
 
         return (
           <Tooltip title={statusMessage(record, isLocked)} color="#163c94">

@@ -16,6 +16,38 @@ const receivedDose = (vaccinesSchedule, doseNumber) => {
   )
 }
 
+export const isCovidQualified = (vaccinesSchedule, vaccine) => {
+  if (vaccine.disease === 'Covid 19 (SARS-CoV-2)') {
+    const covidVaccines = vaccinesSchedule.filter(
+      (item) => item.disease === 'Covid 19 (SARS-CoV-2)'
+    )
+
+    const maxCompletedDose = Math.max(
+      ...covidVaccines
+        .filter((v) => v.status === 'completed')
+        .map((v) => v.doseNumber),
+      0
+    )
+
+    if (vaccine.doseNumber <= maxCompletedDose) {
+      return false
+    }
+    const sameVaccineBrand = covidVaccines.filter(
+      (v) => v.vaccineId.split('-')[2] === vaccine.vaccineId.split('-')[2]
+    )
+    const maxCompletedDoseForBrand = Math.max(
+      ...sameVaccineBrand
+        .filter((v) => v.status === 'completed')
+        .map((v) => v.doseNumber),
+      0
+    )
+
+    return vaccine.doseNumber === maxCompletedDoseForBrand + 1
+  }
+
+  return true
+}
+
 export const isQualified = (vaccinesSchedule, vaccine) => {
   if (vaccine.disease === 'Covid 19 (SARS-CoV-2)') {
     const covidVaccines = vaccinesSchedule.filter(
@@ -32,7 +64,6 @@ export const isQualified = (vaccinesSchedule, vaccine) => {
     if (vaccine.doseNumber <= maxCompletedDose) {
       return false
     }
-
     const sameVaccineBrand = covidVaccines.filter(
       (v) => v.vaccineId.split('-')[2] === vaccine.vaccineId.split('-')[2]
     )
