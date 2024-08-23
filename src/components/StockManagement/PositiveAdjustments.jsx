@@ -1,6 +1,15 @@
-import { Button, Card, DatePicker, Form, Select, notification } from 'antd'
+import {
+  Button,
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  notification,
+  Select,
+  Popconfirm,
+} from 'antd'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { reasons } from '../../data/options/clientDetails'
@@ -8,41 +17,42 @@ import { useAudit } from '../../hooks/useAudit'
 import useInventory from '../../hooks/useInventory'
 import Table from '../DataTable'
 import {
-  inventoryItemUpdate,
+  inventoryItemBuilder,
   inventoryReportBuilder,
   receiveAuditBuilder,
 } from './helpers/stockResourceBuilder'
 
 export default function PositiveAdjustments() {
-  const [batchOptions, setBatchOptions] = useState(null)
-  const [editedBatches, setEditedBatches] = useState(null)
-  const [locations, setLocations] = useState(null)
+  const [batchOptions, setBatchOptions] = useState([])
+  const [editedBatches, setEditedBatches] = useState([])
+  const [locations, setLocations] = useState([])
 
   const [api, contextHolder] = notification.useNotification()
-
   const [form] = Form.useForm()
-
   const { user } = useSelector((state) => state.userInfo)
-
   const navigate = useNavigate()
 
-  const { getInventoryReport, getInventoryItems, updateInventory } =
-    useInventory()
+  const {
+    getAggregateInventoryItems,
+    getDetailedInventoryItems,
+    createInventory,
+    updateInventory,
+  } = useInventory()
 
   const { createAudit, updateAudit, getAudits, audits } = useAudit()
 
   useEffect(() => {
-    getInventoryReport()
+    getDetailedInventoryItems()
     getAudits({ type: 'shared', 'agent-name': user.facilityName, action: 'U' })
   }, [])
 
-  const addIssuedBatches = () => {
+  const addIssuedBatches = useCallback(() => {
     if (!audits?.length) return
 
     const locationOptions = []
     const batches = audits
       .map((auditData) => {
-        const location = auditData?.agent?.[0]?.location
+        const location = auditData?.extension?.[0]?.valueReference
 
         if (location) {
           locationOptions.push({
@@ -55,7 +65,8 @@ export default function PositiveAdjustments() {
         const parsed = issuedBatches ? JSON.parse(issuedBatches) : []
         return parsed.map((batch) => ({
           ...batch,
-          sharedQuantity: batch.quantity,
+          id: auditData.id,
+          sharedQuantity: batch.sharedQuantity,
           quantity: 0,
           facilityName: location.display,
           facility: location.reference,
@@ -66,82 +77,97 @@ export default function PositiveAdjustments() {
 
     setLocations(locationOptions)
     setBatchOptions(batches)
-  }
+  }, [audits])
 
   useEffect(() => {
     if (audits?.length) {
       addIssuedBatches()
     }
-  }, [audits])
+  }, [audits, addIssuedBatches])
 
-  const countPerVaccine = (vaccines) => {
-    const removeSelected = batchOptions.filter(
-      (batch) =>
-        !vaccines.some((vaccine) => vaccine.batchNumber === batch.batchNumber)
-    )
-    const vaccinesToCount = [...vaccines, ...removeSelected]
-    const vaccineCounts = vaccinesToCount.reduce((acc, curr) => {
-      if (acc[curr.vaccine]) {
-        acc[curr.vaccine].quantity += curr.sharedQuantity
-      } else {
-        acc[curr.vaccine] = {
-          ...curr,
-          quantity: curr.quantity + curr.sharedQuantity,
-        }
-      }
-      return acc
-    }, {})
-    return Object.values(vaccineCounts)
-  }
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (values) => {
     try {
-      const getLatestReport = await getInventoryReport()
-      const getLatestItems = await getInventoryItems()
+      const latestItems = await getDetailedInventoryItems()
 
-      const aggregatedBatches = countPerVaccine(editedBatches)
+      const formattedCount = editedBatches.map((batch) => {
+        const existingItem = latestItems.find(
+          (item) =>
+            item.extension?.find((ext) => ext.url === 'batchNumber')
+              ?.valueString === batch.batchNumber
+        )
 
-      const formattedCount = editedBatches.map((batch) => ({
-        ...batch,
-        previousQuantity: batch.quantity,
-        quantity: batch.quantity + batch.sharedQuantity,
-      }))
+        return {
+          ...batch,
+          previousQuantity:
+            existingItem?.extension?.find((ext) => ext.url === 'quantity')
+              ?.valueQuantity?.value || 0,
+          quantity:
+            (existingItem?.extension?.find((ext) => ext.url === 'quantity')
+              ?.valueQuantity?.value || 0) + batch.sharedQuantity,
+        }
+      })
 
-      const updatedReport = inventoryReportBuilder(
-        formattedCount,
-        getLatestReport,
-        user.facility
-      )
+      const payload = {
+        ...values,
+        vaccines: formattedCount,
+        facility: {
+          reference: user.orgUnit?.code,
+          display: user.orgUnit?.name,
+        },
+      }
 
-      updatedReport.id = getLatestReport.id
+      const inventoryItems = inventoryItemBuilder(payload)
 
-      const updatedInventoryItems = inventoryItemUpdate(
-        aggregatedBatches,
-        getLatestItems,
-        'count'
-      )
+      // Separate existing and new items
+      const existingItems = []
+      const newItems = []
 
-      await Promise.all(
-        updatedInventoryItems.map((item) => updateInventory(item))
-      )
+      inventoryItems.forEach((item) => {
+        const existingItem = latestItems.find(
+          (latestItem) =>
+            latestItem.extension?.find((ext) => ext.url === 'batchNumber')
+              ?.valueString ===
+            item.extension?.find((ext) => ext.url === 'batchNumber')
+              ?.valueString
+        )
+
+        if (existingItem) {
+          existingItems.push({ ...existingItem, ...item })
+        } else {
+          newItems.push(item)
+        }
+      })
+
+      // Update existing items
+      await Promise.all(existingItems.map(updateInventory))
+
+      // Create new items
+      await Promise.all(newItems.map(createInventory))
 
       const audit = receiveAuditBuilder(
         formattedCount,
-        getLatestReport,
-        user,
+        {
+          ...user,
+          facility: {
+            reference: user.orgUnit.code,
+            display: user.orgUnit.name,
+          },
+          description: values.reason,
+        },
         'receipt'
       )
       await createAudit(audit)
-      await updateInventory(updatedReport)
 
       await updateAudit({
-        ...audits[0],
+        ...audits?.find((audit) => audit.id === values.id),
         action: 'R',
       })
 
-      setEditedBatches([{}])
+      const aggregate = await getAggregateInventoryItems()
+      const report = inventoryReportBuilder(aggregate, user?.orgUnit?.code)
+      await createInventory(report)
 
-      getInventoryReport()
+      setEditedBatches([])
 
       api.success({
         message: 'Stock count updated successfully',
@@ -149,35 +175,54 @@ export default function PositiveAdjustments() {
 
       setTimeout(() => {
         navigate('/stock-management')
-      }, 1500)
+      }, 500)
     } catch (error) {
       console.error(error)
+      api.error({
+        message: 'Failed to update stock count',
+      })
     }
   }
 
-  const columns = [
-    {
-      title: 'Vaccine/Diluents',
-      dataIndex: 'vaccine',
-    },
-    {
-      title: 'Batch Number',
-      dataIndex: 'batchNumber',
-    },
-    {
-      title: 'Expiry Date',
-      dataIndex: 'expiryDate',
-    },
-    {
-      title: 'Received Quantity',
-      dataIndex: 'sharedQuantity',
-    },
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Vaccine/Diluents',
+        dataIndex: 'vaccine',
+      },
+      {
+        title: 'Batch Number',
+        dataIndex: 'batchNumber',
+      },
+      {
+        title: 'Expiry Date',
+        dataIndex: 'expiryDate',
+      },
+      {
+        title: 'Received Quantity',
+        dataIndex: 'sharedQuantity',
+      },
+      {
+        title: 'VVM Status',
+        dataIndex: 'vvmStatus',
+      },
+    ],
+    []
+  )
 
-    {
-      title: 'VVM Status',
-      dataIndex: 'vvmStatus',
+  const handleLocationChange = useCallback(
+    (value) => {
+      const selectedBatches = batchOptions.filter(
+        (batch) => batch.facility === value
+      )
+      form.setFieldsValue({
+        reason: selectedBatches[0]?.reason,
+        id: selectedBatches[0]?.id,
+      })
+      setEditedBatches(selectedBatches)
     },
-  ]
+    [batchOptions, form]
+  )
 
   return (
     <>
@@ -191,9 +236,14 @@ export default function PositiveAdjustments() {
         actions={[
           <div className="flex w-full justify-end px-6">
             <Button className="mr-4">Cancel</Button>
-            <Button type="primary" onClick={() => form.submit()}>
-              Submit
-            </Button>
+            <Popconfirm
+              title="Are you sure you want to receive stock?"
+              onConfirm={() => form.submit()}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="primary">Submit</Button>
+            </Popconfirm>
           </div>,
         ]}
       >
@@ -220,14 +270,11 @@ export default function PositiveAdjustments() {
               <Select
                 placeholder="Origin"
                 options={locations}
-                onChange={(value) => {
-                  const selectedBatches = batchOptions.filter(
-                    (batch) => batch.facility === value
-                  )
-                  form.setFieldValue('reason', selectedBatches[0]?.reason)
-                  setEditedBatches(selectedBatches)
-                }}
+                onChange={handleLocationChange}
               />
+            </Form.Item>
+            <Form.Item name="id" hidden>
+              <Input />
             </Form.Item>
             <Form.Item
               label="Reason For Adjustment"
@@ -265,7 +312,7 @@ export default function PositiveAdjustments() {
               loading={!audits}
               columns={columns}
               size="small"
-              dataSource={editedBatches || []}
+              dataSource={editedBatches}
               pagination={false}
             />
           </div>

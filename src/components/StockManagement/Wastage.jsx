@@ -6,97 +6,49 @@ import {
   Select,
   notification,
 } from 'antd'
-import { useEffect, useState } from 'react'
-import { createUseStyles } from 'react-jss'
+import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { useAudit } from '../../hooks/useAudit'
 import useInventory from '../../hooks/useInventory'
 import Table from '../DataTable'
 import { formatInventoryToTable } from './helpers/inventoryFormatter'
-import {
-  inventoryItemUpdate,
-  inventoryReportBuilder,
-  receiveAuditBuilder,
-} from './helpers/stockResourceBuilder'
-import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { useAudit } from '../../hooks/useAudit'
+import { receiveAuditBuilder } from './helpers/stockResourceBuilder'
 
 const wastageReasons = {
-  Open: [
-    {
-      label: 'Insufficient Children',
-      value: 'Insufficient Children',
-    },
-  ],
+  Open: [{ label: 'Insufficient Children', value: 'Insufficient Children' }],
   Closed: [
     { label: 'Expiration', value: 'Expiration' },
-    { label: 'Cold chain failures', value: 'Cold chain failures' },
     { label: 'VVM change', value: 'VVM change' },
     { label: 'Breakage', value: 'Breakage' },
-    { label: 'Contamination', value: 'Contamination' },
-    { label: 'Policy changes', value: 'Policy changes' },
-    { label: 'Power outages', value: 'Power outages' },
-    { label: 'Inventory mismanagement', value: 'Inventory mismanagement' },
-    { label: 'Label/packaging issues', value: 'Label/packaging issues' },
-    { label: 'Natural disasters', value: 'Natural disasters' },
   ],
 }
 
 export default function Wastage() {
-  const [batchOptions, setBatchOptions] = useState(null)
+  const [batchOptions, setBatchOptions] = useState([])
   const [editedBatches, setEditedBatches] = useState([{}])
-
   const [api, contextHolder] = notification.useNotification()
 
   const { user } = useSelector((state) => state.userInfo)
-
   const navigate = useNavigate()
 
-  const {
-    getInventoryReport,
-    getInventoryItems,
-    updateInventory,
-    inventoryReport,
-  } = useInventory()
-
+  const { getDetailedInventoryItems, batchItems, updateInventory } =
+    useInventory()
   const { createAudit } = useAudit()
 
   useEffect(() => {
-    getInventoryReport()
+    getDetailedInventoryItems()
   }, [])
 
   useEffect(() => {
-    if (inventoryReport) {
-      const formattedInventory = formatInventoryToTable(inventoryReport)
-      setBatchOptions(formattedInventory)
+    if (batchItems) {
+      setBatchOptions(formatInventoryToTable(batchItems))
     }
-  }, [inventoryReport])
-
-  const countPerVaccine = (vaccines) => {
-    const removeSelected = batchOptions.filter(
-      (batch) =>
-        !vaccines.some((vaccine) => vaccine.batchNumber === batch.batchNumber)
-    )
-    const vaccinesToCount = [...vaccines, ...removeSelected]
-    const vaccineCounts = vaccinesToCount.reduce((acc, curr) => {
-      if (acc[curr.vaccine]) {
-        acc[curr.vaccine].quantity -= curr.quantityWasted
-      } else {
-        acc[curr.vaccine] = {
-          ...curr,
-          quantity: curr.quantity - curr.quantityWasted,
-        }
-      }
-      return acc
-    }, {})
-    return Object.values(vaccineCounts)
-  }
+  }, [batchItems])
 
   const handleSubmit = async () => {
     try {
-      const getLatestReport = await getInventoryReport()
-      const getLatestItems = await getInventoryItems()
-
-      const aggregatedBatches = countPerVaccine(editedBatches)
+      const latestItems = await getDetailedInventoryItems()
 
       const formattedCount = editedBatches.map((batch) => ({
         ...batch,
@@ -104,182 +56,190 @@ export default function Wastage() {
         quantity: batch.quantity - batch.quantityWasted,
       }))
 
-      const updatedReport = inventoryReportBuilder(
-        formattedCount,
-        getLatestReport,
-        user.facility
-      )
+      const updatedItems = latestItems
+        .map((item) => {
+          const match = formattedCount.find(
+            (count) =>
+              count.batchNumber ===
+              item.extension.find((ext) => ext.url === 'batchNumber')
+                ?.valueString
+          )
 
-      updatedReport.id = getLatestReport.id
+          if (match) {
+            const quantityIndex = item.extension.findIndex(
+              (ext) => ext.url === 'quantity'
+            )
+            item.extension[quantityIndex].valueQuantity.value = match.quantity
+            return item
+          }
+          return null
+        })
+        .filter(Boolean)
 
-      const updatedInventoryItems = inventoryItemUpdate(
-        aggregatedBatches,
-        getLatestItems,
-        'count'
-      )
-
-      await Promise.all(
-        updatedInventoryItems.map((item) => updateInventory(item))
-      )
+      await Promise.all(updatedItems.map(updateInventory))
 
       const audit = receiveAuditBuilder(
         formattedCount,
-        getLatestReport,
-        user,
+        {
+          ...user,
+          facility: {
+            reference: user.orgUnit.code,
+            display: user.orgUnit.name,
+          },
+        },
         'wastage'
       )
       await createAudit(audit)
-      await updateInventory(updatedReport)
 
       setEditedBatches([{}])
-
-      getInventoryReport()
-
-      api.success({
-        message: 'Stock count updated successfully',
-      })
-
-      setTimeout(() => {
-        navigate('/stock-management')
-      }, 1500)
+      api.success({ message: 'Stock count updated successfully' })
+      setTimeout(() => navigate('/stock-management'), 1000)
     } catch (error) {
       console.error(error)
+      api.error({ message: 'Failed to update stock count' })
     }
   }
 
-  const columns = [
-    {
-      title: 'Vaccine/Diluents',
-      dataIndex: 'vaccine',
-      render: (record, _, index) => (
-        <Select
-          defaultValue={record}
-          className="w-full"
-          onSelect={(value) => {
-            const vaccineBatch = batchOptions.find(
-              (v) => v.batchNumber === value
-            )
+  const updateBatch = useCallback((index, updates) => {
+    setEditedBatches((prevBatches) => {
+      const newBatches = [...prevBatches]
+      newBatches[index] = { ...newBatches[index], ...updates }
+      return newBatches
+    })
+  }, [])
 
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index] = vaccineBatch
-            setEditedBatches(updatedBatches)
-          }}
-          placeholder="Select Vaccine"
-        >
-          {batchOptions?.map((vaccine) => (
-            <Select.Option
-              key={vaccine.batchNumber}
-              value={vaccine.batchNumber}
-              disabled={editedBatches.some(
-                (batch) =>
-                  batch.vaccine === vaccine.vaccine &&
-                  batch.batchNumber === vaccine.batchNumber
-              )}
-            >
-              {vaccine?.vaccine}
-            </Select.Option>
-          ))}
-        </Select>
-      ),
-      width: '20%',
-    },
-    {
-      title: 'Batch Number',
-      dataIndex: 'batchNumber',
-    },
-    {
-      title: 'Expiry Date',
-      dataIndex: 'expiryDate',
-      disabled: true,
-    },
-    {
-      title: 'Stock Quantity',
-      dataIndex: 'quantity',
-    },
-    {
-      title: 'Type of wastaage',
-      dataIndex: 'wastageType',
-      render: (text, record, index) => (
-        <Select
-          defaultValue={text}
-          onSelect={(value) => {
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index] = {
-              ...updatedBatches[index],
-              wastageType: value,
-              reasonOptions: wastageReasons[value],
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Vaccine/Diluents',
+        dataIndex: 'vaccine',
+        render: (record, _, index) => (
+          <Select
+            defaultValue={record}
+            className="w-full"
+            onSelect={(value) => {
+              const vaccineBatch = batchOptions.find(
+                (v) => v.batchNumber === value
+              )
+              updateBatch(index, vaccineBatch)
+            }}
+            placeholder="Select Vaccine"
+          >
+            {batchOptions?.map((vaccine) => (
+              <Select.Option
+                key={vaccine.batchNumber}
+                value={vaccine.batchNumber}
+                disabled={editedBatches.some(
+                  (batch) =>
+                    batch.vaccine === vaccine.vaccine &&
+                    batch.batchNumber === vaccine.batchNumber
+                )}
+              >
+                {vaccine?.vaccine}
+              </Select.Option>
+            ))}
+          </Select>
+        ),
+        width: '20%',
+      },
+      {
+        title: 'Batch Number',
+        dataIndex: 'batchNumber',
+      },
+      {
+        title: 'Expiry Date',
+        dataIndex: 'expiryDate',
+        disabled: true,
+      },
+      {
+        title: 'Stock Quantity',
+        dataIndex: 'quantity',
+      },
+      {
+        title: 'Type of wastage',
+        dataIndex: 'wastageType',
+        render: (text, _, index) => (
+          <Select
+            defaultValue={text}
+            onSelect={(value) =>
+              updateBatch(index, {
+                wastageType: value,
+                reasonOptions: wastageReasons[value],
+              })
             }
-            setEditedBatches(updatedBatches)
-          }}
-          placeholder="Select Wastage Type"
-          options={[
-            { label: 'Open', value: 'Open' },
-            { label: 'Closed', value: 'Closed' },
-          ]}
-        />
-      ),
-    },
-    {
-      title: 'Reason',
-      dataIndex: 'reason',
-      render: (text, record, index) => (
-        <Select
-          defaultValue={text}
-          onSelect={(value) => {
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index] = {
-              ...updatedBatches[index],
-              reason: value,
+            placeholder="Select Wastage Type"
+            options={[
+              { label: 'Open', value: 'Open' },
+              { label: 'Closed', value: 'Closed' },
+            ]}
+          />
+        ),
+      },
+      {
+        title: 'Reason',
+        dataIndex: 'reason',
+        render: (text, record, index) => (
+          <Select
+            defaultValue={text}
+            onSelect={(value) => updateBatch(index, { reason: value })}
+            placeholder="Select Reason"
+            options={record.reasonOptions}
+          />
+        ),
+      },
+      {
+        title: 'Quantity Wasted',
+        dataIndex: 'quantityWasted',
+        render: (text, record, index) => (
+          <InputNumber
+            value={text}
+            disabled={!record?.batchNumber}
+            status={
+              (!record?.quantityWasted && record?.quantityWasted !== 0) ||
+              text > record?.quantity
+                ? 'error'
+                : 'success'
             }
-            setEditedBatches(updatedBatches)
-          }}
-          placeholder="Select Reason"
-          options={record.reasonOptions}
-        />
-      ),
-    },
+            min={0}
+            max={record?.quantity}
+            onChange={(value) => updateBatch(index, { quantityWasted: value })}
+          />
+        ),
+      },
+      {
+        title: 'VVM Status',
+        dataIndex: 'vvmStatus',
+        type: 'select',
+      },
+      {
+        title: null,
+        hidden: editedBatches?.length <= 1,
+        render: () => (
+          <Button
+            type="link"
+            danger
+            onClick={() => setEditedBatches((prev) => prev.slice(0, -1))}
+          >
+            Delete
+          </Button>
+        ),
+      },
+    ],
+    [batchOptions, editedBatches, updateBatch]
+  )
 
-    {
-      title: 'Quantity Wasted',
-      dataIndex: 'quantityWasted',
-      render: (text, record, index) => (
-        <InputNumber
-          value={text}
-          disabled={!record?.batchNumber}
-          status={
-            (!record?.quantityWasted && record?.quantityWasted !== 0) ||
-            text > record?.quantity
-              ? 'error'
-              : 'success'
-          }
-          min={0}
-          max={record?.quantity}
-          onChange={(value) => {
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index] = {
-              ...updatedBatches[index],
-              quantityWasted: value,
-            }
-            setEditedBatches(updatedBatches)
-          }}
-        />
-      ),
-    },
-    {
-      title: 'VVM Status',
-      dataIndex: 'vvmStatus',
-      type: 'select',
-    },
-    {
-      title: null,
-      hidden: editedBatches?.length <= 1,
-      render: (record) => (
-        <Button type="link" danger>
-          Delete
-        </Button>
-      ),
-    },
-  ]
+  const isSubmitDisabled =
+    !editedBatches?.length ||
+    !editedBatches?.every(
+      (batch) => batch.quantityWasted && batch.reason && batch.wastageType
+    )
+
+  const isAddRowDisabled =
+    !batchOptions?.length ||
+    editedBatches?.length === batchOptions?.length ||
+    editedBatches?.some(
+      (batch) => !batch.quantityWasted || !batch.reason || !batch.wastageType
+    )
 
   return (
     <>
@@ -297,16 +257,7 @@ export default function Wastage() {
               okText="Yes"
               cancelText="No"
             >
-              <Button
-                disabled={
-                  !editedBatches?.length ||
-                  !editedBatches?.every((batch) => batch.quantityWasted) ||
-                  !editedBatches?.every((batch) => batch.reason) ||
-                  !editedBatches?.every((batch) => batch.wastageType)
-                }
-              >
-                Submit
-              </Button>
+              <Button disabled={isSubmitDisabled}>Submit</Button>
             </Popconfirm>
           </div>,
         ]}
@@ -316,20 +267,14 @@ export default function Wastage() {
             loading={!batchOptions}
             columns={columns}
             size="small"
-            dataSource={editedBatches || []}
+            dataSource={editedBatches}
             pagination={false}
           />
-
           <div className="flex justify-end mt-5">
             <Button
               className="!bg-green !text-white hover:!bg-green hover:!border-green hover:!text-white"
-              disabled={
-                !batchOptions?.length ||
-                editedBatches?.length === batchOptions?.length ||
-                editedBatches?.some((batch) => !batch.quantityWasted) ||
-                editedBatches?.some((batch) => !batch.reason) ||
-                editedBatches?.some((batch) => !batch.wastageType)
-              }
+              disabled={isAddRowDisabled}
+              onClick={() => setEditedBatches((prev) => [...prev, {}])}
             >
               Add Row
             </Button>

@@ -1,12 +1,14 @@
 // convert fhir location bundle to a format that can be used by the antd table
 export const convertLocations = (bundle) => {
-  return bundle?.entry?.map((location) => {
-    return {
-      key: location.resource.id,
-      name: toTitleCase(location.resource.name),
-      parent: location.resource.partOf.reference?.split('/')[1],
-    }
-  })?.sort((a, b) => a.name.localeCompare(b.name))
+  return bundle?.entry
+    ?.map((location) => {
+      return {
+        key: location.resource.id,
+        name: toTitleCase(location.resource.name),
+        parent: location.resource.partOf.reference?.split('/')[1],
+      }
+    })
+    ?.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export const toTitleCase = (str) => {
@@ -66,12 +68,21 @@ export const formatFacilitiesToTable = (bundle) => {
   const subCounties = localStorage.getItem('subCounties')
     ? JSON.parse(localStorage.getItem('subCounties'))
     : []
-  const wards = localStorage.getItem('wards') ? JSON.parse(localStorage.getItem('wards')) : []
+  const wards = localStorage.getItem('wards')
+    ? JSON.parse(localStorage.getItem('wards'))
+    : []
   return bundle?.entry?.map((facility) => {
-    const wardName = facility.resource.partOf.reference?.split('/')[1];
-    const ward = wards.find((ward) => ward.key?.toLowerCase() === wardName?.toLowerCase());
-    const subCounty = subCounties.find((subCounty) => subCounty.key?.toLowerCase() === ward?.parent?.toLowerCase())
-    const county = counties.find((county) => county.key?.toLowerCase() === subCounty?.parent?.toLowerCase())
+    const wardName = facility.resource.partOf.reference?.split('/')[1]
+    const ward = wards.find(
+      (ward) => ward.key?.toLowerCase() === wardName?.toLowerCase()
+    )
+    const subCounty = subCounties.find(
+      (subCounty) =>
+        subCounty.key?.toLowerCase() === ward?.parent?.toLowerCase()
+    )
+    const county = counties.find(
+      (county) => county.key?.toLowerCase() === subCounty?.parent?.toLowerCase()
+    )
     return {
       key: facility.resource.id,
       name: toTitleCase(facility.resource?.name),
@@ -84,4 +95,16 @@ export const formatFacilitiesToTable = (bundle) => {
       status: facility.resource?.status,
     }
   })
+}
+
+export const formatLocation = (location) => {
+  return location
+    ? location?.includes('Location/')
+      ? location
+      : `Location/${location}`
+    : null
+}
+
+export const getLocationId = (location) => {
+  return location?.replace('Location/', '')
 }

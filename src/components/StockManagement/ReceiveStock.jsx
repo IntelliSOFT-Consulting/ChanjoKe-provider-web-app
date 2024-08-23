@@ -5,6 +5,7 @@ import {
   Form,
   Input,
   notification,
+  Popconfirm,
   Select,
 } from 'antd'
 import dayjs from 'dayjs'
@@ -12,19 +13,18 @@ import React, { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
+import LoadingArrows from '../../common/spinners/LoadingArrows'
 import useInventory from '../../hooks/useInventory'
 import useStock from '../../hooks/useStock'
 import Table from '../DataTable'
 import {
   inventoryItemBuilder,
   inventoryReportBuilder,
-  inventoryItemUpdate,
 } from './helpers/stockResourceBuilder'
 import {
   deliveriesLocations,
   formatDeliveryToTable,
 } from './helpers/stockUtils'
-import LoadingArrows from '../../common/spinners/LoadingArrows'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -61,12 +61,11 @@ const ReceiveStock = () => {
   const { user } = useSelector((state) => state.userInfo)
 
   const {
-    getInventoryItems,
+    getAggregateInventoryItems,
+    getDetailedInventoryItems,
     getInventoryReport,
     createInventory,
-    updateInventory,
     inventoryItems,
-    inventoryReport,
   } = useInventory()
   const location = useLocation()
   const state = location.state || {}
@@ -75,18 +74,19 @@ const ReceiveStock = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    getIncomingDeliveries(user.facility)
+    getIncomingDeliveries(user.orgUnit?.code)
 
-    getInventoryItems()
+    getAggregateInventoryItems()
     getInventoryReport()
   }, [])
+
   useEffect(() => {
     if (deliveries?.data?.length > 0) {
       form.setFieldsValue({ orderNumber, origin })
     }
   }, [deliveries])
 
-  const onSubmit = async () => {
+  const onSubmit = async (values) => {
     setSaving(true)
     try {
       const original = deliveries?.data?.find(
@@ -97,38 +97,31 @@ const ReceiveStock = () => {
 
       await updateSupplyDelivery(original)
 
-      let facilityInventory = await getInventoryItems()
-      const facilityReport = await getInventoryReport()
-
-      if (facilityInventory?.length === 0) {
-        const inventoryItems = inventoryItemBuilder(user.facility)
-
-        facilityInventory = await Promise.all(
-          inventoryItems.map(async (item) => {
-            return await createInventory(item)
-          })
-        )
+      const payload = {
+        ...values,
+        vaccines: selectedOrder.vaccines,
+        facility: {
+          reference: user.orgUnit?.code,
+          display: user.orgUnit?.name,
+        },
       }
 
-      // Update inventory items
-      const updatedInventory = inventoryItemUpdate(
-        selectedOrder?.vaccines,
-        facilityInventory
-      )
+      const inventory = inventoryItemBuilder(payload)
 
       await Promise.all(
-        updatedInventory.map(async (item) => {
-          return await updateInventory(item)
+        inventory.map(async (item) => {
+          return await createInventory(item)
         })
       )
 
-      const report = inventoryReportBuilder(
-        selectedOrder?.vaccines,
-        facilityReport,
-        user.facility
+      let facilityInventory = await getDetailedInventoryItems()
+
+      const newReport = inventoryReportBuilder(
+        facilityInventory,
+        user?.orgUnit?.code
       )
 
-      await createInventory(report)
+      await createInventory(newReport)
 
       notification.success({
         message: 'Stock received successfully',
@@ -136,16 +129,17 @@ const ReceiveStock = () => {
 
       form.resetFields()
       setSelectedOrder(null)
-      setSaving(false)
 
       setTimeout(() => {
         navigate('/stock-management')
-      }, 1500)
+      }, 1000)
     } catch (error) {
       console.log('error', error)
       notification.error({
         message: 'Failed to receive stock',
       })
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -153,7 +147,7 @@ const ReceiveStock = () => {
     const selectedOrigin = deliveries?.data?.find(
       (delivery) => delivery.origin === value
     )
-    const formatted = formatDeliveryToTable(selectedOrigin)
+    const formatted = formatDeliveryToTable(selectedOrigin, inventoryItems)
 
     form.setFieldValue('orderNumber', formatted.orderNumber)
     setSelectedOrder(formatted)
@@ -207,14 +201,20 @@ const ReceiveStock = () => {
           >
             Cancel
           </Button>
-          <Button
-            className={classes.btnPrimary}
-            onClick={() => form.submit()}
-            loading={loading || saving}
-            disabled={!selectedOrder || saving}
+          <Popconfirm
+            title="Are you sure you want to receive this stock?"
+            onConfirm={() => form.submit()}
+            okText="Yes"
+            cancelText="No"
           >
-            Save
-          </Button>
+            <Button
+              className={classes.btnPrimary}
+              loading={loading || saving}
+              disabled={!selectedOrder || saving}
+            >
+              Receive
+            </Button>
+          </Popconfirm>
         </div>,
       ]}
     >

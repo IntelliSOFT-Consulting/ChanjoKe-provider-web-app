@@ -5,37 +5,27 @@ import ReceiveStockLogo from '../common/icons/receiveStockLogo'
 import StockLedgerLogo from '../common/icons/stockLedgerLogo'
 import useInventory from '../hooks/useInventory'
 import { Link } from 'react-router-dom'
-import DataTable from '../components/DataTable'
+import { useSelector } from 'react-redux'
 import { Input } from 'antd'
 import Table from '../components/DataTable'
 import dayjs from 'dayjs'
-import { render } from '@testing-library/react'
 
 export default function StockManagement() {
   const [allData, setAllData] = useState(null)
   const [results, setResults] = useState(null)
 
-  const { getInventoryItems, inventoryItems } = useInventory()
+  const { getAggregateInventoryItems, inventoryItems } = useInventory()
 
-  const formatResults = (data) => {
-    return data.map((item) => ({
-      id: item.id,
-      vaccine: item?.code?.text,
-      type: 'Dose',
-      quantity: item?.extension?.[0]?.valueQuantity?.value,
-      lastTransactionDate: dayjs(item?.meta?.lastUpdated).format('DD-MM-YYYY'),
-    }))
-  }
+  const { user } = useSelector((state) => state.userInfo)
 
   useEffect(() => {
-    getInventoryItems()
+    getAggregateInventoryItems({ subject: user?.orgUnit?.code })
   }, [])
 
   useEffect(() => {
     if (inventoryItems) {
-      const formatted = formatResults(inventoryItems)
-      setResults(formatted)
-      setAllData(formatted)
+      setResults(inventoryItems)
+      setAllData(inventoryItems)
     }
   }, [inventoryItems])
 

@@ -6,20 +6,21 @@ import {
   Input,
   notification,
   Select,
+  Popconfirm,
 } from 'antd'
-import moment from 'moment'
 import dayjs from 'dayjs'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import useInventory from '../../hooks/useInventory'
-import { useLocations } from '../../hooks/useLocation'
-import useStock from '../../hooks/useStock'
-import NewOrderTable from './newOrder/NewOrderTable'
-import { supplyRequestBuilder } from './helpers/stockResourceBuilder'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
+import useInventory from '../../hooks/useInventory'
+import useStock from '../../hooks/useStock'
 import { titleCase } from '../../utils/methods'
+import { supplyRequestBuilder } from './helpers/stockResourceBuilder'
+import NewOrderTable from './newOrder/NewOrderTable'
+import { formatLocation } from '../../utils/formatter'
 
 const { useForm } = Form
 
@@ -50,7 +51,6 @@ export default function NewOrder() {
   const classes = useStyles()
   const [form] = useForm()
   const [hasErrors, setHasErrors] = useState({})
-  const [subCounty, setSubCounty] = useState(null)
   const [tableData, setTableData] = useState([{}])
 
   const {
@@ -64,24 +64,10 @@ export default function NewOrder() {
 
   const navigate = useNavigate()
 
-  const { getInventoryItems, inventoryItems } = useInventory()
-
-  const { getLocationByCode } = useLocations(form)
-
-  const getSubCounty = async () => {
-    const facility = user.facility
-    const ward = await getLocationByCode(facility?.split('/')[1])
-
-    const subCounty = await getLocationByCode(ward?.[0].parent)
-    setSubCounty(subCounty?.[0])
-
-    form.setFieldValue('facility', subCounty?.[0].key)
-    return subCounty?.[0]
-  }
+  const { getAggregateInventoryItems, inventoryItems } = useInventory()
 
   useEffect(() => {
-    getInventoryItems()
-    getSubCounty()
+    getAggregateInventoryItems()
     getLastOrderRequest()
   }, [])
 
@@ -136,8 +122,8 @@ export default function NewOrder() {
           ...data,
           tableData,
           deliverFrom: {
-            reference: `Location/${subCounty?.key}`,
-            display: subCounty?.name,
+            reference: formatLocation(user?.subCounty),
+            display: user?.subCountyName,
           },
           requester: { reference: `Practitioner/${user.fhirPractitionerId}` },
           deliverTo: {
@@ -206,13 +192,18 @@ export default function NewOrder() {
           >
             Cancel
           </Button>
-          <Button className={classes.btnPrimary} onClick={() => form.submit()}>
-            Submit
-          </Button>
+          <Popconfirm
+            title="Are you sure you want to submit this order?"
+            onConfirm={() => form.submit()}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button className={classes.btnPrimary}>Submit</Button>
+          </Popconfirm>
         </div>,
       ]}
     >
-      {loading || !setSubCounty ? (
+      {loading ? (
         <div className="flex justify-center items-center h-96">
           <LoadingArrows />
         </div>
@@ -232,6 +223,7 @@ export default function NewOrder() {
               authoredOn: dayjs(),
               expectedDateOfNextOrder: dayjs().add(30, 'days'),
               level: 'Sub-County',
+              facility: user.subCountyName,
             }}
             autoComplete="off"
           >

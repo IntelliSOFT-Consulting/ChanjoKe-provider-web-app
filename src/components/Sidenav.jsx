@@ -1,36 +1,36 @@
-import { Fragment, useEffect, useState } from 'react'
-import { Dialog, Transition, Disclosure } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import ProfileDropdown from './ProfileDropdown'
-import { ChevronRightIcon } from '@heroicons/react/20/solid'
-import AefiLogo from '../common/icons/aefiLogo'
-import HomeLogo from '../common/icons/homeLogo'
-import AdministerVaccineLogo from '../common/icons/administerVaccineLogo'
-import VaccinationReportLogo from '../common/icons/vaccinationReportLogo'
-import RegisterClientLogo from '../common/icons/registerClientLogo'
-import UpdateClientLogo from '../common/icons/updateClientLogo'
-import DefaulterTracingLogo from '../common/icons/defaulterTracingLogo'
-import SearchLogo from '../common/icons/searchLogo'
-import AppointmentLogo from '../common/icons/appointmentLogo'
-import ReferralIcon from '../common/icons/referralLogo'
 import {
-  FormOutlined,
-  FallOutlined,
-  DotChartOutlined,
+  BankOutlined,
+  BarChartOutlined,
   ContainerOutlined,
   DatabaseOutlined,
-  PlusCircleOutlined,
+  DotChartOutlined,
+  FallOutlined,
+  FormOutlined,
   MinusCircleOutlined,
+  PlusCircleOutlined,
+  ReconciliationOutlined,
   SelectOutlined,
   SignatureOutlined,
-  ReconciliationOutlined,
-  UsergroupAddOutlined,
-  BankOutlined,
   SoundOutlined,
-  BarChartOutlined,
   TruckOutlined,
+  UsergroupAddOutlined,
 } from '@ant-design/icons'
+import { Dialog, Disclosure, Transition } from '@headlessui/react'
+import { ChevronRightIcon } from '@heroicons/react/20/solid'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Fragment, useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import AdministerVaccineLogo from '../common/icons/administerVaccineLogo'
+import AefiLogo from '../common/icons/aefiLogo'
+import AppointmentLogo from '../common/icons/appointmentLogo'
+import DefaulterTracingLogo from '../common/icons/defaulterTracingLogo'
+import HomeLogo from '../common/icons/homeLogo'
+import ReferralIcon from '../common/icons/referralLogo'
+import RegisterClientLogo from '../common/icons/registerClientLogo'
+import SearchLogo from '../common/icons/searchLogo'
+import UpdateClientLogo from '../common/icons/updateClientLogo'
+import VaccinationReportLogo from '../common/icons/vaccinationReportLogo'
+import ProfileDropdown from './ProfileDropdown'
 
 const iconComponents = {
   aefiLogo: AefiLogo,
@@ -112,7 +112,11 @@ export default function Sidenav() {
           href: '/reports/moh-710',
           icon: <BarChartOutlined />,
         },
-        { name: 'MOH 525', href: '/reports/moh-525', icon: <DotChartOutlined /> },
+        {
+          name: 'MOH 525',
+          href: '/reports/moh-525',
+          icon: <DotChartOutlined />,
+        },
       ],
     },
     {
@@ -170,6 +174,11 @@ export default function Sidenav() {
         {
           name: 'Receive Stock',
           href: '/stock-management/receive-stock',
+          icon: <FallOutlined />,
+        },
+        {
+          name: 'Receive Stock',
+          href: '/stock-management/receive-regional-stock',
           icon: <FallOutlined />,
         },
         {

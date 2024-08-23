@@ -159,17 +159,17 @@ const useStock = () => {
     meta = 'order'
   ) => {
     setLoading(true)
+    facility = facility?.includes('Location/')
+      ? facility
+      : `Location/${facility}`
     const offset = getOffset(page)
     const statusFilter = status ? `&status=${status}` : ''
     const metaFilter = meta ? `&_tag=${meta}` : ''
     const totalResponse = await get(`${supplyRequestPath}?_summary=count`)
     const response = await get(
-      `${supplyRequestPath}?_list=${facility}${statusFilter}${metaFilter}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+      `${supplyRequestPath}?_tag=${facility}${statusFilter}${metaFilter}&_count=${totalResponse.total}&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
     )
-    const data =
-      response?.entry
-        ?.map((entry) => entry.resource)
-        .filter((entry) => entry?.deliverFrom?.reference === facility) || []
+    const data = response?.entry?.map((entry) => entry.resource) || []
     setRequests({
       data,
       total: totalResponse.total,

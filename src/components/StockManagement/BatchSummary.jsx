@@ -7,6 +7,7 @@ import Table from '../DataTable'
 import { getVaccineBatches } from './helpers/stockUtils'
 import { DownloadOutlined } from '@ant-design/icons'
 import { CSVLink } from 'react-csv'
+import { titleCase } from '../../utils/methods'
 
 export default function BatchSummary() {
   const [allData, setAllData] = useState(null)
@@ -15,25 +16,23 @@ export default function BatchSummary() {
   const { vaccine } = useParams()
   const navigate = useNavigate()
 
-  const { getInventoryReport, inventoryReport } = useInventory()
+  const { getDetailedInventoryItems, batchItems } = useInventory()
 
   const { user } = useSelector((state) => state.userInfo)
 
   useEffect(() => {
-    getInventoryReport()
+    getDetailedInventoryItems(user?.orgUnit?.code)
   }, [])
 
   useEffect(() => {
-    if (!inventoryReport) return
-    const formatted = getVaccineBatches(vaccine, inventoryReport)?.map(
-      (item) => ({
-        ...item,
-        location: user?.facilityName,
-      })
-    )
+    if (!batchItems) return
+    const formatted = getVaccineBatches(vaccine, batchItems)?.map((item) => ({
+      ...item,
+      location: titleCase(user?.orgUnit?.name),
+    }))
     setResults(formatted)
     setAllData(formatted)
-  }, [inventoryReport])
+  }, [batchItems])
 
   const handleFilter = (text) => {
     if (!text) {

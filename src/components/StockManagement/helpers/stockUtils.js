@@ -74,7 +74,7 @@ export const deliveriesLocations = (supplyDeliveries) => {
     .filter((location) => location?.label)
 }
 
-export const formatDeliveryToTable = (supplyDelivery) => {
+export const formatDeliveryToTable = (supplyDelivery, inventoryItems = []) => {
   const vaccines = supplyDelivery.extension[0].extension.map((item) => {
     const vaccine = item.extension.find((ext) => ext.url === 'vaccine')
       ?.valueCodeableConcept?.text
@@ -91,11 +91,17 @@ export const formatDeliveryToTable = (supplyDelivery) => {
     const expiryDate = item.extension.find(
       (ext) => ext.url === 'expiryDate'
     )?.valueDateTime
+
+    const availableQuantity =
+      inventoryItems.find(
+        (inventory) => inventory.identifier[0]?.value === vaccine
+      )?.quantity || 0
     return {
       vaccine,
       batchNumber,
       quantity,
       vvmStatus,
+      stockQuantity: availableQuantity,
       manufacturerDetails,
       expiryDate: dayjs(expiryDate).format('DD-MM-YYYY'),
     }
@@ -111,68 +117,49 @@ export const formatDeliveryToTable = (supplyDelivery) => {
   }
 }
 
-export const getVaccineBatches = (vaccineName, inventoryReport) => {
+export const getVaccineBatches = (vaccineName, batches) => {
   const vaccineBatches = []
 
-  const inventoryItems = inventoryReport.extension?.find((ext) =>
-    ext.url.includes('inventory-items')
+  const inventoryItems = batches?.filter(
+    (item) => item.identifier[0]?.value === vaccineName
   )
 
-  if (!inventoryItems || !inventoryItems.extension) {
-    return vaccineBatches
-  }
-
-  inventoryItems.extension.forEach((vaccineExt) => {
-    const vaccine = vaccineExt.extension?.find(
-      (ext) =>
-        ext.url ===
-        `https://example.org/fhir/StructureDefinition/${vaccineName}`
-    )?.valueCodeableConcept?.text
-
-    if (vaccine !== vaccineName) return
-
-    const batches = vaccineExt.extension?.find(
-      (ext) => ext.url === 'batches'
-    )?.extension
-
-    if (!batches) return
-
-    batches.forEach((batchExt) => {
-      const batchData = {
-        vaccine: vaccineName,
-        batchNumber: '',
-        expiryDate: '',
-        vvmStatus: '',
-        manufacturerDetails: '',
-        quantity: 0,
-        type: 'Dose',
-        date: dayjs(inventoryReport.created).format('DD-MM-YYYY'),
+  inventoryItems.forEach((batch) => {
+    const batchData = {
+      vaccine: vaccineName,
+      batchNumber: '',
+      expiryDate: '',
+      vvmStatus: '',
+      manufacturerDetails: '',
+      quantity: 0,
+      type: 'Dose',
+      date: dayjs(batch.created).format('DD-MM-YYYY'),
+    }
+    batch.extension.forEach((ext) => {
+      switch (ext.url) {
+        case 'batchNumber':
+          batchData.batchNumber = ext.valueString
+          break
+        case 'expiryDate':
+          batchData.expiryDate = ext.valueDateTime
+            ? dayjs(ext.valueDateTime).format('DD-MM-YYYY')
+            : ''
+          break
+        case 'quantity':
+          batchData.quantity = ext.valueQuantity.value
+          break
+        case 'vvmStatus':
+          batchData.vvmStatus = ext.valueString
+          break
+        case 'manufacturerDetails':
+          batchData.manufacturerDetails = ext.valueString
+          break
+        default:
+          break
       }
-
-      batchExt.extension.forEach((detail) => {
-        switch (detail.url) {
-          case 'batchNumber':
-            batchData.batchNumber = detail.valueString
-            break
-          case 'expiryDate':
-            batchData.expiryDate = detail.valueDateTime
-              ? dayjs(detail.valueDateTime).format('DD-MM-YYYY')
-              : ''
-            break
-          case 'quantity':
-            batchData.quantity = detail.valueQuantity.value
-            break
-          case 'vvmStatus':
-            batchData.vvmStatus = detail.valueCodeableConcept.text
-            break
-          case 'manufacturerDetails':
-            batchData.manufacturerDetails = detail.valueString
-            break
-        }
-      })
-
-      vaccineBatches.push(batchData)
     })
+
+    vaccineBatches.push(batchData)
   })
 
   return vaccineBatches

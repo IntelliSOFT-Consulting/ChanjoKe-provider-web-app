@@ -97,6 +97,10 @@ export const supplyRequestBuilder = (values) => {
           code: 'order',
           display: 'Order',
         },
+        {
+          code: values.deliverFrom?.reference,
+          display: values.deliverFrom?.display,
+        },
       ],
     },
     occurrenceDateTime: moment().toISOString(),
@@ -255,9 +259,9 @@ export const supplyDeliveryBuilder = (values) => {
   }
 }
 
-export const inventoryItemBuilder = (facility) => {
-  return uniqueVaccines.map((vaccine) => {
-    return {
+export const inventoryItemBuilder = (values) => {
+  return values.vaccines?.map((vaccine) => {
+    const resource = {
       resourceType: 'Basic',
       code: [
         {
@@ -271,169 +275,64 @@ export const inventoryItemBuilder = (facility) => {
           text: vaccine,
         },
       ],
-      created: moment().toISOString(),
+      created:
+        values.dateReceived instanceof dayjs
+          ? values.dateReceived.toISOString()
+          : dayjs(values.dateReceived).toISOString(),
       identifier: [
         {
-          value: vaccine,
+          value: vaccine.vaccine,
         },
       ],
       extension: [
         {
           url: 'quantity',
           valueQuantity: {
-            value: 0,
+            value: vaccine.quantity,
             unit: 'doses',
           },
         },
+        {
+          url: 'expiryDate',
+          valueDateTime:
+            vaccine.expiryDate instanceof dayjs
+              ? vaccine.expiryDate.toISOString()
+              : dayjs(vaccine.expiryDate, 'DD-MM-YYYY').toISOString(),
+        },
+        {
+          url: 'batchNumber',
+          valueString: vaccine.batchNumber,
+        },
+        {
+          url: 'vvmStatus',
+          valueString: vaccine.vvmStatus,
+        },
+        {
+          url: 'manufacturerDetails',
+          valueString: vaccine.manufacturerDetails,
+        },
       ],
-      subject: {
-        reference: facility,
-      },
+      subject: values.facility,
     }
+
+    if (values.orderNumber) {
+      resource.meta = {
+        tag: [
+          {
+            code: values.orderNumber,
+            display: values.orderNumber,
+          },
+        ],
+      }
+    }
+
+    return resource
   })
 }
-const createBatchExtension = (vaccine) => {
-  // Only create batch extension if quantity is provided and is a number
-  if (vaccine.quantity === undefined || isNaN(vaccine.quantity)) {
-    return null
-  }
 
-  return {
-    url: 'batch',
-    extension: [
-      {
-        url: 'batchNumber',
-        valueString: vaccine.batchNumber,
-      },
-      {
-        url: 'expiryDate',
-        valueDateTime: dayjs(vaccine.expiryDate, 'DD-MM-YYYY').toISOString(),
-      },
-      {
-        url: 'quantity',
-        valueQuantity: {
-          value: Number(vaccine.quantity),
-          unit: 'vials',
-        },
-      },
-      {
-        url: 'vvmStatus',
-        valueCodeableConcept: {
-          coding: [
-            {
-              system: 'http://example.org/vvm-status',
-              code: vaccine.vvmStatus,
-            },
-          ],
-          text: vaccine.vvmStatus,
-        },
-      },
-      {
-        url: 'manufacturerDetails',
-        valueString: vaccine.manufacturerDetails,
-      },
-    ],
-  }
-}
-
-const updateOrCreateVaccineExtension = (vaccine, prevVaccines) => {
-  const vaccineUrl = `https://example.org/fhir/StructureDefinition/${vaccine.vaccine.replace(
-    /\s/g,
-    '-'
-  )}`
-
-  let existingVaccine = prevVaccines?.find((pv) => pv.url === vaccineUrl)
-
-  let batchExtensions =
-    existingVaccine?.extension?.find((ext) => ext.url === 'batches')
-      ?.extension || []
-
-  // Filter out batches with quantity <= 0
-  batchExtensions = batchExtensions.filter((batch) => {
-    const quantity = batch.extension.find((ext) => ext.url === 'quantity')
-    return quantity && quantity.valueQuantity.value > 0
-  })
-
-  const newBatchExtension = createBatchExtension(vaccine)
-
-  if (newBatchExtension) {
-    const existingBatchIndex = batchExtensions.findIndex((batch) =>
-      batch.extension.some(
-        (ext) =>
-          ext.url === 'batchNumber' && ext.valueString === vaccine.batchNumber
-      )
-    )
-
-    if (existingBatchIndex > -1) {
-      // Update existing batch
-      batchExtensions[existingBatchIndex] = newBatchExtension
-    } else {
-      // Add new batch
-      batchExtensions.push(newBatchExtension)
-    }
-  }
-
-  return {
-    url: vaccineUrl,
-    extension: [
-      {
-        url: vaccineUrl,
-        valueCodeableConcept: {
-          coding: [
-            {
-              system: 'http://example.org/vaccine-codes',
-              code: vaccine.vaccine,
-            },
-          ],
-          text: vaccine.vaccine,
-        },
-      },
-      {
-        url: 'batches',
-        extension: batchExtensions,
-      },
-    ],
-  }
-}
-
-export const inventoryReportBuilder = (
-  newSupplies,
-  prevInventoryReport,
-  facility
-) => {
-  const inventoryItemsUrl =
-    'http://example.org/fhir/StructureDefinition/inventory-items'
-
-  let prevVaccines =
-    prevInventoryReport?.extension?.find((ext) => ext.url === inventoryItemsUrl)
-      ?.extension || []
-
-  // Process new supplies
-  newSupplies.forEach((supply) => {
-    const vaccineIndex = prevVaccines.findIndex(
-      (pv) =>
-        pv.url ===
-        `https://example.org/fhir/StructureDefinition/${supply.vaccine.replace(
-          /\s/g,
-          '-'
-        )}`
-    )
-
-    if (vaccineIndex > -1) {
-      // Update existing vaccine
-      prevVaccines[vaccineIndex] = updateOrCreateVaccineExtension(supply, [
-        prevVaccines[vaccineIndex],
-      ])
-    } else {
-      // Add new vaccine
-      prevVaccines.push(updateOrCreateVaccineExtension(supply, []))
-    }
-  })
-
+export const inventoryReportBuilder = (items, facility) => {
   return {
     resourceType: 'Basic',
-    id: prevInventoryReport?.id || undefined,
-    meta: prevInventoryReport?.meta || undefined,
     identifier: [
       {
         value: 'inventory-report',
@@ -450,12 +349,10 @@ export const inventoryReportBuilder = (
       ],
       text: 'Inventory Report',
     },
-    extension: [
-      {
-        url: inventoryItemsUrl,
-        extension: prevVaccines,
-      },
-    ],
+    extension: items?.map((value) => ({
+      url: value.vaccine,
+      valueInteger: value.quantity,
+    })),
     subject: {
       reference: facility,
     },
@@ -494,19 +391,14 @@ export const inventoryItemUpdate = (
   })
 }
 
-export const receiveAuditBuilder = (
-  vaccines,
-  inventoryReport,
-  values,
-  type = 'count'
-) => {
+export const receiveAuditBuilder = (vaccines, values, type = 'count') => {
   const auditTypes = {
     count: 'Stock Count',
     receipt: 'Received from other facility',
     shared: 'Shared with other facility',
     wastage: 'Wastage',
   }
-  return {
+  const resource = {
     resourceType: 'AuditEvent',
     action: 'U',
     recorded: moment().toISOString(),
@@ -528,29 +420,19 @@ export const receiveAuditBuilder = (
         ],
         text: 'Human User',
       },
-      location: values.receiver || {
-        reference: `Location/${values.facility}`,
-        display: values.facilityName,
-      },
-      name: values.agentName || values.facilityName,
+      location: values.receiver || values.facility,
+      name: values.agentName || values.facility?.display,
       requestor: true,
     },
     source: {
       observer: {
         reference: `Practitioner/${values.fhirPractitionerId}`,
       },
-      site: {
-        reference: `Location/${values.facility}`,
-        display: values.facilityName,
-      },
+      site: `${values.facility?.reference}`,
     },
     entity: [
       {
         description: values.description || '',
-        what: {
-          reference: `Basic/${inventoryReport.id}`,
-          display: 'Inventory Report',
-        },
         detail: {
           type: auditTypes[type],
           valueString: JSON.stringify(vaccines),
@@ -558,4 +440,15 @@ export const receiveAuditBuilder = (
       },
     ],
   }
+
+  if (type === 'shared') {
+    resource.extension = [
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/audit-event-receiver',
+        valueReference: values.facility,
+      },
+    ]
+  }
+
+  return resource
 }

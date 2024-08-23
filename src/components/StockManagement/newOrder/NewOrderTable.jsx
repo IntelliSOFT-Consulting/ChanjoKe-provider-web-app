@@ -3,11 +3,8 @@ import { uniqueVaccineOptions } from '../../../data/vaccineData'
 import Table from '../../DataTable'
 
 const getVaccineQuantity = (inventory, vaccine) => {
-  const vaccineInventory = inventory?.find(
-    (item) => item.identifier?.[0]?.value === vaccine
-  )
-  return vaccineInventory?.extension?.find((ext) => ext.url === 'quantity')
-    ?.valueQuantity?.value
+  const vaccineInventory = inventory?.find((item) => item.vaccine === vaccine)
+  return vaccineInventory?.quantity ?? 0
 }
 
 const InputColumn = ({

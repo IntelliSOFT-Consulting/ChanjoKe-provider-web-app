@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { message } from 'antd'
+import { formatLocation } from '../../utils/formatter'
 
 const token = localStorage.getItem('authorization')
   ? JSON.parse(localStorage.getItem('authorization')).token
@@ -14,6 +15,37 @@ const server = axios.create({
     Authorization: `Bearer ${token?.access_token}`,
   },
 })
+
+const getLowestOrgUnit = (user) => {
+  const orgUnits = [
+    {
+      name: user.countryName,
+      level: 'country',
+      code: formatLocation(user.country),
+    },
+    {
+      name: user.countyName,
+      level: 'county',
+      code: formatLocation(user.county),
+    },
+    {
+      name: user.subCountyName,
+      level: 'subCounty',
+      code: formatLocation(user.subCounty),
+    },
+    { name: user.wardName, level: 'ward', code: formatLocation(user.ward) },
+    {
+      name: user.facilityName,
+      level: 'facility',
+      code: formatLocation(user.facility),
+    },
+  ]
+
+  return (
+    orgUnits.reverse().find((unit) => unit.name && unit.name.trim() !== '') ||
+    null
+  )
+}
 
 server.interceptors.response.use(
   (response) => {
@@ -60,7 +92,12 @@ export const login = createAsyncThunk('user/login', async (values) => {
       },
     })
 
-    const user = { ...response?.data?.user, ...auth, location: values.location }
+    const user = {
+      ...response?.data?.user,
+      ...auth,
+      location: values.location,
+      orgUnit: getLowestOrgUnit(response?.data?.user),
+    }
 
     JSON.stringify(localStorage.setItem('user', JSON.stringify(user)))
     return user

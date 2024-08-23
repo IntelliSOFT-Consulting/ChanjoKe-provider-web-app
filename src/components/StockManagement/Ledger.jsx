@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { uniqueVaccineOptions } from '../../data/vaccineData'
 import useInventory from '../../hooks/useInventory'
 import Table from '../DataTable'
+import { useSelector } from 'react-redux'
 import { getVaccineBatches } from './helpers/stockUtils'
 import { Link } from 'react-router-dom'
 
@@ -11,36 +12,51 @@ export default function Ledger() {
   const [allData, setAllData] = useState(null)
   const [results, setResults] = useState(null)
 
+  const { user } = useSelector((state) => state.userInfo)
+
   const {
-    getInventoryItems,
-    getInventoryReport,
+    getAggregateInventoryItems,
+    getDetailedInventoryItems,
     inventoryItems,
-    inventoryReport,
+    batchItems,
   } = useInventory()
 
   useEffect(() => {
-    getInventoryItems()
-    getInventoryReport()
+    getAggregateInventoryItems({
+      subject: user?.orgUnit?.code,
+    })
+    getDetailedInventoryItems(user?.orgUnit?.code)
   }, [])
 
   const formatResults = (data) => {
-    return data.map((item) => ({
-      id: item.id,
-      vaccine: item?.code?.text,
-      type: 'Dose',
-      batches: getVaccineBatches(item?.code?.text, inventoryReport)?.length,
-      currentBalance: item?.extension?.[0]?.valueQuantity?.value,
-      lastTransactionDate: dayjs(item?.meta?.lastUpdated).format('DD-MM-YYYY'),
-    }))
+    return data.map((item) => {
+      const batches = getVaccineBatches(item?.vaccine, batchItems)
+
+      batches.sort(
+        (a, b) =>
+          dayjs(b.date, 'DD-MM-YYYY').unix() -
+          dayjs(a.date, 'DD-MM-YYYY').unix()
+      )
+      return {
+        id: item.id,
+        vaccine: item?.vaccine,
+        type: 'Dose',
+        batches: batches?.length,
+        currentBalance: item?.quantity,
+        lastTransactionDate: dayjs(batches?.[0]?.date, 'DD-MM-YYYY').format(
+          'DD-MM-YYYY'
+        ),
+      }
+    })
   }
 
   useEffect(() => {
-    if (inventoryItems && inventoryReport) {
+    if (inventoryItems && batchItems) {
       const formatted = formatResults(inventoryItems)
       setResults(formatted)
       setAllData(formatted)
     }
-  }, [inventoryItems, inventoryReport])
+  }, [inventoryItems, batchItems])
 
   const handleFilter = (vaccine) => {
     if (vaccine === 'All' || !vaccine) {
@@ -132,7 +148,7 @@ export default function Ledger() {
               showSizeChanger: false,
               hideOnSinglePage: true,
             }}
-            loading={!results}
+            loading={!batchItems}
           />
         </div>
       </Card>

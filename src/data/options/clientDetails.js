@@ -6,7 +6,7 @@ export const caregiverTypes = [
 
 export const caregiverRelationships = [
   { id: 1, label: 'Next of Kin', value: 'kin' },
-  { id: 2, label: 'Parent/Guardian', value: 'parent'}
+  { id: 2, label: 'Parent/Guardian', value: 'parent' },
 ]
 
 export const identificationOptions = [
@@ -40,6 +40,13 @@ export const manufacturerOptions = [
   { label: 'Bharat Biotech', value: 'Bharat Biotech' },
   { label: 'Sinovac Biotech', value: 'Sinovac Biotech' },
   { label: 'Biovac Institute', value: 'Biovac Institute' },
+]
+
+export const vvmStatuses = [
+  { label: 'Stage 1', value: 'Stage 1' },
+  { label: 'Stage 2', value: 'Stage 2' },
+  { label: 'Stage 3', value: 'Stage 3' },
+  { label: 'Stage 4', value: 'Stage 4' },
 ]
 
 export const reasons = [
@@ -112,7 +119,7 @@ export const roleGroups = [
       'NATIONAL_SYSTEM_ADMINISTRATOR',
       'COUNTY_SYSTEM_ADMINISTRATOR',
     ],
-    locations: ['SUB-COUNTY',],
+    locations: ['SUB-COUNTY'],
   },
   {
     label: 'Sub-County Store Manager',

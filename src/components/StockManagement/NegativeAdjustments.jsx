@@ -4,12 +4,13 @@ import {
   DatePicker,
   Form,
   InputNumber,
-  Select,
   notification,
+  Select,
   Tag,
+  Popconfirm,
 } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { reasons } from '../../data/options/clientDetails'
@@ -18,72 +19,37 @@ import useInventory from '../../hooks/useInventory'
 import { useLocations } from '../../hooks/useLocation'
 import Table from '../DataTable'
 import { formatInventoryToTable } from './helpers/inventoryFormatter'
-import {
-  inventoryItemUpdate,
-  inventoryReportBuilder,
-  receiveAuditBuilder,
-} from './helpers/stockResourceBuilder'
+import { receiveAuditBuilder } from './helpers/stockResourceBuilder'
 
 export default function NegativeAdjustments() {
-  const [batchOptions, setBatchOptions] = useState(null)
+  const [batchOptions, setBatchOptions] = useState([])
   const [editedBatches, setEditedBatches] = useState([{}])
-
   const [api, contextHolder] = notification.useNotification()
 
   const { user } = useSelector((state) => state.userInfo)
   const { fetchLocations, locations } = useLocations()
-
   const [form] = Form.useForm()
-
   const navigate = useNavigate()
 
-  const {
-    getInventoryReport,
-    getInventoryItems,
-    updateInventory,
-    inventoryReport,
-  } = useInventory()
+  const { getDetailedInventoryItems, updateInventory, batchItems } =
+    useInventory()
 
   const { createAudit } = useAudit()
 
   useEffect(() => {
-    getInventoryReport()
+    getDetailedInventoryItems()
     fetchLocations(user?.ward, 'FACILITY')
   }, [])
 
   useEffect(() => {
-    if (inventoryReport) {
-      const formattedInventory = formatInventoryToTable(inventoryReport)
-      setBatchOptions(formattedInventory)
+    if (batchItems) {
+      setBatchOptions(formatInventoryToTable(batchItems))
     }
-  }, [inventoryReport])
-
-  const countPerVaccine = (vaccines) => {
-    const removeSelected = batchOptions.filter(
-      (batch) =>
-        !vaccines.some((vaccine) => vaccine.batchNumber === batch.batchNumber)
-    )
-    const vaccinesToCount = [...vaccines, ...removeSelected]
-    const vaccineCounts = vaccinesToCount.reduce((acc, curr) => {
-      if (acc[curr.vaccine]) {
-        acc[curr.vaccine].quantity -= curr.sharedQuantity
-      } else {
-        acc[curr.vaccine] = {
-          ...curr,
-          quantity: curr.quantity - curr.sharedQuantity,
-        }
-      }
-      return acc
-    }, {})
-    return Object.values(vaccineCounts)
-  }
+  }, [batchItems])
 
   const handleSubmit = async (values) => {
     try {
-      const getLatestReport = await getInventoryReport()
-      const getLatestItems = await getInventoryItems()
-
-      const aggregatedBatches = countPerVaccine(editedBatches)
+      const latestItems = await getDetailedInventoryItems()
 
       const formattedCount = editedBatches.map((batch) => ({
         ...batch,
@@ -91,23 +57,26 @@ export default function NegativeAdjustments() {
         quantity: batch.quantity - batch.sharedQuantity,
       }))
 
-      const updatedReport = inventoryReportBuilder(
-        formattedCount,
-        getLatestReport,
-        user.facility
-      )
+      const updatedItems = latestItems
+        .map((item) => {
+          const match = formattedCount.find(
+            (count) =>
+              count.batchNumber ===
+              item.extension.find((ext) => ext.url === 'batchNumber')
+                ?.valueString
+          )
+          if (match) {
+            const quantityIndex = item.extension.findIndex(
+              (ext) => ext.url === 'quantity'
+            )
+            item.extension[quantityIndex].valueQuantity.value = match.quantity
+            return item
+          }
+          return null
+        })
+        .filter(Boolean)
 
-      updatedReport.id = getLatestReport.id
-
-      const updatedInventoryItems = inventoryItemUpdate(
-        aggregatedBatches,
-        getLatestItems,
-        'count'
-      )
-
-      await Promise.all(
-        updatedInventoryItems.map((item) => updateInventory(item))
-      )
+      await Promise.all(updatedItems.map(updateInventory))
 
       const receiver = {
         reference: `Location/${values.location}`,
@@ -117,9 +86,12 @@ export default function NegativeAdjustments() {
 
       const audit = receiveAuditBuilder(
         formattedCount,
-        getLatestReport,
         {
           ...user,
+          facility: {
+            reference: user.orgUnit.code,
+            display: user.orgUnit.name,
+          },
           agentName: receiver.display,
           receiver,
           description: values.reason,
@@ -127,109 +99,118 @@ export default function NegativeAdjustments() {
         'shared'
       )
       await createAudit(audit)
-      await updateInventory(updatedReport)
 
       setEditedBatches([{}])
-
-      getInventoryReport()
-
-      api.success({
-        message: 'Vaccines shared successfully',
-      })
-
-      setTimeout(() => {
-        navigate('/stock-management')
-      }, 1000)
+      api.success({ message: 'Vaccines shared successfully' })
+      setTimeout(() => navigate('/stock-management'), 500)
     } catch (error) {
       console.error(error)
+      api.error({ message: 'Failed to share vaccines' })
     }
   }
 
-  const columns = [
-    {
-      title: 'Vaccine/Diluents',
-      dataIndex: 'vaccine',
-      render: (record, _, index) => (
-        <Select
-          defaultValue={record}
-          className="w-full"
-          onSelect={(value) => {
-            const vaccineBatch = batchOptions.find(
-              (v) => v.batchNumber === value
-            )
+  const updateBatch = useCallback((index, updates) => {
+    setEditedBatches((prevBatches) => {
+      const newBatches = [...prevBatches]
+      newBatches[index] = { ...newBatches[index], ...updates }
+      return newBatches
+    })
+  }, [])
 
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index] = vaccineBatch
-            setEditedBatches(updatedBatches)
-          }}
-          placeholder="Select Vaccine"
-        >
-          {batchOptions?.map((vaccine) => (
-            <Select.Option
-              key={vaccine.batchNumber}
-              value={vaccine.batchNumber}
-              disabled={editedBatches.some(
-                (batch) =>
-                  batch.vaccine === vaccine.vaccine &&
-                  batch.batchNumber === vaccine.batchNumber
-              )}
-            >
-              {vaccine?.vaccine} -{' '}
-              <Tag color="blue">{vaccine?.batchNumber}</Tag>
-            </Select.Option>
-          ))}
-        </Select>
-      ),
-      width: 250,
-    },
-    {
-      title: 'Batch Number',
-      dataIndex: 'batchNumber',
-    },
-    {
-      title: 'Expiry Date',
-      dataIndex: 'expiryDate',
-      disabled: true,
-    },
-    {
-      title: 'Stock Quantity',
-      dataIndex: 'quantity',
-      key: 'quantity',
-    },
-    {
-      title: 'Shared Quantity',
-      dataIndex: 'sharedQuantity',
-      render: (text, record, index) => (
-        <InputNumber
-          placeholder="Shared Quantity"
-          value={text}
-          className="w-full"
-          onChange={(value) => {
-            const updatedBatches = [...editedBatches]
-            updatedBatches[index].sharedQuantity = value
-            setEditedBatches(updatedBatches)
-          }}
-          min={0}
-          max={record.quantity}
-        />
-      ),
-    },
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Vaccine/Diluents',
+        dataIndex: 'vaccine',
+        render: (record, _, index) => (
+          <Select
+            defaultValue={record}
+            className="w-full"
+            onSelect={(value) => {
+              const vaccineBatch = batchOptions.find(
+                (v) => v.batchNumber === value
+              )
+              updateBatch(index, vaccineBatch)
+            }}
+            placeholder="Select Vaccine"
+          >
+            {batchOptions?.map((vaccine) => (
+              <Select.Option
+                key={vaccine.batchNumber}
+                value={vaccine.batchNumber}
+                disabled={editedBatches.some(
+                  (batch) =>
+                    batch.vaccine === vaccine.vaccine &&
+                    batch.batchNumber === vaccine.batchNumber
+                )}
+              >
+                {vaccine?.vaccine} -{' '}
+                <Tag color="blue">{vaccine?.batchNumber}</Tag>
+              </Select.Option>
+            ))}
+          </Select>
+        ),
+        width: 250,
+      },
+      {
+        title: 'Batch Number',
+        dataIndex: 'batchNumber',
+      },
+      {
+        title: 'Expiry Date',
+        dataIndex: 'expiryDate',
+        disabled: true,
+      },
+      {
+        title: 'Stock Quantity',
+        dataIndex: 'quantity',
+        key: 'quantity',
+      },
+      {
+        title: 'Shared Quantity',
+        dataIndex: 'sharedQuantity',
+        render: (text, record, index) => (
+          <InputNumber
+            placeholder="Shared Quantity"
+            value={text}
+            className="w-full"
+            onChange={(value) => updateBatch(index, { sharedQuantity: value })}
+            min={0}
+            max={record.quantity}
+          />
+        ),
+      },
+      {
+        title: 'VVM Status',
+        dataIndex: 'vvmStatus',
+        type: 'select',
+      },
+      {
+        title: null,
+        hidden: editedBatches?.length <= 1,
+        render: () => (
+          <Button
+            type="link"
+            danger
+            onClick={() => setEditedBatches((prev) => prev.slice(0, -1))}
+          >
+            Delete
+          </Button>
+        ),
+      },
+    ],
+    [batchOptions, editedBatches, updateBatch]
+  )
 
-    {
-      title: 'VVM Status',
-      dataIndex: 'vvmStatus',
-      type: 'select',
-    },
-    {
-      title: null,
-      hidden: editedBatches?.length <= 1,
-      render: (record) => (
-        <Button type="link" danger>
-          Delete
-        </Button>
-      ),
-    },
-  ]
+  const isSubmitDisabled =
+    !batchOptions?.length ||
+    editedBatches?.some((batch) => !batch.sharedQuantity || !batch.vaccine)
+
+  const isAddRowDisabled =
+    !batchOptions?.length ||
+    editedBatches?.length === batchOptions?.length ||
+    editedBatches?.some((batch) => !batch.sharedQuantity || !batch.vaccine)
+
   return (
     <>
       <Card
@@ -242,17 +223,16 @@ export default function NegativeAdjustments() {
         actions={[
           <div className="flex w-full justify-end px-6">
             <Button className="mr-4">Cancel</Button>
-            <Button
-              type="primary"
-              disabled={
-                !batchOptions?.length ||
-                editedBatches?.some((batch) => !batch.sharedQuantity) ||
-                editedBatches?.some((batch) => !batch.vaccine)
-              }
-              onClick={() => form.submit()}
+            <Popconfirm
+              title="Are you sure you want to submit?"
+              onConfirm={() => form.submit()}
+              okText="Yes"
+              cancelText="No"
             >
-              Submit
-            </Button>
+              <Button type="primary" disabled={isSubmitDisabled}>
+                Submit
+              </Button>
+            </Popconfirm>
           </div>,
         ]}
       >
@@ -261,9 +241,7 @@ export default function NegativeAdjustments() {
           className="p-5"
           form={form}
           onFinish={handleSubmit}
-          initialValues={{
-            date: dayjs(),
-          }}
+          initialValues={{ date: dayjs() }}
         >
           <div className="grid grid-cols-3 gap-10 mb-6">
             <Form.Item
@@ -308,19 +286,15 @@ export default function NegativeAdjustments() {
               loading={!batchOptions}
               columns={columns}
               size="small"
-              dataSource={editedBatches || []}
+              dataSource={editedBatches}
               pagination={false}
             />
 
             <div className="flex justify-end mt-5">
               <Button
                 className="!bg-green !text-white hover:!bg-green hover:!border-green hover:!text-white"
-                disabled={
-                  !batchOptions?.length ||
-                  editedBatches?.length === batchOptions?.length ||
-                  editedBatches?.some((batch) => !batch.sharedQuantity) ||
-                  editedBatches?.some((batch) => !batch.vaccine)
-                }
+                disabled={isAddRowDisabled}
+                onClick={() => setEditedBatches((prev) => [...prev, {}])}
               >
                 Add Row
               </Button>

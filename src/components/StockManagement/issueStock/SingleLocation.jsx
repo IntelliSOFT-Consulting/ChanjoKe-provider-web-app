@@ -17,14 +17,14 @@ import { locationOptions, formatSupplyRequest } from '../helpers/stockUtils'
 import { supplyDeliveryBuilder } from '../helpers/stockResourceBuilder'
 import dayjs from 'dayjs'
 import { manufacturerOptions } from '../../../data/options/clientDetails'
-import { usePractitioner } from '../../../hooks/usePractitioner'
+import useInventory from '../../../hooks/useInventory'
 import { titleCase } from '../../../utils/methods'
 import { useMeta } from '../../../hooks/useMeta'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const { Option } = Select
 
-const SingleLocation = ({ vaccines = [] }) => {
+const SingleLocation = () => {
   const [selectedVaccine, setSelectedVaccine] = useState(null)
   const [orderItems, setOrderItems] = useState([{}])
   const [tableErrors, setTableErrors] = useState({})
@@ -43,12 +43,15 @@ const SingleLocation = ({ vaccines = [] }) => {
     updateSupplyRequest,
     requests,
   } = useStock()
-  const { getPractitionerRoles } = usePractitioner()
 
   const { deleteTags } = useMeta()
 
+  const { getDetailedInventoryItems, batchItems, updateInventory } =
+    useInventory()
+
   useEffect(() => {
-    incomingSupplyRequests(user?.facility, 0, 'active', 'order')
+    incomingSupplyRequests(user?.subCounty, 0, 'active', 'order')
+    getDetailedInventoryItems()
   }, [])
 
   useEffect(() => {
@@ -103,7 +106,16 @@ const SingleLocation = ({ vaccines = [] }) => {
         (request) => selectedVaccine?.id === request.id
       )
 
-      const orderTag = selectedRequest.meta?.tag
+      const orderTag = [
+        [
+          {
+            system:
+              'https://nhdd-api.health.go.ke/orgs/MOH-KENYA/sources/nhdd/tags',
+            code: 'order',
+            display: 'Order',
+          },
+        ],
+      ]
       await deleteTags(`SupplyRequest/${selectedRequest.id}`, orderTag)
 
       selectedRequest.meta = {
@@ -123,9 +135,7 @@ const SingleLocation = ({ vaccines = [] }) => {
         user,
         supplier: {
           reference: `Practitioner/${user?.fhirPractitionerId}`,
-          display: `${titleCase(user?.practitionerRole)}/${
-            selectedRequest.deliverFrom.reference
-          }`,
+          display: `${titleCase(user?.practitionerRole)}`,
         },
         identifier: [
           {
@@ -139,17 +149,38 @@ const SingleLocation = ({ vaccines = [] }) => {
           },
         ],
         destination: selectedRequest.deliverTo,
-        tableValues: orderItems.map((item) => {
-          return {
-            ...item,
-          }
-        }),
+        tableValues: orderItems,
       }
 
       const supplyDelivery = supplyDeliveryBuilder(deliveryData)
 
       await createSupplyDelivery(supplyDelivery)
       await updateSupplyRequest(selectedRequest)
+
+      const changedBatches = batchItems
+        .map((item) => {
+          const findBatch = orderItems.find(
+            (order) =>
+              order.batchNumber ===
+              item.extension?.find((ext) => ext.url === 'batchNumber')
+                ?.valueString
+          )
+
+          if (findBatch) {
+            const quantity = item.extension.find(
+              (ext) => ext.url === 'quantity'
+            )
+            quantity.valueQuantity.value =
+              quantity.valueQuantity.value - findBatch.quantity
+            return item
+          }
+          return null
+        })
+        .filter(Boolean)
+
+      await Promise.all(
+        changedBatches.map(async (item) => await updateInventory(item))
+      )
 
       form.resetFields()
       setOrderItems([{}])
@@ -182,6 +213,7 @@ const SingleLocation = ({ vaccines = [] }) => {
       ...newOrderItems[index],
       vaccine: value,
       orderedQuantity: qty,
+      batchOptions: vaccineBatches(value),
     }
     setOrderItems(newOrderItems)
   }
@@ -190,6 +222,46 @@ const SingleLocation = ({ vaccines = [] }) => {
     const newOrderItems = [...orderItems]
     newOrderItems[index] = { ...newOrderItems[index], [field]: value }
     setOrderItems(newOrderItems)
+  }
+
+  const vaccineBatches = (vaccine) => {
+    const batches = batchItems.filter(
+      (item) => item.identifier[0].value === vaccine
+    )
+
+    return batches.map((batch) => {
+      const batchNumber = batch.extension.find(
+        (ext) => ext.url === 'batchNumber'
+      )
+      return {
+        label: batchNumber.valueString,
+        value: batchNumber.valueString,
+      }
+    })
+  }
+
+  const selectBatch = (vaccine, batchNo) => {
+    const batch = batchItems.find(
+      (item) =>
+        item.identifier[0].value === vaccine &&
+        item.extension.find((ext) => ext.url === 'batchNumber').valueString ===
+          batchNo
+    )
+
+    const expiryDate = batch.extension.find((ext) => ext.url === 'expiryDate')
+    const quantity = batch.extension.find((ext) => ext.url === 'quantity')
+    const batchNumber = batch.extension.find((ext) => ext.url === 'batchNumber')
+    const manufacturer = batch.extension.find(
+      (ext) => ext.url === 'manufacturerDetails'
+    )
+    const vvmStatus = batch.extension.find((ext) => ext.url === 'vvmStatus')
+    return {
+      batchNumber: batchNumber.valueString,
+      expiryDate: dayjs(expiryDate.valueDateTime),
+      availableQuantity: quantity.valueQuantity?.value,
+      manufacturerDetails: manufacturer.valueString,
+      vvmStatus: vvmStatus.valueString,
+    }
   }
 
   const columns = [
@@ -216,13 +288,18 @@ const SingleLocation = ({ vaccines = [] }) => {
       title: 'Batch Number',
       dataIndex: 'batchNumber',
       render: (_text, record, index) => (
-        <Input
+        <Select
           className="w-full"
-          onChange={(e) =>
-            handleInputChange(index, 'batchNumber', e.target.value)
-          }
+          onChange={(value) => {
+            handleInputChange(index, 'batchNumber', value)
+            const batchData = selectBatch(record.vaccine, value)
+            const newOrderItems = [...orderItems]
+            newOrderItems[index] = { ...newOrderItems[index], ...batchData }
+            setOrderItems(newOrderItems)
+          }}
           value={record.batchNumber}
-          placeholder="Enter batch number"
+          placeholder="Select batch number"
+          options={record.batchOptions || []}
           status={
             tableErrors[index.toString()]?.batchNumber ? 'error' : 'success'
           }
@@ -234,6 +311,7 @@ const SingleLocation = ({ vaccines = [] }) => {
       dataIndex: 'expiryDate',
       render: (_text, record, index) => (
         <DatePicker
+          disabled
           className="w-full"
           onChange={(value) => handleInputChange(index, 'expiryDate', value)}
           status={
@@ -256,6 +334,8 @@ const SingleLocation = ({ vaccines = [] }) => {
       render: (_text, record, index) => (
         <InputNumber
           className="w-full"
+          min={0}
+          max={record.availableQuantity}
           value={record.quantity}
           onChange={(value) => handleInputChange(index, 'quantity', value)}
           placeholder="Enter quantity"
@@ -295,6 +375,7 @@ const SingleLocation = ({ vaccines = [] }) => {
             handleInputChange(index, 'manufacturerDetails', value)
           }
           placeholder="Select Manufacturer"
+          disabled
           allowClear
           value={record.manufacturerDetails}
           status={

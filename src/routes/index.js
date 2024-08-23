@@ -54,6 +54,7 @@ import EditAppointment from '../components/ClientDetailsView/EditAppointment'
 import OrderDetails from '../components/StockManagement/OrderDetails'
 import MOH710 from '../pages/MOH710'
 import MOH525 from '../pages/MOH525'
+import ReceiveRegionalStock from '../components/StockManagement/ReceiveRegionalStock'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -121,6 +122,10 @@ const router = createBrowserRouter([
           {
             path: '/stock-management/receive-stock/:orderID',
             element: <ReceiveStock status={'receive'} />,
+          },
+          {
+            path: '/stock-management/receive-regional-stock',
+            element: <ReceiveRegionalStock status={'receive'} />,
           },
           {
             path: '/stock-management/issue-stock',
