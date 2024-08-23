@@ -1,5 +1,6 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusOutlined } from '@ant-design/icons'
+import { WarningTwoTone } from '@ant-design/icons'
 import { Badge, Button, Checkbox, Tag, FloatButton, Popconfirm } from 'antd'
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +24,7 @@ export default function NonRoutineVaccines({
   patientDetails,
   immunizations,
   fetchData,
+  caregiverRefusal,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -265,11 +267,26 @@ export default function NonRoutineVaccines({
       />
       <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
         <div className="flex justify-between">
-          <div>
-            <p>Vaccination Schedule</p>
-            <small>
-              Please click on the checkbox to select which vaccine to administer
-            </small>
+          <div className="grid gap-4 grid-cols-2">
+              <div>
+                <p>Vaccination Schedule</p>
+                <small>
+                  Please click on the checkbox to select which vaccine to administer
+                </small>
+              </div>
+              <div>
+              {caregiverRefusal && (
+                <div className="flex mt-2 md:mt-0 items-center bg-pink px-2 rounded-md ml-0 h-full my-0">
+                      <WarningTwoTone
+                        twoToneColor="red"
+                        classID="text-black"
+                      />
+                      <small>
+                        Some vaccines have not been administered (Caregiver Refusal)
+                      </small>
+                </div>
+              )}
+              </div>
           </div>
           <div>
             <FloatButton

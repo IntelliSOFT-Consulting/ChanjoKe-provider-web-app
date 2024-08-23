@@ -23,6 +23,7 @@ export default function ClientDetailsView() {
   const [routineVaccines, setRoutineVaccines] = useState([])
   const [nonRoutineVaccines, setNonRoutineVaccines] = useState([])
   const [observationsData, setObservationsData] = useState([])
+  const [caregiverRefusal, setCaregiverRefusal] = useState(false)
 
   const { clientID, activeTab } = useParams()
   const navigate = useNavigate()
@@ -58,6 +59,16 @@ export default function ClientDetailsView() {
     }
   }, [patient])
 
+  function checkImmunizations(immunizations) {
+    const notDoneItem = immunizations.find(item => item.status === 'not-done');
+    
+    if (!notDoneItem) {
+        return false;
+    }
+    
+    return notDoneItem.statusReason && notDoneItem.statusReason.text === 'Caregiver refusal';
+}
+
   useEffect(() => {
     if (recommendations) {
       const groupedVaccines = groupVaccinesByCategory(
@@ -73,6 +84,12 @@ export default function ClientDetailsView() {
     if (observations) {
       setObservationsData(formatWeightData(observations, patient?.birthDate))
     }
+
+    if (immunizations) {
+      const caregiverRefusal = checkImmunizations(immunizations)
+      setCaregiverRefusal(caregiverRefusal)
+    }
+
   }, [immunizations, recommendations, observations])
 
 
@@ -166,6 +183,7 @@ export default function ClientDetailsView() {
           routineVaccines={routineVaccines}
           nonRoutineVaccines={nonRoutineVaccines}
           recommendations={recommendations}
+          caregiverRefusal={caregiverRefusal}
           activeTab={activeTab}
           immunizations={immunizations}
           fetchData={fetchData}
