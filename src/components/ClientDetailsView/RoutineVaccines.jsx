@@ -1,5 +1,6 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
+import { WarningTwoTone } from '@ant-design/icons'
 import {
   Badge,
   Button,
@@ -33,6 +34,7 @@ export default function RoutineVaccines({
   routineVaccines,
   fetchData,
   immunizations,
+  caregiverRefusal,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -371,10 +373,28 @@ export default function RoutineVaccines({
       <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
         <div className="flex justify-between">
           <div>
-            <p>Vaccination Schedule</p>
-            <small>
-              Please click on the checkbox to select which vaccine to administer
-            </small>
+            <div className="grid gap-4 grid-cols-2">
+              <div>
+                <p>Vaccination Schedule</p>
+                <small>
+                  Please click on the checkbox to select which vaccine to administer
+                </small>
+              </div>
+              <div>
+              {caregiverRefusal && (
+                <div className="flex mt-2 md:mt-0 items-center bg-pink px-2 rounded-md ml-0 h-full my-0">
+                      <WarningTwoTone
+                        twoToneColor="red"
+                        classID="text-black"
+                      />
+                      <small>
+                        Some vaccines have not been administered (Caregiver Refusal)
+                      </small>
+                </div>
+              )}
+              </div>
+            </div>
+
           </div>
           <FloatButton
             type="primary"
