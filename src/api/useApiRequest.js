@@ -19,7 +19,8 @@ server.interceptors.response.use(
       message.error(
         error.response.status === 401
           ? 'Unauthorized: Incorrect credentials'
-          : error.response.data.error
+          : error.response.data.error ||
+              error?.response?.data?.issue?.[0]?.diagnostics
       )
     } else {
       message.error('Network Error')
@@ -29,7 +30,6 @@ server.interceptors.response.use(
 )
 
 export const useApiRequest = () => {
-  // abort controller
   const abortController = new AbortController()
   const navigate = useNavigate()
 

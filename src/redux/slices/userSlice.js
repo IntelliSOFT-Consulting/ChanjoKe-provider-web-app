@@ -3,18 +3,21 @@ import axios from 'axios'
 import { message } from 'antd'
 import { formatLocation } from '../../utils/formatter'
 
-const token = localStorage.getItem('authorization')
-  ? JSON.parse(localStorage.getItem('authorization')).token
-  : null
+const BASE_URL = 'https://chanjoke.intellisoftkenya.com'
 
-const server = axios.create({
-  baseURL: 'https://chanjoke.intellisoftkenya.com',
-  headers: {
-    'Cache-Control': 'no-cache',
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token?.access_token}`,
-  },
-})
+const createAxiosInstance = () => {
+  const token = JSON.parse(localStorage.getItem('authorization') || '{}')
+  return axios.create({
+    baseURL: BASE_URL,
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'application/json',
+      Authorization: token?.access_token ? `Bearer ${token.access_token}` : '',
+    },
+  })
+}
+
+const server = createAxiosInstance()
 
 const getLowestOrgUnit = (user) => {
   const orgUnits = [
@@ -48,61 +51,63 @@ const getLowestOrgUnit = (user) => {
 }
 
 server.interceptors.response.use(
-  (response) => {
-    return response
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config
-    if (error.response.status === 401 && !originalRequest._retry) {
-      const endpoint = originalRequest.url
-      if (endpoint.includes('login')) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (originalRequest.url.includes('login')) {
         return Promise.reject(error)
       }
 
       originalRequest._retry = true
-      const refreshToken = token?.refresh_token
-      const response = await server.post('/auth/token', {
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-      })
-      localStorage.setItem('authorization', JSON.stringify(response.data))
-      server.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${response.data.access_token}`
-      return server(originalRequest)
+      try {
+        const token = JSON.parse(localStorage.getItem('authorization') || '{}')
+        const response = await server.post('/auth/token', {
+          grant_type: 'refresh_token',
+          refresh_token: token.refresh_token,
+        })
+        localStorage.setItem('authorization', JSON.stringify(response.data))
+        server.defaults.headers.common[
+          'Authorization'
+        ] = `Bearer ${response.data.access_token}`
+        return server(originalRequest)
+      } catch (refreshError) {
+        return Promise.reject(refreshError)
+      }
     }
     return Promise.reject(error)
   }
 )
 
 const initialState = {
-  user: localStorage.getItem('user')
-    ? JSON.parse(localStorage.getItem('user'))
-    : null,
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
   loading: false,
   error: null,
 }
 
-export const login = createAsyncThunk('user/login', async (values) => {
-  const { data: auth } = await server.post('/auth/provider/login', values)
-  if (auth) {
-    const response = await server.get(`/auth/provider/me`, {
-      headers: {
-        Authorization: `Bearer ${auth.access_token}`,
-      },
-    })
+export const login = createAsyncThunk(
+  'user/login',
+  async (values, { rejectWithValue }) => {
+    try {
+      const { data: auth } = await server.post('/auth/provider/login', values)
+      const { data: userData } = await server.get('/auth/provider/me', {
+        headers: { Authorization: `Bearer ${auth.access_token}` },
+      })
 
-    const user = {
-      ...response?.data?.user,
-      ...auth,
-      location: values.location,
-      orgUnit: getLowestOrgUnit(response?.data?.user),
+      const user = {
+        ...userData.user,
+        ...auth,
+        location: values.location,
+        orgUnit: getLowestOrgUnit(userData.user),
+      }
+
+      localStorage.setItem('user', JSON.stringify(user))
+      return user
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || 'Login failed')
     }
-
-    JSON.stringify(localStorage.setItem('user', JSON.stringify(user)))
-    return user
   }
-})
+)
 
 const userSlice = createSlice({
   name: 'user',
@@ -110,21 +115,25 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null
+      localStorage.removeItem('user')
+      localStorage.removeItem('authorization')
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
         state.loading = true
+        state.error = null
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false
         state.user = action.payload
+        state.error = null
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
-        message.error(action.error.message)
+        state.error = action.payload
+        message.error(action.payload)
       })
   },
 })
