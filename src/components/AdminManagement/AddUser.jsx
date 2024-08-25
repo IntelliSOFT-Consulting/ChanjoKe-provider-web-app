@@ -1,287 +1,383 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Button, Form, Input, InputNumber, Select, notification } from 'antd'
+import { useSelector } from 'react-redux'
+import LoadingArrows from '../../common/spinners/LoadingArrows'
+import { roleGroups } from '../../data/options/clientDetails'
 import { useLocations } from '../../hooks/useLocation'
 import { usePractitioner } from '../../hooks/usePractitioner'
-import { Button, Form, Input, InputNumber, Select } from 'antd'
-import LoadingArrows from '../../common/spinners/LoadingArrows'
+import { titleCase } from '../../utils/methods'
+import { camelToHyphen, hyphenToCamel } from '../../utils/formatter'
 
-export default function AddUser({
+const AddUser = ({
   setVisible,
   visible,
-  practitionerData,
   setPractitionerData,
   fetchPractitioners,
   activeTab,
   currentPage,
-}) {
-  const [defaultCounties, setDefaultCounties] = useState(null)
-  const [defaultSubCounties, setDefaultSubCounties] = useState(null)
-  const [defaultWards, setDefaultWards] = useState(null)
-  const [defaultFacilities, setDefaultFacilities] = useState(null)
-
+}) => {
   const [form] = Form.useForm()
+  const { user } = useSelector((state) => state.userInfo)
+  const [role, setRole] = useState(null)
+  const [locationOptions, setLocationOptions] = useState({
+    country: [{ value: '0', label: 'Kenya' }],
+    county: [],
+    subCounty: [],
+    ward: [],
+    facility: [],
+  })
 
-  const {
-    counties,
-    subCounties,
-    wards,
-    facilities,
-    handleCountyChange,
-    handleSubCountyChange,
-    handleWardChange,
-  } = useLocations(form)
+  const [api, contextHolder] = notification.useNotification()
+
+  const { fetchLocations, getLocationByCode } = useLocations(form)
 
   const {
     handleCreatePractitioner,
     getPractitioner,
     handleUpdatePractitioner,
+    searchPractitioner,
   } = usePractitioner({ pageSize: 12 })
-
-  const handleFinish = async (values) => {
-    visible?.id
-      ? await handleUpdatePractitioner(visible.id, values)
-      : await handleCreatePractitioner(values)
-    form.resetFields()
-    setPractitionerData(null)
-    setDefaultCounties(null)
-    setDefaultSubCounties(null)
-    setDefaultWards(null)
-    setDefaultFacilities(null)
-    setVisible(false)
-
-    await fetchPractitioners(null, activeTab === '1', currentPage)
-  }
-
-  const fetchPractitioner = async (id) => {
-    const practitionerData = await getPractitioner(id)
-    setPractitionerData(practitionerData?.formatted)
-    setDefaultCounties(practitionerData?.formatted?.counties)
-    setDefaultSubCounties(practitionerData?.formatted?.subCounties)
-    setDefaultWards(practitionerData?.formatted?.wards)
-    setDefaultFacilities(practitionerData?.formatted?.facilities)
-    form.setFieldsValue(practitionerData?.formatted)
-  }
 
   useEffect(() => {
     if (visible?.id) {
       fetchPractitioner(visible.id)
     }
     if (!visible) {
-      form.resetFields()
-      setPractitionerData(null)
+      resetForm()
     }
   }, [visible])
 
+  const fetchPractitioner = async (id) => {
+    const practitionerData = await getPractitioner(id)
+    setPractitionerData(practitionerData?.formatted)
+    setRole(
+      roleGroups.find((r) => r.value === practitionerData?.formatted?.roleGroup)
+    )
+    await loadLocationHierarchy(practitionerData?.formatted)
+    form.setFieldsValue(practitionerData?.formatted)
+  }
+
+  const handleFinish = async (values) => {
+    try {
+      if (visible?.id) {
+        await handleUpdatePractitioner(visible.id, values)
+      } else {
+        await handleCreatePractitioner(values)
+      }
+      resetForm()
+      await fetchPractitioners(null, activeTab === '1', currentPage)
+    } catch (error) {
+      console.log('error', error)
+      api.error({
+        message: 'Error',
+        description: error?.response?.data?.message || 'An error occurred',
+      })
+    }
+  }
+
+  const resetForm = () => {
+    form.resetFields()
+    setPractitionerData(null)
+    setRole(null)
+    setLocationOptions({
+      country: [{ value: '0', label: 'Kenya' }],
+      county: [],
+      subCounty: [],
+      ward: [],
+      facility: [],
+    })
+    setVisible(false)
+  }
+
+  const loadLocationHierarchy = async (userData) => {
+    const hierarchy = ['country', 'county', 'subCounty', 'ward', 'facility']
+    let parentId = '0'
+    let options = { ...locationOptions }
+
+    for (const level of hierarchy) {
+      if (userData[level]) {
+        const locations = await fetchLocations(parentId, level.toUpperCase())
+        options[level] = locations?.map((loc) => ({
+          value: loc.key,
+          label: loc.name,
+        }))
+        parentId = userData[level]
+      } else {
+        break
+      }
+    }
+
+    setLocationOptions(options)
+  }
+
+  const handleLocationChange = async (value, level) => {
+    const hierarchy = ['country', 'county', 'subCounty', 'ward', 'facility']
+    const currentIndex = hierarchy.indexOf(level)
+    if (currentIndex === hierarchy.length - 1) return
+
+    const nextLevel = hierarchy[currentIndex + 1]
+
+    const locations = await fetchLocations(
+      value,
+      camelToHyphen(nextLevel).toUpperCase()
+    )
+    const newOptions = locations?.map((loc) => ({
+      value: loc.key,
+      label: loc.name,
+    }))
+
+    setLocationOptions((prevOptions) => ({
+      ...prevOptions,
+      [nextLevel]: newOptions,
+      ...hierarchy
+        .slice(currentIndex + 2)
+        .reduce((acc, level) => ({ ...acc, [level]: [] }), {}),
+    }))
+
+    form.setFieldsValue({
+      ...hierarchy
+        .slice(currentIndex + 1)
+        .reduce((acc, level) => ({ ...acc, [level]: undefined }), {}),
+    })
+  }
+
+  console.log({ locationOptions })
+
+  const renderPersonalDetails = () => (
+    <>
+      <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+        Personal Details
+      </h4>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <Form.Item
+          label="First Name"
+          name="firstName"
+          rules={[{ required: true, message: 'First Name is required' }]}
+        >
+          <Input placeholder="First Name" />
+        </Form.Item>
+
+        <Form.Item
+          label="Last Name"
+          name="lastName"
+          rules={[{ required: true, message: 'Last Name is required' }]}
+        >
+          <Input placeholder="Last Name" />
+        </Form.Item>
+
+        <Form.Item
+          label="ID Number"
+          name="idNumber"
+          rules={[
+            { required: true, message: 'ID Number is required' },
+            {
+              validator: async (_, value) => {
+                if (value && value?.toString().length >= 6 && !visible?.id) {
+                  const response = await searchPractitioner({
+                    identifier: value,
+                  })
+                  if (response?.length) {
+                    return Promise.reject(new Error('ID number already exists'))
+                  }
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
+        >
+          <InputNumber className="w-full" placeholder="ID Number" />
+        </Form.Item>
+      </div>
+    </>
+  )
+
+  const renderContactDetails = () => (
+    <>
+      <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+        Contact Details
+      </h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: 'Phone Number is required' },
+            {
+              validator: (_, value) =>
+                value && value.length < 10
+                  ? Promise.reject(new Error('Phone number must be 10 digits'))
+                  : Promise.resolve(),
+            },
+            {
+              validator: async (_, value) => {
+                if (value && value.length === 10 && !visible?.id) {
+                  const response = await searchPractitioner({
+                    telecom: value,
+                  })
+                  if (response?.length) {
+                    return Promise.reject(
+                      new Error('Phone number already exists')
+                    )
+                  }
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
+        >
+          <Input
+            placeholder="07********"
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 10)
+              form.setFieldsValue({ phoneNumber: value })
+            }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true, message: 'Email is required' },
+            { type: 'email', message: 'Email is not valid' },
+            {
+              validator: async (_, value) => {
+                if (value && /\S+@\S+\.\S+/.test(value) && !visible?.id) {
+                  const response = await searchPractitioner({ email: value })
+                  if (response?.length) {
+                    return Promise.reject(new Error('Email already exists'))
+                  }
+                }
+                return Promise.resolve()
+              },
+            },
+          ]}
+        >
+          <Input placeholder="Email" />
+        </Form.Item>
+      </div>
+    </>
+  )
+
+  const renderRoleDetails = () => (
+    <>
+      <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+        Role Details
+      </h4>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4">
+        <Form.Item
+          label="Select Role"
+          name="roleGroup"
+          rules={[{ required: true, message: 'Please select a role group' }]}
+        >
+          <Select
+            placeholder="Select Role"
+            showSearch
+            filterOption={(input, option) =>
+              option?.label.toLowerCase()?.includes(input?.toLowerCase())
+            }
+            onChange={async (value) => {
+              const selected = roleGroups?.find((role) => role.value === value)
+              setRole(selected)
+              form.setFieldsValue({
+                country: '0',
+                county: undefined,
+                subCounty: undefined,
+                ward: undefined,
+                facility: undefined,
+              })
+              await handleLocationChange('0', 'country')
+            }}
+            options={roleGroups?.filter((role) =>
+              role.creators.includes(user?.practitionerRole)
+            )}
+          />
+        </Form.Item>
+      </div>
+    </>
+  )
+
+  const renderLocationDetails = () => {
+    if (!role) return null
+
+    const locationTypes = [
+      'COUNTRY',
+      'COUNTY',
+      'SUB-COUNTY',
+      'WARD',
+      'FACILITY',
+    ]
+    const roleLocationType = role.locations[0]
+    const roleLocationIndex = locationTypes.indexOf(roleLocationType)
+
+    return (
+      <>
+        <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
+          Location Details
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10">
+          {locationTypes
+            .slice(0, roleLocationIndex + 1)
+            ?.map((locationType) => {
+              const fieldName = hyphenToCamel(locationType.toLowerCase())
+              return (
+                <Form.Item
+                  key={fieldName}
+                  label={`Select ${titleCase(locationType)}`}
+                  name={fieldName}
+                  rules={[
+                    { required: true, message: `Please select a ${fieldName}` },
+                  ]}
+                >
+                  <Select
+                    placeholder={`Select ${locationType}`}
+                    options={locationOptions[fieldName]}
+                    showSearch
+                    allowClear
+                    filterOption={(input, option) =>
+                      option?.label
+                        .toLowerCase()
+                        ?.includes(input?.toLowerCase())
+                    }
+                    onChange={(value) => handleLocationChange(value, fieldName)}
+                  />
+                </Form.Item>
+              )
+            })}
+        </div>
+      </>
+    )
+  }
+
+  if (visible?.id && !role) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingArrows />
+      </div>
+    )
+  }
+
   return (
     <div className="px-4 py-5 sm:p-6">
-      {visible?.id && !practitionerData ? (
-        <div className="flex justify-center items-center h-64">
-          <LoadingArrows />
+      {contextHolder}
+      <Form
+        layout="vertical"
+        form={form}
+        autoComplete="off"
+        onFinish={handleFinish}
+      >
+        {renderPersonalDetails()}
+        {renderContactDetails()}
+        {renderRoleDetails()}
+        {renderLocationDetails()}
+        <div className="flex justify-end border-t pt-4">
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
         </div>
-      ) : (
-        <Form
-          layout="vertical"
-          form={form}
-          autoComplete="off"
-          onFinish={handleFinish}
-        >
-          <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
-            Personal Details
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <Form.Item
-              label="First Name"
-              name="firstName"
-              rules={[{ required: true, message: 'First Name is required' }]}
-            >
-              <Input placeholder="First Name" />
-            </Form.Item>
-
-            <Form.Item
-              label="Last Name"
-              name="lastName"
-              rules={[{ required: true, message: 'Last Name is required' }]}
-            >
-              <Input placeholder="Last Name" />
-            </Form.Item>
-
-            <Form.Item
-              label="ID Number"
-              name="idNumber"
-              rules={[{ required: true, message: 'ID Number is required' }]}
-            >
-              <InputNumber className="w-full" placeholder="ID Number" />
-            </Form.Item>
-          </div>
-
-          <div>
-            <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
-              Contact Details
-            </h4>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <Form.Item
-              label="Phone Number"
-              name="phoneNumber"
-              rules={[
-                { required: true, message: 'Phone Number is required' },
-                {
-                  validator: (_, value) => {
-                    if (value && value.length < 10) {
-                      return Promise.reject(
-                        new Error('Phone number must be 10 digits')
-                      )
-                    }
-
-                    return Promise.resolve()
-                  },
-                },
-              ]}
-            >
-              <Input
-                placeholder="07********"
-                onChange={(e) => {
-                  e.target.value = e.target.value
-                    .replace(/\D/g, '')
-                    .slice(0, 10)
-                  form.setFieldsValue({ phoneNumber: e.target.value })
-                }}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                { required: true, message: 'Email is required' },
-                {
-                  type: 'email',
-                  message: 'Email is not valid',
-                },
-              ]}
-            >
-              <Input placeholder="Email" />
-            </Form.Item>
-          </div>
-
-          <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
-            Location Details
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10">
-            <Form.Item
-              label="Select County"
-              name="county"
-              rules={[{ required: true, message: 'Please select a county' }]}
-            >
-              <Select
-                placeholder="Select County"
-                onChange={handleCountyChange}
-                options={(defaultCounties || counties)?.map((county) => ({
-                  value: county.key,
-                  label: county.name,
-                }))}
-                showSearch
-                allowClear
-                filterOption={(input, option) =>
-                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
-                }
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Select Subcounty"
-              name="subCounty"
-              rules={[{ required: true, message: 'Please select a subcounty' }]}
-            >
-              <Select
-                placeholder="Select Subcounty"
-                onChange={handleSubCountyChange}
-                options={(defaultSubCounties || subCounties)?.map(
-                  (subCounty) => ({
-                    value: subCounty.key,
-                    label: subCounty.name,
-                  })
-                )}
-                showSearch
-                allowClear
-                filterOption={(input, option) =>
-                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
-                }
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Ward"
-              name="ward"
-              rules={[{ required: true, message: 'Please select a ward' }]}
-            >
-              <Select
-                placeholder="Select a Ward"
-                options={(defaultWards || wards)?.map((ward) => ({
-                  value: ward.key,
-                  label: ward.name,
-                }))}
-                onChange={handleWardChange}
-                showSearch
-                filterOption={(input, option) =>
-                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
-                }
-                allowClear
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Facility"
-              name="facility"
-              rules={[{ required: true, message: 'Please select a facility' }]}
-            >
-              <Select
-                placeholder="Select Facility"
-                options={(defaultFacilities || facilities)?.map((facility) => ({
-                  value: facility.key,
-                  label: facility.name,
-                }))}
-                showSearch
-                filterOption={(input, option) =>
-                  option?.label.toLowerCase()?.includes(input?.toLowerCase())
-                }
-                allowClear
-              />
-            </Form.Item>
-          </div>
-
-          <h4 className="text-primary border-b-2 border-primary w-full font-semibold text-base mb-6">
-            Role Details
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-4">
-            <Form.Item
-              label="Select Role Group"
-              name="roleGroup"
-              rules={[
-                { required: true, message: 'Please select a role group' },
-              ]}
-            >
-              <Select placeholder="Select Role Group" showSearch>
-                <Select.Option value="ADMINISTRATOR">
-                  Administrator
-                </Select.Option>
-                <Select.Option value="CLERK">Clerk</Select.Option>
-                <Select.Option value="DOCTOR">Doctor</Select.Option>
-                <Select.Option value="LAB TECHNICIAN">
-                  Lab Technician
-                </Select.Option>
-                <Select.Option value="NURSE">Nurse</Select.Option>
-                <Select.Option value="PHARMACIST">Pharmacist</Select.Option>
-              </Select>
-            </Form.Item>
-          </div>
-
-          <div className="flex justify-end border-t pt-4">
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </div>
-        </Form>
-      )}
+      </Form>
     </div>
   )
 }
+
+export default AddUser

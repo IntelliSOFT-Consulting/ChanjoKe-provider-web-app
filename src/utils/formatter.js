@@ -5,7 +5,7 @@ export const convertLocations = (bundle) => {
       return {
         key: location.resource.id,
         name: toTitleCase(location.resource.name),
-        parent: location.resource.partOf.reference?.split('/')[1],
+        parent: location.resource.partOf?.reference?.split('/')?.[1],
       }
     })
     ?.sort((a, b) => a.name.localeCompare(b.name))
@@ -107,4 +107,13 @@ export const formatLocation = (location) => {
 
 export const getLocationId = (location) => {
   return location?.replace('Location/', '')
+}
+
+// create a function that takes a string and formats camel case to hyphenated e.g. camelCase to camel-case
+export const camelToHyphen = (str) => {
+  return str.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)
+}
+
+export const hyphenToCamel = (str) => {
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
 }

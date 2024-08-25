@@ -157,12 +157,6 @@ export const roleGroups = [
     locations: ['FACILITY'],
   },
   {
-    label: 'Lab Technician',
-    value: 'LAB_TECHNICIAN',
-    creators: ['ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR', 'DOCTOR'],
-    locations: ['FACILITY'],
-  },
-  {
     label: 'Nurse',
     value: 'NURSE',
     creators: [
@@ -172,17 +166,5 @@ export const roleGroups = [
       'LAB_TECHNICIAN',
     ],
     locations: ['FACILITY'],
-  },
-  {
-    label: 'Pharmacist',
-    value: 'PHARMACIST',
-    creators: [
-      'ADMINISTRATOR',
-      'FACILITY_SYSTEM_ADMINISTRATOR',
-      'DOCTOR',
-      'LAB_TECHNICIAN',
-      'NURSE',
-    ],
-    locations: ['FACILITY'],
-  },
+  }
 ]

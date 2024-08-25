@@ -17,9 +17,11 @@ export const useLocations = (form) => {
     fetchCounties()
   }, [])
 
-  const fetchLocations = async (partof, type = null) => {
+  const fetchLocations = async (partof = null, type = null) => {
     const typeQuery = type ? `&type=${type}` : ''
-    const url = `${fhirRoute}?partof=${partof}&_count=70${typeQuery}`
+    // eslint-disable-next-line eqeqeq
+    const partofQuery = partof || partof == 0 ? `partof=${partof}` : ''
+    const url = `${fhirRoute}?${partofQuery}&_count=10000${typeQuery}`
     const response = await get(url)
     const convertedLocations = convertLocations(response)
     if (type) {

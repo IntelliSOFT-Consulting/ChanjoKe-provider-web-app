@@ -147,9 +147,9 @@ export default function usePatient() {
             },
           ],
           name: {
-            text: caregiver.caregiverName,
-            given: caregiver.caregiverName.split(' '),
-            family: caregiver.caregiverName.split(' ')[1],
+            text: caregiver?.caregiverName,
+            given: caregiver?.caregiverName?.split(' '),
+            family: caregiver?.caregiverName?.split(' ')[1],
           },
           telecom: [
             {
