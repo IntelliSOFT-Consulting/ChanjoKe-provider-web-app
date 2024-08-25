@@ -29,7 +29,7 @@ const AddUser = ({
 
   const [api, contextHolder] = notification.useNotification()
 
-  const { fetchLocations, getLocationByCode } = useLocations(form)
+  const { fetchLocations } = useLocations(form)
 
   const {
     handleCreatePractitioner,

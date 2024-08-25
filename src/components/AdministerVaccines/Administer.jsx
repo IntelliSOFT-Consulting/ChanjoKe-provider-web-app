@@ -10,25 +10,35 @@ import {
 import dayjs from 'dayjs'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
+import useAppointment from '../../hooks/useAppointment'
 import useEncounter from '../../hooks/useEncounter'
+import useInventory from '../../hooks/useInventory'
 import useObservations from '../../hooks/useObservations'
 import useVaccination from '../../hooks/useVaccination'
-import useAppointment from '../../hooks/useAppointment'
+import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
+import { createNextVaccineAppointment } from '../ClientDetailsView/DataWrapper'
+import {
+  formatInventoryToTable,
+  vaccineInventory,
+} from '../StockManagement/helpers/inventoryFormatter'
 import {
   createImmunizationResource,
   getBodyWeight,
-  updateVaccineDueDates,
+  updateVaccineDueDates
 } from './administerController'
-import { createNextVaccineAppointment } from '../ClientDetailsView/DataWrapper'
-import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 
 export default function Administer() {
+  const [inventory, setInventory] = useState(null)
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [nextVaccines, setNextVaccines] = useState({})
+
   const [loading, setLoading] = useState(false)
+
+  const { getDetailedInventoryItems, batchItems, updateInventory } =
+    useInventory()
 
   const {
     createImmunization,
@@ -60,6 +70,12 @@ export default function Administer() {
   const dispatch = useDispatch()
 
   const { clientID } = useParams()
+
+  useEffect(() => {
+    if (batchItems) {
+      setInventory(formatInventoryToTable(batchItems))
+    }
+  }, [batchItems])
 
   const findNextVaccines = async () => {
     const keys = Object.keys(vaccineSchedules)
@@ -102,6 +118,7 @@ export default function Administer() {
     } else {
       getWeight()
       findNextVaccines()
+      getDetailedInventoryItems()
     }
   }, [selectedVaccines])
 
@@ -139,10 +156,34 @@ export default function Administer() {
     const encounter = await createEncounter(
       clientID,
       user?.fhirPractitionerId,
-      user?.facility?.split('/')[1]
+      user?.orgUnit?.code?.split('/')[1]
     )
 
     await createObservation(values, clientID, encounter?.id)
+
+    const items = await getDetailedInventoryItems()
+
+    await Promise.all(
+      items.map(async (vaccine) => {
+        const batch = vaccine.extension.find((ext) => ext.url === 'batchNumber')
+        if (batch?.valueString === values.vaccines[0].batchNumber) {
+          vaccine.extension = vaccine.extension.map((ext) => {
+            if (ext.url === 'quantity') {
+              return {
+                ...ext,
+                valueQuantity: {
+                  value: ext.valueQuantity.value - 1,
+                  unit: ext.valueQuantity.unit,
+                },
+              }
+            }
+            return ext
+          })
+
+          return await updateInventory(vaccine)
+        }
+      })
+    )
 
     if (responses) {
       setLoading(false)
@@ -326,17 +367,14 @@ export default function Administer() {
                                       ?.coding?.[0]?.code
                               }
                               style={{ width: '100%' }}
-                            >
-                              <Select.Option value="HDKKD8777847">
-                                HDKKD8777847
-                              </Select.Option>
-                              <Select.Option value="OPVJJD788778">
-                                OPVJJD788778
-                              </Select.Option>
-                              <Select.Option value="OPV667HHD889">
-                                OPV667HHD889
-                              </Select.Option>
-                            </Select>
+                              options={vaccineInventory(
+                                selectedVaccines?.[index]?.vaccine,
+                                inventory
+                              )?.map((item) => ({
+                                value: item.batchNumber,
+                                label: item.batchNumber,
+                              }))}
+                            />
                           </Form.Item>
                           <Form.Item
                             name={[field.name, 'diseaseTarget']}
@@ -357,12 +395,7 @@ export default function Administer() {
           </Form>
         )}
         <div className="px-4 py-4 sm:px-6 flex justify-end">
-          <Button
-            onClick={() => navigate(-1)}
-            className="ml-4  outline outline-[#163C94] text-sm font-semibold text-[#163C94]"
-          >
-            Cancel
-          </Button>
+          <Button onClick={() => navigate(-1)}>Cancel</Button>
           <Popconfirm
             title="Are you sure you want to administer?"
             onConfirm={() => form.submit()}
