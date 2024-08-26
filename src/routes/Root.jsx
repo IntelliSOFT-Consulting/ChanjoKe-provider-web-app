@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar'
 import Sidenav from '../components/Sidenav'
 import { SharedStateProvider } from '../shared/sharedState'
 import { useSelector } from 'react-redux'
+import AutoLogout from '../components/AutoLogout'
 
 export default function Root() {
   const { user } = useSelector((state) => state.userInfo)
@@ -20,6 +21,7 @@ export default function Root() {
     <SharedStateProvider>
       {user && (
         <div>
+          <AutoLogout />
           <Sidenav />
           <main className="py-10 lg:pl-72">
             <div className="px-4 sm:px-6 lg:px-8">

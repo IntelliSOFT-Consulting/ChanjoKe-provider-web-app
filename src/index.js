@@ -141,8 +141,6 @@ const App = () => {
           }}
         >
           <div className={classes.root}>
-            {/* {isMobileOrTablet && <IsMobileView />} */}
-            {/* {!isMobileOrTablet && <RouterProvider router={routes} />} */}
             <RouterProvider router={routes} />
           </div>
         </ConfigProvider>
