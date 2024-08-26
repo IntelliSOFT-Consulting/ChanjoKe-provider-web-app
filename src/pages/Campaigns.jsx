@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
 import useCampaigns from '../hooks/useCampaigns'
+import { useSelector } from 'react-redux'
 
 const practitioner = JSON.parse(localStorage.getItem('practitioner'))
 const practitionerRole = practitioner?.practitionerRole
@@ -11,6 +12,7 @@ export default function Campaigns() {
   const navigate = useNavigate()
   const { loading, campaigns, campaignTotal, fetchCampaigns, updateCampaign } =
     useCampaigns()
+  const { user } = useSelector((state) => state.userInfo)
 
   const [activeTab, setActiveTab] = useState('1')
   const [currentPage, setCurrentPage] = useState(1)
@@ -153,13 +155,16 @@ export default function Campaigns() {
       <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
         <div className="text-3xl">Campaigns</div>
         <div className="right-0">
-          <Button
-            type="primary"
-            onClick={() => navigate('/new-campaign/0')}
-            className="ml-4 font-semibold px-10"
-          >
-            New
-          </Button>
+          {(user?.practitionerRole === 'COUNTY_SYSTEM_ADMINISTRATOR' ||
+            user?.practitionerRole === 'ADMINISTRATOR') && (
+            <Button
+              type="primary"
+              onClick={() => navigate('/new-campaign/0')}
+              className="ml-4 font-semibold px-10"
+            >
+              New Campaign
+            </Button>
+          )}
         </div>
       </div>
       <div className="sm:px-4 py-2 sm:py-5 sm:p-6">

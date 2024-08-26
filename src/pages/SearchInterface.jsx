@@ -1,35 +1,23 @@
-import useGet from '../api/useGet'
-import { useEffect, useState } from 'react'
-import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
-import SelectDialog from '../common/dialog/SelectDialog'
-import { Link, useNavigate } from 'react-router-dom'
-import Table from '../components/DataTable'
-import { DatePicker, Form, Input, Button } from 'antd'
-import usePaginatedQuery from '../hooks/usePaginatedQuery'
-import { useApiRequest } from '../api/useApiRequest'
 import { PlusOutlined } from '@ant-design/icons'
+import { Button, DatePicker, Form, Input } from 'antd'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useApiRequest } from '../api/useApiRequest'
+import Table from '../components/DataTable'
+import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
+import usePaginatedQuery from '../hooks/usePaginatedQuery'
 
 export default function SearchInterface(props) {
   const [title, setTitle] = useState('Search')
   const [results, setResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
-  const [searchUrl, setSearchUrl] = useState('Patient?_sort=-_lastUpdated')
   const [loading, setLoading] = useState(false)
-  const [selectedItem, setSelectedItem] = useState({})
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const { get } = useApiRequest()
 
   const { pageSize, handlePageChange } = usePaginatedQuery()
 
-  const { error } = useGet(searchUrl)
-
   const navigate = useNavigate()
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false)
-  }
 
   const columns = [
     {
@@ -58,10 +46,8 @@ export default function SearchInterface(props) {
             : 'routineVaccines'
         }`
 
-        switch (props.searchType) {
-          case 'updateClient':
-            link = `/update-vaccine-history/${record.id}`
-            break
+        if (props.searchType === 'updateClient') {
+          link = `/update-vaccine-history/${record.id}`
         }
         return (
           <Link to={link} className="text-[#163C94] font-semibold">
@@ -156,21 +142,6 @@ export default function SearchInterface(props) {
 
   return (
     <>
-      <SelectDialog
-        open={isDialogOpen}
-        title="Info"
-        description="Select Record to update"
-        btnOne={{
-          text: 'Client Record',
-          url: `/update-client-history/${selectedItem.id}`,
-        }}
-        btnTwo={{
-          text: 'Vaccine Details',
-          url: `/update-vaccine-history/${selectedItem.id}`,
-        }}
-        onClose={handleDialogClose}
-      />
-
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
         <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">
           {title}
@@ -232,8 +203,6 @@ export default function SearchInterface(props) {
               </button>
             </div>
           </Form>
-
-          {error && <div className="my-10 text-center">{error}</div>}
 
           <div className="hidden sm:block sm:px-10 my-6">
             <Table

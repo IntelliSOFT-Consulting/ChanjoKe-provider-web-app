@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux'
 import Root from './Root'
 import Login from '../pages/Login'
 import Home from '../pages/Home'
+import RoleBasedRoute from '../components/RoleBasedRoute'
 import RegisterClient from '../pages/RegisterClient'
 import StockManagement from '../pages/StockManagement'
 import DefaulterTracing from '../pages/DefaulterTracing'
@@ -55,6 +56,7 @@ import OrderDetails from '../components/StockManagement/OrderDetails'
 import MOH710 from '../pages/MOH710'
 import MOH525 from '../pages/MOH525'
 import ReceiveRegionalStock from '../components/StockManagement/ReceiveRegionalStock'
+import Error404 from '../common/Error404'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -84,180 +86,632 @@ const router = createBrowserRouter([
       { path: '/', element: <Home /> },
       {
         path: '/search/:searchType/:campaignSite',
-        element: <SearchInterfaceWrapper />,
+        element: (
+          <RoleBasedRoute
+            element={<SearchInterfaceWrapper />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
-      { path: '/admin-users', element: <Users /> },
+      {
+        path: '/admin-users',
+        element: (
+          <RoleBasedRoute
+            element={<Users />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
+      },
       {
         path: '/admin-facilities',
-        element: <Facility />,
+        element: (
+          <RoleBasedRoute
+            element={<Facility />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/admin-add-user',
-        element: <AddUser />,
+        element: (
+          <RoleBasedRoute
+            element={<AddUser />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/admin-add-facility',
-        element: <AddFacility />,
+        element: (
+          <RoleBasedRoute
+            element={<AddFacility />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/register-client/:clientID',
-        element: <RegisterClient />,
+        element: (
+          <RoleBasedRoute
+            element={<RegisterClient />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/register-client',
-        element: <RegisterClient />,
+        element: (
+          <RoleBasedRoute
+            element={<RegisterClient />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/defaulter-tracing',
-        element: <DefaulterTracing />,
+        element: (
+          <RoleBasedRoute
+            element={<DefaulterTracing />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/stock-management',
         children: [
-          { path: '/stock-management', element: <StockManagement /> },
+          {
+            path: '/stock-management',
+            element: (
+              <RoleBasedRoute
+                element={<StockManagement />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                  'ADMINISTRATOR',
+                ]}
+              />
+            ),
+          },
           {
             path: '/stock-management/receive-stock',
-            element: <ReceiveStock status={'receive'} />,
+            element: (
+              <RoleBasedRoute
+                element={<ReceiveStock status={'receive'} />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/receive-stock/:orderID',
-            element: <ReceiveStock status={'receive'} />,
+            element: (
+              <RoleBasedRoute
+                element={<ReceiveStock status={'receive'} />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/receive-regional-stock',
-            element: <ReceiveRegionalStock status={'receive'} />,
+            element: (
+              <RoleBasedRoute
+                element={<ReceiveRegionalStock status={'receive'} />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/issue-stock',
-            element: <IssueStock status={'issue'} />,
+            element: (
+              <RoleBasedRoute
+                element={<IssueStock status={'issue'} />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
-          { path: '/stock-management/stock-count', element: <StockCount /> },
+          {
+            path: '/stock-management/stock-count',
+            element: (
+              <RoleBasedRoute
+                element={<StockCount />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
+          },
           {
             path: '/stock-management/positive-adjustment',
-            element: <PositiveAdjustments />,
+            element: (
+              <RoleBasedRoute
+                element={<PositiveAdjustments />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/negative-adjustment',
-            element: <NegativeAdjustments />,
+            element: (
+              <RoleBasedRoute
+                element={<NegativeAdjustments />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/wastage',
-            element: <Wastage />,
+            element: (
+              <RoleBasedRoute
+                element={<Wastage />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
-          { path: '/stock-management/new-order', element: <NewOrder /> },
+          {
+            path: '/stock-management/new-order',
+            element: (
+              <RoleBasedRoute
+                element={<NewOrder />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
+          },
           {
             path: '/stock-management/received-orders',
-            element: <ReceivedOrders />,
+            element: (
+              <RoleBasedRoute
+                element={<ReceivedOrders />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
-          { path: '/stock-management/sent-orders', element: <SentOrders /> },
+          {
+            path: '/stock-management/sent-orders',
+            element: (
+              <RoleBasedRoute
+                element={<SentOrders />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
+          },
           {
             path: '/stock-management/administration',
-            element: <Administration />,
+            element: (
+              <RoleBasedRoute
+                element={<Administration />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                  'ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/ledger',
-            element: <Ledger />,
+            element: (
+              <RoleBasedRoute
+                element={<Ledger />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                  'ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/ledger/:vaccine',
-            element: <BatchSummary />,
+            element: (
+              <RoleBasedRoute
+                element={<BatchSummary />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                  'ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
           {
             path: '/stock-management/order-details/:orderID',
-            element: <OrderDetails />,
+            element: (
+              <RoleBasedRoute
+                element={<OrderDetails />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
           },
         ],
       },
       {
         path: '/reports',
-        element: <VaccinationReports />,
+        element: (
+          <RoleBasedRoute
+            element={<VaccinationReports />}
+            allowedRoles={['ALL']}
+          />
+        ),
       },
-      { path: '/reports/moh-710', element: <MOH710 /> },
-      { path: '/reports/moh-525', element: <MOH525 /> },
-      { path: '/profile', element: <Profile /> },
+      {
+        path: '/reports/moh-710',
+        element: <RoleBasedRoute element={<MOH710 />} allowedRoles={['ALL']} />,
+      },
+      {
+        path: '/reports/moh-525',
+        element: <RoleBasedRoute element={<MOH525 />} allowedRoles={['ALL']} />,
+      },
+      {
+        path: '/profile',
+        element: (
+          <RoleBasedRoute element={<Profile />} allowedRoles={['ALL']} />
+        ),
+      },
       {
         path: '/aefi-report/:clientID',
-        element: <CreateAEFI />,
+        element: (
+          <RoleBasedRoute
+            element={<CreateAEFI />}
+            allowedRoles={['NURSE', 'DOCTOR']}
+          />
+        ),
       },
       {
         path: '/aefi-details/:vaccinationID',
-        element: <AEFIDetails />,
+        element: (
+          <RoleBasedRoute
+            element={<AEFIDetails />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/client-details/:clientID/:activeTab',
-        element: <ClientDetailsView />,
+        element: (
+          <RoleBasedRoute
+            element={<ClientDetailsView />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/client-records/:clientID',
-        element: <ClientRecords />,
+        element: (
+          <RoleBasedRoute
+            element={<ClientRecords />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/update-vaccine-history/:clientID',
-        element: <UpdateVaccineHistory />,
+        element: (
+          <RoleBasedRoute
+            element={<UpdateVaccineHistory />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/update-client-history/:clientID',
-        element: <UpdateClientHistory />,
+        element: (
+          <RoleBasedRoute
+            element={<UpdateClientHistory />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/administer-vaccine/:clientID',
-        element: <Administer />,
+        element: (
+          <RoleBasedRoute
+            element={<Administer />}
+            allowedRoles={['NURSE', 'DOCTOR']}
+          />
+        ),
       },
       {
         path: '/add-contraindication/:clientID',
-        element: <Contraindications />,
+        element: (
+          <RoleBasedRoute
+            element={<Contraindications />}
+            allowedRoles={['NURSE', 'DOCTOR']}
+          />
+        ),
       },
       {
         path: '/not-administered/:clientID',
-        element: <NotAdministered />,
+        element: (
+          <RoleBasedRoute
+            element={<NotAdministered />}
+            allowedRoles={['NURSE', 'DOCTOR']}
+          />
+        ),
       },
       {
         path: '/view-vaccination/:vaccinationID',
-        element: <VaccinationDetails />,
+        element: (
+          <RoleBasedRoute
+            element={<VaccinationDetails />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/new-appointment/:userID',
-        element: <NewAppointment />,
+        element: (
+          <RoleBasedRoute
+            element={<NewAppointment />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/edit-appointment/:appointmentID/:userID',
-        element: <EditAppointment />,
+        element: (
+          <RoleBasedRoute
+            element={<EditAppointment />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/view-contraindication/:contraindicationID',
-        element: <ContraindicationDetails />,
+        element: (
+          <RoleBasedRoute
+            element={<ContraindicationDetails />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/view-not-administered/:contraindicationID',
-        element: <ContraindicationDetails notAdministered={true} />,
+        element: (
+          <RoleBasedRoute
+            element={<ContraindicationDetails notAdministered={true} />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/frequently-asked-questions',
-        element: <FAQs />,
+        element: <RoleBasedRoute element={<FAQs />} allowedRoles={['ALL']} />,
       },
       {
         path: '/referral-details/:id',
-        element: <ReferralDetails />,
+        element: (
+          <RoleBasedRoute
+            element={<ReferralDetails />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/referrals',
-        element: <Referrals />,
+        element: (
+          <RoleBasedRoute
+            element={<Referrals />}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/campaigns',
-        element: <Campaigns />,
+        element: (
+          <RoleBasedRoute
+            element={<Campaigns />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'NURSE',
+              'DOCTOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/new-campaign/:campaignID',
-        element: <NewCampaign />,
+        element: (
+          <RoleBasedRoute
+            element={<NewCampaign />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/campaign-site/:campaignID',
-        element: <CampaignSite />,
+        element: (
+          <RoleBasedRoute
+            element={<CampaignSite />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'NURSE',
+              'DOCTOR',
+            ]}
+          />
+        ),
       },
       {
         path: '/campaign/:campaignID',
-        element: <CampaignDetails />,
+        element: (
+          <RoleBasedRoute
+            element={<CampaignDetails />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'NURSE',
+              'DOCTOR',
+            ]}
+          />
+        ),
       },
     ],
   },
@@ -269,6 +723,10 @@ const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: <AuthRoute element={<ForgotPassword />} />,
+  },
+  {
+    path: '*',
+    element: <Error404 />,
   },
 ])
 

@@ -85,7 +85,7 @@ export default function useAppointment() {
 
   const getFacilityAppointments = async (appointmentDate) => {
     setLoader(true)
-    const facilityParam = `actor=${user?.facility}`
+    const facilityParam = `actor=${user?.orgUnit?.code || '0'}`
     const dateFilter = appointmentDate
       ? `&date=${moment(appointmentDate).format('YYYY-MM-DD')}`
       : ''

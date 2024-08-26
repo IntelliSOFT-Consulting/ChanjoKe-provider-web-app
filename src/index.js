@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import routes from './routes/index'
-import IsMobileView from './components/isMobileView'
-import { RouterProvider } from 'react-router-dom'
-import reportWebVitals from './reportWebVitals'
 import { ConfigProvider } from 'antd'
-import { Provider } from 'react-redux'
-import store from './redux/store'
-import { createUseStyles } from 'react-jss'
-import { debounce } from './utils/methods'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import React, { useEffect, useState } from 'react'
+import ReactDOM from 'react-dom/client'
+import { createUseStyles } from 'react-jss'
+import { Provider } from 'react-redux'
+import { RouterProvider } from 'react-router-dom'
+import './index.css'
+import store from './redux/store'
+import reportWebVitals from './reportWebVitals'
+import routes from './routes/index'
+import { debounce } from './utils/methods'
 dayjs.extend(customParseFormat)
 
 const dateFormat = 'DD-MM-YYYY'
@@ -85,36 +84,21 @@ const defaultData = {
 }
 
 const App = () => {
-  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false)
-
   const classes = useStyles()
 
   useEffect(() => {
     debounce(() => {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          if (entry.contentRect.width <= 1012) {
-            setIsMobileOrTablet(true)
-          } else {
-            setIsMobileOrTablet(false)
+          const { width } = entry.contentRect
+          if (width < 768) {
+            document.body.classList.add('mobile')
           }
         }
       })
 
       resizeObserver.observe(document.body)
     }, 100)()
-    const mediaQuery = window.matchMedia('(max-width: 1012px)')
-    const handleWidthChange = (e) => {
-      setIsMobileOrTablet(e.matches)
-    }
-
-    handleWidthChange(mediaQuery)
-
-    mediaQuery.addListener(handleWidthChange)
-
-    return () => {
-      mediaQuery.removeListener(handleWidthChange)
-    }
   }, [])
 
   return (

@@ -20,6 +20,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import AdministerVaccineLogo from '../common/icons/administerVaccineLogo'
 import AefiLogo from '../common/icons/aefiLogo'
 import AppointmentLogo from '../common/icons/appointmentLogo'
@@ -85,156 +86,278 @@ export default function Sidenav() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const { user } = useSelector((state) => state.userInfo)
 
-  const [navigation, setNavigation] = useState([
-    { name: 'Home', href: '/', current: true, icon: 'homeLogo' },
-    {
-      name: 'Admin Management',
-      icon: '',
-      href: '#',
-      children: [
-        { name: 'Users', href: '/admin-users', icon: <UsergroupAddOutlined /> },
-        {
-          name: 'Facility',
-          href: '/admin-add-facility',
-          icon: <BankOutlined />,
-        },
-        { name: 'Campaigns', href: '/campaigns', icon: <SoundOutlined /> },
-      ],
-    },
-    {
-      name: 'Vaccination Reports',
-      href: '#',
-      icon: 'vaccinationReportLogo',
-      children: [
-        {
-          name: 'MOH 710',
-          href: '/reports/moh-710',
-          icon: <BarChartOutlined />,
-        },
-        {
-          name: 'MOH 525',
-          href: '/reports/moh-525',
-          icon: <DotChartOutlined />,
-        },
-      ],
-    },
-    {
-      name: 'Search Client',
-      href: '/search/searchClient/n',
-      icon: 'searchLogo',
-    },
-    {
-      name: 'Register Client',
-      href: '/register-client',
-      icon: 'registerClientLogo',
-    },
-    {
-      name: 'Update Vaccine History',
-      href: '/search/updateClient/n',
-      icon: 'updateClientLogo',
-    },
-    {
-      name: 'Administer Vaccine',
-      href: '/search/administerVaccine/n',
-      icon: 'administerVaccineLogo',
-    },
-    {
-      name: 'Appointments',
-      href: '/search/appointments/n',
-      icon: 'appointmentLogo',
-    },
-    { name: 'AEFI', href: '/search/aefi/n', icon: 'aefiLogo' },
-    { name: 'Community Referrals', href: '/referrals', icon: 'referralIcon' },
-    {
-      name: 'Defaulter Tracing',
-      href: '/defaulter-tracing',
-      icon: 'defaulterTracingLogo',
-    },
-    {
-      name: 'Stock Management',
-      href: '/stock-management',
-      icon: '',
-      children: [
-        {
-          name: 'New Order',
-          href: '/stock-management/new-order',
-          icon: <FormOutlined />,
-        },
-        {
-          name: 'Sent Orders',
-          href: '/stock-management/sent-orders',
-          icon: <SelectOutlined />,
-        },
-        {
-          name: 'Issue Stock',
-          href: '/stock-management/issue-stock',
-          icon: <TruckOutlined />,
-        },
-        {
-          name: 'Receive Stock',
-          href: '/stock-management/receive-stock',
-          icon: <FallOutlined />,
-        },
-        {
-          name: 'Receive Stock',
-          href: '/stock-management/receive-regional-stock',
-          icon: <FallOutlined />,
-        },
-        {
-          name: 'Received Orders',
-          href: '/stock-management/received-orders',
-          icon: <SignatureOutlined />,
-        },
-        {
-          name: 'Received from another facility',
-          href: '/stock-management/positive-adjustment',
-          icon: <PlusCircleOutlined />,
-        },
-        {
-          name: 'Shared with another facility',
-          href: '/stock-management/negative-adjustment',
-          icon: <MinusCircleOutlined />,
-        },
-        {
-          name: 'Stock Count',
-          href: '/stock-management/stock-count',
-          icon: <DatabaseOutlined />,
-        },
-        {
-          name: 'Wastage',
-          href: '/stock-management/wastage',
-          icon: <ReconciliationOutlined />,
-        },
+  const getNavigationItems = () => {
+    const baseNavigation = [
+      {
+        name: 'Home',
+        href: '/',
+        current: true,
+        icon: 'homeLogo',
+        roles: ['ALL'],
+      },
+      {
+        name: 'Admin Management',
+        icon: '',
+        href: '#',
+        roles: [
+          'ADMINISTRATOR',
+          'NATIONAL_SYSTEM_ADMINISTRATOR',
+          'COUNTY_SYSTEM_ADMINISTRATOR',
+          'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+          'FACILITY_SYSTEM_ADMINISTRATOR',
+          'NURSE',
+          'DOCTOR',
+        ],
+        children: [
+          {
+            name: 'Users',
+            href: '/admin-users',
+            icon: <UsergroupAddOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Facility',
+            href: '/admin-add-facility',
+            icon: <BankOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Campaigns',
+            href: '/campaigns',
+            icon: <SoundOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'NURSE',
+              'DOCTOR',
+            ],
+          },
+        ],
+      },
+      {
+        name: 'Vaccination Reports',
+        href: '#',
+        icon: 'vaccinationReportLogo',
+        roles: ['ALL'],
+        children: [
+          {
+            name: 'MOH 710',
+            href: '/reports/moh-710',
+            icon: <BarChartOutlined />,
+            roles: ['ALL'],
+          },
+          {
+            name: 'MOH 525',
+            href: '/reports/moh-525',
+            icon: <DotChartOutlined />,
+            roles: ['ALL'],
+          },
+        ],
+      },
+      {
+        name: 'Search Client',
+        href: '/search/searchClient/n',
+        icon: 'searchLogo',
+        roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR', 'ADMINISTRATOR'],
+      },
+      {
+        name: 'Register Client',
+        href: '/register-client',
+        icon: 'registerClientLogo',
+        roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+      },
+      {
+        name: 'Update Vaccine History',
+        href: '/search/updateClient/n',
+        icon: 'updateClientLogo',
+        roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+      },
+      {
+        name: 'Administer Vaccine',
+        href: '/search/administerVaccine/n',
+        icon: 'administerVaccineLogo',
+        roles: ['NURSE', 'DOCTOR'],
+      },
+      {
+        name: 'Appointments',
+        href: '/search/appointments/n',
+        icon: 'appointmentLogo',
+        roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+      },
+      {
+        name: 'AEFI',
+        href: '/search/aefi/n',
+        icon: 'aefiLogo',
+        roles: ['NURSE', 'DOCTOR'],
+      },
+      {
+        name: 'Community Referrals',
+        href: '/referrals',
+        icon: 'referralIcon',
+        roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+      },
+      {
+        name: 'Defaulter Tracing',
+        href: '/defaulter-tracing',
+        icon: 'defaulterTracingLogo',
+        roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+      },
+      {
+        name: 'Stock Management',
+        href: '/stock-management',
+        icon: '',
+        roles: [
+          'SUB_COUNTY_STORE_MANAGER',
+          'FACILITY_STORE_MANAGER',
+          'FACILITY_SYSTEM_ADMINISTRATOR',
+          'ADMINISTRATOR',
+        ],
+        children: [
+          {
+            name: 'New Order',
+            href: '/stock-management/new-order',
+            icon: <FormOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Sent Orders',
+            href: '/stock-management/sent-orders',
+            icon: <SelectOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Issue Stock',
+            href: '/stock-management/issue-stock',
+            icon: <TruckOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+            ],
+          },
+          {
+            name: 'Receive Stock',
+            href: '/stock-management/receive-stock',
+            icon: <FallOutlined />,
+            roles: [
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Receive Regional Stock',
+            href: '/stock-management/receive-regional-stock',
+            icon: <FallOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+            ],
+          },
+          {
+            name: 'Received Orders',
+            href: '/stock-management/received-orders',
+            icon: <SignatureOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+            ],
+          },
+          {
+            name: 'Received from another facility',
+            href: '/stock-management/positive-adjustment',
+            icon: <PlusCircleOutlined />,
+            roles: [
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Shared with another facility',
+            href: '/stock-management/negative-adjustment',
+            icon: <MinusCircleOutlined />,
+            roles: [
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Stock Count',
+            href: '/stock-management/stock-count',
+            icon: <DatabaseOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Wastage',
+            href: '/stock-management/wastage',
+            icon: <ReconciliationOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
+            name: 'Ledger',
+            href: '/stock-management/ledger',
+            icon: <ContainerOutlined />,
+            roles: [
+              'SUB_COUNTY_STORE_MANAGER',
+              'FACILITY_STORE_MANAGER',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+            ],
+          },
+        ],
+      },
+    ]
 
-        {
-          name: 'Ledger',
-          href: '/stock-management/ledger',
-          icon: <ContainerOutlined />,
-        },
-      ],
-    },
-  ])
+    return baseNavigation
+      .filter(
+        (item) =>
+          item.roles.includes('ALL') ||
+          item.roles.includes(user.practitionerRole)
+      )
+      .map((item) => ({
+        ...item,
+        children: item.children
+          ? item.children.filter(
+              (child) =>
+                child.roles.includes('ALL') ||
+                child.roles.includes(user.practitionerRole)
+            )
+          : undefined,
+      }))
+  }
+
+  const [navigation, setNavigation] = useState([])
 
   useEffect(() => {
-    const updatedNavigation = navigation.map((item) => {
-      if (item.children) {
-        return {
-          ...item,
-          children: item.children.map((child) => ({
-            ...child,
-            current: child.href === location.pathname,
-          })),
-        }
-      }
-      return {
-        ...item,
-        current: item.href === location.pathname,
-      }
-    })
-
-    setNavigation(updatedNavigation)
-  }, [location.pathname])
+    setNavigation(getNavigationItems())
+  }, [user, location.pathname])
 
   const handleItemClick = (clickedItem) => {
     const updatedNavigation = navigation.map((item) => {

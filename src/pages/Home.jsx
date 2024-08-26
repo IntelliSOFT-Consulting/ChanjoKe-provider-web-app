@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import AefiIcon from '../assets/aefi.svg'
@@ -10,41 +10,26 @@ import RegisterClientIcon from '../assets/register-client.svg'
 import SearchIcon from '../assets/search.svg'
 import StockManagementIcon from '../assets/stock-management.svg'
 import UpdateClientHistoryIcon from '../assets/update-client-history.svg'
+import UsersIcon from '../assets/users.png'
+import FacilityIcon from '../assets/facility.png'
+import CampaignIcon from '../assets/campaigns.png'
 import LoadingArrows from '../common/spinners/LoadingArrows'
 import useAppointment from '../hooks/useAppointment'
 import useReferral from '../hooks/useReferral'
 import useVaccination from '../hooks/useVaccination'
 
-const stats = [
-  { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient/n' },
-  {
-    name: 'Register Client',
-    icon: RegisterClientIcon,
-    href: 'register-client',
-  },
-  {
-    name: 'Update Vaccine History',
-    icon: UpdateClientHistoryIcon,
-    href: 'search/updateClient/n',
-  },
-  {
-    name: 'Administer Vaccine',
-    icon: AdministerVaccineIcon,
-    href: 'search/administerVaccine/n',
-  },
-  { name: 'AEFI', icon: AefiIcon, href: 'search/aefi/n' },
-  {
-    name: 'Appointments',
-    icon: AppointmentIcon,
-    href: 'search/appointments/n',
-  },
-  {
-    name: 'Stock Management',
-    icon: StockManagementIcon,
-    href: 'stock-management',
-  },
-  { name: 'Community Referrals', icon: ReferralIcon, href: 'referrals' },
-  { name: 'Campaigns', icon: ReferralIcon, href: 'campaigns' },
+const allShortcuts = [
+  { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient/n', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Register Client', icon: RegisterClientIcon, href: 'register-client', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Update Vaccine History', icon: UpdateClientHistoryIcon, href: 'search/updateClient/n', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'search/administerVaccine/n', roles: ['NURSE', 'DOCTOR'] },
+  { name: 'AEFI', icon: AefiIcon, href: 'search/aefi/n', roles: ['NURSE', 'DOCTOR'] },
+  { name: 'Appointments', icon: AppointmentIcon, href: 'search/appointments/n', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Stock Management', icon: StockManagementIcon, href: 'stock-management', roles: ['SUB_COUNTY_STORE_MANAGER', 'FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Community Referrals', icon: ReferralIcon, href: 'referrals', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Campaigns', icon: CampaignIcon, href: 'campaigns', roles: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR', 'SUB_COUNTY_SYSTEM_ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Users', icon: UsersIcon, href: 'admin-users', roles: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR', 'SUB_COUNTY_SYSTEM_ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
+  { name: 'Facilities', icon: FacilityIcon, href: 'admin-facilities', roles: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR', 'SUB_COUNTY_SYSTEM_ADMINISTRATOR'] },
 ]
 
 export default function Home() {
@@ -57,10 +42,10 @@ export default function Home() {
   const today = moment().format('YYYY-MM-DD')
 
   useEffect(() => {
-    getFacilityImmunizations(user?.facility, `&date=gt${today}`)
+    getFacilityImmunizations(user?.orgUnit?.code || '0', `&date=gt${today}`)
     getFacilityAppointments(today)
-    getReferralsToFacility(user?.facility, 0, today)
-  }, [user?.facility])
+    getReferralsToFacility(user?.orgUnit?.code || '0', 0, today)
+  }, [user?.orgUnit?.code])
 
   const statsTwo = [
     {
@@ -80,7 +65,7 @@ export default function Home() {
       changeType: 'increase',
     },
     {
-      id: 2,
+      id: 3,
       name: 'Vaccines Administered',
       stat: immunizations?.length || 0,
       icon: AdministerVaccineIcon,
@@ -88,6 +73,12 @@ export default function Home() {
       changeType: 'increase',
     },
   ]
+
+  const allowedShortcuts = useMemo(() => {
+    return allShortcuts.filter(shortcut => 
+      shortcut.roles.includes(user?.practitionerRole) || shortcut.roles.includes('ALL')
+    )
+  }, [user])
 
   return (
     <>
@@ -131,8 +122,11 @@ export default function Home() {
       <br />
 
       <div>
+        <h3 className="mt-5 text-[#163C94] text-2xl mx-auto max-w-7xl">
+          Quick Access
+        </h3>
         <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 p-6 rounded-lg shadow-xl border bg-white">
-          {stats.map((item) => (
+          {allowedShortcuts.map((item) => (
             <Link
               to={item.href}
               key={item.name}
