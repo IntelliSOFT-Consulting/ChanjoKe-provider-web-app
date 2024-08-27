@@ -3,9 +3,11 @@ import { useApiRequest } from '../api/useApiRequest'
 import { useSelector } from 'react-redux'
 import { debounce, getOffset, passwordGenerator } from '../utils/methods'
 import { useLocations } from './useLocation'
+import { formatLocation } from '../utils/formatter'
 
-const roleRoute = '/hapi/fhir/PractitionerRole'
 const practitionerRoute = '/hapi/fhir/Practitioner'
+const registerRoute = '/auth/provider/register'
+const providerRoute = '/auth/provider'
 
 export const usePractitioner = () => {
   const [practitioners, setPractitioners] = useState([])
@@ -16,39 +18,47 @@ export const usePractitioner = () => {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const { fetchLocations, fetchCounties, getLocationByCode } = useLocations()
+  const { fetchLocations } = useLocations()
 
   const { get, post, put } = useApiRequest()
 
-  const availableLocation = (values) => {
-    const { county, subCounty, ward, facility } = values
-
-    const availableLocation = facility || ward || subCounty || county || '0'
-
-    if (facility) {
-      return {
-        address: {
-          use: 'work',
-          line: values.facility ? [values.facility] : [''],
-          city: ward,
-          district: subCounty,
-          state: county,
-          country: 'Kenya',
-        },
-        location: {
-          reference: `Location/${availableLocation}`,
-        },
-      }
-    }
-  }
-
   const fetchPractitioners = async (name = '', isActive = true, page = 0) => {
     setLoading(true)
-    const query = `${name ? `name=${name}` : ''}&active=${isActive}`
-    const offset = getOffset(page)
 
-    const url = `${practitionerRoute}?${query}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
-    const response = await get(url)
+    const currentLocation = user?.orgUnit?.code
+    const level = user?.orgUnit?.level
+    const offset = getOffset(page)
+    const query = `${name ? `name=${name}` : ''}&active=${isActive}`
+    let url = `${practitionerRoute}?${query}&_count=12&_offset=${offset}&_total=accurate&_sort=-_lastUpdated`
+    let response
+
+    switch (level) {
+      case 'county':
+        const subCounty = formatLocation(user?.subCounty)
+        url = `${url}&_tag=${subCounty}`
+        response = await get(url)
+
+        break
+      case 'subCounty':
+        const wards = await fetchLocations(currentLocation, 'WARD')
+        const wardIds = wards?.map((ward) => ward.key).join(',')
+        const facilities = await fetchLocations(wardIds, 'FACILITY')
+        const facilityIds = facilities
+          ?.map((facility) => formatLocation(facility.key))
+          .join(',')
+        url = `${url}&_tag=${facilityIds}`
+        response = await get(url)
+
+        break
+      case 'facility':
+        url = `${url}&_tag=${currentLocation}`
+        response = await get(url)
+        break
+      default:
+        response = await get(url)
+        break
+    }
+
     setLoading(false)
     if (isActive) {
       setPractitioners(response?.entry || [])
@@ -65,75 +75,15 @@ export const usePractitioner = () => {
     setTotal(response.total)
   }, 500)
 
-  const handlePageChange = async (page) => {
-    await fetchPractitioners('', 'active', page)
-  }
-
-  const handleArchivePageChange = async (page) => {
-    await fetchPractitioners('', 'inactive', page)
-  }
-
-  const handleCreatePractitionerRole = async (values, practitioner) => {
-    const practitionerRole = {
-      resourceType: 'PractitionerRole',
-      active: true,
-      practitioner: {
-        reference: `Practitioner/${practitioner.id}`,
-      },
-      code: [
-        {
-          coding: [
-            {
-              system: 'http://terminology.hl7.org/CodeSystem/practitioner-role',
-              code: values.roleGroup,
-            },
-          ],
-        },
-      ],
-      location: [availableLocation(values)?.location],
-    }
-    const response = await post(roleRoute, practitionerRole)
-    return response
-  }
-
   const handleCreatePractitioner = async (values) => {
-    const practitioner = {
-      resourceType: 'Practitioner',
-      active: true,
-      identifier: [
-        {
-          system: 'http://terminology.hl7.org/CodeSystem/v2-0203',
-          value: values.idNumber,
-        },
-      ],
-      name: [
-        {
-          use: 'official',
-          family: values.lastName,
-          given: [values.firstName, values.middleName]?.filter(Boolean),
-        },
-      ],
-      telecom: [
-        {
-          system: 'phone',
-          value: values.phoneNumber,
-        },
-        {
-          system: 'email',
-          value: values.email,
-        },
-      ],
-      address: [availableLocation(values)?.address],
-    }
-
-    await post('/auth/provider/register', {
+    const response = await post(`${registerRoute}`, {
       idNumber: values.idNumber,
       password: passwordGenerator(8),
       email: values.email,
       role: values.roleGroup,
       firstName: values.firstName,
       lastName: values.lastName,
-      facility:
+      facilityCode:
         values.facility ||
         values.ward ||
         values.subCounty ||
@@ -142,200 +92,43 @@ export const usePractitioner = () => {
       phone: values.phoneNumber,
     })
 
-    const response = await post(practitionerRoute, practitioner)
-
-    if (response) {
-      await handleCreatePractitionerRole(values, response)
-    }
-
     return response
   }
 
-  const getLocations = async (wardCode) => {
-    const facilities = await fetchLocations(wardCode)
-    const wardData = await getLocationByCode(wardCode)
-    const wards = await fetchLocations(wardData[0]?.parent)
-
-    const subCountyData = await getLocationByCode(wards[0]?.parent)
-
-    const subCounties = await fetchLocations(subCountyData[0]?.parent)
-
-    const counties = await fetchCounties()
-
-    const ward = wardData[0]?.key
-    const subCounty = subCountyData[0]?.key
-    const county = subCountyData[0]?.parent
-    return {
-      counties,
-      subCounties,
-      wards,
-      facilities,
-      county,
-      subCounty,
-      ward,
-    }
-  }
-
-  const formatPractitioner = async (response) => {
-    const practitioner = response?.entry?.find(
-      (entry) => entry.resource.resourceType === 'Practitioner'
-    )
-    const practitionerRole = response?.entry?.find(
-      (entry) => entry.resource.resourceType === 'PractitionerRole'
-    )
-
-    const location = response?.entry?.find(
-      (entry) => entry.resource.resourceType === 'Location'
-    )
-
-    const firstName = practitioner?.resource?.name[0]?.given?.join(' ')
-    const lastName = practitioner?.resource?.name[0]?.family
-    const email = practitioner?.resource?.telecom?.find(
-      (telecom) => telecom.system === 'email'
-    )?.value
-    const phoneNumber = practitioner?.resource?.telecom?.find(
-      (telecom) => telecom.system === 'phone'
-    )?.value
-    const idNumber = practitioner?.resource?.identifier?.[0]?.value
-    const facility =
-      practitionerRole?.resource?.location?.[0]?.reference.split('/')[1]
-    const roleGroup = practitionerRole?.resource?.code?.[0]?.coding?.[0]?.code
-
-    const locationData = await getLocations(
-      location?.resource?.partOf?.reference?.split('/')[1]
-    )
-
-    return {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      idNumber,
-      facility,
-      roleGroup,
-      practitionerRole: practitionerRole?.resource?.id,
-      practitioner: practitioner?.resource?.id,
-      ...locationData,
-    }
-  }
-
   const getPractitioner = async (id) => {
-    const response = await get(
-      `${roleRoute}?practitioner=${id}&_include=PractitionerRole:practitioner&_include=PractitionerRole:location`
-    )
-
-    const formattedPractitioner = await formatPractitioner(response)
-    return {
-      formatted: formattedPractitioner,
-      raw: response?.entry?.map((entry) => entry.resource),
-    }
+    const response = await get(`${providerRoute}/user/${id}`)
+    return response?.user
   }
 
-  const handleUpdatePractitioner = async (id, values) => {
-    const practitioner = {
-      resourceType: 'Practitioner',
-      id: id,
-      active: true,
-      identifier: [
-        {
-          system: 'http://terminology.hl7.org/CodeSystem/v2-0203',
-          value: values.idNumber,
-        },
-      ],
-      name: [
-        {
-          use: 'official',
-          family: values.lastName,
-          given: [values.firstName, values.middleName]?.filter(Boolean),
-        },
-      ],
-      telecom: [
-        {
-          system: 'phone',
-          value: values.phoneNumber,
-        },
-        {
-          system: 'email',
-          value: values.email,
-        },
-      ],
-      address: [
-        {
-          use: 'home',
-          line: [''],
-          city: values.subCounty,
-          district: values.county,
-          state: values.level,
-          country: 'Kenya',
-        },
-      ],
-    }
-
-    const response = await put(`${practitionerRoute}/${id}`, practitioner)
-    if (response) {
-      const practitionerRole = {
-        resourceType: 'PractitionerRole',
-        id: values.practitionerRole,
-        active: true,
-        code: [
-          {
-            coding: [
-              {
-                system:
-                  'http://terminology.hl7.org/CodeSystem/practitioner-role',
-                code: values.roleGroup,
-              },
-            ],
-          },
-        ],
-        location: [
-          {
-            reference: values.facility
-              ? `Location/${values.facility}`
-              : user.facility,
-          },
-        ],
-      }
-      await put(`${roleRoute}/${values.practitionerRole}`, practitionerRole)
-    }
+  const handleUpdatePractitioner = async (values) => {
+    const response = await post(`${providerRoute}/me`, {
+      idNumber: values.idNumber,
+      email: values.email,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      phone: values.phoneNumber,
+      role: values.roleGroup,
+      facility:
+        values.facility ||
+        values.ward ||
+        values.subCounty ||
+        values.county ||
+        '0',
+    })
 
     return response
   }
 
   const handleArchivePractitioner = async (id, active = false) => {
     const practitionerData = await getPractitioner(id)
-    const practitioner = practitionerData.raw.find(
-      (entry) => entry.resourceType === 'Practitioner'
-    )
-    const practitionerRole = practitionerData.raw.find(
-      (entry) => entry.resourceType === 'PractitionerRole'
-    )
+    const fhirId = practitionerData.fhirPractitionerId
 
-    const archivedPractitioner = {
-      ...practitioner,
-      active,
-    }
+    const fhirData = await get(`${practitionerRoute}/${fhirId}`)
+    fhirData.active = active
 
-    const archivedPractitionerRole = {
-      ...practitionerRole,
-      active,
-    }
-
-    await put(`${practitionerRoute}/${id}`, archivedPractitioner)
-    await put(
-      `${roleRoute}/${practitionerData.formatted.practitionerRole}`,
-      archivedPractitionerRole
-    )
+    await put(`${practitionerRoute}/${fhirId}`, fhirData)
 
     return true
-  }
-
-  const getPractitionerRoles = async (practitionerId) => {
-    const response = await get(
-      `${roleRoute}?practitioner=${practitionerId}&_include=PractitionerRole:practitioner&_include=PractitionerRole:location`
-    )
-    const roles = response.entry.map((entry) => entry.resource)
-    return roles
   }
 
   const searchPractitioner = async (params) => {
@@ -352,12 +145,9 @@ export const usePractitioner = () => {
     archivedTotal,
     loading,
     handleSearch,
-    handlePageChange,
-    handleArchivePageChange,
     handleCreatePractitioner,
     handleUpdatePractitioner,
     handleArchivePractitioner,
-    getPractitionerRoles,
     searchPractitioner,
   }
 }

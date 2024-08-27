@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { message } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const server = axios.create({
   baseURL: 'https://chanjoke.intellisoftkenya.com',
@@ -32,6 +33,10 @@ server.interceptors.response.use(
 export const useApiRequest = () => {
   const abortController = new AbortController()
   const navigate = useNavigate()
+
+  const { user } = useSelector((state) => state.userInfo)
+
+  server.defaults.headers.common['Authorization'] = `Bearer ${user?.access_token}`
 
   const get = async (url, params = {}) => {
     try {

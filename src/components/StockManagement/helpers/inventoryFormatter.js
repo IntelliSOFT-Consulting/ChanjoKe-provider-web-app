@@ -44,7 +44,6 @@ export const formatInventoryToTable = (items) => {
 }
 
 export const vaccineInventory = (vaccine, inventory) => {
-  console.log({ vaccine, inventory })
   const data = inventory?.filter(
     (item) =>
       vaccine?.startsWith(item.vaccine[0]) && vaccine?.includes(item.vaccine)

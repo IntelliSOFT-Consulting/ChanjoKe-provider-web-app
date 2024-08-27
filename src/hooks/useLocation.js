@@ -19,7 +19,6 @@ export const useLocations = (form) => {
 
   const fetchLocations = async (partof = null, type = null) => {
     const typeQuery = type ? `&type=${type}` : ''
-    // eslint-disable-next-line eqeqeq
     const partofQuery = partof || partof == 0 ? `partof=${partof}` : ''
     const url = `${fhirRoute}?${partofQuery}&_count=10000${typeQuery}`
     const response = await get(url)
@@ -31,9 +30,10 @@ export const useLocations = (form) => {
   }
 
   const getLocationByCode = async (code) => {
+    if (!code) return null
     const url = `${fhirRoute}?_id=${code}`
     const response = await get(url)
-    return convertLocations(response)
+    return convertLocations(response)[0]
   }
 
   const getLocationsBylevel = async (level) => {
@@ -45,21 +45,21 @@ export const useLocations = (form) => {
   }
 
   const fetchCounties = async () => {
-    const countiesData = await fetchLocations(0)
+    const countiesData = await fetchLocations(0, 'COUNTY')
     setCounties(countiesData)
     return countiesData
   }
 
   const fetchSubCounties = async (county) => {
-    return await fetchLocations(county)
+    return await fetchLocations(county, 'SUB-COUNTY')
   }
 
   const fetchWards = async (subCounty) => {
-    return await fetchLocations(subCounty)
+    return await fetchLocations(subCounty, 'WARD')
   }
 
   const fetchFacilities = async (ward) => {
-    return await fetchLocations(ward)
+    return await fetchLocations(ward, 'FACILITY')
   }
 
   const handleCountyChange = async (county) => {
@@ -91,6 +91,26 @@ export const useLocations = (form) => {
     return convertLocations(response)
   }
 
+  const getLocationHierarchy = async (facilityCode) => {
+    const facility = await getLocationByCode(facilityCode)
+    const ward = await getLocationByCode(
+      facility?.partOf?.reference?.split('/')[1]
+    )
+    const subCounty = await getLocationByCode(
+      ward?.partOf?.reference?.split('/')[1]
+    )
+    const county = await getLocationByCode(
+      subCounty?.partOf?.reference?.split('/')[1]
+    )
+
+    return {
+      facility,
+      ward,
+      subCounty,
+      county,
+    }
+  }
+
   return {
     counties,
     subCounties,
@@ -108,5 +128,6 @@ export const useLocations = (form) => {
     handleWardChange,
     fetchLocationsByIds,
     getLocationsBylevel,
+    getLocationHierarchy,
   }
 }

@@ -102,7 +102,6 @@ const useInputTable = () => {
       setCount(count + 1)
     }
     const handleSave = (row) => {
-      console.log('row', row)
       const newData = [...dataSource]
       const index = newData.findIndex((item) => row.key === item.key)
       const item = newData[index]
@@ -111,7 +110,6 @@ const useInputTable = () => {
         ...row,
       })
 
-      console.log('newData', newData)
       setDataSource(newData)
     }
     const components = {

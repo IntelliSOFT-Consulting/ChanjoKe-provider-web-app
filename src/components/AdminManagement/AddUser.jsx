@@ -49,18 +49,22 @@ const AddUser = ({
 
   const fetchPractitioner = async (id) => {
     const practitionerData = await getPractitioner(id)
-    setPractitionerData(practitionerData?.formatted)
-    setRole(
-      roleGroups.find((r) => r.value === practitionerData?.formatted?.roleGroup)
+
+    form.setFieldsValue({
+      ...practitionerData,
+      phoneNumber: practitionerData?.phone,
+      roleGroup: practitionerData?.practitionerRole,
+    })
+    const selected = roleGroups?.find(
+      (role) => role.value === practitionerData?.practitionerRole
     )
-    await loadLocationHierarchy(practitionerData?.formatted)
-    form.setFieldsValue(practitionerData?.formatted)
+    setRole(selected)
   }
 
   const handleFinish = async (values) => {
     try {
       if (visible?.id) {
-        await handleUpdatePractitioner(visible.id, values)
+        await handleUpdatePractitioner(values)
       } else {
         await handleCreatePractitioner(values)
       }
@@ -140,8 +144,6 @@ const AddUser = ({
         .reduce((acc, level) => ({ ...acc, [level]: undefined }), {}),
     })
   }
-
-  console.log({ locationOptions })
 
   const renderPersonalDetails = () => (
     <>

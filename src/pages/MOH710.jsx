@@ -82,8 +82,6 @@ export default function MOH710() {
           dataIndex: key,
           key,
           render: (_, record) => {
-            console.log('date', date)
-            console.log('record', record[key])
             return record?.[key]?.total || 0
           },
         }

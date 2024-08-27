@@ -38,7 +38,7 @@ export default function Users() {
         createdAt: moment(practitioner.resource.meta?.lastUpdated).format(
           'DD-MM-YYYY'
         ),
-        id: practitioner.resource.id,
+        id: practitioner.resource.identifier?.[0]?.value,
       }
     })
   }
@@ -75,7 +75,7 @@ export default function Users() {
           <Button
             type="link"
             onClick={() => {
-              setVisible(record)
+              setVisible({ id: record.id })
             }}
           >
             Update
