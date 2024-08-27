@@ -72,6 +72,7 @@ const useStyles = createUseStyles({
 const defaultData = {
   borderRadius: 6,
   colorPrimary: '#163C94',
+  algorithm: 'lighten',
   Button: {
     colorPrimary: '#163C94',
   },
@@ -133,6 +134,13 @@ const App = () => {
               },
               Descriptions: {
                 borderRadius: 0,
+              },
+              Checkbox: {
+                colorPrimary: defaultData.colorPrimary,
+                algorithm: defaultData.algorithm,
+                colorBorder: defaultData.colorPrimary,
+                colorBgContainerDisabled: '#f5f5f5',
+                
               },
             },
           }}

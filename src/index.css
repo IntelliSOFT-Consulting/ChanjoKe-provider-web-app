@@ -204,3 +204,7 @@ code {
   border-radius: 2px;
   height: 32px;
 }
+
+.ant-checkbox input[type='checkbox']:disabled + .ant-checkbox-inner {
+  border: 1px solid rgb(168, 168, 168) !important;
+}
