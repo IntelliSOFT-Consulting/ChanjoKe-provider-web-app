@@ -148,7 +148,7 @@ const VACCINE_STATUS = {
 
 const REASON_TYPES = {
   RELIGIOUS: 'Religious objection',
-  PATIENT: 'Patient objection',
+  PATIENT: 'Caregiver refusal',
   RESCHEDULED: 'Rescheduled',
 };
 

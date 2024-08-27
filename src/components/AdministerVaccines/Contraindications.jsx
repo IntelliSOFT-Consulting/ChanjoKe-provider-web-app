@@ -156,7 +156,7 @@ export default function Contraindications() {
                     placeholder="Select vaccines to reschedule"
                     style={{ width: '100%' }}
                     options={selectedVaccines?.map((vaccine) => ({
-                      label: vaccine.vaccineName,
+                      label: vaccine.vaccine,
                       value: vaccine.vaccineId,
                     }))}
                   />
