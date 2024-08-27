@@ -124,7 +124,11 @@ export const roleGroups = [
   {
     label: 'Sub-County EPI Manager',
     value: 'SUB_COUNTY_STORE_MANAGER',
-    creators: [],
+    creators: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+    ],
     locations: ['SUB-COUNTY'],
   },
   {
@@ -166,5 +170,5 @@ export const roleGroups = [
       'LAB_TECHNICIAN',
     ],
     locations: ['FACILITY'],
-  }
+  },
 ]

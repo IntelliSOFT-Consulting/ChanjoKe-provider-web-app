@@ -6,7 +6,7 @@ import { formatLocation } from '../../utils/formatter'
 const BASE_URL = 'https://chanjoke.intellisoftkenya.com'
 
 const createAxiosInstance = () => {
-  const token = JSON.parse(localStorage.getItem('authorization') || '{}')
+  const token = JSON.parse(localStorage.getItem('user') || '{}')
   return axios.create({
     baseURL: BASE_URL,
     headers: {
@@ -61,12 +61,12 @@ server.interceptors.response.use(
 
       originalRequest._retry = true
       try {
-        const token = JSON.parse(localStorage.getItem('authorization') || '{}')
+        const token = JSON.parse(localStorage.getItem('user') || '{}')
         const response = await server.post('/auth/token', {
           grant_type: 'refresh_token',
           refresh_token: token.refresh_token,
         })
-        localStorage.setItem('authorization', JSON.stringify(response.data))
+        localStorage.setItem('user', JSON.stringify(response.data))
         server.defaults.headers.common[
           'Authorization'
         ] = `Bearer ${response.data.access_token}`
@@ -109,6 +109,26 @@ export const login = createAsyncThunk(
   }
 )
 
+export const refreshToken = createAsyncThunk(
+  'user/refreshToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem('user') || '{}')
+      const response = await server.post('/auth/provider/refresh_token', {
+        grant_type: 'refresh_token',
+        refresh_token: token.refresh_token,
+      })
+
+      localStorage.setItem('user', JSON.stringify(response.data))
+      return response.data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || 'Failed to refresh token'
+      )
+    }
+  }
+)
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -116,7 +136,6 @@ const userSlice = createSlice({
     logout: (state) => {
       state.user = null
       localStorage.removeItem('user')
-      localStorage.removeItem('authorization')
     },
   },
   extraReducers: (builder) => {
@@ -134,6 +153,15 @@ const userSlice = createSlice({
         state.loading = false
         state.error = action.payload
         message.error(action.payload)
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        const newToken = action.payload
+        state.user = { ...state.user, ...newToken }
+        localStorage.setItem('user', JSON.stringify(newToken))
+      })
+      .addCase(refreshToken.rejected, (state) => {
+        state.user = null
+        localStorage.removeItem('user')
       })
   },
 })

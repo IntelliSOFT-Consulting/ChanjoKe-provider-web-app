@@ -101,19 +101,15 @@ export const usePractitioner = () => {
   }
 
   const handleUpdatePractitioner = async (values) => {
-    const response = await post(`${providerRoute}/me`, {
+    const response = await put(`${providerRoute}/user/${values.idNumber}`, {
+      ...values,
       idNumber: values.idNumber,
       email: values.email,
       firstName: values.firstName,
       lastName: values.lastName,
       phone: values.phoneNumber,
       role: values.roleGroup,
-      facilityCode:
-        values.facility ||
-        values.ward ||
-        values.subCounty ||
-        values.county ||
-        '0',
+      facilityCode: values.facility,
     })
 
     return response
