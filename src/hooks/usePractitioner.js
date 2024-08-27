@@ -108,7 +108,7 @@ export const usePractitioner = () => {
       lastName: values.lastName,
       phone: values.phoneNumber,
       role: values.roleGroup,
-      facility:
+      facilityCode:
         values.facility ||
         values.ward ||
         values.subCounty ||

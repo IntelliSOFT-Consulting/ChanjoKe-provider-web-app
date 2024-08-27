@@ -141,3 +141,56 @@ export const outGrown = (lastDate) => {
   const last = moment(lastDate)
   return today.isAfter(last)
 }
+const VACCINE_STATUS = {
+  NOT_DONE: 'not-done',
+  COMPLETED: 'completed',
+};
+
+const REASON_TYPES = {
+  RELIGIOUS: 'Religious objection',
+  PATIENT: 'Patient objection',
+  RESCHEDULED: 'Rescheduled',
+};
+
+const filterVaccines = (immunizations, statusReason) =>
+  immunizations.filter(
+    (vaccine) =>
+      vaccine.status === VACCINE_STATUS.NOT_DONE &&
+      (vaccine.statusReason?.text === statusReason ||
+        vaccine.reasonCode?.[0]?.text === statusReason)
+  );
+
+const isVaccineCompleted = (immunizations, vaccine) =>
+  immunizations.some(
+    (v) =>
+      v.vaccineCode.text === vaccine.vaccineCode.text &&
+      v.status === VACCINE_STATUS.COMPLETED
+  );
+
+const listVaccines = (immunizations) =>
+  immunizations.map((vaccine) => vaccine.vaccineCode.text).join(', ');
+
+const createAlert = (vaccines, reason) => {
+  if (vaccines.length === 0) return null;
+
+  const vaccineList = listVaccines(vaccines);
+  if (reason === REASON_TYPES.RESCHEDULED) {
+    const verb = vaccines.length > 1 ? 'were' : 'was';
+    return `${vaccineList} ${verb} rescheduled`;
+  }
+  return `${vaccineList} not administered because of ${reason}`;
+};
+
+const createAlertForReason = (immunizations, reason) => {
+  const filtered = filterVaccines(immunizations, reason);
+  const finalFiltered = reason === REASON_TYPES.RESCHEDULED
+    ? filtered.filter(vaccine => !isVaccineCompleted(immunizations, vaccine))
+    : filtered;
+  return createAlert(finalFiltered, reason);
+};
+
+export const vaccineAlerts = (immunizations) => ({
+  religious: createAlertForReason(immunizations, REASON_TYPES.RELIGIOUS),
+  refusal: createAlertForReason(immunizations, REASON_TYPES.PATIENT),
+  rescheduled: createAlertForReason(immunizations, REASON_TYPES.RESCHEDULED),
+});

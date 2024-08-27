@@ -9,6 +9,7 @@ import {
   Popconfirm,
   Tag,
   Tooltip,
+  Alert,
 } from 'antd'
 import dayjs from 'dayjs'
 import moment from 'moment'
@@ -25,7 +26,11 @@ import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import DeleteModal from './DeleteModal'
-import { colorCodeVaccines, isCovidQualified } from './vaccineController'
+import {
+  colorCodeVaccines,
+  isCovidQualified,
+  vaccineAlerts,
+} from './vaccineController'
 import { useAccess } from '../../hooks/useAccess'
 
 export default function RoutineVaccines({
@@ -35,11 +40,11 @@ export default function RoutineVaccines({
   routineVaccines,
   fetchData,
   immunizations,
-  caregiverRefusal,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [immunizationToDelete, setImmunizationToDelete] = useState(null)
+  const [alerts, setAlerts] = useState(null)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -64,7 +69,13 @@ export default function RoutineVaccines({
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
+
+    if (immunizations) {
+      setAlerts(vaccineAlerts(immunizations))
+    }
   }, [immunizations, routineVaccines, patientDetails])
+
+  console.log('alerts', alerts)
 
   const deleteImmunization = async (id, reason) => {
     const immunization = immunizations?.find((entry) => entry.id === id)
@@ -374,9 +385,9 @@ export default function RoutineVaccines({
         }
       />
       <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
-        <div className="flex justify-between">
+        <div className="">
           <div>
-            <div className="grid gap-4 grid-cols-2">
+            <div className="flex flex-col">
               <div>
                 <p>Vaccination Schedule</p>
                 <small>
@@ -385,14 +396,33 @@ export default function RoutineVaccines({
                 </small>
               </div>
               <div>
-                {caregiverRefusal && (
-                  <div className="flex mt-2 md:mt-0 items-center bg-pink px-2 rounded-md ml-0 h-full my-0">
-                    <WarningTwoTone twoToneColor="red" classID="text-black" />
-                    <small>
-                      Some vaccines have not been administered (Caregiver
-                      Refusal)
-                    </small>
-                  </div>
+                {alerts?.religious && (
+                  <Alert
+                    message={alerts?.religious}
+                    type="error"
+                    showIcon
+                    className="mt-1 w-full"
+                    closable
+                  />
+                )}
+                {alerts?.refusal && (
+                  <Alert
+                    message={alerts?.refusal}
+                    type="error"
+                    showIcon
+                    className="mt-1"
+                    closable
+                  />
+                )}
+
+                {alerts?.rescheduled && (
+                  <Alert
+                    message={alerts?.rescheduled}
+                    type="warning"
+                    showIcon
+                    className="mt-1"
+                    closable
+                  />
                 )}
               </div>
             </div>
