@@ -75,7 +75,6 @@ export default function RoutineVaccines({
     }
   }, [immunizations, routineVaccines, patientDetails])
 
-  console.log('alerts', alerts)
 
   const deleteImmunization = async (id, reason) => {
     const immunization = immunizations?.find((entry) => entry.id === id)

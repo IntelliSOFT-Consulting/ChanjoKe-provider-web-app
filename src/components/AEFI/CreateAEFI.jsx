@@ -227,7 +227,7 @@ export default function CreateAEFI() {
                     disabledDate={(current) => {
                       return (
                         (current && current > moment().endOf('day')) ||
-                        current.isBefore(earliestDueDate)
+                        current.isBefore(moment(earliestDueDate).subtract(1, 'd'))
                       )
                     }}
                   />
