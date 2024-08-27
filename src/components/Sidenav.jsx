@@ -125,7 +125,11 @@ export default function Sidenav() {
             name: 'Facility',
             href: '/admin-add-facility',
             icon: <BankOutlined />,
-            roles: ['SUB_COUNTY_SYSTEM_ADMINISTRATOR'],
+            roles: [
+              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+            ],
           },
           {
             name: 'Campaigns',
