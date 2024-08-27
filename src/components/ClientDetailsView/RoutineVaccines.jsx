@@ -218,9 +218,8 @@ export default function RoutineVaccines({
               : 'Not Administered'
           if (text === 'Rescheduled') return 'Rescheduled'
           if (isMissed && text !== 'entered-in-error') return 'Missed'
-          if (moment().isAfter(record.dueDate))
-            return patientDetails?.deceased ? 'N/A' : 'Due'
-          return patientDetails?.deceased ? 'N/A' : 'Upcoming'
+          if (moment().isAfter(record.dueDate)) return 'Due'
+          return 'Upcoming'
         })()
 
         return <Tag color={statusColor}>{statusText}</Tag>

@@ -202,11 +202,7 @@ export default function NonRoutineVaccines({
               ? 'Rescheduled'
               : missed && text !== 'entered-in-error' && hasCompletedSeries
               ? moment().isAfter(record.dueDate)
-                ? patientDetails?.deceased
-                  ? 'N/A'
-                  : 'Due'
-                : patientDetails?.deceased
-                ? 'N/A'
+                ? 'Due'
                 : 'Missed'
               : ''}
           </Tag>
