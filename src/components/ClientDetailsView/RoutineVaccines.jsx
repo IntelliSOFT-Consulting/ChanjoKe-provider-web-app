@@ -103,7 +103,7 @@ export default function RoutineVaccines({
 
   const statusMessage = (record, locked = false) => {
     if (patientDetails?.deceased && record.status !== 'completed') {
-      return 'Patient is deceased'
+      return 'Client is deceased'
     }
 
     if (record.contraindicated) {
@@ -218,8 +218,9 @@ export default function RoutineVaccines({
               : 'Not Administered'
           if (text === 'Rescheduled') return 'Rescheduled'
           if (isMissed && text !== 'entered-in-error') return 'Missed'
-          if (moment().isAfter(record.dueDate)) return 'Due'
-          return 'Upcoming'
+          if (moment().isAfter(record.dueDate))
+            return patientDetails?.deceased ? 'N/A' : 'Due'
+          return patientDetails?.deceased ? 'N/A' : 'Upcoming'
         })()
 
         return <Tag color={statusColor}>{statusText}</Tag>
