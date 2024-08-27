@@ -6,6 +6,7 @@ import Table from '../components/DataTable'
 import usePatient from '../hooks/usePatient'
 import { convertCamelCaseString, titleCase } from '../utils/methods'
 import Loading from '../common/spinners/LoadingArrows'
+import { useAccess } from '../hooks/useAccess'
 
 export default function ClientRecords() {
   const [details, setDetails] = useState({})
@@ -13,6 +14,8 @@ export default function ClientRecords() {
 
   const { clientID } = useParams()
   const navigate = useNavigate()
+
+  const { canAccess } = useAccess()
 
   const { getPatient, patient } = usePatient()
 
@@ -134,12 +137,14 @@ export default function ClientRecords() {
       ) : (
         <>
           <div className="px-4 text-2xl font-semibold py-4 flex justify-end px-14">
-            <Button
-              onClick={() => navigate(`/register-client/${clientID}`)}
-              type="primary"
-            >
-              Update record
-            </Button>
+            {canAccess('UPDATE_CLIENT') && (
+              <Button
+                onClick={() => navigate(`/register-client/${clientID}`)}
+                type="primary"
+              >
+                Update record
+              </Button>
+            )}
           </div>
           <div className="px-4 py-5 sm:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mx-7">

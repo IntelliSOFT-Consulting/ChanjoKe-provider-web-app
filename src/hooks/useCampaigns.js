@@ -29,7 +29,7 @@ export default function useCampaign() {
         campaignName: value?.resource?.title,
         status: value?.resource?.status,
         dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
-        campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} - ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
+        campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} → ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
         resource: value?.resource,
       }))))
     }
@@ -39,7 +39,7 @@ export default function useCampaign() {
       campaignName: value?.resource?.title,
       status: value?.resource?.status,
       dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
-      campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} - ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
+      campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} → ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
       resource: value?.resource,
     })))
     setLoading(false)

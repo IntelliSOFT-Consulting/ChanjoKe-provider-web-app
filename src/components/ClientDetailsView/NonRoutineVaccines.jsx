@@ -11,11 +11,11 @@ import { formatCardTitle } from '../../utils/methods'
 import { datePassed } from '../../utils/validate'
 import Table from '../DataTable'
 import { colorCodeVaccines, isQualified, outGrown } from './vaccineController'
-import SelectDialog from '../../common/dialog/SelectDialog'
 import useVaccination from '../../hooks/useVaccination'
 import moment from 'moment'
 import DeleteModal from './DeleteModal'
 import useAefi from '../../hooks/useAefi'
+import { useAccess } from '../../hooks/useAccess'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -28,17 +28,16 @@ export default function NonRoutineVaccines({
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [selectAefi, setSelectAefi] = useState(false)
   const [immunizationToDelete, setImmunizationToDelete] = useState(null)
 
   const navigate = useNavigate()
   const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
-  const { user } = useSelector((state) => state.userInfo)
 
   const dispatch = useDispatch()
 
   const { updateImmunization } = useVaccination()
-  const { getAefis, loading: loadingAefis, aefis } = useAefi()
+  const { getAefis, aefis } = useAefi()
+  const { canAccess } = useAccess()
 
   useEffect(() => {
     getAefis()
@@ -112,6 +111,7 @@ export default function NonRoutineVaccines({
       title: '',
       dataIndex: 'vaccine',
       key: 'vaccine',
+      hidden: !canAccess('ADMINISTER_VACCINE'),
       render: (_text, record) => {
         const completed = record.status === 'completed'
 
@@ -231,18 +231,15 @@ export default function NonRoutineVaccines({
           >
             View
           </Button>
-          {record.status === 'completed' &&
-            user?.practitionerRole
-              ?.toLowerCase()
-              ?.includes('administrator') && (
-              <Button
-                type="link"
-                danger
-                onClick={() => setImmunizationToDelete(record.id)}
-              >
-                Delete
-              </Button>
-            )}
+          {record.status === 'completed' && canAccess('DELETE_VACCINATION') && (
+            <Button
+              type="link"
+              danger
+              onClick={() => setImmunizationToDelete(record.id)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       ),
     },
@@ -268,42 +265,42 @@ export default function NonRoutineVaccines({
       <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
         <div className="flex justify-between">
           <div className="grid gap-4 grid-cols-2">
-              <div>
-                <p>Vaccination Schedule</p>
-                <small>
-                  Please click on the checkbox to select which vaccine to administer
-                </small>
-              </div>
-              <div>
+            <div>
+              <p>Vaccination Schedule</p>
+              <small>
+                Please click on the checkbox to select which vaccine to
+                administer
+              </small>
+            </div>
+            <div>
               {caregiverRefusal && (
                 <div className="flex mt-2 md:mt-0 items-center bg-pink px-2 rounded-md ml-0 h-full my-0">
-                      <WarningTwoTone
-                        twoToneColor="red"
-                        classID="text-black"
-                      />
-                      <small>
-                        Some vaccines have not been administered (Caregiver Refusal)
-                      </small>
+                  <WarningTwoTone twoToneColor="red" classID="text-black" />
+                  <small>
+                    Some vaccines have not been administered (Caregiver Refusal)
+                  </small>
                 </div>
               )}
-              </div>
+            </div>
           </div>
           <div>
-            <FloatButton
-              type="primary"
-              onClick={() => {
-                setDialogOpen(true)
-                dispatch(setSelectedVaccines(vaccinesToAdminister))
-              }}
-              disabled={vaccinesToAdminister?.length > 0 ? false : true}
-              className={`w-fit ${
-                vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''
-              }`}
-              description={
-                <span className="px-2 font-semibold">{`Administer Vaccine ( ${vaccinesToAdminister?.length} )`}</span>
-              }
-              shape="square"
-            />
+            {canAccess('ADMINISTER_VACCINE') && (
+              <FloatButton
+                type="primary"
+                onClick={() => {
+                  setDialogOpen(true)
+                  dispatch(setSelectedVaccines(vaccinesToAdminister))
+                }}
+                disabled={vaccinesToAdminister?.length > 0 ? false : true}
+                className={`w-fit ${
+                  vaccinesToAdminister?.length === 0 ? 'btn-disabled' : ''
+                }`}
+                description={
+                  <span className="px-2 font-semibold">{`Administer Vaccine ( ${vaccinesToAdminister?.length} )`}</span>
+                }
+                shape="square"
+              />
+            )}
           </div>
         </div>
 
@@ -323,12 +320,22 @@ export default function NonRoutineVaccines({
                 >
                   {({ open }) => {
                     const color = colorCodeVaccines(sectionVaccines, false)
+                    const categoryvaccines = nonRoutineVaccines[category]
                     const administered = sectionVaccines?.filter(
                       (item) => item.status === 'completed'
                     )
+
+                    const vaccineAefisCount =
+                      aefis?.filter((aefi) =>
+                        categoryvaccines?.find((vaccine) =>
+                          aefi?.resource?.suspectEntity?.[0]?.instance?.reference?.includes(
+                            vaccine.immunizationId
+                          )
+                        )
+                      )?.length || 0
                     return (
                       <>
-                        <dt>
+                        <dt className="relative">
                           <Disclosure.Button className="flex w-full items-start justify-between text-left text-gray-900">
                             <div className="flex w-full justify-between px-10">
                               <span>
@@ -342,22 +349,7 @@ export default function NonRoutineVaccines({
                                 </span>
                               </span>
                               <span>
-                                {open ? (
-                                  <Button
-                                    to="/aefi-report"
-                                    className="text-[#163C94]"
-                                    disabled={['gray', 'red'].includes(color)}
-                                    onClick={() => {
-                                      dispatch(
-                                        setSelectedVaccines(administered)
-                                      )
-                                      setSelectAefi(true)
-                                    }}
-                                    type="link"
-                                  >
-                                    AEFIs
-                                  </Button>
-                                ) : (
+                                {!open && (
                                   <PlusOutlined
                                     className="h-6 w-6"
                                     aria-hidden="true"
@@ -366,6 +358,40 @@ export default function NonRoutineVaccines({
                               </span>
                             </div>
                           </Disclosure.Button>
+                          {open && (
+                            <Popconfirm
+                              title="Please select an action"
+                              onConfirm={() => {
+                                dispatch(setSelectedVaccines(administered))
+                                navigate(
+                                  `/aefi-report/${selectedVaccines?.[0]?.id}`
+                                )
+                              }}
+                              onCancel={() => {
+                                dispatch(setSelectedVaccines(administered))
+                                navigate(
+                                  `/aefi-details/${selectedVaccines?.[0]?.id}`
+                                )
+                              }}
+                              okText="Record AEFI"
+                              okButtonProps={{
+                                disabled: !canAccess('CREATE_AEFI'),
+                                className: !canAccess('CREATE_AEFI')
+                                  ? 'hidden'
+                                  : '',
+                              }}
+                              cancelText="view AEFIs"
+                              className="absolute right-0 -top-2"
+                            >
+                              <Button
+                                className="text-[#163C94] absolute"
+                                disabled={['gray', 'red'].includes(color)}
+                                type="link"
+                              >
+                                AEFIs ({vaccineAefisCount})
+                              </Button>
+                            </Popconfirm>
+                          )}
                         </dt>
                         <Disclosure.Panel
                           as="dd"
@@ -387,20 +413,6 @@ export default function NonRoutineVaccines({
             </dl>
           )
         })}
-        <SelectDialog
-          open={selectAefi}
-          onClose={setSelectAefi}
-          title="Select AEFI"
-          description="Please select an action"
-          btnTwo={{
-            text: 'View AEFIs',
-            url: `/aefi-details/${selectedVaccines?.[0]?.id}`,
-          }}
-          btnOne={{
-            text: 'Report AEFI',
-            url: `/aefi-report/${selectedVaccines?.[0]?.id}`,
-          }}
-        />
       </div>
     </>
   )

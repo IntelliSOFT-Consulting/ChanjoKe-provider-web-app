@@ -17,6 +17,7 @@ import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
 import { setCurrentPatient } from '../redux/slices/patientSlice'
 import { setVaccineSchedules } from '../redux/slices/vaccineSlice'
+import { useAccess } from '../hooks/useAccess'
 
 export default function ClientDetailsView() {
   const [patientData, setPatientData] = useState(null)
@@ -32,6 +33,7 @@ export default function ClientDetailsView() {
   const queryParams = window.location.search?.split('=')?.[1]
 
   const { getPatient, patient } = usePatient()
+  const { canAccess } = useAccess()
   const {
     getRecommendations,
     getImmunizations,
@@ -120,7 +122,7 @@ export default function ClientDetailsView() {
             >
               View Client Details
             </Button>
-            {!patientData?.deceased && (
+            {!patientData?.deceased && canAccess('VACCINATION_HISTORY') && (
               <Button
                 type="primary"
                 onClick={() =>

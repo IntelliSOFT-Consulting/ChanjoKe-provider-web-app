@@ -1,18 +1,16 @@
-import { Form, Input, Button, Popconfirm, Tabs } from 'antd'
+import { Button, Form, Input, Popconfirm, Tabs } from 'antd'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
+import { useAccess } from '../hooks/useAccess'
 import useCampaigns from '../hooks/useCampaigns'
-import { useSelector } from 'react-redux'
-
-const practitioner = JSON.parse(localStorage.getItem('practitioner'))
-const practitionerRole = practitioner?.practitionerRole
 
 export default function Campaigns() {
   const navigate = useNavigate()
   const { loading, campaigns, campaignTotal, fetchCampaigns, updateCampaign } =
     useCampaigns()
-  const { user } = useSelector((state) => state.userInfo)
+
+  const { canAccess } = useAccess()
 
   const [activeTab, setActiveTab] = useState('1')
   const [currentPage, setCurrentPage] = useState(1)
@@ -35,11 +33,12 @@ export default function Campaigns() {
       key: 'campaignDuration',
     },
     {
-      title: 'Actions',
+      title: null,
       dataIndex: '',
+      hidden: !canAccess('CREATE_CAMPAIGN') && activeTab === '2',
       key: 'x',
       render: (_, record) =>
-        practitionerRole === 'ADMINISTRATOR' ? (
+        canAccess('CREATE_CAMPAIGN') ? (
           <>
             <Link
               to={`/campaign/${record?.id}`}
@@ -47,7 +46,7 @@ export default function Campaigns() {
             >
               View
             </Link>
-            {activeTab === '1' && (
+            {activeTab === '1' && canAccess('CREATE_CAMPAIGN') && (
               <Popconfirm
                 title="Are you sure you want to archive this campaign?"
                 onConfirm={() => {
@@ -80,7 +79,7 @@ export default function Campaigns() {
               </Popconfirm>
             )}
 
-            {activeTab === '2' && (
+            {activeTab === '2' && canAccess('CREATE_CAMPAIGN') && (
               <Popconfirm
                 title="Are you sure you want to make this campaign active?"
                 onConfirm={() => {
@@ -152,11 +151,10 @@ export default function Campaigns() {
 
   return (
     <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
-      <div className="flex justify-between px-4 text-2xl py-5 sm:px-14">
+      <div className="flex justify-between px-4 text-2xl py-2 sm:px-14">
         <div className="text-3xl">Campaigns</div>
         <div className="right-0">
-          {(user?.practitionerRole === 'COUNTY_SYSTEM_ADMINISTRATOR' ||
-            user?.practitionerRole === 'ADMINISTRATOR') && (
+          {canAccess('CREATE_CAMPAIGN') && (
             <Button
               type="primary"
               onClick={() => navigate('/new-campaign/0')}

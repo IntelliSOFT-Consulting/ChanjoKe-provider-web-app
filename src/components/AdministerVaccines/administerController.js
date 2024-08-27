@@ -54,7 +54,7 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
         },
       ],
       location: {
-        reference: user.facility,
+        reference: user?.orgUnit?.code,
       },
       lotNumber: vaccine.batchNumber,
       note: [

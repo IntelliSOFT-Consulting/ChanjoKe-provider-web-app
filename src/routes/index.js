@@ -95,6 +95,7 @@ const router = createBrowserRouter([
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
               'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -191,6 +192,8 @@ const router = createBrowserRouter([
           <RoleBasedRoute
             element={<DefaulterTracing />}
             allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
               'NURSE',
               'DOCTOR',
               'CLERK',
@@ -208,6 +211,8 @@ const router = createBrowserRouter([
               <RoleBasedRoute
                 element={<StockManagement />}
                 allowedRoles={[
+                  'ADMINISTRATOR',
+                  'NATIONAL_SYSTEM_ADMINISTRATOR',
                   'SUB_COUNTY_STORE_MANAGER',
                   'FACILITY_STORE_MANAGER',
                   'FACILITY_SYSTEM_ADMINISTRATOR',
@@ -247,11 +252,7 @@ const router = createBrowserRouter([
             element: (
               <RoleBasedRoute
                 element={<ReceiveRegionalStock status={'receive'} />}
-                allowedRoles={[
-                  'SUB_COUNTY_STORE_MANAGER',
-                  'FACILITY_STORE_MANAGER',
-                  'FACILITY_SYSTEM_ADMINISTRATOR',
-                ]}
+                allowedRoles={['SUB_COUNTY_STORE_MANAGER']}
               />
             ),
           },
@@ -352,6 +353,8 @@ const router = createBrowserRouter([
               <RoleBasedRoute
                 element={<SentOrders />}
                 allowedRoles={[
+                  'ADMINISTRATOR',
+                  'NATIONAL_SYSTEM_ADMINISTRATOR',
                   'SUB_COUNTY_STORE_MANAGER',
                   'FACILITY_STORE_MANAGER',
                   'FACILITY_SYSTEM_ADMINISTRATOR',
@@ -379,10 +382,11 @@ const router = createBrowserRouter([
               <RoleBasedRoute
                 element={<Ledger />}
                 allowedRoles={[
+                  'ADMINISTRATOR',
+                  'NATIONAL_SYSTEM_ADMINISTRATOR',
                   'SUB_COUNTY_STORE_MANAGER',
                   'FACILITY_STORE_MANAGER',
                   'FACILITY_SYSTEM_ADMINISTRATOR',
-                  'ADMINISTRATOR',
                 ]}
               />
             ),
@@ -397,6 +401,7 @@ const router = createBrowserRouter([
                   'FACILITY_STORE_MANAGER',
                   'FACILITY_SYSTEM_ADMINISTRATOR',
                   'ADMINISTRATOR',
+                  'NATIONAL_SYSTEM_ADMINISTRATOR',
                 ]}
               />
             ),
@@ -458,6 +463,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -472,6 +479,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -486,6 +495,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -555,6 +566,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -597,6 +610,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -611,6 +626,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -629,6 +646,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -643,6 +662,8 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -669,13 +690,7 @@ const router = createBrowserRouter([
         element: (
           <RoleBasedRoute
             element={<NewCampaign />}
-            allowedRoles={[
-              'ADMINISTRATOR',
-              'NATIONAL_SYSTEM_ADMINISTRATOR',
-              'COUNTY_SYSTEM_ADMINISTRATOR',
-              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
-              'FACILITY_SYSTEM_ADMINISTRATOR',
-            ]}
+            allowedRoles={['COUNTY_SYSTEM_ADMINISTRATOR']}
           />
         ),
       },

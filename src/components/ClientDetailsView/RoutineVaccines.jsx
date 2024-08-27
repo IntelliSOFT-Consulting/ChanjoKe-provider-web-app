@@ -26,6 +26,7 @@ import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import DeleteModal from './DeleteModal'
 import { colorCodeVaccines, isCovidQualified } from './vaccineController'
+import { useAccess } from '../../hooks/useAccess'
 
 export default function RoutineVaccines({
   userCategory,
@@ -44,8 +45,8 @@ export default function RoutineVaccines({
   const dispatch = useDispatch()
   const { updateImmunization } = useVaccination()
   const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
-  const { user } = useSelector((state) => state.userInfo)
   const { getAefis, loading: loadingAefis, aefis } = useAefi()
+  const { canAccess } = useAccess()
 
   const categories = routineVaccines
     ? [...new Set(Object.keys(routineVaccines))]
@@ -135,6 +136,7 @@ export default function RoutineVaccines({
       title: '',
       dataIndex: 'vaccine',
       key: 'vaccine',
+      hidden: !canAccess('ADMINISTER_VACCINE'),
       render: (_text, record) => {
         const isCompleted = record.status === 'completed'
         const isLocked = lockVaccine(record.dueDate, record.lastDate)
@@ -235,18 +237,15 @@ export default function RoutineVaccines({
           >
             View
           </Button>
-          {record.status === 'completed' &&
-            user?.practitionerRole
-              ?.toLowerCase()
-              ?.includes('administrator') && (
-              <Button
-                type="link"
-                danger
-                onClick={() => setImmunizationToDelete(record.id)}
-              >
-                Delete
-              </Button>
-            )}
+          {record.status === 'completed' && canAccess('DELETE_VACCINATION') && (
+            <Button
+              type="link"
+              danger
+              onClick={() => setImmunizationToDelete(record.id)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       ),
     },
@@ -307,6 +306,10 @@ export default function RoutineVaccines({
                     navigate(`/aefi-details/${selectedVaccines?.[0]?.id}`)
                   }}
                   okText="Record AEFI"
+                  okButtonProps={{
+                    disabled: !canAccess('CREATE_AEFI'),
+                    className: !canAccess('CREATE_AEFI') ? 'hidden' : '',
+                  }}
                   cancelText="view AEFIs"
                   className="absolute right-0 -top-2"
                 >
@@ -377,42 +380,42 @@ export default function RoutineVaccines({
               <div>
                 <p>Vaccination Schedule</p>
                 <small>
-                  Please click on the checkbox to select which vaccine to administer
+                  Please click on the checkbox to select which vaccine to
+                  administer
                 </small>
               </div>
               <div>
-              {caregiverRefusal && (
-                <div className="flex mt-2 md:mt-0 items-center bg-pink px-2 rounded-md ml-0 h-full my-0">
-                      <WarningTwoTone
-                        twoToneColor="red"
-                        classID="text-black"
-                      />
-                      <small>
-                        Some vaccines have not been administered (Caregiver Refusal)
-                      </small>
-                </div>
-              )}
+                {caregiverRefusal && (
+                  <div className="flex mt-2 md:mt-0 items-center bg-pink px-2 rounded-md ml-0 h-full my-0">
+                    <WarningTwoTone twoToneColor="red" classID="text-black" />
+                    <small>
+                      Some vaccines have not been administered (Caregiver
+                      Refusal)
+                    </small>
+                  </div>
+                )}
               </div>
             </div>
-
           </div>
-          <FloatButton
-            type="primary"
-            onClick={() => {
-              setDialogOpen(true)
-              dispatch(setSelectedVaccines(vaccinesToAdminister))
-            }}
-            disabled={vaccinesToAdminister.length === 0}
-            className={`w-fit ${
-              vaccinesToAdminister.length === 0 ? 'btn-disabled' : ''
-            }`}
-            description={
-              <span className="px-2 font-semibold">
-                {`Administer Vaccine ( ${vaccinesToAdminister.length} )`}
-              </span>
-            }
-            shape="square"
-          />
+          {canAccess('ADMINISTER_VACCINE') && (
+            <FloatButton
+              type="primary"
+              onClick={() => {
+                setDialogOpen(true)
+                dispatch(setSelectedVaccines(vaccinesToAdminister))
+              }}
+              disabled={vaccinesToAdminister.length === 0}
+              className={`w-fit ${
+                vaccinesToAdminister.length === 0 ? 'btn-disabled' : ''
+              }`}
+              description={
+                <span className="px-2 font-semibold">
+                  {`Administer Vaccine ( ${vaccinesToAdminister.length} )`}
+                </span>
+              }
+              shape="square"
+            />
+          )}
         </div>
 
         {userCategory && !loadingAefis ? (

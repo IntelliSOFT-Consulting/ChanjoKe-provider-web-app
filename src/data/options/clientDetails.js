@@ -122,7 +122,7 @@ export const roleGroups = [
     locations: ['SUB-COUNTY'],
   },
   {
-    label: 'Sub-County Store Manager',
+    label: 'Sub-County EPI Manager',
     value: 'SUB_COUNTY_STORE_MANAGER',
     creators: [],
     locations: ['SUB-COUNTY'],
