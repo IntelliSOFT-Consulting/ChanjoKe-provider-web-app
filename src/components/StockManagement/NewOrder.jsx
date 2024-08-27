@@ -177,8 +177,8 @@ export default function NewOrder() {
       className="mt-5"
       title={
         <div className="text-xl font-semibold">
-          {`New Order for ${titleCase(user.facilityName)} (${
-            user?.facility?.split('/')[1]
+          {`New Order for ${titleCase(user?.orgUnit?.name)} (${
+            user?.orgUnit?.code?.split('/')[1]
           })`}
         </div>
       }

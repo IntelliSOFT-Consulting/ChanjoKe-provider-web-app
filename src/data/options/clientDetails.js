@@ -145,7 +145,13 @@ export const roleGroups = [
   {
     label: 'Facility Store Manager',
     value: 'FACILITY_STORE_MANAGER',
-    creators: [],
+    creators: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+      'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+      'FACILITY_SYSTEM_ADMINISTRATOR',
+    ],
     locations: ['FACILITY'],
   },
   {
