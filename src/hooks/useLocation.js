@@ -45,7 +45,7 @@ export const useLocations = (form) => {
   }
 
   const fetchCounties = async () => {
-    const countiesData = await fetchLocations(0, 'COUNTY')
+    const countiesData = await fetchLocations('0')
     setCounties(countiesData)
     return countiesData
   }

@@ -197,6 +197,7 @@ export default function NewOrder() {
             onConfirm={() => form.submit()}
             okText="Yes"
             cancelText="No"
+            placement="topRight"
           >
             <Button className={classes.btnPrimary}>Submit</Button>
           </Popconfirm>

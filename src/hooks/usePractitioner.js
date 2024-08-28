@@ -83,7 +83,7 @@ export const usePractitioner = () => {
       role: values.roleGroup,
       firstName: values.firstName,
       lastName: values.lastName,
-      facilityCode:
+      facility:
         values.facility ||
         values.ward ||
         values.subCounty ||

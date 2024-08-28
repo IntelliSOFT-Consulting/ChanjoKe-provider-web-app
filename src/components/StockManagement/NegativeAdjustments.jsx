@@ -20,6 +20,7 @@ import { useLocations } from '../../hooks/useLocation'
 import Table from '../DataTable'
 import { formatInventoryToTable } from './helpers/inventoryFormatter'
 import { receiveAuditBuilder } from './helpers/stockResourceBuilder'
+import { formatLocation } from '../../utils/formatter'
 
 export default function NegativeAdjustments() {
   const [batchOptions, setBatchOptions] = useState([])
@@ -27,7 +28,7 @@ export default function NegativeAdjustments() {
   const [api, contextHolder] = notification.useNotification()
 
   const { user } = useSelector((state) => state.userInfo)
-  const { fetchLocations, locations } = useLocations()
+  const { fetchLocations, locations } = useLocations({})
   const [form] = Form.useForm()
   const navigate = useNavigate()
 
@@ -38,7 +39,7 @@ export default function NegativeAdjustments() {
 
   useEffect(() => {
     getDetailedInventoryItems()
-    fetchLocations(user?.ward, 'FACILITY')
+    fetchLocations(formatLocation(user?.ward), 'FACILITY')
   }, [])
 
   useEffect(() => {
