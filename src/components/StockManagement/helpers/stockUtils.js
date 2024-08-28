@@ -94,7 +94,7 @@ export const formatDeliveryToTable = (supplyDelivery, inventoryItems = []) => {
 
     const availableQuantity =
       inventoryItems.find(
-        (inventory) => inventory.identifier[0]?.value === vaccine
+        (inventory) => inventory.vaccine === vaccine
       )?.quantity || 0
     return {
       vaccine,
