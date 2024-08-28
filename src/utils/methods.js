@@ -132,10 +132,8 @@ export const passwordGenerator = (length) => {
 export const capitalizeFirstLetter = (value = '') => {
   return value
     .split(/[\s-]+/)
-    .map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    )
-    .join(' ');
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
 }
 
 export const convertCamelCaseString = (inputString) => {
@@ -147,4 +145,29 @@ export const convertCamelCaseString = (inputString) => {
     return word.charAt(0).toUpperCase() + word.slice(1)
   })
   return stringWithSpaces
+}
+
+export const getLocations = (user) => {
+  const userLocation = {
+    facility_code: user?.orgUnit?.code?.split('/')[1],
+  }
+  const availableLevel = user?.orgUnit?.level
+
+  switch (availableLevel) {
+    case 'county':
+      delete userLocation.facility_code
+      userLocation.county = user.orgUnit?.code?.split('/')[1]
+      break
+    case 'subCounty':
+      delete userLocation.facility_code
+      userLocation.subcounty = user.orgUnit?.code?.split('/')[1]
+      break
+    case 'facility':
+      break
+    default:
+      delete userLocation.facility_code
+      userLocation.country = 'Kenya'
+      break
+  }
+  return userLocation
 }

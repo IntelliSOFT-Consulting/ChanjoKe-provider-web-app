@@ -4,6 +4,7 @@ import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useReports } from '../hooks/useReports'
 import dayjs from 'dayjs'
+import { getLocations } from '../utils/methods'
 
 export default function MOH710() {
   const [dates, setDates] = useState([])
@@ -12,6 +13,7 @@ export default function MOH710() {
   const { moh710, getMoh710 } = useReports()
 
   const { user } = useSelector((state) => state.userInfo)
+
 
   const handleDates = (values = {}) => {
     const { start, end } = values
@@ -32,9 +34,11 @@ export default function MOH710() {
       }
     }
 
+    const userLocation = getLocations(user)
+
     setDates(dates)
     getMoh710({
-      facility_code: user.orgUnit?.code?.split('/')[1],
+      ...userLocation,
       start_date: moment(dates[0], 'DD-MM-YYYY').format('YYYY-MM-DD'),
       end_date: moment(dates[dates.length - 1], 'DD-MM-YYYY').format(
         'YYYY-MM-DD'
@@ -44,8 +48,9 @@ export default function MOH710() {
 
   useEffect(() => {
     handleDates()
+    const userLocation = getLocations(user)
     getMoh710({
-      facility_code: user.orgUnit?.code?.split('/')[1],
+      ...userLocation,
       start_date: moment().startOf('month').format('YYYY-MM-DD'),
       end_date: moment().format('YYYY-MM-DD'),
     })

@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { useReports } from '../hooks/useReports'
 import Table from '../components/DataTable'
 import dayjs from 'dayjs'
+import { getLocations } from '../utils/methods'
 
 export default function MOH525() {
   const [dates, setDates] = useState([])
@@ -32,10 +33,10 @@ export default function MOH525() {
         startDate.add(1, 'days')
       }
     }
-
+    const userLocation = getLocations(user)
     setDates(dates)
     getMoh525({
-      facility_code: user.orgUnit?.code?.split('/')[1],
+      ...userLocation,
       start_date: moment(dates[0], 'DD-MM-YYYY').format('YYYY-MM-DD'),
       end_date: moment(dates[dates.length - 1], 'DD-MM-YYYY').format(
         'YYYY-MM-DD'
@@ -45,8 +46,9 @@ export default function MOH525() {
 
   useEffect(() => {
     handleDates()
+    const userLocation = getLocations(user)
     getMoh525({
-      facility_code: user.orgUnit?.code?.split('/')[1],
+      ...userLocation,
       start_date: moment().startOf('month').format('YYYY-MM-DD'),
       end_date: moment().format('YYYY-MM-DD'),
     })
