@@ -64,7 +64,7 @@ export default function Referrals() {
   }
 
   useEffect(() => {
-    getReferralsToFacility(user?.facility)
+    getReferralsToFacility(user?.orgUnit?.code)
   }, [user])
 
   useEffect(() => {

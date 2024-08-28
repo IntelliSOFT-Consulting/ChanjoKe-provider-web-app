@@ -88,7 +88,7 @@ export default function useInventory() {
   const getInventoryReport = async () => {
     const response = await get(ENDPOINT, {
       params: {
-        subject: user.facility,
+        subject: user.orgUnit?.code,
         code: 'inventory-report',
         _sort: '-created',
         _count: 1,

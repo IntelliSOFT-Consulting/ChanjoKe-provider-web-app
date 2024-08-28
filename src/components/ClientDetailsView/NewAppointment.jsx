@@ -13,7 +13,6 @@ import { WarningTwoTone } from '@ant-design/icons'
 import moment from 'moment'
 
 export default function NewAppointment() {
-  const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
 
   const navigate = useNavigate()
   const { userID } = useParams()

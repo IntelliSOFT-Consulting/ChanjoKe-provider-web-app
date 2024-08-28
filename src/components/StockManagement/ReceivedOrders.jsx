@@ -77,7 +77,7 @@ export default function ReceivedOrders() {
   }, [requests])
 
   useEffect(() => {
-    incomingSupplyRequests(user.facility)
+    incomingSupplyRequests(user.orgUnit?.code)
   }, [])
 
   const handleDateChange = (date, dateString) => {

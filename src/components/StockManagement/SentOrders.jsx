@@ -64,7 +64,7 @@ export default function SentOrders() {
 
   const fetchStock = async () => {
     try {
-      const sentOrders = await outgoingSupplyRequests(user?.facility)
+      const sentOrders = await outgoingSupplyRequests(user?.orgUnit?.code)
       const formattedOrders = sentOrders?.map(formatOrder) || []
 
       setResults(formattedOrders)
@@ -77,13 +77,15 @@ export default function SentOrders() {
 
   const formatOrder = (order) => {
     const vaccines = extractVaccines(order)
+    const dispatched = order.meta?.tag?.find((tag) => tag.code === 'dispatched')
 
     return {
       id: order.id,
       identifier: order.identifier?.[0]?.value,
       date: moment(order.date).format('DD-MM-YYYY'),
       facility: order.deliverTo?.display,
-      status: order.status,
+      status:
+        dispatched && order.status === 'active' ? 'Dispatched' : order.status,
       vaccines: vaccines.join(', '),
       supplier: order.deliverFrom?.display,
     }
@@ -140,15 +142,21 @@ export default function SentOrders() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <span
-          className={
-            status === 'active' ? classes.statusPending : classes.statusReceived
-          }
-        >
-          {status === 'active' ? 'Pending' : 'Received'}
-        </span>
-      ),
+      render: (status, record) => {
+        return (
+          <span
+            className={
+              status === 'active'
+                ? classes.statusPending
+                : status === 'Dispatched'
+                ? 'text-primary font-bold'
+                : classes.statusReceived
+            }
+          >
+            {status}
+          </span>
+        )
+      },
     },
     {
       title: 'Antigens',

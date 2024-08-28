@@ -260,7 +260,7 @@ export default function NegativeAdjustments() {
               <Select
                 placeholder="Select Facility"
                 options={locations
-                  ?.filter((item) => !user.facility?.includes(item.key))
+                  ?.filter((item) => !user.orgUnit?.code?.includes(item.key))
                   ?.map((location) => ({
                     label: location.name,
                     value: location.key,

@@ -30,7 +30,7 @@ export default function Profile() {
             {titleCase(user?.wardName)}
           </Descriptions.Item>
           <Descriptions.Item label="Facility Attached">
-            {titleCase(user?.facilityName)}
+            {titleCase(user?.orgUnit?.name)}
           </Descriptions.Item>
           <Descriptions.Item label="Location">
             {titleCase(user?.location)}

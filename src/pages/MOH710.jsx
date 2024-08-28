@@ -34,7 +34,7 @@ export default function MOH710() {
 
     setDates(dates)
     getMoh710({
-      facility_code: user.facility?.split('/')[1],
+      facility_code: user.orgUnit?.code?.split('/')[1],
       start_date: moment(dates[0], 'DD-MM-YYYY').format('YYYY-MM-DD'),
       end_date: moment(dates[dates.length - 1], 'DD-MM-YYYY').format(
         'YYYY-MM-DD'
@@ -45,7 +45,7 @@ export default function MOH710() {
   useEffect(() => {
     handleDates()
     getMoh710({
-      facility_code: user.facility?.split('/')[1],
+      facility_code: user.orgUnit?.code?.split('/')[1],
       start_date: moment().startOf('month').format('YYYY-MM-DD'),
       end_date: moment().format('YYYY-MM-DD'),
     })

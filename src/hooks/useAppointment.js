@@ -48,7 +48,7 @@ export default function useAppointment() {
   const getPatientAppointments = async (patientID, offset = 0) => {
     setLoader(true)
 
-    const facilityParam = `actor=${user?.facility}`
+    const facilityParam = `actor=${user?.orgUnit?.code || '0'}`
 
     const url =
       offset < 1
@@ -95,6 +95,20 @@ export default function useAppointment() {
 
     setFacilityAppointments(response?.entry)
     setLoader(false)
+  }
+
+  const listAppointments = async (offset = 0) => {
+    setLoader(true)
+    const facilityParam = `actor=${user?.orgUnit?.code || '0'}`
+    const dateFilter = `&date=ge${moment().format('YYYY-MM-DD')}`
+    const url =
+      offset < 1
+        ? `${appointmentsEndpoint}?${facilityParam}&_count=5`
+        : `${appointmentsEndpoint}?${facilityParam}&_count=5&_offset=${offset}`
+    const response = await get(url)
+
+   
+   
   }
 
   return {

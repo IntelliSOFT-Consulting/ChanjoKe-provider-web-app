@@ -127,7 +127,7 @@ export default function NewOrder() {
           },
           requester: { reference: `Practitioner/${user.fhirPractitionerId}` },
           deliverTo: {
-            reference: user.facility,
+            reference: user.orgUnit?.code,
             display: user.facilityName,
           },
         }

@@ -7,8 +7,6 @@ dayjs.extend(utc)
 const createVaccinationAppointment = (data, patientID, user) => {
   let dateToAdminister = ''
 
-  const practitioner = JSON.parse(localStorage.getItem('practitioner'))
-
   try {
     const item = data?.dateCriterion?.find((item) =>
       item.code.coding.some(
@@ -34,7 +32,7 @@ const createVaccinationAppointment = (data, patientID, user) => {
         doseNumber: data?.doseNumberPositiveInt,
       },
       {
-        display: practitioner?.facility,
+        display: user?.orgUnit?.code,
       },
     ],
     start: moment(data?.appointmentDate, 'DD-MM-YYYY').format(
@@ -49,7 +47,7 @@ const createVaccinationAppointment = (data, patientID, user) => {
       },
       {
         actor: {
-          reference: `${user?.facility}`,
+          reference: `${user?.orgUnit?.code}`,
         },
       },
       {
@@ -231,7 +229,7 @@ const createNextVaccineAppointment = (vaccines, patientId, user) => {
       },
       {
         actor: {
-          reference: user.facility,
+          reference: user.orgUnit?.code,
         },
       },
       {

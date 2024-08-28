@@ -8,8 +8,6 @@ import { useSelector } from 'react-redux'
 import dayjs from 'dayjs'
 
 export default function EditAppointment() {
-  const practitionerDetails = JSON.parse(localStorage.getItem('practitioner'))
-
   const { appointmentID, userID } = useParams()
   const navigate = useNavigate()
   const [form] = Form.useForm()
@@ -47,7 +45,7 @@ export default function EditAppointment() {
         },
         {
           actor: {
-            reference: `${user?.facility}`,
+            reference: `${user?.orgUnit?.code}`,
           },
         },
         {
@@ -87,9 +85,7 @@ export default function EditAppointment() {
   useEffect(() => {
     form.setFieldValue('scheduledDate', dayjs(appointment?.created))
     form.setFieldValue('appointmentDate', dayjs(appointment?.start))
-    getFacilityAppointments(
-      dayjs(appointment?.start).format('YYYY-MM-DD')
-    )
+    getFacilityAppointments(dayjs(appointment?.start).format('YYYY-MM-DD'))
   }, [appointment])
 
   useEffect(() => {
@@ -171,9 +167,7 @@ export default function EditAppointment() {
                     return current && current < today
                   }}
                   onChange={(e) => {
-                    getFacilityAppointments(
-                      dayjs(e).format('YYYY-MM-DD')
-                    )
+                    getFacilityAppointments(dayjs(e).format('YYYY-MM-DD'))
                   }}
                   format={'DD-MM-YYYY'}
                   className="w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"

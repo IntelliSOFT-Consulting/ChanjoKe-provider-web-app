@@ -1,4 +1,4 @@
-import { Card, Descriptions, Table } from 'antd'
+import { Card, Descriptions } from 'antd'
 import { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useParams } from 'react-router-dom'
@@ -6,6 +6,7 @@ import useWindowSize from '../../hooks/useWindowSize'
 import useStock from '../../hooks/useStock'
 import moment from 'moment'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
+import Table from '../DataTable'
 
 const useStyles = createUseStyles({
   label: {
@@ -17,13 +18,6 @@ const useStyles = createUseStyles({
   },
   columnText: {
     color: '#707070',
-  },
-  tableHeader: {
-    '& .ant-table-thead > tr > th': {
-      backgroundColor: '#163C9412',
-      color: '#707070',
-      border: '1px solid #d9d9d9',
-    },
   },
 })
 
@@ -48,7 +42,7 @@ export default function OrderDetails() {
       }
     }
     fetchOrderDetails()
-  }, [orderID, getSupplyRequestById])
+  }, [orderID])
 
   const extractVaccines = (order) => {
     const vaccineExtension = order.extension?.find((item) =>
@@ -261,10 +255,10 @@ export default function OrderDetails() {
             <Table
               columns={columns}
               dataSource={orderDetails?.orderItems}
-              className={classes.tableHeader}
               bordered
               pagination={false}
               loading={!orderDetails}
+              size="small"
             />
           </div>
         </>

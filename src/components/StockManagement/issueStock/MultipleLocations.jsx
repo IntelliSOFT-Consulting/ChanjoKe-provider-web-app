@@ -42,7 +42,7 @@ const SingleLocation = ({ vaccines = [] }) => {
   const { deleteTags } = useMeta()
 
   useEffect(() => {
-    incomingSupplyRequests(user?.facility, 0, 'active', 'order')
+    incomingSupplyRequests(user?.orgUnit?.code, 0, 'active', 'order')
   }, [])
 
   const handleValidate = () => {
@@ -131,7 +131,7 @@ const SingleLocation = ({ vaccines = [] }) => {
 
       form.resetFields()
       setOrderItems([{}])
-      await incomingSupplyRequests(user?.facility, 0, 'active', 'order')
+      await incomingSupplyRequests(user?.orgUnit?.code, 0, 'active', 'order')
       api.success({
         message: 'Stock issued successfully',
         description:

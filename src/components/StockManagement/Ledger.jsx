@@ -127,7 +127,7 @@ export default function Ledger() {
       >
         <div className="flex justify-between items-center px-4 my-4">
           <Select
-            placeholder="Select Status"
+            placeholder="Select Antigen"
             className="w-full md:w-1/2"
             placement="Filter by Vaccine"
             allowClear

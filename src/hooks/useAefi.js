@@ -73,7 +73,7 @@ const createAefiPayload = (values, currentPatient, user, selectedVaccines) => ({
     },
   ],
   location: {
-    reference: user?.facility,
+    reference: user?.orgUnit?.code,
   },
   extension: createExtensions(values),
 })
