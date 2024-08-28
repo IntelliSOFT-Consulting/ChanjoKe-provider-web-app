@@ -449,7 +449,12 @@ const router = createBrowserRouter([
         element: (
           <RoleBasedRoute
             element={<CreateAEFI />}
-            allowedRoles={['NURSE', 'DOCTOR']}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'CLERK',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
           />
         ),
       },
@@ -534,7 +539,12 @@ const router = createBrowserRouter([
         element: (
           <RoleBasedRoute
             element={<Administer />}
-            allowedRoles={['NURSE', 'DOCTOR', 'FACILITY_SYSTEM_ADMINISTRATOR', 'CLERK']}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'CLERK',
+            ]}
           />
         ),
       },
@@ -543,7 +553,12 @@ const router = createBrowserRouter([
         element: (
           <RoleBasedRoute
             element={<Contraindications />}
-            allowedRoles={['NURSE', 'DOCTOR','FACILITY_SYSTEM_ADMINISTRATOR', 'CLERK']}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'CLERK',
+            ]}
           />
         ),
       },
@@ -552,7 +567,12 @@ const router = createBrowserRouter([
         element: (
           <RoleBasedRoute
             element={<NotAdministered />}
-            allowedRoles={['NURSE', 'DOCTOR','FACILITY_SYSTEM_ADMINISTRATOR', 'CLERK']}
+            allowedRoles={[
+              'NURSE',
+              'DOCTOR',
+              'FACILITY_SYSTEM_ADMINISTRATOR',
+              'CLERK',
+            ]}
           />
         ),
       },

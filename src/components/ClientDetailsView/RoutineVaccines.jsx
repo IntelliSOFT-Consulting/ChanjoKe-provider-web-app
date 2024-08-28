@@ -308,11 +308,12 @@ export default function RoutineVaccines({
                   title="Please select an action"
                   onConfirm={() => {
                     dispatch(setSelectedVaccines(administered))
-                    navigate(`/aefi-report/${selectedVaccines?.[0]?.id}`)
+                    navigate(`/aefi-report/${administered?.[0]?.id}`)
                   }}
                   onCancel={() => {
                     dispatch(setSelectedVaccines(administered))
-                    navigate(`/aefi-details/${selectedVaccines?.[0]?.id}`)
+
+                    navigate(`/aefi-details/${administered?.[0]?.id}`)
                   }}
                   okText="Record AEFI"
                   okButtonProps={{

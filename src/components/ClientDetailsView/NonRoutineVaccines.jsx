@@ -364,13 +364,13 @@ export default function NonRoutineVaccines({
                               onConfirm={() => {
                                 dispatch(setSelectedVaccines(administered))
                                 navigate(
-                                  `/aefi-report/${selectedVaccines?.[0]?.id}`
+                                  `/aefi-report/${administered?.[0]?.id}`
                                 )
                               }}
                               onCancel={() => {
                                 dispatch(setSelectedVaccines(administered))
                                 navigate(
-                                  `/aefi-details/${selectedVaccines?.[0]?.id}`
+                                  `/aefi-details/${administered?.[0]?.id}`
                                 )
                               }}
                               okText="Record AEFI"

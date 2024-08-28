@@ -432,11 +432,11 @@ const SingleLocation = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Form.Item
             name="location"
-            label="Location"
+            label="Issued To"
             rules={[{ required: true, message: 'Please select a location' }]}
           >
             <Select
-              placeholder="Select location"
+              placeholder="Select facility"
               options={locationOptions(requests?.data)}
               onChange={handleVaccineOptions}
               allowClear
