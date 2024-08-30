@@ -601,6 +601,7 @@ const router = createBrowserRouter([
               'NURSE',
               'DOCTOR',
               'CLERK',
+              'ADMINISTRATOR',
               'FACILITY_SYSTEM_ADMINISTRATOR',
             ]}
           />
