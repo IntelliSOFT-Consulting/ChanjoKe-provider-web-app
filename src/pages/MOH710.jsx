@@ -1,19 +1,42 @@
-import { Button, Card, DatePicker, Form, Table } from 'antd'
+import { Button, Card, DatePicker, Form, Table, Select } from 'antd'
 import { useEffect, useState } from 'react'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useReports } from '../hooks/useReports'
 import dayjs from 'dayjs'
+import { useLocations } from '../hooks/useLocation'
 import { getLocations } from '../utils/methods'
+import { locationToOptions } from '../utils/formatter'
 
 export default function MOH710() {
   const [dates, setDates] = useState([])
   const [form] = Form.useForm()
 
   const { moh710, getMoh710 } = useReports()
-
+  const {
+    handleCountyChange,
+    handleWardChange,
+    handleSubCountyChange,
+    fetchWards,
+    wards,
+    subCounties,
+    counties,
+    facilities,
+  } = useLocations()
   const { user } = useSelector((state) => state.userInfo)
 
+  const defaultLocationOptions = async () => {
+    if (user?.orgUnit?.level === 'county') {
+      return await handleCountyChange(user?.orgUnit?.code)
+    }
+    if (user?.orgUnit?.level === 'subCounty') {
+      const wards = await fetchWards(user?.orgUnit?.code)
+      const wardIds = wards?.map((ward) => ward?.key)?.join(',')
+      const facilities = await handleWardChange(wardIds)
+      return facilities
+    }
+    return []
+  }
 
   const handleDates = (values = {}) => {
     const { start, end } = values
@@ -48,6 +71,7 @@ export default function MOH710() {
 
   useEffect(() => {
     handleDates()
+    defaultLocationOptions()
     const userLocation = getLocations(user)
     getMoh710({
       ...userLocation,
@@ -124,6 +148,21 @@ export default function MOH710() {
             date: [dayjs().startOf('month'), dayjs()],
           }}
         >
+          {!user?.orgUnit?.level && (
+            <Form.Item label="County" name="county" className="m-0">
+              <Select options={locationToOptions(counties)} />
+            </Form.Item>
+          )}
+          {!user?.subCounty && (
+            <Form.Item label="Sub County" name="subCounty" className="m-0">
+              <Select options={locationToOptions(subCounties)} />
+            </Form.Item>
+          )}
+          {!user?.facility && (
+            <Form.Item label="Facility" name="facility" className="m-0">
+              <Select options={locationToOptions(facilities)} />
+            </Form.Item>
+          )}
           <Form.Item label="Date" name="date" className="m-0">
             <DatePicker.RangePicker
               className="w-full"

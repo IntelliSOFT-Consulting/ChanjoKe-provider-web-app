@@ -33,20 +33,6 @@ export default function usePatient() {
           type: {
             coding: [
               {
-                system: 'estimated-age',
-                code: 'estimated_age',
-                display: 'Estimated Age',
-              },
-            ],
-            text: data.estimatedAge ? 'false' : 'true',
-          },
-          system: 'estimated-age',
-          value: data.estimatedAge ? 'false' : 'true',
-        },
-        {
-          type: {
-            coding: [
-              {
                 system: 'system-creation',
                 code: 'system_creation',
                 display: 'System Creation',
@@ -70,22 +56,7 @@ export default function usePatient() {
           },
           system: 'identification',
           value: generateUniqueCode(8),
-        },
-        ...data.caregivers.map((caregiver) => ({
-          type: {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/administrative-identifier',
-                code: 'CAREGIVER_ID',
-                display: 'CAREGIVER_ID',
-                value: 'CAREGIVER_ID',
-              },
-            ],
-            text: caregiver.caregiverID,
-          },
-          system: 'identification',
-          value: caregiver.caregiverID,
-        })),
+        }
       ],
       active: true,
       name: [
@@ -107,29 +78,29 @@ export default function usePatient() {
       address: [
         {
           use: 'home',
-          line: [
-            data.countyName,
-            data.subCounty,
-            data.ward,
-            data.communityUnit,
-            data.townCenter,
-            data.estateOrHouseNo,
-          ]?.filter(Boolean),
+          line: [data.county, data.subCounty, data.ward]?.filter(Boolean),
           type: 'both',
           district: data.county,
           subdistrict: data.subCounty,
           township: data.ward,
           city: data.townCenter,
-          text: [
-            data.estateOrHouseNo,
-            data.townCenter,
-            data.communityUnit,
-            data.ward,
-            data.subCounty,
-            data.county,
-          ]
+          text: [data.ward, data.subCounty, data.county]
             ?.filter(Boolean)
             .join(', '),
+          extension: [
+            {
+              url: 'community_unit',
+              valueString: data.communityUnit || '',
+            },
+            {
+              url: 'estate_or_house_no',
+              valueString: data.estateOrHouseNo || '',
+            },
+            {
+              url: 'town_center',
+              valueString: data.townCenter || '',
+            },
+          ],
         },
       ],
       contact: data.caregivers.map((caregiver) => {
@@ -159,8 +130,32 @@ export default function usePatient() {
                 : '',
             },
           ],
+          extension: [
+            {
+              url: 'relationship_to_client',
+              valueString: caregiver.caregiverRelationship,
+            },
+            {
+              url: 'caregiver_id_type',
+              valueString: caregiver.caregiverIdentificationType,
+            },
+            {
+              url: 'caregiver_id_number',
+              valueString: caregiver.caregiverID,
+            },
+          ],
         }
       }),
+      extension: [
+        {
+          url: 'estimated_age',
+          valueBoolean: data.estimatedAge,
+        },
+        {
+          url: 'vaccination_category',
+          valueString: data.vaccineType,
+        },
+      ],
     }
 
     if (data.clientID) {

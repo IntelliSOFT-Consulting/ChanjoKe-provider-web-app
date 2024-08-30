@@ -117,3 +117,10 @@ export const camelToHyphen = (str) => {
 export const hyphenToCamel = (str) => {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
 }
+
+export const locationToOptions = (locations) => {
+  return locations?.map((location) => ({
+    label: location.name,
+    value: location.key,
+  }))
+}

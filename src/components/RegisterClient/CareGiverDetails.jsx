@@ -10,6 +10,7 @@ import {
 import {
   caregiverTypes,
   caregiverRelationships,
+  caregiverIdentificationTypes,
 } from '../../data/options/clientDetails'
 import { countryCodes } from '../../data/countryCodes'
 import Table from '../DataTable'
@@ -49,6 +50,11 @@ export default function CaregiverDetails({
       title: `${caregiverType()} Name`,
       dataIndex: 'caregiverName',
       key: 'caregiverName',
+    },
+    {
+      title: `${caregiverType()} ID Type`,
+      dataIndex: 'caregiverIdentificationType',
+      key: 'caregiverIdentificationType',
     },
     {
       title: `${caregiverType()} ID Number`,
@@ -176,17 +182,57 @@ export default function CaregiverDetails({
           </Form.Item>
 
           <Form.Item
+            name="caregiverIdentificationType"
+            label="ID Type"
+            rules={[
+              {
+                required: caregiveRelationship === 'kin',
+                message: `Please select the ${caregiverType(
+                  caregiveRelationship
+                )} ID type`,
+              },
+            ]}
+          >
+            <Select
+              placeholder="Select ID Type"
+              options={caregiverIdentificationTypes}
+              showSearch
+              searchable
+              allowClear
+            />
+          </Form.Item>
+          <Form.Item
             name="caregiverID"
             label={`${caregiverType(caregiveRelationship)} ID Number`}
             rules={[
               {
+                required: caregiveRelationship === 'kin',
                 message: `Please input the ${caregiverType(
                   caregiveRelationship
                 )} ID number`,
               },
-              {
-                required: caregiveRelationship === 'kin',
-              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (value) {
+                    if (
+                      getFieldValue('caregiverIdentificationType') ===
+                      'National ID'
+                    ) {
+                      if (!/^\d+$/.test(value)) {
+                        return Promise.reject(
+                          new Error('ID number must be numerical')
+                        )
+                      }
+                      if (value.length < 6) {
+                        return Promise.reject(
+                          new Error('ID number must be at least 6 digits')
+                        )
+                      }
+                    }
+                  }
+                  return Promise.resolve()
+                },
+              }),
             ]}
           >
             <Input

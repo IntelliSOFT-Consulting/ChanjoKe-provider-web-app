@@ -178,3 +178,9 @@ export const roleGroups = [
     locations: ['FACILITY'],
   },
 ]
+
+export const caregiverIdentificationTypes = [
+  { label: 'National ID', value: 'National ID' },
+  { label: 'Passport', value: 'Passport' },
+  { label: 'Alien ID', value: 'Alien ID' },
+]

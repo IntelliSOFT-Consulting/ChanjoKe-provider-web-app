@@ -64,29 +64,29 @@ export const useLocations = (form) => {
 
   const handleCountyChange = async (county) => {
     const subCounties = await fetchSubCounties(county)
-    form.setFieldValue('subCounty', '')
-    form.setFieldValue('ward', '')
-    form.setFieldValue('facility', '')
+    form?.setFieldValue('subCounty', '')
+    form?.setFieldValue('ward', '')
+    form?.setFieldValue('facility', '')
     setSubCounties(subCounties)
     setWards([])
   }
 
   const handleSubCountyChange = async (subCounty) => {
     const wards = await fetchWards(subCounty)
-    form.setFieldValue('ward', '')
-    form.setFieldValue('facility', '')
+    form?.setFieldValue('ward', '')
+    form?.setFieldValue('facility', '')
     setWards(wards)
   }
 
   const handleWardChange = async (ward) => {
     const facilities = await fetchFacilities(ward)
     setFacilities(facilities)
-    form.setFieldValue('facility', '')
+    form?.setFieldValue('facility', '')
   }
 
   const fetchLocationsByIds = async (ids) => {
     if (!ids?.length) return []
-    const url = `${fhirRoute}?_id=${ids.join(',')}&_count=70`
+    const url = `${fhirRoute}?_id=${ids.join(',')}&_count=700`
     const response = await get(url)
     return convertLocations(response)
   }

@@ -39,22 +39,48 @@ export default function PreloadDetails({
     const county = patient.address[0].district
     const subCounty = patient.address[0]?.line?.[1]
     const ward = patient.address[0]?.line?.[2]
-    const communityUnit = patient.address[0]?.line?.[3]
-    const townCenter = patient.address[0]?.line?.[4]
-    const estateOrHouseNo = patient.address[0]?.line?.[5]
-    const estimatedAge = patient.multipleBirthBoolean === true
-    const caregiverIds =
-      patient.caregiver?.filter(
-        (item) => item.type?.coding?.[0]?.code === 'CAREGIVER_ID'
-      ) || []
+    const communityUnit = patient.address[0]?.extension?.find(
+      (item) => item.url === 'community_unit'
+    )?.valueString
+
+    const townCenter = patient.address[0]?.extension?.find(
+      (item) => item.url === 'town_center'
+    )?.valueString
+
+    const estateOrHouseNo = patient.address[0]?.extension?.find(
+      (item) => item.url === 'estate_or_house_no'
+    )?.valueString
+
+    const vaccinationCategory = patient.extension?.find(
+      (item) => item.url === 'vaccination_category'
+    )?.valueString
+    const estimatedAge = patient.extension?.find(
+      (item) => item.url === 'estimated_age'
+    )?.valueBoolean
+
+    const vaccineType = patient.extension?.find(
+      (item) => item.url === 'vaccination_category'
+    )?.valueString
+
     const caregivers = patient.contact.map((caregiver, index) => {
+      const caregiverRelationship = caregiver.extension?.find(
+        (item) => item.url === 'relationship_to_client'
+      )?.valueString
+      const caregiverIdentificationType = caregiver.extension?.find(
+        (item) => item.url === 'caregiver_id_type'
+      )?.valueString
+      const caregiverIdentificationNumber = caregiver.extension?.find(
+        (item) => item.url === 'caregiver_id_number'
+      )?.valueString
       return {
-        caregiverRelationship: caregiver.relationship[0].coding?.[0]?.code,
         caregiverType: caregiver.relationship[0].coding?.[0]?.display,
         caregiverName: caregiver.name?.text,
         phoneCode: caregiver.telecom[0].value?.slice(0, -9) || '+254',
         phoneNumber: caregiver.telecom[0].value?.slice(-9),
-        caregiverID: caregiverIds?.[index]?.value,
+        caregiverID: caregiverIdentificationNumber,
+        caregiverIdentificationType,
+        caregiverIdentificationNumber,
+        caregiverRelationship,
       }
     })
 
@@ -77,7 +103,9 @@ export default function PreloadDetails({
       middleName,
       lastName,
       dateOfBirth,
+      vaccinationCategory,
       gender,
+      vaccineType,
       phoneNumber,
       phoneCode,
       identificationType,

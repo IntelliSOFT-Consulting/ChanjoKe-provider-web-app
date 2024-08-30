@@ -4,9 +4,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Table from '../components/DataTable'
 import usePatient from '../hooks/usePatient'
-import { convertCamelCaseString, titleCase } from '../utils/methods'
+import {
+  convertCamelCaseString,
+  formatCardTitle,
+  titleCase,
+} from '../utils/methods'
 import Loading from '../common/spinners/LoadingArrows'
 import { useAccess } from '../hooks/useAccess'
+import { useLocations } from '../hooks/useLocation'
 
 export default function ClientRecords() {
   const [details, setDetails] = useState({})
@@ -14,6 +19,8 @@ export default function ClientRecords() {
 
   const { clientID } = useParams()
   const navigate = useNavigate()
+
+  const { counties } = useLocations()
 
   const { canAccess } = useAccess()
 
@@ -34,6 +41,7 @@ export default function ClientRecords() {
     const lastName = patient?.name?.[0]?.family || ''
     const gender = titleCase(patient?.gender || '')
     const dob = formatDate(patient?.birthDate)
+    const clientNumber = patient?.telecom?.[0]?.value || ''
 
     const identifiers =
       patient?.identifier?.filter(
@@ -66,12 +74,11 @@ export default function ClientRecords() {
 
     const county =
       getPatientAddress(patient, 0) || patient?.address?.[0]?.city || ''
+    const countyName = counties.find((item) => item.key === county)?.name
     const subCounty =
       getPatientAddress(patient, 1) || patient?.address?.[0]?.district || ''
     const ward =
       getPatientAddress(patient, 2) || patient?.address?.[0]?.state || ''
-    const town = getPatientAddress(patient, 3)
-    const estate = getPatientAddress(patient, 4)
 
     const caregiverName = patient?.contact?.[0]?.name
     const caregiverFullName = `${caregiverName?.given?.join(' ') || ''} ${
@@ -79,6 +86,15 @@ export default function ClientRecords() {
     }`?.trim()
     const caregiverType = patient?.contact?.[0]?.relationship?.[0]?.text || ''
     const phoneNumber = patient?.contact?.[0]?.telecom?.[0]?.value || ''
+    const townCenter = patient?.address?.[0]?.extension?.find(
+      (item) => item.url === 'town_center'
+    )?.valueString
+    const communityUnit = patient?.address?.[0]?.extension?.find(
+      (item) => item.url === 'community_unit'
+    )?.valueString
+    const estateOrHouseNo = patient?.address?.[0]?.extension?.find(
+      (item) => item.url === 'estate_or_house_no'
+    )?.valueString
 
     return {
       'First Name': firstName,
@@ -86,16 +102,18 @@ export default function ClientRecords() {
       'Last Name': lastName,
       Gender: gender,
       'Date of Birth': dob,
-      'Identification Type': mainIdentifier,
+      'Identification Type': formatCardTitle(mainIdentifier),
       'Document Number': identificationNumber,
-      'County of Residence': county,
-      'Sub-County': subCounty,
-      Ward: ward,
-      'Town/Trading Center': town,
-      'Estate & House Number/Village': estate,
+      'Phone Number': clientNumber,
+      'County of Residence': countyName,
+      'Sub-County': titleCase(subCounty),
+      Ward: titleCase(ward),
+      'Town/Trading Center': townCenter,
+      'Community Unit': communityUnit,
+      'Estate & House Number/Village': estateOrHouseNo,
       'Caregiver Name': caregiverFullName,
       'Caregiver Relationship': caregiverType,
-      'Phone Number': phoneNumber,
+      'Caregiver Phone Number': phoneNumber,
     }
   }
 
@@ -124,8 +142,8 @@ export default function ClientRecords() {
     },
     {
       title: 'Phone Number',
-      dataIndex: 'Phone Number',
-      key: 'Phone Number',
+      dataIndex: 'Caregiver Phone Number',
+      key: 'Caregiver Phone Number',
     },
   ]
   return (
@@ -165,6 +183,7 @@ export default function ClientRecords() {
                     'Date of Birth',
                     'Identification Type',
                     'Document Number',
+                    'Phone Number',
                   ].map((key) => (
                     <Descriptions.Item
                       key={key}
@@ -193,6 +212,7 @@ export default function ClientRecords() {
                     'County of Residence',
                     'Sub-County',
                     'Ward',
+                    'Community Unit',
                     'Town/Trading Center',
                     'Estate & House Number/Village',
                   ].map((key) => (
@@ -219,7 +239,7 @@ export default function ClientRecords() {
                   {
                     'Caregiver Name': details['Caregiver Name'],
                     'Caregiver Relationship': details['Caregiver Relationship'],
-                    'Phone Number': details['Phone Number'],
+                    'Caregiver Phone Number': details['Caregiver Phone Number'],
                   },
                 ]}
                 size="small"

@@ -48,7 +48,14 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
     {
       title: `${caregiverType()} Details`,
       data: caregivers.map((caregiver, index) => {
-        const labels = ['caregiverType', 'caregiverName', 'phoneNumber']
+        const labels = [
+          'caregiverRelationship',
+          'caregiverType',
+          'caregiverName',
+          'phoneNumber',
+          'caregiverIdentificationType',
+          'caregiverID',
+        ]
         return labels.map((label) => {
           return {
             label: camelToTitle(label)?.replace('Caregiver', caregiverType()),
@@ -89,14 +96,14 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
       {sections.map((section) => (
         <Descriptions
           key={section.title}
           title={section.title}
           bordered
           column={1}
-          className='mt-5'
+          className="mt-5"
           size="small"
         >
           {section.data.map((item) => {
