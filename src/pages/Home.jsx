@@ -19,17 +19,93 @@ import useReferral from '../hooks/useReferral'
 import useVaccination from '../hooks/useVaccination'
 
 const allShortcuts = [
-  { name: 'Search Client', icon: SearchIcon, href: 'search/searchClient/n', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Register Client', icon: RegisterClientIcon, href: 'register-client', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Update Vaccine History', icon: UpdateClientHistoryIcon, href: 'search/updateClient/n', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Administer Vaccine', icon: AdministerVaccineIcon, href: 'search/administerVaccine/n', roles: ['NURSE', 'DOCTOR'] },
-  { name: 'AEFI', icon: AefiIcon, href: 'search/aefi/n', roles: ['NURSE', 'DOCTOR'] },
-  { name: 'Appointments', icon: AppointmentIcon, href: 'search/appointments/n', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Stock Management', icon: StockManagementIcon, href: 'stock-management', roles: ['SUB_COUNTY_STORE_MANAGER', 'FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Community Referrals', icon: ReferralIcon, href: 'referrals', roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Campaigns', icon: CampaignIcon, href: 'campaigns', roles: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR', 'SUB_COUNTY_SYSTEM_ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Users', icon: UsersIcon, href: 'admin-users', roles: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR', 'SUB_COUNTY_SYSTEM_ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'] },
-  { name: 'Facilities', icon: FacilityIcon, href: 'admin-facilities', roles: ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR', 'SUB_COUNTY_SYSTEM_ADMINISTRATOR'] },
+  {
+    name: 'Search Client',
+    icon: SearchIcon,
+    href: 'search/searchClient/n',
+    roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+  },
+  {
+    name: 'Register Client',
+    icon: RegisterClientIcon,
+    href: 'register-client',
+    roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+  },
+  {
+    name: 'Update Vaccine History',
+    icon: UpdateClientHistoryIcon,
+    href: 'search/updateClient/n',
+    roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+  },
+  {
+    name: 'Administer Vaccine',
+    icon: AdministerVaccineIcon,
+    href: 'search/administerVaccine/n',
+    roles: ['NURSE', 'DOCTOR'],
+  },
+  {
+    name: 'AEFI',
+    icon: AefiIcon,
+    href: 'search/aefi/n',
+    roles: ['NURSE', 'DOCTOR'],
+  },
+  {
+    name: 'Appointments',
+    icon: AppointmentIcon,
+    href: 'search/appointments/n',
+    roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+  },
+  {
+    name: 'Stock Management',
+    icon: StockManagementIcon,
+    href: 'stock-management',
+    roles: [
+      'SUB_COUNTY_STORE_MANAGER',
+      'FACILITY_STORE_MANAGER',
+      'FACILITY_SYSTEM_ADMINISTRATOR',
+    ],
+  },
+  {
+    name: 'Community Referrals',
+    icon: ReferralIcon,
+    href: 'referrals',
+    roles: ['NURSE', 'DOCTOR', 'CLERK', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+  },
+  {
+    name: 'Campaigns',
+    icon: CampaignIcon,
+    href: 'campaigns',
+    roles: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+      'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+      'FACILITY_SYSTEM_ADMINISTRATOR',
+    ],
+  },
+  {
+    name: 'Users',
+    icon: UsersIcon,
+    href: 'admin-users',
+    roles: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+      'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+      'FACILITY_SYSTEM_ADMINISTRATOR',
+    ],
+  },
+  {
+    name: 'Facilities',
+    icon: FacilityIcon,
+    href: 'admin-facilities',
+    roles: [
+      'ADMINISTRATOR',
+      'NATIONAL_SYSTEM_ADMINISTRATOR',
+      'COUNTY_SYSTEM_ADMINISTRATOR',
+      'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+    ],
+  },
 ]
 
 export default function Home() {
@@ -75,8 +151,10 @@ export default function Home() {
   ]
 
   const allowedShortcuts = useMemo(() => {
-    return allShortcuts.filter(shortcut => 
-      shortcut.roles.includes(user?.practitionerRole) || shortcut.roles.includes('ALL')
+    return allShortcuts.filter(
+      (shortcut) =>
+        shortcut.roles.includes(user?.practitionerRole) ||
+        shortcut.roles.includes('ALL')
     )
   }, [user])
 
@@ -116,34 +194,34 @@ export default function Home() {
               </div>
             ))}
           </dl>
+
+          <br />
+
+          <div>
+            <h3 className="mt-5 text-[#163C94] text-2xl mx-auto max-w-7xl">
+              Quick Access
+            </h3>
+            <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 p-6 rounded-lg shadow-xl border bg-white">
+              {allowedShortcuts.map((item) => (
+                <Link
+                  to={item.href}
+                  key={item.name}
+                  className="overflow-hidden text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-[#5370B0]"
+                >
+                  <img
+                    className="h-12 mx-auto mb-5"
+                    src={item.icon}
+                    alt={item.name}
+                  />
+                  <dt className="truncate text-sm font-normal text-gray-500">
+                    {item.name}
+                  </dt>
+                </Link>
+              ))}
+            </dl>
+          </div>
         </div>
       )}
-
-      <br />
-
-      <div>
-        <h3 className="mt-5 text-[#163C94] text-2xl mx-auto max-w-7xl">
-          Quick Access
-        </h3>
-        <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 p-6 rounded-lg shadow-xl border bg-white">
-          {allowedShortcuts.map((item) => (
-            <Link
-              to={item.href}
-              key={item.name}
-              className="overflow-hidden text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-[#5370B0]"
-            >
-              <img
-                className="h-12 mx-auto mb-5"
-                src={item.icon}
-                alt={item.name}
-              />
-              <dt className="truncate text-sm font-normal text-gray-500">
-                {item.name}
-              </dt>
-            </Link>
-          ))}
-        </dl>
-      </div>
     </>
   )
 }

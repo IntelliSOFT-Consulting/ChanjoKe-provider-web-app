@@ -183,5 +183,4 @@ export const caregiverIdentificationTypes = [
   { label: 'National ID', value: 'National ID' },
   { label: 'Passport', value: 'Passport' },
   { label: 'NEMIS', value: 'NEMIS' },
-  { label: 'Alien ID', value: 'Alien ID' },
 ]
