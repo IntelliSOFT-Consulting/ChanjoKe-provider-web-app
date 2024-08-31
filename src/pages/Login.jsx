@@ -24,8 +24,9 @@ export default function Login() {
   const { user, loading } = useSelector((state) => state.userInfo)
 
   const locations = [
-    { label: 'Outreach', value: 'Outreach' },
     { label: 'Facility', value: 'Facility' },
+    { label: 'Outreach', value: 'Outreach' },
+    { label: 'Campaign', value: 'Campaign' },
   ]
 
   const onFinish = async (values) => {

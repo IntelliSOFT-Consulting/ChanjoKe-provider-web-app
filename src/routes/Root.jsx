@@ -12,14 +12,14 @@ export default function Root() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!user?.token) {
+    if (!user?.access_token) {
       navigate('/auth')
     }
   }, [user, navigate])
 
   return (
     <SharedStateProvider>
-      {user?.token && (
+      {user?.access_token && (
         <div>
           <AutoLogout />
           <Sidenav />

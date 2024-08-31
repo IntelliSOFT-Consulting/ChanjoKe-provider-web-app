@@ -71,7 +71,7 @@ const AuthRoute = ({ element }) => {
 
   const location = useLocation()
 
-  return user?.token && authRoutes.includes(location.pathname) ? (
+  return user?.access_token && authRoutes.includes(location.pathname) ? (
     <Navigate to="/" />
   ) : (
     element
