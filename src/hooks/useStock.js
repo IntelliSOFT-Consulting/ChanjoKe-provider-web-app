@@ -3,6 +3,7 @@ import { useApiRequest } from '../api/useApiRequest'
 import { getOffset } from '../utils/methods'
 import { useSelector } from 'react-redux'
 import { useLocations } from './useLocation'
+import { formatLocation } from '../utils/formatter'
 
 const inventoryPath = '/hapi/fhir/InventoryItem'
 const deliveryPath = '/hapi/fhir/SupplyDelivery'
@@ -152,6 +153,13 @@ const useStock = () => {
     return response
   }
 
+  const countSupplyRequests = async () => {
+    const response = await get(
+      `${supplyRequestPath}?_summary=count&subject=${user?.orgUnit?.code}`
+    )
+    return response.total
+  }
+
   const incomingSupplyRequests = async (
     facility,
     page = 0,
@@ -159,9 +167,7 @@ const useStock = () => {
     meta = 'order'
   ) => {
     setLoading(true)
-    facility = facility?.includes('Location/')
-      ? facility
-      : `Location/${facility}`
+    facility = formatLocation(facility)
     const offset = getOffset(page)
     const statusFilter = status ? `&status=${status}` : ''
     const metaFilter = meta ? `&_tag=${meta}` : ''
@@ -369,6 +375,7 @@ const useStock = () => {
     createSupplyDelivery,
     updateSupplyDelivery,
     getIncomingDeliveries,
+    countSupplyRequests,
   }
 }
 

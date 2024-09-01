@@ -1,4 +1,4 @@
-import { Button, Card, Input } from 'antd'
+import { Button, Card, Input, Radio } from 'antd'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -8,10 +8,12 @@ import { getVaccineBatches } from './helpers/stockUtils'
 import { DownloadOutlined } from '@ant-design/icons'
 import { CSVLink } from 'react-csv'
 import { titleCase } from '../../utils/methods'
+import { dosesToVials } from './helpers/stockUtils'
 
 export default function BatchSummary() {
   const [allData, setAllData] = useState(null)
   const [results, setResults] = useState(null)
+  const [countType, setCountType] = useState('Doses')
 
   const { vaccine } = useParams()
   const navigate = useNavigate()
@@ -29,10 +31,15 @@ export default function BatchSummary() {
     const formatted = getVaccineBatches(vaccine, batchItems)?.map((item) => ({
       ...item,
       location: titleCase(user?.orgUnit?.name),
+      quantity:
+        countType === 'Doses'
+          ? item?.quantity
+          : dosesToVials(item.vaccine, item?.quantity),
     }))
+
     setResults(formatted)
     setAllData(formatted)
-  }, [batchItems])
+  }, [batchItems, countType])
 
   const handleFilter = (text) => {
     if (!text) {
@@ -135,6 +142,14 @@ export default function BatchSummary() {
       >
         <div className="flex justify-between items-center px-4 my-4">
           <div className="flex items-center">
+            <Radio.Group
+              value={countType}
+              onChange={(e) => setCountType(e.target.value)}
+            >
+              <Radio value="Doses">Doses</Radio>
+              <Radio value="Vials">Vials</Radio>
+            </Radio.Group>
+
             <Input.Search
               placeholder="Search"
               onSearch={handleFilter}

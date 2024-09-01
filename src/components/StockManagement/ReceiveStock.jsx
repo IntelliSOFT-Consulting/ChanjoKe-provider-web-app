@@ -7,6 +7,7 @@ import {
   notification,
   Popconfirm,
   Select,
+  Tag,
 } from 'antd'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
@@ -25,6 +26,7 @@ import {
   deliveriesLocations,
   formatDeliveryToTable,
 } from './helpers/stockUtils'
+import { vialsToDoses } from './helpers/stockUtils'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -99,7 +101,12 @@ const ReceiveStock = () => {
 
       const payload = {
         ...values,
-        vaccines: selectedOrder.vaccines,
+        vaccines: selectedOrder.vaccines.map((item) => {
+          return {
+            ...item,
+            quantity: vialsToDoses(item.vaccine, item.quantity),
+          }
+        }),
         facility: {
           reference: user.orgUnit?.code,
           display: user.orgUnit?.name,
@@ -145,7 +152,9 @@ const ReceiveStock = () => {
 
   const handleSelectOrigin = (value) => {
     const selectedOrigin = deliveries?.data?.find(
-      (delivery) => delivery.origin === value
+      (delivery) =>
+        delivery.origin === value?.split('_')[0] &&
+        delivery.basedOn?.[0]?.display === value?.split('_')[1]
     )
     const formatted = formatDeliveryToTable(selectedOrigin, inventoryItems)
 
@@ -251,15 +260,23 @@ const ReceiveStock = () => {
                 name="origin"
                 showSearch
                 allowClear
-                filterOption={(input, option) =>
-                  option.label
-                    ? option.label.toLowerCase().includes(input.toLowerCase())
-                    : false
-                }
-                options={deliveriesLocations(deliveries?.data)}
+                filterOption={(input, option) => {
+                  return option?.key
+                    ?.toLowerCase()
+                    .includes(input.toLowerCase())
+                }}
                 placeholder="Origin"
                 onSelect={handleSelectOrigin}
-              />
+              >
+                {deliveriesLocations(deliveries?.data)?.map((location) => {
+                  const [origin, orderNumber] = location.value.split('_')
+                  return (
+                    <Select.Option key={location.value} value={location.value}>
+                      {origin} <Tag color="blue">{orderNumber}</Tag>
+                    </Select.Option>
+                  )
+                })}
+              </Select>
             </Form.Item>
 
             <Form.Item

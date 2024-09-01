@@ -58,6 +58,7 @@ export default function NewOrder() {
     createSupplyRequest,
     incomingSupplyRequests,
     getLastOrderRequest,
+    countSupplyRequests,
     requestItem,
   } = useStock()
   const { user } = useSelector((state) => state.userInfo)
@@ -134,10 +135,8 @@ export default function NewOrder() {
 
         const payload = supplyRequestBuilder(combinedData)
 
-        const facilityRequests = await incomingSupplyRequests(
-          payload.deliverFrom.reference
-        )
-        const facilityKey = payload.deliverFrom.display
+        const facilityRequests = await countSupplyRequests()
+        const facilityKey = user?.orgUnit?.name
           .replace(/\s/g, '')
           .substring(0, 3)
           .toUpperCase()
@@ -146,7 +145,7 @@ export default function NewOrder() {
           {
             system:
               'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
-            value: `${facilityKey}-${(facilityRequests.length + 1)
+            value: `${facilityKey}-${(facilityRequests + 1)
               .toString()
               .padStart(4, '0')}`,
           },

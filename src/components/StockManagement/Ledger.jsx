@@ -1,16 +1,18 @@
-import { Button, Card, Select } from 'antd'
+import { Radio, Card, Select } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { uniqueVaccineOptions } from '../../data/vaccineData'
 import useInventory from '../../hooks/useInventory'
 import Table from '../DataTable'
 import { useSelector } from 'react-redux'
-import { getVaccineBatches } from './helpers/stockUtils'
+import { getVaccineBatches, vialsToDoses } from './helpers/stockUtils'
 import { Link } from 'react-router-dom'
+import { dosesToVials } from './helpers/stockUtils'
 
 export default function Ledger() {
   const [allData, setAllData] = useState(null)
   const [results, setResults] = useState(null)
+  const [countType, setCountType] = useState('Doses')
 
   const { user } = useSelector((state) => state.userInfo)
 
@@ -53,14 +55,49 @@ export default function Ledger() {
   useEffect(() => {
     if (inventoryItems && batchItems) {
       const formatted = formatResults(inventoryItems)
+      setCountType('Doses')
       setResults(formatted)
       setAllData(formatted)
     }
   }, [inventoryItems, batchItems])
 
+  const handleTypeChange = (type) => {
+    setCountType(type)
+    switch (type) {
+      case 'Vials':
+        setResults(
+          allData
+            .filter((item) =>
+              results.some((result) => result.vaccine === item.vaccine)
+            )
+            .map((item) => ({
+              ...item,
+              currentBalance: dosesToVials(item.vaccine, item.currentBalance),
+            }))
+        )
+        break
+      case 'Doses':
+        setResults(
+          allData.filter((item) =>
+            results.some((result) => result.vaccine === item.vaccine)
+          )
+        )
+        break
+      default:
+        break
+    }
+  }
+
   const handleFilter = (vaccine) => {
     if (vaccine === 'All' || !vaccine) {
-      setResults(allData)
+      if (countType === 'Vials') {
+        setResults(allData.map((item) => ({
+          ...item,
+          currentBalance: dosesToVials(item.vaccine, item.currentBalance),
+        })))
+      } else {
+        setResults(allData)
+      }
       return
     }
 
@@ -81,17 +118,12 @@ export default function Ledger() {
       key: 'vaccine',
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
       title: 'Batches',
       dataIndex: 'batches',
       key: 'batches',
     },
     {
-      title: 'Current Balance',
+      title: `Current Balance (${countType})`,
       dataIndex: 'currentBalance',
       key: 'currentBalance',
     },
@@ -126,6 +158,15 @@ export default function Ledger() {
         }
       >
         <div className="flex justify-between items-center px-4 my-4">
+          <div>
+            <Radio.Group
+              onChange={(e) => handleTypeChange(e.target.value)}
+              value={countType}
+            >
+              <Radio value="Doses">Doses</Radio>
+              <Radio value="Vials">Vials</Radio>
+            </Radio.Group>
+          </div>
           <Select
             placeholder="Select Antigen"
             className="w-full md:w-1/2"

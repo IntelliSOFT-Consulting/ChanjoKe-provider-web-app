@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { vaccineDoses } from '../../../data/vaccineDoses'
 
 export const updateStock = async (updates, inventory) => {
   const updatedInventory = { ...inventory }
@@ -16,10 +17,14 @@ export const updateStock = async (updates, inventory) => {
 
 export const locationOptions = (supplyRequests) => {
   return supplyRequests
-    ?.map((request) => ({
-      label: request.deliverTo?.display,
-      value: request.deliverTo?.reference,
-    }))
+    ?.map((request) => {
+      const orderNumber = request.identifier[0]?.value
+
+      return {
+        label: `${request.deliverTo?.display}_${orderNumber}`,
+        value: `${request.deliverTo?.reference}_${orderNumber}`,
+      }
+    })
     .filter((location) => location?.label)
 }
 
@@ -68,8 +73,8 @@ export const updateSupplyRequest = async (values, supplyRequests) => {
 export const deliveriesLocations = (supplyDeliveries) => {
   return supplyDeliveries
     ?.map((delivery) => ({
-      label: delivery.origin,
-      value: delivery.origin,
+      label: `${delivery.origin} | ${delivery.basedOn?.[0]?.display}`,
+      value: `${delivery.origin}_${delivery.basedOn?.[0]?.display}`,
     }))
     .filter((location) => location?.label)
 }
@@ -93,9 +98,8 @@ export const formatDeliveryToTable = (supplyDelivery, inventoryItems = []) => {
     )?.valueDateTime
 
     const availableQuantity =
-      inventoryItems.find(
-        (inventory) => inventory.vaccine === vaccine
-      )?.quantity || 0
+      inventoryItems.find((inventory) => inventory.vaccine === vaccine)
+        ?.quantity || 0
     return {
       vaccine,
       batchNumber,
@@ -163,4 +167,14 @@ export const getVaccineBatches = (vaccineName, batches) => {
   })
 
   return vaccineBatches
+}
+
+export const dosesToVials = (vacine, quantity) => {
+  const vials = Math.ceil(quantity / vaccineDoses[vacine])
+  return vials
+}
+
+export const vialsToDoses = (vacine, quantity) => {
+  const doses = quantity * vaccineDoses[vacine]
+  return doses
 }

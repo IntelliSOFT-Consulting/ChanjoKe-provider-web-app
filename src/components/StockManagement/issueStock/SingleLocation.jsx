@@ -21,6 +21,7 @@ import useInventory from '../../../hooks/useInventory'
 import { titleCase } from '../../../utils/methods'
 import { useMeta } from '../../../hooks/useMeta'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { dosesToVials, vialsToDoses } from '../helpers/stockUtils'
 
 const { Option } = Select
 
@@ -28,6 +29,7 @@ const SingleLocation = () => {
   const [selectedVaccine, setSelectedVaccine] = useState(null)
   const [orderItems, setOrderItems] = useState([{}])
   const [tableErrors, setTableErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
 
   const [form] = Form.useForm()
   const [api, contextHolder] = notification.useNotification()
@@ -97,6 +99,7 @@ const SingleLocation = () => {
   }
 
   const handleSubmit = async (values) => {
+    setSubmitting(true)
     try {
       const err = handleValidate()
       if (Object.keys(err).length) {
@@ -171,7 +174,8 @@ const SingleLocation = () => {
               (ext) => ext.url === 'quantity'
             )
             quantity.valueQuantity.value =
-              quantity.valueQuantity.value - findBatch.quantity
+              quantity.valueQuantity.value -
+              vialsToDoses(findBatch.vaccine, findBatch.quantity)
             return item
           }
           return null
@@ -201,6 +205,8 @@ const SingleLocation = () => {
         message: 'Error issuing stock',
         description: 'An error occurred while issuing stock. Please try again.',
       })
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -258,7 +264,7 @@ const SingleLocation = () => {
     return {
       batchNumber: batchNumber.valueString,
       expiryDate: dayjs(expiryDate.valueDateTime),
-      availableQuantity: quantity.valueQuantity?.value,
+      availableQuantity: dosesToVials(vaccine, quantity.valueQuantity?.value),
       manufacturerDetails: manufacturer.valueString,
       vvmStatus: vvmStatus.valueString,
     }
@@ -398,7 +404,7 @@ const SingleLocation = () => {
     }
 
     const selectedRequest = requests?.data.find(
-      (request) => request.deliverTo?.reference === location
+      (request) => request.deliverTo?.reference === location?.split('_')[0]
     )
 
     const selected = formatSupplyRequest(selectedRequest)
@@ -437,20 +443,22 @@ const SingleLocation = () => {
           >
             <Select
               placeholder="Select facility"
-              options={locationOptions(requests?.data)}
               onChange={handleVaccineOptions}
               allowClear
               showSearch
-              filterOption={(input, option) =>
-                option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
+              filterOption={(input, option) => {
+                return option?.key?.toLowerCase().includes(input.toLowerCase())
+              }}
             >
-              {locationOptions(requests?.data)?.map((location) => (
-                <Option key={location.value} value={location.value}>
-                  <Tag color="blue">({location.value?.split('/')[1]})</Tag>
-                  {location.label}
-                </Option>
-              ))}
+              {locationOptions(requests?.data)?.map((item) => {
+                const name = item.label.split('_')[0]
+                const orderNumber = item.label.split('_')[1]
+                return (
+                  <Option key={item.label} value={item.value}>
+                    {name} <Tag color="blue">{orderNumber}</Tag>
+                  </Option>
+                )
+              })}
             </Select>
           </Form.Item>
           <Form.Item name="orderNumber" label="Order Number" allowClear>
@@ -510,7 +518,9 @@ const SingleLocation = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button type="primary">Submit</Button>
+            <Button type="primary" loading={submitting}>
+              Submit
+            </Button>
           </Popconfirm>
         </div>
       </Form>

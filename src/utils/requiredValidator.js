@@ -5,16 +5,11 @@ const RequiredValidator = (formStructure, formRules) => {
 
   // const keys = Object.keys(formRules)
 
-  // console.log({ formRules, keys })
-
   const checkFormValidity = () => {
     for (const field in formRules) {
       const rules = formRules[field];
       const value = formStructure[field];
 
-      // console.log({ field, rules, value })
-
-      // console.log({ rules, value, field })
 
       if (rules.required) {
         if (!value || value === "") {
@@ -39,7 +34,6 @@ const RequiredValidator = (formStructure, formRules) => {
       }
     }
 
-    // console.log('should set it to true')
 
     setFormValid(true);
   };

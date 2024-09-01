@@ -25,7 +25,7 @@ import {
   inventoryItemBuilder,
   inventoryReportBuilder,
 } from './helpers/stockResourceBuilder'
-
+import { dosesToVials, vialsToDoses } from './helpers/stockUtils'
 const useStyles = createUseStyles({
   btnSuccess: {
     backgroundColor: '#169416',
@@ -60,7 +60,6 @@ const ReceiveRegionalStock = () => {
   const {
     getAggregateInventoryItems,
     createInventory,
-    batchItems,
     inventoryItems,
   } = useInventory()
 
@@ -69,6 +68,8 @@ const ReceiveRegionalStock = () => {
   useEffect(() => {
     getAggregateInventoryItems({ subject: formatLocation(user?.subCounty) })
   }, [])
+
+  console.log('items', items)
 
   const onSubmit = async (values) => {
     setSaving(true)
@@ -79,7 +80,11 @@ const ReceiveRegionalStock = () => {
           reference: formatLocation(user.subCounty),
           display: user.subCountyName,
         },
-        vaccines: items,
+        vaccines: items.map((item) => ({
+          ...item,
+          vaccine: item.vaccine,
+          quantity: vialsToDoses(item.vaccine, item.quantity),
+        })),
       }
 
       const inventoryItems = inventoryItemBuilder(data)
@@ -107,7 +112,6 @@ const ReceiveRegionalStock = () => {
 
       form.resetFields()
       setItems([{}])
-      setSaving(false)
 
       setTimeout(() => {
         navigate('/stock-management')
@@ -117,6 +121,8 @@ const ReceiveRegionalStock = () => {
       notification.error({
         message: 'Failed to receive stock',
       })
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -135,7 +141,7 @@ const ReceiveRegionalStock = () => {
               inventoryItems?.find((batch) => batch.vaccine === value)
                 ?.quantity ?? 0
             updatedItems[index].vaccine = value
-            updatedItems[index].stockQuantity = vaccineQty
+            updatedItems[index].stockQuantity = dosesToVials(value, vaccineQty)
             setItems(updatedItems)
           }}
         />

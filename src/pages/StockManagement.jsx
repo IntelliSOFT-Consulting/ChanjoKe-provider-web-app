@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react'
+import { Input } from 'antd'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import IssueStockLogo from '../common/icons/issueStockLogo'
 import OrderStockLogo from '../common/icons/orderStockLogo'
 import ReceiveStockLogo from '../common/icons/receiveStockLogo'
 import StockLedgerLogo from '../common/icons/stockLedgerLogo'
-import useInventory from '../hooks/useInventory'
-import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { Input } from 'antd'
 import Table from '../components/DataTable'
-import dayjs from 'dayjs'
+import {
+  dosesToVials
+} from '../components/StockManagement/helpers/stockUtils'
+import useInventory from '../hooks/useInventory'
 
 export default function StockManagement() {
   const [allData, setAllData] = useState(null)
@@ -51,7 +53,12 @@ export default function StockManagement() {
       render: (_, _record, index) => index + 1,
     },
     { title: 'Vaccine', dataIndex: 'vaccine', key: 'vaccine' },
-    { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
+    {
+      title: 'Quantity (Vials)',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      render: (_, record) => dosesToVials(record.vaccine, record.quantity),
+    },
   ]
 
   const handleSearch = (vaccine) => {
