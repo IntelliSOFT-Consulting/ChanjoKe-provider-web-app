@@ -13,7 +13,8 @@ const classifyUserByAge = (birthDate) => {
     { name: '9 Months', start: 274, end: 365 },
     { name: '12 Months', start: 365, end: 548 },
     { name: '18 Months', start: 548, end: 730 },
-    { name: '24 Months', start: 730, end: Infinity },
+    { name: '24 Months', start: 730, end: 760 },
+    { name: 'Deworming', start: 760, end: 1825 },
   ]
 
   return (

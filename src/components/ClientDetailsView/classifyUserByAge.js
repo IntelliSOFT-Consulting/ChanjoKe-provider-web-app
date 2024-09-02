@@ -14,6 +14,7 @@ export default function classifyUserByAge(dateString) {
     { category: '12_months', maxAge: 12 * 30.44 },
     { category: '18_months', maxAge: 18 * 30.44 },
     { category: '24_months', maxAge: 24 * 30.44 },
+    { category: 'Deworming', maxAge: 25 * 30.44 },
   ];
 
   for (const category of ageCategories) {
