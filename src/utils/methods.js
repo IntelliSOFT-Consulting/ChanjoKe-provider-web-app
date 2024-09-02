@@ -55,6 +55,9 @@ export const writeAge = (age) => {
   if (age.days > 0) {
     ageString += `${age.days} day${age.days > 1 ? 's' : ''} `
   }
+  if (age.years === 0 && age.months === 0 && age.weeks === 0 && age.days === 0) {
+    ageString = '0 days'
+  }
   return ageString
 }
 

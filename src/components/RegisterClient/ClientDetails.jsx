@@ -118,6 +118,10 @@ export default function ClientDetails() {
     values.countyName = counties?.find(
       (county) => county.key === values.county
     )?.name
+    values.subCountyName = subCounties?.find(
+      (subCounty) => subCounty.key === values.subCounty
+    )?.name
+    values.wardName = wards?.find((ward) => ward.key === values.ward)?.name
     values.clientID = clientID
 
     const patient = await createPatient(values)

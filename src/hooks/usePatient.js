@@ -80,10 +80,9 @@ export default function usePatient() {
           use: 'home',
           line: [data.county, data.subCounty, data.ward]?.filter(Boolean),
           type: 'both',
-          district: data.county,
-          subdistrict: data.subCounty,
-          township: data.ward,
-          city: data.townCenter,
+          city: data.countyName,
+          district: data.subCountyName,
+          state: data.wardName,
           text: [data.ward, data.subCounty, data.county]
             ?.filter(Boolean)
             .join(', '),
