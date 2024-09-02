@@ -115,13 +115,16 @@ export default function ClientDetails() {
       return
     }
     values.caregivers = caregivers
-    values.countyName = counties?.find(
-      (county) => county.key === values.county
-    )?.name
-    values.subCountyName = subCounties?.find(
-      (subCounty) => subCounty.key === values.subCounty
-    )?.name
-    values.wardName = wards?.find((ward) => ward.key === values.ward)?.name
+    values.countyName = titleCase(
+      counties?.find((county) => county.key === values.county)?.name
+    )
+    values.subCountyName = titleCase(
+      subCounties?.find((subCounty) => subCounty.key === values.subCounty)?.name
+    )
+    values.wardName = titleCase(
+      wards?.find((ward) => ward.key === values.ward)?.name
+    )
+
     values.clientID = clientID
 
     const patient = await createPatient(values)
