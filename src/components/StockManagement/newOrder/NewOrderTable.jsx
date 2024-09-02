@@ -46,6 +46,7 @@ const NewOrderTable = ({
         <Select
           style={{ width: '100%' }}
           options={uniqueVaccineOptions}
+          value={record.vaccine}
           placeholder="Select Antigen"
           status={hasErrors?.[index.toString()]?.vaccine ? 'error' : 'default'}
           onChange={(value) => {

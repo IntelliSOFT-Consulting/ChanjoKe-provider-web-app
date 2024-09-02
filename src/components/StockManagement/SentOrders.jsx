@@ -1,4 +1,4 @@
-import { Card, Button, Form, Select } from 'antd'
+import { Card, Button, Form, Select, Popconfirm } from 'antd'
 import { createUseStyles } from 'react-jss'
 import { Link, useNavigate } from 'react-router-dom'
 import useStock from '../../hooks/useStock'
@@ -7,6 +7,7 @@ import moment from 'moment'
 import usePaginatedQuery from '../../hooks/usePaginatedQuery'
 import { useSelector } from 'react-redux'
 import Table from '../DataTable'
+import { titleCase } from '../../utils/methods'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -48,12 +49,7 @@ const useStyles = createUseStyles({
 
 export default function SentOrders() {
   const classes = useStyles()
-  const {
-    myFacilityRequests,
-    updateRequestStatus,
-    outgoingSupplyRequests,
-    requests,
-  } = useStock()
+  const { updateRequestStatus, outgoingSupplyRequests, requests } = useStock()
   const [results, setResults] = useState([])
   const [filteredResults, setFilteredResults] = useState([])
   const [totalItems, setTotalItems] = useState(0)
@@ -85,7 +81,11 @@ export default function SentOrders() {
       date: moment(order.date).format('DD-MM-YYYY'),
       facility: order.deliverTo?.display,
       status:
-        dispatched && order.status === 'active' ? 'Dispatched' : order.status,
+        dispatched && order.status === 'active'
+          ? 'Dispatched'
+          : order.status === 'completed'
+          ? 'Received'
+          : order.status,
       vaccines: vaccines.join(', '),
       supplier: order.deliverFrom?.display,
     }
@@ -122,11 +122,16 @@ export default function SentOrders() {
     }
   }
 
+  const cancelOrder = async (id) => {
+    await updateRequestStatus(id, 'cancelled')
+    fetchStock()
+  }
+
   const columns = [
     {
       title: 'ID',
       dataIndex: 'identifier',
-      key: 'id',
+      key: 'identifier',
     },
     {
       title: 'Date',
@@ -150,10 +155,12 @@ export default function SentOrders() {
                 ? classes.statusPending
                 : status === 'Dispatched'
                 ? 'text-primary font-bold'
+                : status === 'cancelled'
+                ? 'text-red-500 font-bold'
                 : classes.statusReceived
             }
           >
-            {status}
+            {titleCase(status)}
           </span>
         )
       },
@@ -168,13 +175,54 @@ export default function SentOrders() {
       dataIndex: '',
       key: 'x',
       render: (_, record) => (
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-2">
           <Link
             to={`/stock-management/order-details/${record.id}`}
             className="text-[#163C94] font-semibold"
           >
             View
           </Link>
+          {record.status === 'Dispatched' && (
+            <Button
+              type="link"
+              className="text-green font-semibold p-0"
+              onClick={() =>
+                navigate(`/stock-management/receive-stock/${record.id}`, {
+                  state: {
+                    orderNumber: record.identifier,
+                    origin: `${titleCase(record.supplier)}_${
+                      record.identifier
+                    }`,
+                    selectedOriginId: record.id,
+                    supplierId: record.supplier,
+                  },
+                })
+              }
+            >
+              Receive
+            </Button>
+          )}
+          {record.status === 'active' && (
+            <Button
+              type="link"
+              className="p-0"
+              onClick={() =>
+                navigate(`/stock-management/edit-order/${record.id}`)
+              }
+            >
+              Edit
+            </Button>
+          )}
+          {record.status === 'active' && (
+            <Popconfirm
+              title="Are you sure you want to cancel this order?"
+              onConfirm={() => cancelOrder(record.id)}
+            >
+              <Button type="link" danger className="p-0">
+                Cancel
+              </Button>
+            </Popconfirm>
+          )}
         </div>
       ),
     },

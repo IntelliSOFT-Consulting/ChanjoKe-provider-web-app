@@ -12,6 +12,7 @@ export const supplyRequestBuilder = (values) => {
     expectedDateOfNextOrder,
     totalPopulation,
     pregnantWomen,
+    children,
   } = values
 
   const orderItems = tableData.map((tableValue) => {
@@ -146,12 +147,16 @@ export const supplyRequestBuilder = (values) => {
         valueDateTime: expectedDateOfNextOrder?.toISOString(),
       },
       {
-        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-totalPopulation',
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-catchmentPopulation',
         valueInteger: totalPopulation,
       },
       {
         url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-pregnantWomen',
         valueInteger: pregnantWomen,
+      },
+      {
+        url: 'http://hl7.org/fhir/StructureDefinition/supplyrequest-childrenAged0-11Months',
+        valueInteger: children,
       },
     ],
   }

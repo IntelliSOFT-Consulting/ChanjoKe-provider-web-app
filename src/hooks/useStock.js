@@ -4,6 +4,7 @@ import { getOffset } from '../utils/methods'
 import { useSelector } from 'react-redux'
 import { useLocations } from './useLocation'
 import { formatLocation } from '../utils/formatter'
+import { message } from 'antd'
 
 const inventoryPath = '/hapi/fhir/InventoryItem'
 const deliveryPath = '/hapi/fhir/SupplyDelivery'
@@ -337,8 +338,12 @@ const useStock = () => {
     return response
   }
 
-  const updaTeRequestStatus = async (id, status) => {
+  const updateRequestStatus = async (id, status) => {
     const request = await get(`${supplyRequestPath}/${id}`)
+    const dispatched = request.meta?.tag?.find((tag) => tag.code === 'dispatched')
+    if (dispatched && status === 'cancelled') {
+      return message.error('Stock has already been dispatched')
+    }
     const updatedPayload = { ...request, status: status }
     const response = await put(`${supplyRequestPath}/${id}`, updatedPayload)
     return response
@@ -368,7 +373,7 @@ const useStock = () => {
     myFacilityRequests,
     mySupplyRequests,
     getSupplyRequestById,
-    updaTeRequestStatus,
+    updateRequestStatus,
     fetchActiveSupplyRequests,
     createSupplyRequest,
     updateSupplyRequest,

@@ -55,8 +55,13 @@ const ReceiveStock = () => {
   const [saving, setSaving] = useState(false)
   const classes = useStyles()
   const [form] = Form.useForm()
-  const { loading, getIncomingDeliveries, deliveries, updateSupplyDelivery } =
-    useStock()
+  const {
+    loading,
+    getIncomingDeliveries,
+    deliveries,
+    updateSupplyDelivery,
+    updateRequestStatus,
+  } = useStock()
 
   const [selectedOrder, setSelectedOrder] = useState(null)
 
@@ -85,6 +90,13 @@ const ReceiveStock = () => {
   useEffect(() => {
     if (deliveries?.data?.length > 0) {
       form.setFieldsValue({ orderNumber, origin })
+
+      const findDelivery = deliveries?.data?.find(
+        (delivery) => delivery.basedOn?.[0]?.display === orderNumber
+      )
+
+      const formatted = formatDeliveryToTable(findDelivery, inventoryItems)
+      setSelectedOrder(formatted)
     }
   }, [deliveries])
 
@@ -96,8 +108,10 @@ const ReceiveStock = () => {
       )
 
       original.status = 'completed'
+      const supplyRequest = original.basedOn?.[0]?.reference?.split('/')?.[1]
 
       await updateSupplyDelivery(original)
+      await updateRequestStatus(supplyRequest, 'completed')
 
       const payload = {
         ...values,
@@ -137,9 +151,7 @@ const ReceiveStock = () => {
       form.resetFields()
       setSelectedOrder(null)
 
-      setTimeout(() => {
-        navigate('/stock-management')
-      }, 1000)
+      navigate('/stock-management', { replace: true })
     } catch (error) {
       console.log('error', error)
       notification.error({

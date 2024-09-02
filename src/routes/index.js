@@ -335,6 +335,19 @@ const router = createBrowserRouter([
             ),
           },
           {
+            path: '/stock-management/edit-order/:orderID',
+            element: (
+              <RoleBasedRoute
+                element={<NewOrder />}
+                allowedRoles={[
+                  'SUB_COUNTY_STORE_MANAGER',
+                  'FACILITY_STORE_MANAGER',
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                ]}
+              />
+            ),
+          },
+          {
             path: '/stock-management/received-orders',
             element: (
               <RoleBasedRoute

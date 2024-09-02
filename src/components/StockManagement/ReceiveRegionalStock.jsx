@@ -69,8 +69,6 @@ const ReceiveRegionalStock = () => {
     getAggregateInventoryItems({ subject: formatLocation(user?.subCounty) })
   }, [])
 
-  console.log('items', items)
-
   const onSubmit = async (values) => {
     setSaving(true)
     try {

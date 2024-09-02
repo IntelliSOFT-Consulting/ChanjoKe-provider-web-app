@@ -13,7 +13,7 @@ import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
 import useInventory from '../../hooks/useInventory'
 import useStock from '../../hooks/useStock'
@@ -52,11 +52,13 @@ export default function NewOrder() {
   const [form] = useForm()
   const [hasErrors, setHasErrors] = useState({})
   const [tableData, setTableData] = useState([{}])
+  const [requestDetails, setRequestDetails] = useState(null)
 
   const {
     loading,
     createSupplyRequest,
-    incomingSupplyRequests,
+    updateSupplyRequest,
+    getSupplyRequestById,
     getLastOrderRequest,
     countSupplyRequests,
     requestItem,
@@ -64,13 +66,59 @@ export default function NewOrder() {
   const { user } = useSelector((state) => state.userInfo)
 
   const navigate = useNavigate()
-
+  const { orderID } = useParams()
   const { getAggregateInventoryItems, inventoryItems } = useInventory()
 
   useEffect(() => {
     getAggregateInventoryItems()
     getLastOrderRequest()
   }, [])
+
+  const getOrderDetails = async () => {
+    const details = await getSupplyRequestById(orderID);
+    setRequestDetails(details);
+  
+    const findExtension = (url) => details.extension?.find((item) => item.url.includes(url));
+  
+    const extensionData = {
+      vaccine: findExtension('supplyrequest-vaccine'),
+      level: details.extension[1],
+      lastOrderDate: findExtension('supplyrequest-lastOrderDate'),
+      preferredPickupDate: findExtension('supplyrequest-preferredPickupDate'),
+      expectedDateOfNextOrder: findExtension('supplyrequest-expectedDateOfNextOrder'),
+      catchmentPopulation: findExtension('supplyrequest-catchmentPopulation'),
+      children: findExtension('supplyrequest-childrenAged0-11Months')
+    };
+  
+    const formattedAntigens = extensionData.vaccine?.extension?.map((antigen) => {
+      const findAntigenExtension = (url) => antigen?.extension?.find((item) => item.url.includes(url));
+  
+      return {
+        vaccine: findAntigenExtension('vaccine')?.valueCodeableConcept?.text,
+        minimum: findAntigenExtension('minimum')?.valueQuantity?.value,
+        maximum: findAntigenExtension('maximum')?.valueQuantity?.value,
+        recommendedStock: findAntigenExtension('recommendedStock')?.valueQuantity?.value,
+        quantity: findAntigenExtension('quantity')?.valueQuantity?.value,
+      };
+    });
+  
+    setTableData(formattedAntigens);
+  
+    form.setFieldsValue({
+      level: extensionData.level?.valueString,
+      lastOrderDate: dayjs(extensionData.lastOrderDate?.valueDateTime),
+      preferredPickupDate: dayjs(extensionData.preferredPickupDate?.valueDateTime),
+      expectedDateOfNextOrder: dayjs(extensionData.expectedDateOfNextOrder?.valueDateTime),
+      catchmentPopulation: extensionData.catchmentPopulation?.valueInteger,
+      children: extensionData.children?.valueInteger,
+    });
+  };
+
+  useEffect(() => {
+    if (orderID) {
+      getOrderDetails()
+    }
+  }, [orderID])
 
   useEffect(() => {
     if (requestItem) {
@@ -135,33 +183,36 @@ export default function NewOrder() {
 
         const payload = supplyRequestBuilder(combinedData)
 
-        const facilityRequests = await countSupplyRequests()
-        const facilityKey = user?.orgUnit?.name
-          .replace(/\s/g, '')
-          .substring(0, 3)
-          .toUpperCase()
+        if (orderID) {
+          payload.identifier = requestDetails.identifier
+          payload.id = orderID
+          await updateSupplyRequest(payload)
+        } else {
+          const facilityRequests = await countSupplyRequests()
+          const facilityKey = user?.orgUnit?.name
+            .replace(/\s/g, '')
+            .substring(0, 3)
+            .toUpperCase()
 
-        let identifier = [
-          {
-            system:
-              'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
-            value: `${facilityKey}-${(facilityRequests + 1)
-              .toString()
-              .padStart(4, '0')}`,
-          },
-        ]
-
-        payload.identifier = identifier
-
-        await createSupplyRequest(payload)
+          let identifier = [
+            {
+              system:
+                'https://www.cdc.gov/vaccines/programs/iis/iis-standards.html',
+              value: `${facilityKey}-${(facilityRequests + 1)
+                .toString()
+                .padStart(4, '0')}`,
+            },
+          ]
+          payload.identifier = identifier
+          await createSupplyRequest(payload)
+        }
 
         form.resetFields()
 
         notification.success({
           message: 'Order created successfully',
         })
-
-        navigate('/stock-management/sent-orders')
+        navigate('/stock-management/sent-orders', { replace: true })
       }
     } catch (err) {
       console.log(err)
@@ -317,7 +368,7 @@ export default function NewOrder() {
 
               <Form.Item
                 label="Children Aged 0-11 Months (under 1 year)"
-                name="childrenAged0-11Months"
+                name="children"
               >
                 <Input placeholder="Children Aged 0-11 Months (under 1 year)" />
               </Form.Item>
