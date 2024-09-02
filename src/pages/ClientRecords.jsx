@@ -73,7 +73,7 @@ export default function ClientRecords() {
     }
 
     const county =
-      getPatientAddress(patient, 0) || patient?.address?.[0]?.city || ''
+      getPatientAddress(patient, 0) || patient?.address?.[0]?.line?.[0] || ''
     const countyName = counties.find((item) => item.key === county)?.name
     const subCounty =
       getPatientAddress(patient, 1) || patient?.address?.[0]?.district || ''
@@ -86,15 +86,10 @@ export default function ClientRecords() {
     }`?.trim()
     const caregiverType = patient?.contact?.[0]?.relationship?.[0]?.text || ''
     const phoneNumber = patient?.contact?.[0]?.telecom?.[0]?.value || ''
-    const townCenter = patient?.address?.[0]?.extension?.find(
-      (item) => item.url === 'town_center'
-    )?.valueString
-    const communityUnit = patient?.address?.[0]?.extension?.find(
-      (item) => item.url === 'community_unit'
-    )?.valueString
-    const estateOrHouseNo = patient?.address?.[0]?.extension?.find(
-      (item) => item.url === 'estate_or_house_no'
-    )?.valueString
+    const communityUnit = patient?.address?.[0]?.line?.[3]
+    const townCenter = patient?.address?.[0]?.line?.[4]
+    const estateOrHouseNo = patient?.address?.[0]?.line?.[5]
+
 
     return {
       'First Name': firstName,

@@ -56,7 +56,7 @@ export default function usePatient() {
           },
           system: 'identification',
           value: generateUniqueCode(8),
-        }
+        },
       ],
       active: true,
       name: [
@@ -78,7 +78,14 @@ export default function usePatient() {
       address: [
         {
           use: 'home',
-          line: [data.county, data.subCounty, data.ward]?.filter(Boolean),
+          line: [
+            data.county,
+            data.subCounty,
+            data.ward,
+            data.communityUnit || '',
+            data.townCenter || '',
+            data.estateOrHouseNo || '',
+          ],
           type: 'both',
           city: data.countyName,
           district: data.subCountyName,
@@ -86,20 +93,6 @@ export default function usePatient() {
           text: [data.ward, data.subCounty, data.county]
             ?.filter(Boolean)
             .join(', '),
-          extension: [
-            {
-              url: 'community_unit',
-              valueString: data.communityUnit || '',
-            },
-            {
-              url: 'estate_or_house_no',
-              valueString: data.estateOrHouseNo || '',
-            },
-            {
-              url: 'town_center',
-              valueString: data.townCenter || '',
-            },
-          ],
         },
       ],
       contact: data.caregivers.map((caregiver) => {

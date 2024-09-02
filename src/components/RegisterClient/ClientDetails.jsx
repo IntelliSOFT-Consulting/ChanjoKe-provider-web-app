@@ -349,7 +349,7 @@ export default function ClientDetails() {
 
                     setIsAdult(estimate.years >= 18)
                   }}
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                  className="w-full"
                 />
               </Form.Item>
 
@@ -367,7 +367,7 @@ export default function ClientDetails() {
                 <Input
                   placeholder="Age"
                   disabled={true}
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                  className="w-full"
                 />
               </Form.Item>
 
@@ -415,7 +415,7 @@ export default function ClientDetails() {
                   <DatePicker
                     disabled={true}
                     format="DD-MM-YYYY"
-                    className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                    className="w-full"
                   />
                 </Form.Item>
               )}
@@ -464,7 +464,7 @@ export default function ClientDetails() {
                   }}
                   placeholder="Document Identification Number"
                   autoComplete="off"
-                  className="block w-full rounded-md border-0 py-2.5 text-sm text-[#707070] ring-1 ring-inset ring-[#4E4E4E] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#163C94]"
+                  className="w-full"
                 />
               </Form.Item>
 

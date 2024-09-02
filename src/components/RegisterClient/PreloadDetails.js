@@ -18,6 +18,10 @@ export default function PreloadDetails({
 }) {
   const [patient, setPatient] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [county, setCounty] = useState('')
+  const [subCounty, setSubCounty] = useState('')
+  const [ward, setWard] = useState('')
+
   const { getPatient } = usePatient()
 
   const fetchPatient = async () => {
@@ -25,6 +29,23 @@ export default function PreloadDetails({
     const patient = await getPatient(patientId)
     setPatient(patient)
   }
+
+  const preloadLocation = async () => {
+    if (counties?.length && county && subCounty && ward) {
+      await handleCountyChange(county)
+      await handleSubCountyChange(subCounty)
+      await handleWardChange(ward)
+
+      form.setFieldValue('subCounty', subCounty)
+      form.setFieldValue('ward', ward)
+
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    preloadLocation()
+  }, [counties])
 
   const formatPatient = async () => {
     const firstName = patient.name[0].given[0]
@@ -36,20 +57,12 @@ export default function PreloadDetails({
     const phoneCode = patient.telecom[0].value?.slice(0, -9) || '+254'
     const identificationType = patient.identifier[0].type?.coding?.[0]?.display
     const identificationNumber = patient.identifier[0].value
-    const county = patient.address[0].district
+    const county = patient.address[0]?.line?.[0]
     const subCounty = patient.address[0]?.line?.[1]
     const ward = patient.address[0]?.line?.[2]
-    const communityUnit = patient.address[0]?.extension?.find(
-      (item) => item.url === 'community_unit'
-    )?.valueString
-
-    const townCenter = patient.address[0]?.extension?.find(
-      (item) => item.url === 'town_center'
-    )?.valueString
-
-    const estateOrHouseNo = patient.address[0]?.extension?.find(
-      (item) => item.url === 'estate_or_house_no'
-    )?.valueString
+    const communityUnit = patient.address[0]?.line?.[3]
+    const townCenter = patient.address[0]?.line?.[4]
+    const estateOrHouseNo = patient.address[0]?.line?.[5]
 
     const vaccinationCategory = patient.extension?.find(
       (item) => item.url === 'vaccination_category'
@@ -124,13 +137,9 @@ export default function PreloadDetails({
       estimatedAge,
     })
 
-    if (counties?.length) {
-      await handleCountyChange(county)
-      await handleSubCountyChange(subCounty)
-      await handleWardChange(ward)
-      form.setFieldValue('subCounty', subCounty)
-      form.setFieldValue('ward', ward)
-    }
+    setCounty(county)
+    setSubCounty(subCounty)
+    setWard(ward)
   }
 
   useEffect(() => {
