@@ -80,7 +80,8 @@ export const deliveriesLocations = (supplyDeliveries) => {
 }
 
 export const formatDeliveryToTable = (supplyDelivery, inventoryItems = []) => {
-  const vaccines = supplyDelivery.extension[0].extension.map((item) => {
+  console.log(supplyDelivery)
+  const vaccines = supplyDelivery?.extension?.[0]?.extension?.map((item) => {
     const vaccine = item.extension.find((ext) => ext.url === 'vaccine')
       ?.valueCodeableConcept?.text
     const batchNumber = item.extension.find(

@@ -91,12 +91,14 @@ const ReceiveStock = () => {
     if (deliveries?.data?.length > 0) {
       form.setFieldsValue({ orderNumber, origin })
 
-      const findDelivery = deliveries?.data?.find(
-        (delivery) => delivery.basedOn?.[0]?.display === orderNumber
-      )
+      if (orderNumber) {
+        const findDelivery = deliveries?.data?.find(
+          (delivery) => delivery.basedOn?.[0]?.display === orderNumber
+        )
 
-      const formatted = formatDeliveryToTable(findDelivery, inventoryItems)
-      setSelectedOrder(formatted)
+        const formatted = formatDeliveryToTable(findDelivery, inventoryItems)
+        setSelectedOrder(formatted)
+      }
     }
   }, [deliveries])
 
