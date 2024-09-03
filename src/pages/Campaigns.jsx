@@ -1,9 +1,10 @@
-import { Button, Form, Input, Popconfirm, Tabs } from 'antd'
+import { Button, Form, Input, Popconfirm, Tabs, Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Table from '../components/DataTable'
 import { useAccess } from '../hooks/useAccess'
 import useCampaigns from '../hooks/useCampaigns'
+import { useSelector } from 'react-redux'
 
 export default function Campaigns() {
   const navigate = useNavigate()
@@ -11,6 +12,7 @@ export default function Campaigns() {
     useCampaigns()
 
   const { canAccess } = useAccess()
+  const { user } = useSelector((state) => state.userInfo)
 
   const [activeTab, setActiveTab] = useState('1')
   const [currentPage, setCurrentPage] = useState(1)
@@ -40,12 +42,15 @@ export default function Campaigns() {
       render: (_, record) =>
         canAccess('CREATE_CAMPAIGN') ? (
           <>
-            <Link
-              to={`/campaign/${record?.id}`}
-              className="text-[#163C94] font-semibold mr-4"
+            <Button
+              type="link"
+              onClick={() => {
+                navigate(`/campaign/${record?.id}`)
+              }}
             >
               View
-            </Link>
+            </Button>
+
             {activeTab === '1' && canAccess('CREATE_CAMPAIGN') && (
               <Popconfirm
                 title="Are you sure you want to archive this campaign?"
@@ -113,12 +118,28 @@ export default function Campaigns() {
             )}
           </>
         ) : (
-          <Link
-            to={`/campaign-site/${record?.id}`}
-            className="text-[#163C94] font-semibold"
+          <Tooltip
+            color="red"
+            className='p-0'
+            title={
+              user?.location !== 'Campaign'
+                ? 'Only Campaign users can select campaigns'
+                : ''
+            }
           >
-            {activeTab === '1' ? 'Select' : ''}
-          </Link>
+            <Button
+              type="link"
+              onClick={() => {
+                if (user?.location === 'Campaign') {
+                  navigate(`/campaign-site/${record?.id}`)
+                }
+              }}
+              disabled={user?.location !== 'Campaign'}
+              className="text-[#163C94] font-semibold"
+            >
+              {activeTab === '1' ? 'Select' : ''}
+            </Button>
+          </Tooltip>
         ),
     },
   ]
@@ -236,38 +257,6 @@ export default function Campaigns() {
               })
             )}
           />
-        </div>
-
-        <div className="sm:hidden mt-5">
-          {campaigns.map((result) => (
-            <div
-              key={result.id}
-              className="w-full grid grid-cols-5 gap-3 border border-1 border-gray-200"
-            >
-              <div className="py-5 pr-6 col-span-4">
-                <div className="text-sm pl-5 leading-6 text-gray-900">
-                  {result.campaignName}
-                </div>
-                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
-                  Duration:{' '}
-                  <span className="font-bold">{result.campaignDuration}</span>
-                </div>
-                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
-                  {result.dateCreated}
-                </div>
-              </div>
-              <div className="py-5 max-w-auto right-5">
-                <div className="flex">
-                  <a
-                    href={`/client-details/${result.id}/routineVaccines`}
-                    className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500"
-                  >
-                    View
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
