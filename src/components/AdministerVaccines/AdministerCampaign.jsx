@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Button,
+  Card,
   Form,
   Input,
   InputNumber,
@@ -12,6 +13,7 @@ import {
   notification,
 } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
+import Table from '../DataTable'
 import dayjs from 'dayjs'
 import moment from 'moment'
 
@@ -21,6 +23,7 @@ import useCampaign from '../../hooks/useCampaigns'
 import useEncounter from '../../hooks/useEncounter'
 import useInventory from '../../hooks/useInventory'
 import useObservations from '../../hooks/useObservations'
+import usePatient from '../../hooks/usePatient'
 import useVaccination from '../../hooks/useVaccination'
 import { formatInventoryToTable } from '../StockManagement/helpers/inventoryFormatter'
 import {
@@ -28,6 +31,7 @@ import {
   getBodyWeight,
 } from './administerController'
 import { checkIfVaccineIsAlreadyAdministered } from './helpers/campaignHelper'
+import { calculateAges, titleCase, writeAge } from '../../utils/methods'
 
 const AdministerCampaign = () => {
   const [inventory, setInventory] = useState(null)
@@ -35,6 +39,8 @@ const AdministerCampaign = () => {
   const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
   const [api, contextHolder] = notification.useNotification()
+
+  const { patient, getPatient } = usePatient()
 
   const { campaign, fetchCampaign } = useCampaign()
   const { getDetailedInventoryItems, batchItems, updateInventory } =
@@ -72,6 +78,7 @@ const AdministerCampaign = () => {
       fetchCampaign(campaignStore?.campaignID)
       getWeight()
       getDetailedInventoryItems()
+      getPatient(clientID)
     }
   }, [campaignStore?.campaignID, user])
 
@@ -207,6 +214,52 @@ const AdministerCampaign = () => {
     }
   }
 
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: (_, record) => {
+        const firstName = record?.name?.[0]?.given?.join(' ')
+        const lastName = record?.name?.[0]?.family
+        return `${firstName} ${lastName}`
+      },
+    },
+    {
+      title: 'System ID',
+      dataIndex: 'systemID',
+      key: 'systemID',
+      render: (_, record) => {
+        return record?.identifier?.find(
+          (id) => id.type?.text === 'SYSTEM_GENERATED'
+        )?.value
+      },
+    },
+    {
+      title: 'D.O.B',
+      dataIndex: 'dob',
+      key: 'dob',
+      render: (_, record) => {
+        return dayjs(record?.birthDate).format('DD-MM-YYYY')
+      },
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+      render: (_, record) => {
+        const age = calculateAges(record?.birthDate)
+        return writeAge(age)
+      },
+    },
+    {
+      title: 'Gender',
+      dataIndex: 'gender',
+      key: 'gender',
+      render: (text) => titleCase(text),
+    },
+  ]
+
   const renderVaccineFields = (fields, { add, remove }) => (
     <div className="w-full">
       {fields.map((field, index) => (
@@ -282,11 +335,20 @@ const AdministerCampaign = () => {
   }
 
   return (
-    <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow mt-5">
-      <div className="px-4 text-xl font-semibold py-2 sm:px-6">
-        Administer Vaccine
-      </div>
+    <Card
+      className="divide-y overflow-hidden rounded-lg bg-white mt-5"
+      title="Administer Vaccine"
+      size="small"
+    >
       {contextHolder}
+      <Table
+        className="mt-4 px-6"
+        size="small"
+        columns={columns}
+        dataSource={[patient]}
+        loading={loading}
+        pagination={false}
+      />
       <Form
         className="px-4 py-5 sm:p-6"
         layout="vertical"
@@ -341,7 +403,7 @@ const AdministerCampaign = () => {
           </Button>
         </Popconfirm>
       </div>
-    </div>
+    </Card>
   )
 }
 
