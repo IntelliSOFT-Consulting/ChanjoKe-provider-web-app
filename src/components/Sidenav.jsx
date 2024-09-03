@@ -66,17 +66,17 @@ const SidebarItem = ({ item, onItemClick, child = false }) => {
     >
       {item.icon && (
         <span className={`mr-2`}>
-          {
-            typeof item.icon === 'object' ? (
-              <span className={child ? "text-gray-500" : "text-xl"}>{item.icon}</span>
-            ) : (
-              <IconComponent
-                width="24"
-                height="24"
-                fillColor={item.current ? '#163C94' : '#000000'}
-              />
-            )
-          }
+          {typeof item.icon === 'object' ? (
+            <span className={child ? 'text-gray-500' : 'text-xl'}>
+              {item.icon}
+            </span>
+          ) : (
+            <IconComponent
+              width="24"
+              height="24"
+              fillColor={item.current ? '#163C94' : '#000000'}
+            />
+          )}
         </span>
       )}
       {item.name}
@@ -152,6 +152,16 @@ export default function Sidenav() {
             href: '/reports/moh-525',
             icon: <DotChartOutlined />,
             roles: ['ALL'],
+          },
+          {
+            name: 'Dashboard',
+            href: '/dashboard',
+            icon: <BarChartOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+            ],
           },
         ],
       },

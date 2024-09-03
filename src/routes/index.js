@@ -58,6 +58,7 @@ import MOH525 from '../pages/MOH525'
 import ReceiveRegionalStock from '../components/StockManagement/ReceiveRegionalStock'
 import Error404 from '../common/Error404'
 import AdministerCampaign from '../components/AdministerVaccines/AdministerCampaign'
+import SupersetDashboard from '../pages/Dashboards'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -197,6 +198,19 @@ const router = createBrowserRouter([
               'DOCTOR',
               'CLERK',
               'FACILITY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
+      },
+      {
+        path: '/dashboard',
+        element: (
+          <RoleBasedRoute
+            element={<SupersetDashboard />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
