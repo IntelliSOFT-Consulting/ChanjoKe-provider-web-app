@@ -66,15 +66,17 @@ const SidebarItem = ({ item, onItemClick, child = false }) => {
     >
       {item.icon && (
         <span className={`mr-2`}>
-          {child ? (
-            <span className="text-gray-500">{item.icon}</span>
-          ) : (
-            <IconComponent
-              width="24"
-              height="24"
-              fillColor={item.current ? '#163C94' : '#000000'}
-            />
-          )}
+          {
+            typeof item.icon === 'object' ? (
+              <span className={child ? "text-gray-500" : "text-xl"}>{item.icon}</span>
+            ) : (
+              <IconComponent
+                width="24"
+                height="24"
+                fillColor={item.current ? '#163C94' : '#000000'}
+              />
+            )
+          }
         </span>
       )}
       {item.name}
@@ -129,20 +131,6 @@ export default function Sidenav() {
               'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
               'ADMINISTRATOR',
               'NATIONAL_SYSTEM_ADMINISTRATOR',
-            ],
-          },
-          {
-            name: 'Campaigns',
-            href: '/campaigns',
-            icon: <SoundOutlined />,
-            roles: [
-              'ADMINISTRATOR',
-              'NATIONAL_SYSTEM_ADMINISTRATOR',
-              'COUNTY_SYSTEM_ADMINISTRATOR',
-              'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
-              'FACILITY_SYSTEM_ADMINISTRATOR',
-              'NURSE',
-              'DOCTOR',
             ],
           },
         ],
@@ -222,6 +210,20 @@ export default function Sidenav() {
           'FACILITY_SYSTEM_ADMINISTRATOR',
           'ADMINISTRATOR',
           'NATIONAL_SYSTEM_ADMINISTRATOR',
+        ],
+      },
+      {
+        name: 'Campaigns',
+        href: '/campaigns',
+        icon: <SoundOutlined />,
+        roles: [
+          'ADMINISTRATOR',
+          'NATIONAL_SYSTEM_ADMINISTRATOR',
+          'COUNTY_SYSTEM_ADMINISTRATOR',
+          'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+          'FACILITY_SYSTEM_ADMINISTRATOR',
+          'NURSE',
+          'DOCTOR',
         ],
       },
       {

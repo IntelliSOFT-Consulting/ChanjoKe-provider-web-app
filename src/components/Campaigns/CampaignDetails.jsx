@@ -2,12 +2,14 @@ import { Button, Descriptions } from 'antd'
 import Loading from '../../common/spinners/LoadingArrows'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { convertCamelCaseString, capitalizeFirstLetter } from '../../utils/methods'
+import {
+  convertCamelCaseString,
+  capitalizeFirstLetter,
+} from '../../utils/methods'
 import useCampaign from '../../hooks/useCampaigns'
 import dayjs from 'dayjs'
 
-export default function CampaignDetails () {
-
+export default function CampaignDetails() {
   const navigate = useNavigate()
   const { campaignID } = useParams()
   const { loading, campaign, fetchCampaign } = useCampaign()
@@ -20,12 +22,20 @@ export default function CampaignDetails () {
   useEffect(() => {
     setDetails({
       'Campaign Name': campaign?.title,
-      'County': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[0]?.display),
-      'Sub-County': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[1]?.display),
-      'Ward': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[2]?.display),
+      County: capitalizeFirstLetter(
+        campaign?.category?.[0]?.coding?.[0]?.display
+      ),
+      'Sub-County': capitalizeFirstLetter(
+        campaign?.category?.[0]?.coding?.[1]?.display
+      ),
       'Start Date': dayjs(campaign?.period?.start).format('DD-MM-YYYY'),
       'End Date': dayjs(campaign?.period?.end).format('DD-MM-YYYY'),
-      'Facility': capitalizeFirstLetter(campaign?.category?.[0]?.coding?.[3]?.display),
+      Diseases: campaign?.activity
+        ?.map(
+          (activity) =>
+            activity?.detail?.productCodeableConcept?.coding?.[0]?.display
+        )
+        .join(', '),
     })
   }, [campaign])
   return (
@@ -58,12 +68,7 @@ export default function CampaignDetails () {
                   column={1}
                   className="w-full"
                 >
-                  {[
-                    'Campaign Name',
-                    'County',
-                    'Sub-County',
-                    'Ward',
-                  ].map((key) => (
+                  {['Campaign Name', 'County', 'Diseases'].map((key) => (
                     <Descriptions.Item
                       key={key}
                       label={convertCamelCaseString(key)}
@@ -82,11 +87,7 @@ export default function CampaignDetails () {
                   column={1}
                   className="w-full"
                 >
-                  {[
-                    'Start Date',
-                    'End Date',
-                    'Facility',
-                  ].map((key) => (
+                  {['Start Date', 'End Date'].map((key) => (
                     <Descriptions.Item
                       key={key}
                       label={convertCamelCaseString(key)}

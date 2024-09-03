@@ -29,11 +29,13 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
       description: values.description,
       doseQuantity: {
         value: vaccine.doseNumber,
-        unit: vaccine.doseNumber,
+        unit: 'dose',
         system: 'http://unitsofmeasure.org',
       },
       patient: {
-        reference: `Patient/${patient.id}`,
+        reference: `Patient/${
+          typeof patient === 'object' ? patient.id : patient
+        }`,
       },
       performer: [
         {
@@ -62,6 +64,18 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
           text: user?.location,
         },
       ],
+    }
+
+    if (values.site) {
+      resource.reportOrigin = {
+        coding: [
+          {
+            code: values.site,
+            display: values.site,
+          },
+        ],
+        text: values.site,
+      }
     }
 
     if (vaccine.status !== 'completed') {
@@ -94,7 +108,7 @@ export const createImmunizationResource = (values, vaccines, patient, user) => {
       }
     }
 
-    if(values.otherReason) {
+    if (values.otherReason) {
       resource.reasonCode.push({
         coding: [
           {

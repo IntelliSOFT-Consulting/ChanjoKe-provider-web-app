@@ -1,11 +1,12 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, DatePicker, Form, Input } from 'antd'
+import { Alert, Button, DatePicker, Form, Input } from 'antd'
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApiRequest } from '../api/useApiRequest'
 import Table from '../components/DataTable'
 import { deconstructPatientData } from '../components/RegisterClient/DataWrapper'
 import usePaginatedQuery from '../hooks/usePaginatedQuery'
+import { useSelector } from 'react-redux'
 
 export default function SearchInterface(props) {
   const [title, setTitle] = useState('Search')
@@ -16,7 +17,11 @@ export default function SearchInterface(props) {
   const { get } = useApiRequest()
 
   const { pageSize, handlePageChange } = usePaginatedQuery()
+  const { user } = useSelector((state) => state.userInfo)
 
+  const campaign = localStorage.getItem('campaign')
+    ? JSON.parse(localStorage.getItem('campaign'))
+    : null
   const navigate = useNavigate()
 
   const columns = [
@@ -40,17 +45,32 @@ export default function SearchInterface(props) {
       dataIndex: '',
       key: 'x',
       render: (_, record) => {
-        let link = `/client-details/${record.id}/${
-          props.searchType === 'appointments'
-            ? 'appointments'
-            : 'routineVaccines'
-        }`
+        let link = ''
+        if (user?.location === 'Campaign') {
+          link = campaign?.campaignID
+            ? `/administer/campaigns/${record.id}`
+            : '/campaigns'
+        } else {
+          link = `/client-details/${record.id}/${
+            props.searchType === 'appointments'
+              ? 'appointments'
+              : 'routineVaccines'
+          }`
 
-        if (props.searchType === 'updateClient') {
-          link = `/update-vaccine-history/${record.id}`
+          if (props.searchType === 'updateClient') {
+            link = `/update-vaccine-history/${record.id}`
+          }
         }
+
         return (
-          <Link to={link} className="text-[#163C94] font-semibold">
+          <Link
+            to={link}
+            state={{
+              campaignID: campaign?.campaignID,
+              site: campaign?.campaignSite,
+            }}
+            className="text-[#163C94] font-semibold"
+          >
             View
           </Link>
         )
@@ -143,9 +163,22 @@ export default function SearchInterface(props) {
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white sm:mt-1 shadow md:mt-5">
-        <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">
-          {title}
-        </div>
+        {campaign ? (
+          <Alert
+            message={
+              <div className="flex items-end">
+                <h4 className="font-semibold mr-2">Campaign:</h4>
+                <p>{campaign?.title}</p>
+              </div>
+            }
+            showIcon
+            banner
+          />
+        ) : (
+          <div className="px-2 text-2xl font-semibold py-3 sm:px-6 sm:py-5">
+            {title}
+          </div>
+        )}
         <div className="sm:px-4 py-2 sm:py-5 sm:p-6">
           {props.searchType === 'referrals' && (
             <Form layout="vertical" colon={true}>
@@ -235,37 +268,6 @@ export default function SearchInterface(props) {
                 ),
               }}
             />
-          </div>
-
-          <div className="sm:hidden mt-5">
-            {results.map((result) => (
-              <div
-                key={result.id}
-                className="w-full grid grid-cols-5 gap-3 border border-1 border-gray-200"
-              >
-                <div className="py-5 pr-6 col-span-4">
-                  <div className="text-sm pl-5 leading-6 text-gray-900">
-                    {result.clientName}
-                  </div>
-                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
-                    ID: <span className="font-bold">{result.idNumber}</span>
-                  </div>
-                  <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
-                    {result.phoneNumber}
-                  </div>
-                </div>
-                <div className="py-5 max-w-auto right-5">
-                  <div className="flex">
-                    <a
-                      href={`/client-details/${result.id}/routineVaccines`}
-                      className="text-sm font-medium leading-6 text-indigo-600 hover:text-indigo-500"
-                    >
-                      View
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>

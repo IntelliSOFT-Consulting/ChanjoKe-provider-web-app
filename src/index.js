@@ -129,8 +129,10 @@ const App = () => {
                 algorithm: defaultData.InputNumber?.algorithm,
               },
               DatePicker: {
-                colorPrimary: defaultData.DatePicker?.colorPrimary,
-                algorithm: defaultData.DatePicker?.algorithm,
+                colorPrimary: defaultData.colorPrimary,
+                algorithm: defaultData.algorithm,
+                cellActiveWithRangeBg: defaultData.colorPrimary,
+  
               },
               Descriptions: {
                 borderRadius: 0,
@@ -140,7 +142,6 @@ const App = () => {
                 algorithm: defaultData.algorithm,
                 colorBorder: defaultData.colorPrimary,
                 colorBgContainerDisabled: '#f5f5f5',
-                
               },
             },
           }}

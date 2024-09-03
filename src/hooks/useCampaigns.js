@@ -9,44 +9,55 @@ export default function useCampaign() {
 
   const [campaigns, setCampaigns] = useState([])
   const [campaign, setCampaign] = useState({})
-  const [loading, setLoading]  = useState(false)
+  const [loading, setLoading] = useState(false)
   const [campaignTotal, setCampaignTotal] = useState(0)
 
   const fetchCampaigns = async (title = '') => {
     setLoading(true)
-    const response = await get(title ? `${fhirApi}` : `${fhirApi}?_count=10000000&_sort=-_lastUpdated`)
+    const response = await get(
+      title ? `${fhirApi}` : `${fhirApi}?_count=10000000&_sort=-_lastUpdated`
+    )
 
     const searchTitle = title.toLowerCase()
 
     setCampaignTotal(response?.total)
 
     if (response?.total > 0 && title) {
-      const searchedCampaigns = response?.entry?.filter(campaign => {
-        return campaign?.resource?.title.toLowerCase().includes(searchTitle);
-      });
-      setCampaigns((searchedCampaigns.map((value) => ({
-        id: value?.resource?.id,
-        campaignName: value?.resource?.title,
-        status: value?.resource?.status,
-        dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
-        campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} → ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
-        resource: value?.resource,
-      }))))
+      const searchedCampaigns = response?.entry?.filter((campaign) => {
+        return campaign?.resource?.title.toLowerCase().includes(searchTitle)
+      })
+      setCampaigns(
+        searchedCampaigns.map((value) => ({
+          id: value?.resource?.id,
+          campaignName: value?.resource?.title,
+          status: value?.resource?.status,
+          dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
+          campaignDuration: `${dayjs(value?.resource?.period?.start).format(
+            'DD-MM-YYYY'
+          )} → ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
+          resource: value?.resource,
+        }))
+      )
     }
 
-    if (response?.total > 0 && title === '') setCampaigns(response?.entry.map((value) => ({
-      id: value?.resource?.id,
-      campaignName: value?.resource?.title,
-      status: value?.resource?.status,
-      dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
-      campaignDuration: `${dayjs(value?.resource?.period?.start).format('DD-MM-YYYY')} → ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
-      resource: value?.resource,
-    })))
+    if (response?.total > 0 && title === '')
+      setCampaigns(
+        response?.entry.map((value) => ({
+          id: value?.resource?.id,
+          campaignName: value?.resource?.title,
+          status: value?.resource?.status,
+          dateCreated: dayjs(value?.resource?.created).format('DD-MM-YYYY'),
+          campaignDuration: `${dayjs(value?.resource?.period?.start).format(
+            'DD-MM-YYYY'
+          )} → ${dayjs(value?.resource?.period?.end).format('DD-MM-YYYY')}`,
+          resource: value?.resource,
+        }))
+      )
     setLoading(false)
     return response
   }
 
-  const fetchCampaign = async(campaignID) => {
+  const fetchCampaign = async (campaignID) => {
     setLoading(true)
     const response = await get(`${fhirApi}/${campaignID}`)
     setCampaign(response)
@@ -55,43 +66,42 @@ export default function useCampaign() {
 
   const createPayload = (values, status = 'active') => {
     return {
-      resourceType : "CarePlan",
+      resourceType: 'CarePlan',
       status: status,
-      intent: "plan",
+      intent: 'plan',
       title: values?.campaignName,
-      identifier: [{
-        value: values?.campaignName,
-      }],
+      identifier: [
+        {
+          value: values?.campaignName,
+        },
+      ],
       id: values?.id,
       description: values?.campaignName,
       created: new Date().toISOString(),
       period: [
         {
           start: new Date(values?.startDate).toISOString() || '',
-          end: new Date(values?.endDate).toISOString() || ''
+          end: new Date(values?.endDate).toISOString() || '',
         },
       ],
       category: {
         coding: [
           {
-            code: "county",
-            display: values?.county
+            code: 'county',
+            display: values?.county,
           },
           {
-            code: "subCounty",
-            display: values?.subCounty
-          },
-          {
-            code: "ward",
-            display: values?.ward
-          },
-          {
-            code: "facility",
-            display: values?.facility
+            code: 'subCounty',
+            display: values?.subCounty,
           },
         ],
-        text: "Address"
-      }
+        text: 'Location',
+      },
+      activity: values?.targetDiseases?.map((disease) => ({
+        detail: {
+          productCodeableConcept: disease,
+        },
+      })),
     }
   }
 

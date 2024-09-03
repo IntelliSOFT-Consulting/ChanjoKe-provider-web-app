@@ -992,7 +992,7 @@ export const uniqueVaccines = [
   'IPV',
   'Vitamin A',
   'Measles-Rubella',
-  'RTS/AS01 (Malaria Vaccine)',
+  'RTS/AS01',
   'Yellow Fever',
   'Albendazole',
   'HPV Vaccine',
@@ -1012,7 +1012,14 @@ export const vaccineOptions = allVaccines.map((vaccine) => ({
   value: vaccine.vaccineCode,
 }))
 
-export const uniqueVaccineOptions = uniqueVaccines.map((vaccine) => ({
-  label: vaccine,
-  value: vaccine,
-}))
+export const uniqueVaccineOptions = uniqueVaccines.map((vaccine) => {
+  const vaccineData = allVaccines.find(
+    (v) => v.vaccineName.includes(vaccine) && v.vaccineName.startsWith(vaccine)
+  )
+  return {
+    label: vaccine,
+    value: vaccine,
+    nhddCode: vaccineData?.nhddCode,
+    disease: vaccineData?.diseaseTarget,
+  }
+})
