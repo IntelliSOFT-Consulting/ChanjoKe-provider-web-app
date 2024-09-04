@@ -1,9 +1,9 @@
-name: React App Deployment # name of the workflow
+name: React App Deployment
 
 on:
   push:
     branches:
-      - develop # branch name
+      - develop
 
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -17,6 +17,9 @@ env:
   SSH_HOST: ${{ secrets.SSH_HOST }}
   SSH_USER: ${{ secrets.SSH_USER }}
   SUDO_PASSWORD: ${{ secrets.SUDO_PASSWORD }}
+
+  REACT_APP_DASHBOARD_ID: ${{ secrets.REACT_APP_DASHBOARD_ID }}
+  REACT_APP_SUPERSET_DOMAIN: ${{ secrets.REACT_APP_SUPERSET_DOMAIN }}
 
 jobs:
   build_frontend_app:
@@ -34,7 +37,10 @@ jobs:
         run: |
           echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
           docker buildx create --use --name workflowBuilder
-          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME }} --push -f docker/Dockerfile.prod .
+          docker buildx build --platform=linux/amd64,linux/arm64 \
+          --build-arg REACT_APP_DASHBOARD_ID=${{ env.REACT_APP_DASHBOARD_ID }} \
+          --build-arg REACT_APP_SUPERSET_DOMAIN=${{ env.REACT_APP_SUPERSET_DOMAIN }} \
+          -t ${{ env.IMAGE_NAME }} --push -f docker/Dockerfile.prod .
           docker logout
 
       - name: Setup SSH keys
@@ -75,6 +81,9 @@ jobs:
             fi
 
             # Run Docker commands with sudo and pass the password
-            echo '${{ env.SUDO_PASSWORD }}' | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
+            echo '${{ env.SUDO_PASSWORD }}' | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 \
+            --build-arg REACT_APP_DASHBOARD_ID=${{ env.REACT_APP_DASHBOARD_ID }} \
+            --build-arg REACT_APP_SUPERSET_DOMAIN=${{ env.REACT_APP_SUPERSET_DOMAIN }} \
+            ${{ env.IMAGE_NAME }}
             sudo docker logout
             sleep 10

@@ -9,6 +9,9 @@ RUN npm install
 
 COPY . .
 
+ARG REACT_APP_DASHBOARD_ID
+ARG REACT_APP_SUPERSET_DOMAIN
+
 RUN npm run build
 
 FROM nginx:alpine AS production
