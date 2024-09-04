@@ -37,10 +37,9 @@ jobs:
         run: |
           echo '${{ env.DOCKER_PASSWORD }}' | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
           docker buildx create --use --name workflowBuilder
-          docker buildx build --platform=linux/amd64,linux/arm64 \
-          --build-arg REACT_APP_DASHBOARD_ID=${{ env.REACT_APP_DASHBOARD_ID }} \
-          --build-arg REACT_APP_SUPERSET_DOMAIN=${{ env.REACT_APP_SUPERSET_DOMAIN }} \
-          -t ${{ env.IMAGE_NAME }} --push -f docker/Dockerfile.prod .
+          echo "REACT_APP_DASHBOARD_ID: ${{ env.REACT_APP_DASHBOARD_ID }}" >> .env
+          echo "REACT_APP_SUPERSET_DOMAIN: ${{ env.REACT_APP_SUPERSET_DOMAIN }}" >> .env
+          docker buildx build --platform=linux/amd64,linux/arm64 -t ${{ env.IMAGE_NAME }} --push -f docker/Dockerfile.prod .
           docker logout
 
       - name: Setup SSH keys
@@ -82,8 +81,6 @@ jobs:
 
             # Run Docker commands with sudo and pass the password
             echo '${{ env.SUDO_PASSWORD }}' | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 \
-            --build-arg REACT_APP_DASHBOARD_ID=${{ env.REACT_APP_DASHBOARD_ID }} \
-            --build-arg REACT_APP_SUPERSET_DOMAIN=${{ env.REACT_APP_SUPERSET_DOMAIN }} \
-            ${{ env.IMAGE_NAME }}
+            --env-file .env ${{ env.IMAGE_NAME }}
             sudo docker logout
             sleep 10
