@@ -50,7 +50,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ env.IMAGE_NAME }}
-          build-args:
+          build-args: |
             REACT_APP_DASHBOARD_ID=${{ env.REACT_APP_DASHBOARD_ID }}
             REACT_APP_SUPERSET_DOMAIN=${{ env.REACT_APP_SUPERSET_DOMAIN }}
       - name: Log out from Docker Hub
