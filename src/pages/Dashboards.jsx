@@ -43,7 +43,7 @@ const SupersetDashboard = () => {
   }, [embedDashboardFunc])
 
   return (
-    <div ref={dashboardRef} className="mt-4 w-full h-full superset-dashboard" />
+    <div ref={dashboardRef} className="mt-4 w-full min-h-screen superset-dashboard" />
   )
 }
 
