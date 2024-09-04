@@ -94,7 +94,6 @@ jobs:
             fi
 
             # Run Docker commands with sudo and pass the password
-            echo '${{ env.SUDO_PASSWORD }}' | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 \
-            --env-file .env ${{ env.IMAGE_NAME }}
+            echo '${{ env.SUDO_PASSWORD }}' | sudo -S docker run -d --name ${{ env.CONTAINER_NAME }} -p 8099:3000 ${{ env.IMAGE_NAME }}
             sudo docker logout
             sleep 10
