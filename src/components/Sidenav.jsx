@@ -142,6 +142,16 @@ export default function Sidenav() {
         roles: ['ALL'],
         children: [
           {
+            name: 'Dashboard',
+            href: '/dashboard',
+            icon: <BarChartOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+              'COUNTY_SYSTEM_ADMINISTRATOR',
+            ],
+          },
+          {
             name: 'MOH 710',
             href: '/reports/moh-710',
             icon: <BarChartOutlined />,
@@ -152,16 +162,6 @@ export default function Sidenav() {
             href: '/reports/moh-525',
             icon: <DotChartOutlined />,
             roles: ['ALL'],
-          },
-          {
-            name: 'Dashboard',
-            href: '/dashboard',
-            icon: <BarChartOutlined />,
-            roles: [
-              'ADMINISTRATOR',
-              'NATIONAL_SYSTEM_ADMINISTRATOR',
-              'COUNTY_SYSTEM_ADMINISTRATOR',
-            ],
           },
         ],
       },
@@ -311,13 +311,13 @@ export default function Sidenav() {
             roles: ['SUB_COUNTY_STORE_MANAGER'],
           },
           {
-            name: 'Received from another facility',
+            name: 'Receive from another facility',
             href: '/stock-management/positive-adjustment',
             icon: <PlusCircleOutlined />,
             roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
           },
           {
-            name: 'Shared with another facility',
+            name: 'Share with another facility',
             href: '/stock-management/negative-adjustment',
             icon: <MinusCircleOutlined />,
             roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],

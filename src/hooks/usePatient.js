@@ -29,34 +29,6 @@ export default function usePatient() {
           system: 'http://hl7.org/fhir/administrative-identifier',
           value: data.identificationNumber,
         },
-        {
-          type: {
-            coding: [
-              {
-                system: 'system-creation',
-                code: 'system_creation',
-                display: 'System Creation',
-              },
-            ],
-            text: moment().format('YYYY-MM-DD HH:mm:ss'),
-          },
-          system: 'system-creation',
-          value: moment().format('YYYY-MM-DD HH:mm:ss'),
-        },
-        {
-          type: {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/administrative-identifier',
-                code: 'system_generated',
-                display: 'SYSTEM_GENERATED',
-              },
-            ],
-            text: 'SYSTEM_GENERATED',
-          },
-          system: 'identification',
-          value: generateUniqueCode(8),
-        },
       ],
       active: true,
       name: [
@@ -152,12 +124,55 @@ export default function usePatient() {
 
     if (data.clientID) {
       patientResource.id = data.clientID
+      const patient = await getPatient(data.clientID)
+
+      patientResource.identifier = [
+        ...patient.identifier?.filter((id) => {
+          const type = id.type.coding[0].display
+          return !patientResource.identifier.some(
+            (identifier) => identifier.type.coding[0].display === type
+          )
+        }),
+        ...patientResource.identifier,
+      ]
 
       return await put(
         `${fhirEndpoint}/Patient/${data.clientID}`,
         patientResource
       )
     }
+
+    patientResource.identifier = [
+      ...patientResource.identifier,
+      {
+        type: {
+          coding: [
+            {
+              system: 'system-creation',
+              code: 'system_creation',
+              display: 'System Creation',
+            },
+          ],
+          text: moment().format('YYYY-MM-DD HH:mm:ss'),
+        },
+        system: 'system-creation',
+        value: moment().format('YYYY-MM-DD HH:mm:ss'),
+      },
+      {
+        type: {
+          coding: [
+            {
+              system: 'http://hl7.org/fhir/administrative-identifier',
+              code: 'system_generated',
+              display: 'SYSTEM_GENERATED',
+            },
+          ],
+          text: 'SYSTEM_GENERATED',
+        },
+        system: 'identification',
+        value: generateUniqueCode(8),
+      },
+    ]
 
     return await post(`${fhirEndpoint}/Patient`, patientResource)
   }

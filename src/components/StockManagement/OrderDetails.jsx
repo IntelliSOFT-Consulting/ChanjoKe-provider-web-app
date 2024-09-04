@@ -90,13 +90,24 @@ export default function OrderDetails() {
       }
     })
 
+    const isCanceled = order?.status === 'cancelled'
+    const cancelDate = isCanceled
+      ? moment(order?.meta?.lastUpdated).format('DD-MM-YYYY')
+      : '-'
+    const preferredPickupDate = order?.extension?.find((item) =>
+      item.url?.includes('preferredPickupDate')
+    )?.valueDateTime
+
     return {
       orderNumber: order?.identifier?.[0]?.value,
       issueDate: moment(order?.occurrenceDateTime).format('DD-MM-YYYY'),
       orderingStore: order?.deliverTo?.display,
       receiveDate: moment(order?.occurrencePeriod?.start).format('DD-MM-YYYY'),
       fulfillingStore: order?.deliverFrom?.display,
-      cancelDate: order?.cancelDate,
+      cancelDate,
+      preferredPickupDate: preferredPickupDate
+      ? moment(preferredPickupDate).format('DD-MM-YYYY')
+      : '-',
       packDate: moment(order?.occurrencePeriod?.end).format('DD-MM-YYYY'),
       status: order?.status,
       orderItems,
@@ -179,6 +190,8 @@ export default function OrderDetails() {
       ],
     },
   ]
+
+  console.log(orderDetails)
 
   return (
     <Card title={orderDetails?.orderNumber || orderID} className="mt-5">

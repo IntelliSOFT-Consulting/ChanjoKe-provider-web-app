@@ -117,12 +117,12 @@ export default function ClientRecords() {
   }, [clientID])
 
   useEffect(() => {
-    if (patient) {
+    if (patient && counties?.length) {
       const age = moment().diff(patient.birthDate, 'years')
       setIsOver18(age >= 18)
       setDetails(formatDetails(patient))
     }
-  }, [patient])
+  }, [patient, counties])
 
   const columns = [
     {

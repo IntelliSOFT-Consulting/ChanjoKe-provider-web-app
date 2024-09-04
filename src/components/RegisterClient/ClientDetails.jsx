@@ -131,8 +131,9 @@ export default function ClientDetails() {
 
     if (!clientID) {
       await createRecommendations(patient)
+    } else {
+      await createRecommendations(patient, 'update')
     }
-    await createRecommendations(patient, 'update')
 
     setSaving(false)
 
@@ -364,11 +365,7 @@ export default function ClientDetails() {
                   },
                 ]}
               >
-                <Input
-                  placeholder="Age"
-                  disabled={true}
-                  className="w-full"
-                />
+                <Input placeholder="Age" disabled={true} className="w-full" />
               </Form.Item>
 
               <div

@@ -135,14 +135,15 @@ export default function ReceivedOrders() {
           >
             View
           </Link>
-
-          <Link
-            to={`/stock-management/issue-stock`}
-            state={{ order: record }}
-            className="text-green font-semibold hover:!text-green"
-          >
-            Issue Stock
-          </Link>
+          {record.status === 'active' && (
+            <Link
+              to={`/stock-management/issue-stock`}
+              state={{ order: record }}
+              className="text-green font-semibold hover:!text-green"
+            >
+              Issue Stock
+            </Link>
+          )}
         </div>
       ),
     },

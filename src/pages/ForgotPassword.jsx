@@ -40,6 +40,7 @@ export default function ForgotPassword() {
         message.success(response.response)
 
         setTimeout(() => {
+          localStorage.clear()
           navigate('/auth')
         }, 3000)
       }

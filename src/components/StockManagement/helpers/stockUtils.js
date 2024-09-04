@@ -178,3 +178,18 @@ export const vialsToDoses = (vacine, quantity) => {
   const doses = quantity * vaccineDoses[vacine]
   return doses
 }
+
+// stock consumed last month
+export const stockConsumedLastMonth = (batches, inventoryReports) => {
+  // get consumption per vaccine
+  const consumptionPerVaccine = inventoryReports.map((report) => {
+    const vaccine = report.vaccine
+    const consumed = report.consumed
+    return { vaccine, consumed }
+  })
+
+  // get the total consumed
+  const totalConsumed = consumptionPerVaccine.reduce((acc, curr) => {
+    return acc + curr.consumed
+  }, 0)
+}
