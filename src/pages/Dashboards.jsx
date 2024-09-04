@@ -2,6 +2,11 @@ import React, { useEffect, useRef } from 'react'
 import { embedDashboard } from '@superset-ui/embedded-sdk'
 import { useApiRequest } from '../api/useApiRequest'
 
+const id = process.env.REACT_APP_DASHBOARD_ID
+const domain = process.env.REACT_APP_SUPERSET_DOMAIN
+
+console.log({id, domain})
+
 const SupersetDashboard = () => {
   const dashboardRef = useRef(null)
   const { get } = useApiRequest()
@@ -12,8 +17,8 @@ const SupersetDashboard = () => {
         const data = await get('/auth/provider/superset-token')
         const token = data?.token
         await embedDashboard({
-          id: process.env.REACT_APP_DASHBOARD_ID,
-          supersetDomain: process.env.REACT_APP_SUPERSET_DOMAIN,
+          id,
+          supersetDomain: domain,
           mountPoint: dashboardRef.current,
           fetchGuestToken: () => token,
           dashboardUiConfig: {
