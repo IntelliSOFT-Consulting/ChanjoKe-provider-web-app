@@ -68,6 +68,7 @@ const AdministerCampaign = () => {
     const expiryDate = moment(campaignItem?.period?.ed).format('YYYY-MM-DD')
 
     if (today > expiryDate) {
+      localStorage.removeItem('campaign')
       return navigate('/campaigns')
     }
     return false

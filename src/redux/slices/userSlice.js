@@ -136,6 +136,7 @@ const userSlice = createSlice({
     logout: (state) => {
       state.user = null
       localStorage.removeItem('user')
+      localStorage.clear()
     },
   },
   extraReducers: (builder) => {
@@ -162,6 +163,7 @@ const userSlice = createSlice({
       .addCase(refreshToken.rejected, (state) => {
         state.user = null
         localStorage.removeItem('user')
+        localStorage.clear()
       })
   },
 })
