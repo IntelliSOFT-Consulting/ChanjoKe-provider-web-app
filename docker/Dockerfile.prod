@@ -9,8 +9,7 @@ RUN npm install
 
 COPY . .
 
-ARG REACT_APP_DASHBOARD_ID
-ARG REACT_APP_SUPERSET_DOMAIN
+COPY .env .
 
 RUN npm run build
 
