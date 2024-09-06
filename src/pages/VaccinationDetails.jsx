@@ -8,7 +8,6 @@ import usePatient from '../hooks/usePatient'
 import useVaccination from '../hooks/useVaccination'
 import { calculateAges, getAgeAtDose } from '../utils/methods'
 import { allVaccines } from '../data/vaccineData'
-import { all } from 'axios'
 
 export default function VaccinationDetails() {
   const [patientInfo, setPatientInfo] = useState(null)
@@ -106,6 +105,9 @@ export default function VaccinationDetails() {
             >
               <Descriptions.Item label="Dose administered">
                 {immunization?.doseQuantity?.value}
+              </Descriptions.Item>
+              <Descriptions.Item label="Batch Number">
+                {immunization?.lotNumber}
               </Descriptions.Item>
               <Descriptions.Item label="Date of last dose">
                 {dayjs(immunization?.occurrenceDateTime).format('Do MMM YYYY')}

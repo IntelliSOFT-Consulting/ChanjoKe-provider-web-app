@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { Button, DatePicker, Form, Select } from 'antd'
+import { Button, DatePicker, Form, Input, Select } from 'antd'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
 import useVaccination from '../../hooks/useVaccination'
@@ -141,7 +141,11 @@ export default function UpdateVaccineHistory() {
             onFinish={handleFinish}
             initialValues={{
               vaccines: [
-                { vaccineType: null, dateOfLastDose: null, placeOfVaccination: null },
+                {
+                  vaccineType: null,
+                  dateOfLastDose: null,
+                  placeOfVaccination: null,
+                },
               ],
             }}
           >
@@ -188,6 +192,13 @@ export default function UpdateVaccineHistory() {
                             )
                           })}
                         </Select>
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Batch Number"
+                        name={[name, 'batchNumber']}
+                      >
+                        <Input placeholder="Enter batch number" />
                       </Form.Item>
 
                       <Form.Item
