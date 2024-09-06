@@ -1,7 +1,31 @@
+/*
+Grandparent
+Foster Parent
+Sibling (Brother/Sister)
+Aunt/Uncle
+Stepparent
+Cousin
+Family Friend
+Neighbor
+Nanny/Babysitter
+Social Worker
+Other (with a field for specification)
+*/
 export const caregiverTypes = [
   { id: 1, label: 'Father', value: 'Father' },
   { id: 2, label: 'Mother', value: 'Mother' },
   { id: 3, label: 'Guardian', value: 'Guardian' },
+  { id: 4, label: 'Grandparent', value: 'Grandparent' },
+  { id: 5, label: 'Foster Parent', value: 'Foster Parent' },
+  { id: 6, label: 'Sibling', value: 'Sibling' },
+  { id: 7, label: 'Aunt/Uncle', value: 'Aunt/Uncle' },
+  { id: 8, label: 'Stepparent', value: 'Stepparent' },
+  { id: 9, label: 'Cousin', value: 'Cousin' },
+  { id: 10, label: 'Family Friend', value: 'Family Friend' },
+  { id: 11, label: 'Neighbor', value: 'Neighbor' },
+  { id: 12, label: 'Nanny/Babysitter', value: 'Nanny/Babysitter' },
+  { id: 13, label: 'Social Worker', value: 'Social Worker' },
+  { id: 14, label: 'Other', value: 'Other' },
 ]
 
 export const caregiverRelationships = [

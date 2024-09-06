@@ -2,20 +2,16 @@ import {
   Button,
   Form,
   Input,
-  Select,
   Popconfirm,
-  InputNumber,
-  Radio,
+  Select
 } from 'antd'
-import {
-  caregiverTypes,
-  caregiverRelationships,
-  caregiverIdentificationTypes,
-} from '../../data/options/clientDetails'
 import { countryCodes } from '../../data/countryCodes'
-import Table from '../DataTable'
+import {
+  caregiverIdentificationTypes,
+  caregiverTypes
+} from '../../data/options/clientDetails'
 import { titleCase } from '../../utils/methods'
-import { useState } from 'react'
+import Table from '../DataTable'
 
 export default function CaregiverDetails({
   setCaregivers,
@@ -29,15 +25,7 @@ export default function CaregiverDetails({
     setCaregivers(caregivers.filter((item) => item !== record))
   }
 
-  const [caregiveRelationship, setCaregiverRelationship] = useState('parent')
-
   const columns = [
-    {
-      title: 'Relationship with client',
-      dataIndex: 'caregiverRelationship',
-      key: 'caregiverRelationship',
-      width: 100,
-    },
     {
       title:
         caregiverType() === 'Caregiver'
@@ -108,50 +96,22 @@ export default function CaregiverDetails({
 
   return (
     <div>
-      <h3 className="text-xl font-medium mb-6">
-        {`${caregiverType(caregiveRelationship)} Details`}{' '}
-        {caregiveRelationship}
-      </h3>
+      <h3 className="text-xl font-medium mb-6">Caregiver Details</h3>
       <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
         <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
           <Form.Item
-            name="caregiverRelationship"
-            label="Relationship with client"
-            rules={[
-              {
-                required: true,
-                message: `Please select the relationship`,
-              },
-            ]}
-          >
-            <Select
-              placeholder={`Select Relationship`}
-              options={caregiverRelationships}
-              onChange={(value) => setCaregiverRelationship(value)}
-              showSearch
-              searchable
-              allowClear
-            />
-          </Form.Item>
-
-          <Form.Item
             name="caregiverType"
-            label={
-              caregiverType(caregiveRelationship) === 'Caregiver'
-                ? `${caregiverType(caregiveRelationship)} Type`
-                : `Relationship with ${caregiverType(caregiveRelationship)}`
-            }
+            label="Caregiver Relationship"
             rules={[
               {
                 required: true,
-                message: `Please select the ${caregiverType(
-                  caregiveRelationship
-                )} type`,
+                message: `Please select the caregiver relationship`,
               },
             ]}
+            extra="Select the relationship of the caregiver to the client"
           >
             <Select
-              placeholder={`Select ${caregiverType(caregiveRelationship)} Type`}
+              placeholder={`Select Caregiver Relationship`}
               options={caregiverTypes}
               showSearch
               searchable
@@ -161,13 +121,11 @@ export default function CaregiverDetails({
 
           <Form.Item
             name="caregiverName"
-            label={`${caregiverType(caregiveRelationship)} Name`}
+            label="Caregiver Name"
             rules={[
               {
                 required: true,
-                message: `Please input the ${caregiverType(
-                  caregiveRelationship
-                )} name`,
+                message: `Please input the caregiver name`,
               },
             ]}
           >
@@ -186,10 +144,8 @@ export default function CaregiverDetails({
             label="ID Type"
             rules={[
               {
-                required: caregiveRelationship === 'kin',
-                message: `Please select the ${caregiverType(
-                  caregiveRelationship
-                )} ID type`,
+                required: true,
+                message: `Please select the caregiver ID type`,
               },
             ]}
           >
@@ -203,14 +159,14 @@ export default function CaregiverDetails({
           </Form.Item>
           <Form.Item
             name="caregiverID"
-            label={`${caregiverType(caregiveRelationship)} ID Number`}
+            label={`Caregiver ID Number`}
             rules={[
-              {
-                required: caregiveRelationship === 'kin',
-                message: `Please input the ${caregiverType(
-                  caregiveRelationship
-                )} ID number`,
-              },
+              ({ getFieldValue }) => ({
+                required: !['Father', 'Mother'].includes(
+                  getFieldValue('caregiverType')
+                ),
+                message: `Please input the Caregiver ID number`,
+              }),
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (value) {
@@ -254,7 +210,12 @@ export default function CaregiverDetails({
                 pattern: /^(\+?)([0-9]{7,15})$/,
                 message: 'Please enter a valid phone number!',
               },
-              { required: caregiveRelationship === 'kin' },
+              ({ getFieldValue }) => ({
+                required: !['Father', 'Mother'].includes(
+                  getFieldValue('caregiverType')
+                ),
+                message: `Please input the Caregiver phone number`,
+              }),
             ]}
             className="mb-0"
           >
@@ -301,7 +262,7 @@ export default function CaregiverDetails({
                 })
             }}
           >
-            {`Add ${caregiverType(caregiveRelationship)}`}
+            {`Add Caregiver`}
           </Button>
         </Form.Item>
       </Form>

@@ -74,7 +74,7 @@ export default function usePatient() {
               coding: [
                 {
                   system: 'http://terminology.hl7.org/CodeSystem/v2-0131',
-                  code: caregiver.caregiverRelationship,
+                  code: caregiver.caregiverType,
                   display: caregiver.caregiverType,
                 },
               ],
@@ -95,10 +95,6 @@ export default function usePatient() {
             },
           ],
           extension: [
-            {
-              url: 'relationship_to_client',
-              valueString: caregiver.caregiverRelationship,
-            },
             {
               url: 'caregiver_id_type',
               valueString: caregiver.caregiverIdentificationType,

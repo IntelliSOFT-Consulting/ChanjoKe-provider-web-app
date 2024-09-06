@@ -49,7 +49,6 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
       title: `${caregiverType()} Details`,
       data: caregivers.map((caregiver, index) => {
         const labels = [
-          'caregiverRelationship',
           'caregiverType',
           'caregiverName',
           'phoneNumber',

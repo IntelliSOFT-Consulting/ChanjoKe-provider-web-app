@@ -76,9 +76,6 @@ export default function PreloadDetails({
     )?.valueString
 
     const caregivers = patient.contact.map((caregiver, index) => {
-      const caregiverRelationship = caregiver.extension?.find(
-        (item) => item.url === 'relationship_to_client'
-      )?.valueString
       const caregiverIdentificationType = caregiver.extension?.find(
         (item) => item.url === 'caregiver_id_type'
       )?.valueString
@@ -93,7 +90,6 @@ export default function PreloadDetails({
         caregiverID: caregiverIdentificationNumber,
         caregiverIdentificationType,
         caregiverIdentificationNumber,
-        caregiverRelationship,
       }
     })
 
