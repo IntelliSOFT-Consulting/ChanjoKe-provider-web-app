@@ -3,6 +3,9 @@ export const checkIfVaccineIsAlreadyAdministered = (
   immunizations,
   selectedVaccines
 ) => {
+  immunizations = immunizations?.filter(
+    (immunization) => immunization.status === 'completed'
+  )
   const recommendations = recommendation.recommendation
   const selectedVaccineNames = selectedVaccines.map(
     (vaccine) => vaccine.vaccine
