@@ -73,8 +73,10 @@ const AuthRoute = ({ element }) => {
 
   const location = useLocation()
 
+  const dashboardRoles = ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR']
+
   return user?.access_token && authRoutes.includes(location.pathname) ? (
-    <Navigate to="/" />
+    <Navigate to={dashboardRoles.includes(user?.practitionerRole) ? '/dashboard' : '/'} />
   ) : (
     element
   )

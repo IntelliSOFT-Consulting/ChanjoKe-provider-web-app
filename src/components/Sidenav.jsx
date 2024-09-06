@@ -100,6 +100,16 @@ export default function Sidenav() {
         roles: ['ALL'],
       },
       {
+        name: 'Dashboard',
+        href: '/dashboard',
+        icon: <BarChartOutlined />,
+        roles: [
+          'ADMINISTRATOR',
+          'NATIONAL_SYSTEM_ADMINISTRATOR',
+          'COUNTY_SYSTEM_ADMINISTRATOR',
+        ],
+      },
+      {
         name: 'Admin Management',
         icon: '',
         href: '#',
@@ -141,16 +151,6 @@ export default function Sidenav() {
         icon: 'vaccinationReportLogo',
         roles: ['ALL'],
         children: [
-          {
-            name: 'Dashboard',
-            href: '/dashboard',
-            icon: <BarChartOutlined />,
-            roles: [
-              'ADMINISTRATOR',
-              'NATIONAL_SYSTEM_ADMINISTRATOR',
-              'COUNTY_SYSTEM_ADMINISTRATOR',
-            ],
-          },
           {
             name: 'MOH 710',
             href: '/reports/moh-710',

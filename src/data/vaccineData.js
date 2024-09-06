@@ -558,6 +558,9 @@ export const routineVaccines = [
     description: 'routine',
     dependencyPeriod: 180,
   },
+]
+
+export const nonRoutineVaccines = [
   {
     vaccineName: 'HPV Vaccine 1',
     vaccineCode: 'IMHPV-1',
@@ -566,7 +569,7 @@ export const routineVaccines = [
     doseNumber: '1',
     status: 'upcoming',
     category: 'HPV',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 3650,
       end: 5110,
@@ -584,7 +587,7 @@ export const routineVaccines = [
     doseNumber: '2',
     status: 'upcoming',
     category: 'HPV',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 3830,
       end: 5110,
@@ -605,7 +608,7 @@ export const routineVaccines = [
     dueDate: null,
     status: 'upcoming',
     category: 'covid_19',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: Infinity,
@@ -622,7 +625,7 @@ export const routineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-ASTR-1',
-    description: 'routine',
+    description: 'non-routine',
     dependencyPeriod: 84,
     adminRange: {
       start: 6570,
@@ -639,7 +642,7 @@ export const routineVaccines = [
     dueDate: null,
     status: 'upcoming',
     category: 'covid_19',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: Infinity,
@@ -655,7 +658,7 @@ export const routineVaccines = [
     dueDate: null,
     status: 'upcoming',
     category: 'covid_19',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 4380,
       end: Infinity,
@@ -672,7 +675,7 @@ export const routineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-PFIZER-1',
-    description: 'routine',
+    description: 'non-routine',
     dependencyPeriod: 28,
     adminRange: {
       start: 4380,
@@ -689,7 +692,7 @@ export const routineVaccines = [
     dueDate: null,
     status: 'upcoming',
     category: 'covid_19',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: Infinity,
@@ -706,7 +709,7 @@ export const routineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-MOD-1',
-    description: 'routine',
+    description: 'non-routine',
     dependencyPeriod: 28,
     adminRange: {
       start: 6570,
@@ -723,7 +726,7 @@ export const routineVaccines = [
     dueDate: null,
     status: 'upcoming',
     category: 'covid_19',
-    description: 'routine',
+    description: 'non-routine',
     adminRange: {
       start: 6570,
       end: 21900,
@@ -740,7 +743,7 @@ export const routineVaccines = [
     status: 'upcoming',
     category: 'covid_19',
     dependentVaccine: 'IMCOV-SINO-1',
-    description: 'routine',
+    description: 'non-routine',
     dependencyPeriod: 28,
     adminRange: {
       start: 6570,
@@ -748,9 +751,6 @@ export const routineVaccines = [
       unit: 'days',
     },
   },
-]
-
-export const nonRoutineVaccines = [
   {
     vaccineName: 'Tetanus 1',
     vaccineCode: 'IMTD-1',
