@@ -60,9 +60,9 @@ export default function PreloadDetails({
     const county = patient.address[0]?.line?.[0]
     const subCounty = patient.address[0]?.line?.[1]
     const ward = patient.address[0]?.line?.[2]
-    const communityUnit = patient.address[0]?.line?.[3]
-    const townCenter = patient.address[0]?.line?.[4]
-    const estateOrHouseNo = patient.address[0]?.line?.[5]
+    const communityUnit = patient.address[0]?.line?.[3]?.replace('N/A', '')
+    const townCenter = patient.address[0]?.line?.[4]?.replace('N/A', '')
+    const estateOrHouseNo = patient.address[0]?.line?.[5]?.replace('N/A', '')
 
     const vaccinationCategory = patient.extension?.find(
       (item) => item.url === 'vaccination_category'

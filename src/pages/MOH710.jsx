@@ -38,6 +38,16 @@ export default function MOH710() {
     return []
   }
 
+  const priority = ['facility', 'subcounty', 'ward', 'county']
+
+  const getLocation = (formValues) => {
+    const values = { ...formValues }
+    const location = priority.find((key) => values?.[key])
+    return {
+      [location]: values?.[location],
+    }
+  }
+
   const handleDates = (values = {}) => {
     const { start, end } = values
     const dates = []
@@ -57,7 +67,10 @@ export default function MOH710() {
       }
     }
 
-    const userLocation = getLocations(user)
+    const location = getLocation(values) || {}
+
+    const userLocation =
+      Object.values(values)?.length > 2 ? location : getLocations(user)
 
     setDates(dates)
     getMoh710({
@@ -150,17 +163,61 @@ export default function MOH710() {
         >
           {!user?.orgUnit?.level && (
             <Form.Item label="County" name="county" className="m-0">
-              <Select options={locationToOptions(counties)} />
+              <Select
+                options={locationToOptions(counties)}
+                onChange={handleCountyChange}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+                notFoundContent="No counties found"
+                placeholder="Select County"
+              />
             </Form.Item>
           )}
           {!user?.subCounty && (
-            <Form.Item label="Sub County" name="subCounty" className="m-0">
-              <Select options={locationToOptions(subCounties)} />
+            <Form.Item label="Sub County" name="subcounty" className="m-0">
+              <Select
+                options={locationToOptions(subCounties)}
+                onChange={handleSubCountyChange}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+                notFoundContent="No sub counties found"
+                placeholder="Select Sub County"
+              />
+            </Form.Item>
+          )}
+          {!user?.subCounty && (
+            <Form.Item label="Ward" name="ward" className="m-0">
+              <Select
+                options={locationToOptions(wards)}
+                onChange={handleWardChange}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+                notFoundContent="No wards found"
+                placeholder="Select Ward"
+              />
             </Form.Item>
           )}
           {!user?.facility && (
             <Form.Item label="Facility" name="facility" className="m-0">
-              <Select options={locationToOptions(facilities)} />
+              <Select
+                options={locationToOptions(facilities)}
+                allowClear
+                showSearch
+                filterOption={(input, option) =>
+                  option.label.toLowerCase().includes(input.toLowerCase())
+                }
+                notFoundContent="No facilities found"
+                placeholder="Select Facility"
+              />
             </Form.Item>
           )}
           <Form.Item label="Date" name="date" className="m-0">
