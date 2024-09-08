@@ -8,9 +8,15 @@ import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 import { formatCardTitle } from '../../utils/methods'
-import { datePassed } from '../../utils/validate'
+import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
-import { colorCodeVaccines, isQualified, outGrown } from './vaccineController'
+import {
+  colorCodeVaccines,
+  isCovidQualified,
+  isQualified,
+  outGrown,
+  prevDoseNotDone,
+} from './vaccineController'
 import useVaccination from '../../hooks/useVaccination'
 import moment from 'moment'
 import DeleteModal from './DeleteModal'
@@ -114,6 +120,18 @@ export default function NonRoutineVaccines({
       hidden: !canAccess('ADMINISTER_VACCINE'),
       render: (_text, record) => {
         const completed = record.status === 'completed'
+        const isLocked = lockVaccine(record.dueDate, record.lastDate)
+        const prevNotDone = prevDoseNotDone(immunizations, record)
+        const isDisabled =
+          completed ||
+          patientDetails?.deceased ||
+          (isLocked &&
+            !['Rescheduled', 'Not Administered'].includes(record.status)) ||
+          record.contraindicated ||
+          !isCovidQualified(allVaccines, record) ||
+          prevNotDone
+
+        
 
         return (
           <Checkbox
@@ -121,12 +139,7 @@ export default function NonRoutineVaccines({
             value={record.vaccine}
             defaultChecked={completed}
             className="tooltip"
-            disabled={
-              (!isQualified(allVaccines, record) ||
-                outGrown(record?.lastDate) ||
-                patientDetails?.deceased) &&
-              record.status !== 'Rescheduled'
-            }
+            disabled={isDisabled}
             onChange={() => handleCheckBox(record)}
           />
         )

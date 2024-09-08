@@ -106,8 +106,8 @@ export default function OrderDetails() {
       fulfillingStore: order?.deliverFrom?.display,
       cancelDate,
       preferredPickupDate: preferredPickupDate
-      ? moment(preferredPickupDate).format('DD-MM-YYYY')
-      : '-',
+        ? moment(preferredPickupDate).format('DD-MM-YYYY')
+        : '-',
       packDate: moment(order?.occurrencePeriod?.end).format('DD-MM-YYYY'),
       status: order?.status,
       orderItems,
@@ -190,8 +190,6 @@ export default function OrderDetails() {
       ],
     },
   ]
-
-  console.log(orderDetails)
 
   return (
     <Card title={orderDetails?.orderNumber || orderID} className="mt-5">

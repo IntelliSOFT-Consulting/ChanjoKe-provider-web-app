@@ -48,6 +48,17 @@ export const isCovidQualified = (vaccinesSchedule, vaccine) => {
   return true
 }
 
+export const prevDoseNotDone = (immunizations, vaccine) => {
+  if (vaccine.doseNumber > 1) {
+    const prevDoseImmunization = immunizations.find(
+      (item) =>
+        item.vaccineCode?.coding?.[0]?.display === vaccine.dependentVaccine
+    )
+    return prevDoseImmunization?.status !== 'completed'
+  }
+  return false
+}
+
 export const isQualified = (vaccinesSchedule, vaccine) => {
   if (vaccine.disease === 'Covid 19 (SARS-CoV-2)') {
     const covidVaccines = vaccinesSchedule.filter(
@@ -221,7 +232,6 @@ const createAlert = (vaccines, reason) => {
 
 const createAlertForReason = (immunizations, reason) => {
   immunizations = filterImmunizations(immunizations)
-  console.log('immunizations', immunizations)
   const filtered = filterVaccines(immunizations, reason)
   const finalFiltered =
     reason === REASON_TYPES.RESCHEDULED
