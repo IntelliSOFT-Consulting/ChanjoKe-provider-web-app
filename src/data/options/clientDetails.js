@@ -1,16 +1,3 @@
-/*
-Grandparent
-Foster Parent
-Sibling (Brother/Sister)
-Aunt/Uncle
-Stepparent
-Cousin
-Family Friend
-Neighbor
-Nanny/Babysitter
-Social Worker
-Other (with a field for specification)
-*/
 export const caregiverTypes = [
   { id: 1, label: 'Father', value: 'Father' },
   { id: 2, label: 'Mother', value: 'Mother' },
@@ -207,4 +194,13 @@ export const caregiverIdentificationTypes = [
   { label: 'National ID', value: 'National ID' },
   { label: 'Passport', value: 'Passport' },
   { label: 'NEMIS', value: 'NEMIS' },
+]
+
+// the priority of identification types
+export const identificationPriority = [
+  'ID_number',
+  'Passport',
+  'Birth_Certificate',
+  'NEMIS',
+  'Birth_Notification_Number',
 ]
