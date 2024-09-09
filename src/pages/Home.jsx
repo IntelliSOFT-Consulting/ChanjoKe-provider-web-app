@@ -118,7 +118,7 @@ export default function Home() {
   const today = moment().format('YYYY-MM-DD')
 
   useEffect(() => {
-    getFacilityImmunizations(user?.orgUnit?.code || '0', `&date=gt${today}`)
+    getFacilityImmunizations(user?.orgUnit?.code || '0', `&date=${today}`)
     getFacilityAppointments(today)
     getReferralsToFacility(user?.orgUnit?.code || '0', 0, today)
   }, [user?.orgUnit?.code])
