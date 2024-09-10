@@ -36,7 +36,7 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
           value: values.age,
         },
         {
-          label: 'Identification Type',
+          label: 'Document Identification Type',
           value: titleCase(values.identificationType?.replace(/_/g, ' ')),
         },
         {

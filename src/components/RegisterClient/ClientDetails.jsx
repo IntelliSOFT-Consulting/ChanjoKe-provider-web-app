@@ -427,17 +427,17 @@ export default function ClientDetails() {
 
               <Form.Item
                 name="identificationType"
-                label="Identification Type"
+                label="Document Identification Type"
                 rules={[
                   {
                     required: true,
-                    message: 'Please select identification type',
+                    message: 'Please select document identification type',
                   },
                 ]}
               >
                 <Select
                   disabled={!idOptions?.length}
-                  placeholder="Select Identification Type"
+                  placeholder="Select Document Identification Type"
                   onChange={(value) => {
                     if (value) {
                       setIsDocumentTypeSelected(true)
@@ -451,7 +451,7 @@ export default function ClientDetails() {
 
               <Form.Item
                 name="identificationNumber"
-                label="Identification Number"
+                label="Document Identification Number"
                 rules={[
                   {
                     message: 'Please input identifier number',
@@ -467,7 +467,7 @@ export default function ClientDetails() {
                     const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
                     form.setFieldValue('identificationNumber', value)
                   }}
-                  placeholder="Document Identification Number"
+                  placeholder="Document Document Identification Number"
                   autoComplete="off"
                   className="w-full"
                 />

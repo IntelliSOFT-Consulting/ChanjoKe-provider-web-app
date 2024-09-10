@@ -1,11 +1,13 @@
+import { PlusOutlined, WarningTwoTone } from '@ant-design/icons'
 import { Disclosure } from '@headlessui/react'
-import { PlusOutlined } from '@ant-design/icons'
-import { WarningTwoTone } from '@ant-design/icons'
-import { Badge, Button, Checkbox, Tag, FloatButton, Popconfirm } from 'antd'
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { Badge, Button, Checkbox, FloatButton, Popconfirm, Tag } from 'antd'
+import moment from 'moment'
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
+import { useAccess } from '../../hooks/useAccess'
+import useAefi from '../../hooks/useAefi'
 import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
@@ -13,15 +15,8 @@ import Table from '../DataTable'
 import {
   colorCodeVaccines,
   isCovidQualified,
-  isQualified,
-  outGrown,
-  prevDoseNotDone,
+  prevDoseNotDone
 } from './vaccineController'
-import useVaccination from '../../hooks/useVaccination'
-import moment from 'moment'
-import DeleteModal from './DeleteModal'
-import useAefi from '../../hooks/useAefi'
-import { useAccess } from '../../hooks/useAccess'
 
 export default function NonRoutineVaccines({
   userCategory,
@@ -29,42 +24,21 @@ export default function NonRoutineVaccines({
   nonRoutineVaccines,
   patientDetails,
   immunizations,
-  fetchData,
   caregiverRefusal,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [immunizationToDelete, setImmunizationToDelete] = useState(null)
 
   const navigate = useNavigate()
-  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
 
   const dispatch = useDispatch()
 
-  const { updateImmunization } = useVaccination()
   const { getAefis, aefis } = useAefi()
   const { canAccess } = useAccess()
 
   useEffect(() => {
     getAefis()
   }, [])
-
-  const deleteImmunization = async (id, reason) => {
-    const immunization = immunizations?.find((entry) => entry.id === id)
-
-    immunization.status = 'entered-in-error'
-    immunization.statusReason = {
-      coding: [
-        {
-          code: 'entered-in-error',
-          display: reason,
-        },
-      ],
-      text: reason,
-    }
-    await updateImmunization(immunization)
-    fetchData()
-  }
 
   function handleCheckBox(item) {
     const vaccineExists = vaccinesToAdminister.find(
@@ -244,15 +218,6 @@ export default function NonRoutineVaccines({
           >
             View
           </Button>
-          {record.status === 'completed' && canAccess('DELETE_VACCINATION') && (
-            <Button
-              type="link"
-              danger
-              onClick={() => setImmunizationToDelete(record.id)}
-            >
-              Delete
-            </Button>
-          )}
         </div>
       ),
     },
@@ -264,16 +229,6 @@ export default function NonRoutineVaccines({
         open={isDialogOpen}
         buttons={administerVaccineBtns}
         onClose={handleDialogClose}
-      />
-      <DeleteModal
-        immunization={immunizationToDelete}
-        onCancel={() => setImmunizationToDelete(null)}
-        onOk={(values) =>
-          deleteImmunization(
-            immunizationToDelete,
-            values.reason === 'Other' ? values.otherReason : values.reason
-          )
-        }
       />
       <div className="overflow-hidden rounded-lg bg-white px-10 pb-12 pt-5 mt-2 shadow container sm:pt-6">
         <div className="flex justify-between">

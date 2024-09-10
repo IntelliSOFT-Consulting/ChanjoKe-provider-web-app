@@ -15,14 +15,14 @@ export const routineVaccines = [
     vaccineCode: 'IMPO-bOPV',
     nhddCode: '54379',
     diseaseTarget: 'Polio',
-    doseNumber: '0',
+    doseNumber: '1',
     status: 'upcoming',
     category: 'at_birth',
     description: 'routine',
     adminRange: { start: 0, end: 14, unit: 'days' },
   },
   {
-    vaccineName: 'OPV I',
+    vaccineName: 'OPV',
     vaccineCode: 'IMPO-OPV-I',
     nhddCode: '54377',
     diseaseTarget: 'Polio',
@@ -33,10 +33,10 @@ export const routineVaccines = [
     adminRange: { start: 42, end: 1825, unit: 'days' },
   },
   {
-    vaccineName: 'DPT-HepB+Hib 1',
+    vaccineName: 'DPT-HepB+Hib',
     vaccineCode: 'IMDPT-1',
     nhddCode: '14676',
-    diseaseTarget: 'DPT-HepB+Hib 1',
+    diseaseTarget: 'DPT-HepB+Hib',
     doseNumber: '1',
     status: 'upcoming',
     category: '6_weeks',
@@ -44,7 +44,7 @@ export const routineVaccines = [
     adminRange: { start: 42, end: 1825, unit: 'days' },
   },
   {
-    vaccineName: 'PCV10 1',
+    vaccineName: 'PCV10',
     vaccineCode: 'IMPCV10-1',
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
@@ -59,7 +59,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Rotavirus 1',
+    vaccineName: 'Rotavirus',
     vaccineCode: 'IMROTA-1',
     nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
@@ -73,7 +73,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'OPV II',
+    vaccineName: 'OPV',
     vaccineCode: 'IMPO-OPV-II',
     nhddCode: '54377',
     diseaseTarget: 'Polio',
@@ -90,7 +90,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'DPT-HepB+Hib 2',
+    vaccineName: 'DPT-HepB+Hib',
     vaccineCode: 'IMDPT-2',
     nhddCode: '14676',
     diseaseTarget:
@@ -108,7 +108,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'PCV10 2',
+    vaccineName: 'PCV10',
     vaccineCode: 'IMPCV10-2',
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
@@ -125,7 +125,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'Rotavirus 2',
+    vaccineName: 'Rotavirus',
     vaccineCode: 'IMROTA-2',
     nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
@@ -142,7 +142,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'OPV III',
+    vaccineName: 'OPV',
     vaccineCode: 'IMPO-OPV-III',
     nhddCode: '54377',
     diseaseTarget: 'Polio',
@@ -159,7 +159,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'DPT-HepB+Hib 3',
+    vaccineName: 'DPT-HepB+Hib',
     vaccineCode: 'IMDPT-3',
     nhddCode: '50732',
     diseaseTarget:
@@ -177,7 +177,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'PCV10 3',
+    vaccineName: 'PCV10',
     vaccineCode: 'IMPCV10-3',
     nhddCode: '3573',
     diseaseTarget: 'Pneumonia',
@@ -209,7 +209,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Rotavirus 3',
+    vaccineName: 'Rotavirus',
     vaccineCode: 'IMROTA-3',
     nhddCode: '2763',
     diseaseTarget: 'Rotavirus',
@@ -226,7 +226,7 @@ export const routineVaccines = [
     dependencyPeriod: 28,
   },
   {
-    vaccineName: 'Vitamin A 1st Dose',
+    vaccineName: 'Vitamin A',
     vaccineCode: 'IMVIT-1',
     nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
@@ -260,7 +260,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'RTS/AS01 (Malaria Vaccine - 1)',
+    vaccineName: 'RTS/AS01 (Malaria Vaccine)',
     vaccineCode: 'IMMALA-1',
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
@@ -275,11 +275,11 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'RTS/AS01 (Malaria Vaccine - 2)',
+    vaccineName: 'RTS/AS01 (Malaria Vaccine)',
     vaccineCode: 'IMMALA-2',
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
-    doseNumber: '1',
+    doseNumber: '2',
     status: 'upcoming',
     category: '7_months',
     description: 'routine',
@@ -292,7 +292,7 @@ export const routineVaccines = [
     dependencyPeriod: 30,
   },
   {
-    vaccineName: 'Measles-Rubella 1st Dose',
+    vaccineName: 'Measles-Rubella',
     vaccineCode: 'IMMEAS-1',
     nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
@@ -322,11 +322,11 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'RTS/AS01 (Malaria Vaccine - 3)',
+    vaccineName: 'RTS/AS01 (Malaria Vaccine)',
     vaccineCode: 'IMMALA-3',
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
-    doseNumber: '1',
+    doseNumber: '3',
     status: 'upcoming',
     category: '9_months',
     description: 'routine',
@@ -339,11 +339,11 @@ export const routineVaccines = [
     dependencyPeriod: 30,
   },
   {
-    vaccineName: 'Vitamin A 2nd Dose',
+    vaccineName: 'Vitamin A',
     vaccineCode: 'IMVIT-2',
     nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
-    doseNumber: '1',
+    doseNumber: '2',
     status: 'upcoming',
     category: '12_months',
     description: 'routine',
@@ -356,7 +356,7 @@ export const routineVaccines = [
     dependencyPeriod: 180,
   },
   {
-    vaccineName: 'Albendazole 1st Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-1',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -371,7 +371,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 2nd Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-2',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -388,7 +388,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 3rd Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-3',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -406,7 +406,7 @@ export const routineVaccines = [
   },
 
   {
-    vaccineName: 'Albendazole 4th Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-4',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -423,7 +423,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 5th Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-5',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -440,7 +440,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 6th Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-6',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -457,7 +457,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 7th Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-7',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -474,7 +474,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 8th Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-8',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -491,7 +491,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Albendazole 9th Dose',
+    vaccineName: 'Albendazole',
     vaccineCode: 'IMALB-9',
     nhddCode: '11742',
     diseaseTarget: 'Worms',
@@ -508,7 +508,7 @@ export const routineVaccines = [
     },
   },
   {
-    vaccineName: 'Measles-Rubella 2nd Dose',
+    vaccineName: 'Measles-Rubella',
     vaccineCode: 'IMMEAS-2',
     nhddCode: '24014',
     diseaseTarget: 'Measles, Rubella',
@@ -525,11 +525,11 @@ export const routineVaccines = [
     dependencyPeriod: 180,
   },
   {
-    vaccineName: 'Vitamin A 3rd Dose',
+    vaccineName: 'Vitamin A',
     vaccineCode: 'IMVIT-3',
     nhddCode: '1107',
     diseaseTarget: 'Vitamin A Deficiency',
-    doseNumber: '1',
+    doseNumber: '3',
     status: 'upcoming',
     category: '18_months',
     adminRange: {
@@ -542,11 +542,11 @@ export const routineVaccines = [
     dependencyPeriod: 180,
   },
   {
-    vaccineName: 'RTS/AS01 (Malaria Vaccine - 4)',
+    vaccineName: 'RTS/AS01 (Malaria Vaccine)',
     vaccineCode: 'IMMALA-4',
     nhddCode: '15846',
     diseaseTarget: 'Malaria',
-    doseNumber: '1',
+    doseNumber: '4',
     status: 'upcoming',
     category: '24_months',
     adminRange: {
@@ -562,7 +562,7 @@ export const routineVaccines = [
 
 export const nonRoutineVaccines = [
   {
-    vaccineName: 'HPV Vaccine 1',
+    vaccineName: 'HPV Vaccine',
     vaccineCode: 'IMHPV-1',
     nhddCode: '29659',
     diseaseTarget: 'Human Papillomavirus',
@@ -580,7 +580,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'HPV Vaccine 2',
+    vaccineName: 'HPV Vaccine',
     vaccineCode: 'IMHPV-2',
     nhddCode: '29659',
     diseaseTarget: 'Human Papillomarivus',
@@ -616,7 +616,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'AstraZeneca 2nd Dose',
+    vaccineName: 'AstraZeneca',
     vaccineCode: 'IMCOV-ASTR-2',
     nhddCode: '16927',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -650,7 +650,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Pfizer/BioNTech 1st Dose',
+    vaccineName: 'Pfizer/BioNTech',
     vaccineCode: 'IMCOV-PFIZER-1',
     nhddCode: '16929',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -666,7 +666,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Pfizer/BioNTech 2nd Dose',
+    vaccineName: 'Pfizer/BioNTech',
     vaccineCode: 'IMCOV-PFIZER-2',
     nhddCode: '16929',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -684,7 +684,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Moderna 1st Dose',
+    vaccineName: 'Moderna',
     vaccineCode: 'IMCOV-MOD-1',
     nhddCode: '16931',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -700,7 +700,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Moderna 2nd Dose',
+    vaccineName: 'Moderna',
     vaccineCode: 'IMCOV-MOD-2',
     nhddCode: '16931',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -718,7 +718,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Sinopharm 1st Dose',
+    vaccineName: 'Sinopharm',
     vaccineCode: 'IMCOV-SINO-1',
     nhddCode: '16489',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -734,7 +734,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Sinopharm 2nd Dose',
+    vaccineName: 'Sinopharm',
     vaccineCode: 'IMCOV-SINO-2',
     nhddCode: '16489',
     diseaseTarget: 'Covid 19 (SARS-CoV-2)',
@@ -752,7 +752,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 1',
+    vaccineName: 'Tetanus',
     vaccineCode: 'IMTD-1',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -768,7 +768,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 2',
+    vaccineName: 'Tetanus',
     vaccineCode: 'IMTD-2',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -786,7 +786,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 3',
+    vaccineName: 'Tetanus',
     vaccineCode: 'IMTD-3',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -804,7 +804,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 4',
+    vaccineName: 'Tetanus',
     vaccineCode: 'IMTD-4',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -822,7 +822,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 5',
+    vaccineName: 'Tetanus',
     vaccineCode: 'IMTD-5',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -857,7 +857,7 @@ export const nonRoutineVaccines = [
   },
 
   {
-    vaccineName: 'Rabies 1',
+    vaccineName: 'Rabies',
     vaccineCode: 'IMRABIES-RABIES-1',
     nhddCode: '13809',
     diseaseTarget: 'Rabies',
@@ -873,7 +873,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Rabies 2',
+    vaccineName: 'Rabies',
     vaccineCode: 'IMRABIES-RABIES-2',
     nhddCode: '13809',
     diseaseTarget: 'Rabies',
@@ -891,7 +891,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Rabies 3',
+    vaccineName: 'Rabies',
     vaccineCode: 'IMRABIES-RABIES-3',
     nhddCode: '13809',
     diseaseTarget: 'Rabies',
@@ -909,7 +909,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Rabies 4',
+    vaccineName: 'Rabies',
     vaccineCode: 'IMRABIES-RABIES-4',
     nhddCode: '13809',
     diseaseTarget: 'Rabies',
@@ -927,7 +927,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Rabies 5',
+    vaccineName: 'Rabies',
     vaccineCode: 'IMRABIES-RABIES-5',
     nhddCode: '13809',
     diseaseTarget: 'Rabies',
@@ -945,7 +945,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Influenza 1',
+    vaccineName: 'Influenza',
     vaccineCode: 'IMINFLU-1',
     nhddCode: '6306',
     diseaseTarget: 'Influenza',
@@ -961,7 +961,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Influenza 2',
+    vaccineName: 'Influenza',
     vaccineCode: 'IMINFLU-2',
     nhddCode: '6306',
     diseaseTarget: 'Influenza',
@@ -992,7 +992,7 @@ export const uniqueVaccines = [
   'IPV',
   'Vitamin A',
   'Measles-Rubella',
-  'RTS/AS01',
+  'RTS/AS01 (Malaria Vaccine)',
   'Yellow Fever',
   'Albendazole',
   'HPV Vaccine',

@@ -1,7 +1,7 @@
 import { Disclosure } from '@headlessui/react'
 import { PlusSmallIcon } from '@heroicons/react/24/outline'
-import { WarningTwoTone } from '@ant-design/icons'
 import {
+  Alert,
   Badge,
   Button,
   Checkbox,
@@ -9,47 +9,40 @@ import {
   Popconfirm,
   Tag,
   Tooltip,
-  Alert,
 } from 'antd'
 import dayjs from 'dayjs'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import Loader from '../../common/spinners/LoadingArrows'
+import { useAccess } from '../../hooks/useAccess'
 import useAefi from '../../hooks/useAefi'
-import useVaccination from '../../hooks/useVaccination'
 import { setCurrentPatient } from '../../redux/slices/patientSlice'
 import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
 import { formatCardTitle } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
-import DeleteModal from './DeleteModal'
 import {
   colorCodeVaccines,
   isCovidQualified,
   vaccineAlerts,
 } from './vaccineController'
-import { useAccess } from '../../hooks/useAccess'
 
 export default function RoutineVaccines({
   userCategory,
   patientData,
   patientDetails,
   routineVaccines,
-  fetchData,
   immunizations,
 }) {
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
-  const [immunizationToDelete, setImmunizationToDelete] = useState(null)
   const [alerts, setAlerts] = useState(null)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { updateImmunization } = useVaccination()
-  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
   const { getAefis, loading: loadingAefis, aefis } = useAefi()
   const { canAccess } = useAccess()
 
@@ -74,20 +67,6 @@ export default function RoutineVaccines({
       setAlerts(vaccineAlerts(immunizations))
     }
   }, [immunizations, routineVaccines, patientDetails])
-
-  const deleteImmunization = async (id, reason) => {
-    const immunization = immunizations?.find((entry) => entry.id === id)
-    if (immunization) {
-      immunization.status = 'entered-in-error'
-      immunization.statusReason = {
-        coding: [{ code: 'entered-in-error', display: reason }],
-        text: reason,
-      }
-      await updateImmunization(immunization)
-      setImmunizationToDelete(null)
-      fetchData()
-    }
-  }
 
   const handleCheckBox = (item) => {
     setVaccinesToAdminister((prev) => {
@@ -246,15 +225,6 @@ export default function RoutineVaccines({
           >
             View
           </Button>
-          {record.status === 'completed' && canAccess('DELETE_VACCINATION') && (
-            <Button
-              type="link"
-              danger
-              onClick={() => setImmunizationToDelete(record.id)}
-            >
-              Delete
-            </Button>
-          )}
         </div>
       ),
     },
@@ -372,16 +342,6 @@ export default function RoutineVaccines({
           },
         ]}
         onClose={() => setDialogOpen(false)}
-      />
-      <DeleteModal
-        immunization={immunizationToDelete}
-        onCancel={() => setImmunizationToDelete(null)}
-        onOk={(values) =>
-          deleteImmunization(
-            immunizationToDelete,
-            values.reason === 'Other' ? values.otherReason : values.reason
-          )
-        }
       />
       <div className="overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 mt-2 shadow sm:px-6 sm:pt-6">
         <div className="">

@@ -145,7 +145,7 @@ export default function AddFacility() {
       key: 'level',
     },
     {
-      title: 'KMFL Code',
+      title: 'KHMFL Code',
       dataIndex: 'kmflCode',
       key: 'kmflCode',
     },
@@ -304,7 +304,9 @@ export default function AddFacility() {
                         pagination={{
                           pageSize: 12,
                           showTotal: (total, range) =>
-                            `${range[0]} - ${range[1]} of ${pageSize - 1} facilities`,
+                            `${range[0]} - ${range[1]} of ${
+                              pageSize - 1
+                            } facilities`,
                           showSizeChanger: false,
                           defaultCurrent: 1,
                           current: currentPage,
@@ -407,11 +409,13 @@ export default function AddFacility() {
                 </Form.Item>
 
                 <Form.Item
-                  label="KMFL Code"
+                  label="KHMFL Code"
                   name="kmflCode"
-                  rules={[{ required: true, message: 'KMFL Code is required' }]}
+                  rules={[
+                    { required: true, message: 'KHMFL Code is required' },
+                  ]}
                 >
-                  <Input placeholder="KMFL Code" />
+                  <Input placeholder="KHMFL Code" />
                 </Form.Item>
 
                 <Form.Item

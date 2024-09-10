@@ -90,14 +90,13 @@ export default function ClientRecords() {
     const townCenter = patient?.address?.[0]?.line?.[4]
     const estateOrHouseNo = patient?.address?.[0]?.line?.[5]
 
-
     return {
       'First Name': firstName,
       'Middle Name': middleName,
       'Last Name': lastName,
       Gender: gender,
       'Date of Birth': dob,
-      'Identification Type': formatCardTitle(mainIdentifier),
+      'Document Identification Type': formatCardTitle(mainIdentifier),
       'Document Number': identificationNumber,
       'Phone Number': clientNumber,
       'County of Residence': countyName,
@@ -176,7 +175,7 @@ export default function ClientRecords() {
                     'Last Name',
                     'Gender',
                     'Date of Birth',
-                    'Identification Type',
+                    'Document Identification Type',
                     'Document Number',
                     'Phone Number',
                   ].map((key) => (
