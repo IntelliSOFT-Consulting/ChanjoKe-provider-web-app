@@ -50,7 +50,7 @@ export const isCovidQualified = (vaccinesSchedule, vaccine) => {
 
 export const prevDoseNotDone = (immunizations, vaccine) => {
   if (vaccine.doseNumber > 1) {
-    const prevDoseImmunization = immunizations.find(
+    const prevDoseImmunization = immunizations?.find(
       (item) =>
         item.vaccineCode?.coding?.[0]?.display === vaccine.dependentVaccine
     )
@@ -164,7 +164,7 @@ const REASON_TYPES = {
 }
 
 const filterVaccines = (immunizations, statusReason) =>
-  immunizations.filter(
+  immunizations?.filter(
     (vaccine) =>
       vaccine.status === VACCINE_STATUS.NOT_DONE &&
       (vaccine.statusReason?.text === statusReason ||
@@ -172,7 +172,7 @@ const filterVaccines = (immunizations, statusReason) =>
   )
 
 const isVaccineCompleted = (immunizations, vaccine) =>
-  immunizations.some(
+  immunizations?.some(
     (v) =>
       v.vaccineCode.text === vaccine.vaccineCode.text &&
       v.status === VACCINE_STATUS.COMPLETED
@@ -183,7 +183,7 @@ const filterImmunizations = (immunizations) => {
 
   // Get unique vaccine names
   const uniqueVaccines = [
-    ...new Set(immunizations.map((v) => v.vaccineCode.text)),
+    ...new Set(immunizations?.map((v) => v.vaccineCode.text)),
   ]
 
   return uniqueVaccines
@@ -217,7 +217,7 @@ const filterImmunizations = (immunizations) => {
 }
 
 const listVaccines = (immunizations) =>
-  immunizations.map((vaccine) => vaccine.vaccineCode.text).join(', ')
+  immunizations?.map((vaccine) => vaccine.vaccineCode.text).join(', ')
 
 const createAlert = (vaccines, reason) => {
   if (vaccines.length === 0) return null
