@@ -22,7 +22,7 @@ export default function DefaulterTracing() {
     }))
   }
 
-  const fetcbDefaulters = async (params) => {
+  const fetchDefaulters = async (params) => {
     let query = '/reports/api/defaulters?'
     for (const key in params) {
       if (params[key]) {
@@ -36,20 +36,22 @@ export default function DefaulterTracing() {
   }
 
   useEffect(() => {
-    fetcbDefaulters({})
+    fetchDefaulters({})
   }, [])
 
-  const handleChange = async () => {
+  const handleChange = async (page = 1, pageSize = 20) => {
     const formvalues = form.getFieldsValue()
 
     const startDate = formvalues.date?.[0]?.format('YYYY-MM-DD')
     const endDate = formvalues.date?.[1]?.format('YYYY-MM-DD')
 
-    await fetcbDefaulters({
+    await fetchDefaulters({
       name: formvalues.clientName,
       vaccine_name: formvalues.vaccineName,
       start_date: startDate,
       end_date: endDate,
+      page: page,
+      page_size: pageSize,
     })
   }
 
@@ -72,8 +74,8 @@ export default function DefaulterTracing() {
     },
     {
       title: 'Vaccines Missed',
-      dataIndex: 'vaccinename',
-      key: 'vaccinename',
+      dataIndex: 'vaccine_name',
+      key: 'vaccine_name',
     },
     {
       title: 'Dose',
@@ -133,15 +135,19 @@ export default function DefaulterTracing() {
         </Form>
 
         <Table
-          dataSource={defaulters}
+          dataSource={defaulters?.data}
           columns={columns}
           loading={loading}
           rowKey="id"
           size="small"
           bordered
           pagination={{
-            pageSize: 12,
+            pageSize: 20,
             showSizeChanger: false,
+            total: defaulters?.total_records,
+            onChange: (page, pageSize) => {
+              handleChange(page, pageSize)
+            },
           }}
         />
       </div>
