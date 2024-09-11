@@ -169,7 +169,6 @@ export const getLocations = (user) => {
       break
     default:
       delete userLocation.facility_code
-      userLocation.country = 'Kenya'
       break
   }
   return userLocation
