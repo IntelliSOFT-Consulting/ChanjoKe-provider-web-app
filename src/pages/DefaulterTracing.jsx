@@ -55,12 +55,25 @@ export default function DefaulterTracing() {
     })
   }
 
+  const formatName = (given_name, family_name) => {
+    if (given_name && family_name) {
+      return `${given_name} ${family_name}`
+    } else if (given_name) {
+      return given_name
+    } else if (family_name) {
+      return family_name
+    } else {
+      return 'N/A'
+    }
+  }
+
   const columns = [
     {
       title: 'Name',
       dataIndex: 'family_name',
       key: 'family_name',
-      render: (_text, record) => `${record.given_name} ${record.family_name}`,
+      render: (_text, record) =>
+        formatName(record.given_name, record.family_name),
     },
     {
       title: 'ID Number',
