@@ -5,8 +5,8 @@ import VaccineAppointments from '../../components/ClientDetailsView/VaccineAppoi
 import Referrals from '../../components/ClientDetailsView/Referrals'
 
 const tabs = [
-  { name: 'Routine Vaccines', id: 'routineVaccines', href: '#', current: false },
-  { name: 'Non Routine Vaccines', id: 'nonRoutineVaccines', href: '#', current: false },
+  { name: 'Under 5 years', id: 'routineVaccines', href: '#', current: false },
+  { name: 'Above 5 years', id: 'nonRoutineVaccines', href: '#', current: false },
   { name: 'Appointments', id: 'appointments', href: '#', current: false },
   { name: 'Community Referrals', id: 'referrals', href: '#', current: false },
 ]

@@ -230,7 +230,7 @@ export default function PositiveAdjustments() {
         className="mt-5"
         title={
           <div className="text-xl font-semibold">
-            Received from another facility
+            Receive from another facility
           </div>
         }
         actions={[
@@ -242,7 +242,7 @@ export default function PositiveAdjustments() {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="primary">Submit</Button>
+              <Button type="primary">Receive</Button>
             </Popconfirm>
           </div>,
         ]}
