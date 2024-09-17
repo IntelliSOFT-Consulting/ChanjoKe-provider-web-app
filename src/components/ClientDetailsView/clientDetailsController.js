@@ -66,6 +66,8 @@ export const formatRecommendationsToObject = (recommendation) => {
     targetDisease,
     status,
     forecastStatus,
+    facility,
+    batchNumber,
   } = recommendation
 
   const dependent = recommendation.seriesDosesString?.split(',')
@@ -104,6 +106,8 @@ export const formatRecommendationsToObject = (recommendation) => {
     type: recommendation.description,
     immunizationId: recommendation.immunizationId,
     contraindicated: recommendation.contraindicated,
+    facility,
+    batchNumber,
   }
 }
 
@@ -147,6 +151,8 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
       recommendation.reasonCode = getVaccine.reasonCode
       recommendation.immunizationId = getVaccine.id
       recommendation.contraindicated = contraindicated
+      recommendation.facility = getVaccine.location?.reference
+      recommendation.batchNumber = getVaccine.lotNumber
     }
 
     const category =

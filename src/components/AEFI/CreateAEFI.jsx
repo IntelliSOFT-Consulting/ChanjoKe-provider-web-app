@@ -1,29 +1,18 @@
-import {
-  Alert,
-  Checkbox,
-  DatePicker,
-  Form,
-  Input,
-  Radio,
-  Select,
-  Button,
-} from 'antd'
+import { Button, DatePicker, Form, Input, Radio, Select } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
 import useAefi from '../../hooks/useAefi'
-import AEFIPreview from './AEFIPreview'
 import usePatient from '../../hooks/usePatient'
+import AEFIPreview from './AEFIPreview'
 
 export default function CreateAEFI() {
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [errors, setErrors] = useState([])
-  const [isTreatmentGiven, setIsTreatmentGiven] = useState(false)
-  const [isSpecimenCollected, setIsSpecimenCollected] = useState(false)
 
   const { updatePatient } = usePatient()
 
@@ -54,14 +43,6 @@ export default function CreateAEFI() {
     },
   ]
 
-  const aefiOutcomes = [
-    { label: 'Recovered', value: 'Recovered' },
-    { label: 'Recovering', value: 'Recovering' },
-    { label: 'Not Recovered', value: 'Not Recovered' },
-    { label: 'Unknown', value: 'Unknown' },
-    { label: 'Died', value: 'Died' },
-  ]
-
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
@@ -82,11 +63,12 @@ export default function CreateAEFI() {
   }, [])
 
   const onFinish = async (values) => {
-    if (currentStep < 3) {
+    if (currentStep < 2) {
       setCurrentStep(currentStep + 1)
       return
     }
     setLoading(true)
+    
 
     await submitAefi(values)
     if (values.aefiOutcome === 'Died') {
@@ -114,6 +96,8 @@ export default function CreateAEFI() {
       })
   }
 
+  console.log('currentStep', currentStep)
+
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">
@@ -124,20 +108,13 @@ export default function CreateAEFI() {
         </div>
         <div className="px-4 py-5 sm:p-6">
           {errors.length > 0 && (
-            <Alert
-              className="mx-6"
-              description={
-                <ul className="list-decimal ml-2">
-                  {errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              }
-              type="error"
-              showIcon={errors.length === 1}
-              closable
-              onClose={() => setErrors([])}
-            />
+            <div className="text-red-500 border border-red-500 rounded-md p-2 bg-red-100 transition-all duration-300 ease-in-out transform origin-top">
+              <ul className="mx-2 text-xs list-none">
+                {errors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>
           )}
 
           <ConfirmDialog
@@ -153,6 +130,7 @@ export default function CreateAEFI() {
             form={form}
             autoComplete="off"
             onFinish={onFinish}
+            onValuesChange={() => setErrors([])}
           >
             <div
               className={`grid mt-5 grid-cols-2 gap-10 ${
@@ -209,7 +187,6 @@ export default function CreateAEFI() {
                 </Form.Item>
               </div>
 
-              {/* Column 2 */}
               <div>
                 <Form.Item
                   label="Onset of event"
@@ -227,7 +204,9 @@ export default function CreateAEFI() {
                     disabledDate={(current) => {
                       return (
                         (current && current > moment().endOf('day')) ||
-                        current.isBefore(moment(earliestDueDate).subtract(1, 'd'))
+                        current.isBefore(
+                          moment(earliestDueDate).subtract(1, 'd')
+                        )
                       )
                     }}
                   />
@@ -248,84 +227,11 @@ export default function CreateAEFI() {
               </div>
             </div>
 
-            <div
-              className={`mt-5 px-6 grid-cols-1 md:grid-cols-2 gap-x-10 ${
-                currentStep !== 2 ? 'hidden' : 'grid'
-              }`}
-              gutter={16}
-            >
-              <Form.Item name="actionTaken" label="Action taken">
-                <Checkbox.Group
-                  onChange={(values) => {
-                    setIsTreatmentGiven(values.includes('Treatment given'))
-                    setIsSpecimenCollected(
-                      values.includes('Specimen collected')
-                    )
-                  }}
-                >
-                  <Checkbox value="Treatment given">Treatment Given</Checkbox>
-                  <Checkbox value="Specimen collected">
-                    Specimen collected for investigation
-                  </Checkbox>
-                </Checkbox.Group>
-              </Form.Item>
-
-              <div className="col-span-2 grid-cols-1 md:grid-cols-2 gap-x-10">
-                {isTreatmentGiven && (
-                  <Form.Item
-                    name="treatmentDetails"
-                    label="Specify treatment Details"
-                  >
-                    <Input.TextArea
-                      rows={4}
-                      placeholder="Specify treatment Details"
-                    />
-                  </Form.Item>
-                )}
-
-                {isSpecimenCollected && (
-                  <Form.Item
-                    name="specimenDetails"
-                    label="Specify specimen Details"
-                  >
-                    <Input.TextArea
-                      rows={4}
-                      placeholder="Specify specimen Details"
-                    />
-                  </Form.Item>
-                )}
-              </div>
-
-              <div className="col-span-2">
-                <Form.Item
-                  name="aefiOutcome"
-                  className="w-full md:w-1/2"
-                  label={
-                    <div>
-                      <span className="font-bold">AEFI Outcome</span>
-                    </div>
-                  }
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Add AEFI Outcome!',
-                    },
-                  ]}
-                >
-                  <Select
-                    size="large"
-                    options={aefiOutcomes}
-                    placeholder="Select AEFI Outcome"
-                  />
-                </Form.Item>
-              </div>
-            </div>
-
-            {currentStep === 3 && <AEFIPreview form={form} />}
+            {currentStep === 2 && <AEFIPreview form={form} selectedVaccines={selectedVaccines} />}
           </Form>
 
           <div className="px-4 py-4 sm:px-6 flex justify-end">
-            {currentStep <= 3 && currentStep > 1 && (
+            {currentStep > 1 && (
               <Button
                 onClick={() => setCurrentStep(currentStep - 1)}
                 className="ml-4 outline outline-[#163C94] text-sm font-semibold text-[#163C94]"
@@ -338,7 +244,7 @@ export default function CreateAEFI() {
               loading={loading}
               disabled={loading}
               onClick={() => {
-                if (currentStep < 3) {
+                if (currentStep === 1) {
                   setCurrentStep(currentStep + 1)
                   return
                 }
@@ -346,11 +252,7 @@ export default function CreateAEFI() {
               }}
               className="ml-4 "
             >
-              {currentStep === 1
-                ? 'Next'
-                : currentStep === 2
-                ? 'Preview'
-                : 'Submit'}
+              {currentStep === 1 ? 'Preview' : 'Submit'}
             </Button>
           </div>
         </div>

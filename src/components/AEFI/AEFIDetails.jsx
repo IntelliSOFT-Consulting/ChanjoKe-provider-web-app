@@ -9,6 +9,7 @@ import usePatient from '../../hooks/usePatient'
 import { flattenPatientData } from '../../utils/flattenData'
 import { CalendarOutlined, UserOutlined } from '@ant-design/icons'
 import { formatExtensions } from './aefiController'
+import { titleCase } from '../../utils/methods'
 
 export default function AEFIDetails({ patientInfo }) {
   const [vaccinationAEFIs, setVaccinationAEFIs] = useState([])
@@ -51,6 +52,10 @@ export default function AEFIDetails({ patientInfo }) {
         symptomName: aefi?.resource?.event?.coding?.[0]?.display,
         occurenceDate: dayjs(aefi?.resource?.detected).format('DD-MM-YYYY'),
         details: aefi?.resource?.event?.text,
+        reportingFacility: titleCase(aefi?.resource?.location?.display),
+        vaccines: aefi?.resource?.suspectEntity
+          ?.map((vaccine) => vaccine?.instance?.display)
+          ?.join(', '),
         outcome:
           aefi?.resource?.outcome?.text ||
           aefi?.resource?.outcome?.coding?.[0]?.display,
@@ -185,28 +190,11 @@ export default function AEFIDetails({ patientInfo }) {
           <Descriptions.Item label="Past Medical History">
             {aefiSelected?.pastMedicalHistory}
           </Descriptions.Item>
-          <Descriptions.Item label="AEFI Outcome">
-            {aefiSelected?.outcome}
+          <Descriptions.Item label="Reporting Facility">
+            {aefiSelected?.reportingFacility}
           </Descriptions.Item>
-          <Descriptions.Item label="Action Taken">
-            {aefiSelected?.treatmentGiven === 'Yes' && (
-              <div className="flex space-x-2">
-                <h4 className="font-semibold">Treatment Given:</h4>
-                <p>
-                  {aefiSelected?.treatmentDetails || 'No details specified'}
-                </p>
-              </div>
-            )}
-            {aefiSelected?.specimenCollected === 'Yes' && (
-              <div
-                className={`flex space-x-2 ${
-                  aefiSelected?.treatmentGiven === 'Yes' ? 'mt-4' : ''
-                }`}
-              >
-                <h4 className="font-semibold">Specimen Collected:</h4>
-                <p>{aefiSelected?.specimenDetails || 'No details specified'}</p>
-              </div>
-            )}
+          <Descriptions.Item label="Vaccines">
+            {aefiSelected?.vaccines}
           </Descriptions.Item>
         </Descriptions>
       </Modal>

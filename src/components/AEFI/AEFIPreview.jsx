@@ -1,9 +1,11 @@
 import { Descriptions } from 'antd'
 import React from 'react'
-import { camelToTitle } from '../../utils/methods'
+import { camelToTitle, titleCase } from '../../utils/methods'
+import { useSelector } from 'react-redux'
 
-const AEFIPreview = ({ form }) => {
+const AEFIPreview = ({ form, selectedVaccines }) => {
   const formValues = form.getFieldsValue()
+  const { user } = useSelector((state) => state.userInfo)
 
   const fields = [
     {
@@ -27,28 +29,12 @@ const AEFIPreview = ({ form }) => {
       value: formValues.pastMedicalHistory,
     },
     {
-      title: 'Treatment Given',
-      value: formValues.actionTaken?.includes('Treatment Given') ? 'Yes' : 'No',
+      title: 'Facility Name',
+      value: titleCase(user?.facilityName),
     },
     {
-      title: 'Specimen collected for investigation',
-      value: formValues.actionTaken?.includes(
-        'Specimen collected for investigation'
-      )
-        ? 'Yes'
-        : 'No',
-    },
-    {
-      title: 'Specify treatment Details',
-      value: formValues.treatmentDetails,
-    },
-    {
-      title: 'Specify specimen Details',
-      value: formValues.specimenDetails,
-    },
-    {
-      title: 'AEFI Outcome',
-      value: formValues.aefiOutcome,
+      title: 'Vaccines',
+      value: selectedVaccines?.map((vaccine) => `${vaccine?.vaccine} (${vaccine?.batchNumber})`)?.join(', '),
     },
   ]
 

@@ -45,23 +45,11 @@ const createAefiPayload = (values, currentPatient, user, selectedVaccines) => ({
   ],
   detected: new Date(values.eventOnset).toISOString(),
   recordedDate: new Date().toISOString(),
-  mitigatingAction: {
-    coding: createMitigatingActionCoding(values),
-  },
-  outcome: {
-    coding: [
-      {
-        code: 'outcome',
-        display: values.aefiOutcome,
-        system: 'http://terminology.hl7.org/CodeSystem/adverse-event-outcome',
-      },
-    ],
-    text: values.aefiOutcome,
-  },
   suspectEntity: [
     ...(selectedVaccines?.map((vaccine) => ({
       instance: {
         reference: `Immunization/${vaccine.id}`,
+        display: `${vaccine.vaccine} (${vaccine.batchNumber})`,
       },
     })) || []),
     {
@@ -74,22 +62,10 @@ const createAefiPayload = (values, currentPatient, user, selectedVaccines) => ({
   ],
   location: {
     reference: user?.orgUnit?.code,
+    display: user?.orgUnit?.name,
   },
   extension: createExtensions(values),
 })
-
-const createMitigatingActionCoding = (values) =>
-  values?.actionTaken
-    ? values.actionTaken.map((action) => ({
-        code: action,
-        display:
-          action === 'Treatment given'
-            ? values.treatmentDetails
-            : values.specimenDetails,
-        system:
-          'http://terminology.hl7.org/CodeSystem/adverse-event-mitigating-action',
-      }))
-    : []
 
 const createExtensions = (values) => [
   {
@@ -99,24 +75,6 @@ const createExtensions = (values) => [
   {
     url: 'http://example.org/StructureDefinition/past-medical-history',
     valueString: values.pastMedicalHistory,
-  },
-  {
-    url: 'http://example.org/StructureDefinition/treatment-given',
-    valueString: values.actionTaken?.includes('Treatment given') ? 'Yes' : 'No',
-  },
-  {
-    url: 'http://example.org/StructureDefinition/treatment-details',
-    valueString: values.treatmentDetails,
-  },
-  {
-    url: 'http://example.org/StructureDefinition/specimen-collected',
-    valueString: values.actionTaken?.includes('Specimen collected')
-      ? 'Yes'
-      : 'No',
-  },
-  {
-    url: 'http://example.org/StructureDefinition/specimen-details',
-    valueString: values.specimenDetails,
   },
 ]
 
