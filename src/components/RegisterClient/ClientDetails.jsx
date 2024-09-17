@@ -44,6 +44,11 @@ export default function ClientDetails() {
   const [isDocumentTypeSelected, setIsDocumentTypeSelected] = useState(false)
   const [estimatedAge, setEstimatedAge] = useState(true)
   const [draftCaregiver, setDraftCaregiver] = useState(false)
+  const [requiredCaregiverFields, setRequiredCaregiverFields] = useState([
+    'caregiverType',
+    'caregiverName',
+    'caregiverIdentificationType',
+  ])
   const [currentStep, setCurrentStep] = useState(1)
   const [success, setSuccess] = useState(false)
   const [errors, setErrors] = useState(null)
@@ -571,7 +576,7 @@ export default function ClientDetails() {
             <div className="shadow w-fit p-2 flex ml-auto rounded-md bg-red-50 text-semibold">
               <WarningOutlined className="text-red-500 mr-2" />
               <p className="text-red-700">
-                Please add the draft caregiver details to proceed.
+                Please complete all caregiver details before proceeding.
               </p>
             </div>
           )}
@@ -607,8 +612,16 @@ export default function ClientDetails() {
                     const caregiverValues = Object.values(caregiverData)
                     const isEmpty = caregiverValues.every((value) => !value)
                     if (!isEmpty) {
-                      setDraftCaregiver(true)
-                      return
+                      const requiredFields = requiredCaregiverFields.every(
+                        (field) => caregiverData[field]
+                      )
+                      if (!requiredFields) {
+                        setDraftCaregiver(true)
+                        return
+                      }
+
+                      setCaregivers([...caregivers, caregiverData])
+                      caregiverForm.resetFields()
                     }
                     setDraftCaregiver(false)
                   }
