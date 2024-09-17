@@ -136,7 +136,8 @@ export const groupVaccinesByCategory = (recommendation, immunizations = []) => {
     }, null)
 
     if (getVaccine) {
-      const contraindicated = getVaccine.statusReason?.text === 'Contraindication'
+      const contraindicated =
+        getVaccine.statusReason?.text === 'Contraindication'
       const statusCode = getVaccine.reasonCode?.[0]?.text
       recommendation.status =
         getVaccine.status === 'completed' ? 'completed' : statusCode

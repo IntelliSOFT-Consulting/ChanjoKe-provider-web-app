@@ -11,6 +11,6 @@ export const flattenPatientData = (patientResource) => {
     name: `${firstName} ${lastName}`,
     age: age,
     ageString: ageString,
-    gender: titleCase(patientResource.gender)
+    gender: titleCase(patientResource.gender),
   }
 }

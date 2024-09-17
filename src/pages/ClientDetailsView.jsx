@@ -100,7 +100,7 @@ export default function ClientDetailsView() {
     { title: 'System ID', dataIndex: 'systemID', key: 'systemID' },
     { title: 'D.O.B', dataIndex: 'dob', key: 'dob' },
     { title: 'Age', dataIndex: 'age', key: 'age' },
-    { title: 'Gender', dataIndex: 'gender', key: 'gender' },
+    { title: 'Sex', dataIndex: 'gender', key: 'gender' },
   ]
 
   return (

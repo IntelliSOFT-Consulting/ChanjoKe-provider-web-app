@@ -14,15 +14,15 @@ export default function useVaccination() {
   const [immunizations, setImmunizations] = useState(null)
   const [immunization, setImmunization] = useState(null)
 
-  const isEligibleByGender = (patientGender, vaccineGender) => {
-    if (!vaccineGender) return true
-    return patientGender?.toLowerCase() !== vaccineGender?.toLowerCase()
+  const isEligibleBySex = (patientSex, vaccineSex) => {
+    if (!vaccineSex) return true
+    return patientSex?.toLowerCase() !== vaccineSex?.toLowerCase()
   }
 
   const filterVaccinationRecommendations = (patient) => {
     const filterVaccines = (vaccines) =>
       vaccines.filter(({ constraints }) =>
-        isEligibleByGender(patient.gender, constraints?.gender)
+        isEligibleBySex(patient.gender, constraints?.gender)
       )
 
     return [

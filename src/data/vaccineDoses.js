@@ -1,6 +1,5 @@
 export const vaccineDoses = {
   BCG: 20,
-  bOPV: 20,
   OPV: 20,
   'DPT-HepB+Hib': 10,
   PCV10: 5,

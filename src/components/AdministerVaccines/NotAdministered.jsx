@@ -46,6 +46,7 @@ export default function NotAdministered() {
     { label: 'Cold Chain Break', value: 'Cold Chain Break' },
     { label: 'VVM change', value: 'VVM change' },
     { label: 'Contraindication', value: 'Contraindication' },
+    { label: 'Reaction', value: 'Reaction' },
     { label: 'Other', value: 'Other' },
   ]
 

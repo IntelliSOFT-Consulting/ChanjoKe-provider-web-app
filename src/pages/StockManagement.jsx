@@ -7,9 +7,7 @@ import OrderStockLogo from '../common/icons/orderStockLogo'
 import ReceiveStockLogo from '../common/icons/receiveStockLogo'
 import StockLedgerLogo from '../common/icons/stockLedgerLogo'
 import Table from '../components/DataTable'
-import {
-  dosesToVials
-} from '../components/StockManagement/helpers/stockUtils'
+import { dosesToVials } from '../components/StockManagement/helpers/stockUtils'
 import useInventory from '../hooks/useInventory'
 
 export default function StockManagement() {
@@ -39,10 +37,30 @@ export default function StockManagement() {
   }
 
   const stats = [
-    { name: 'Receive Stock', icon: 'ReceiveStockLogo', href: 'receive-stock' },
-    { name: 'Order Stock', icon: 'OrderStockLogo', href: 'new-order' },
-    { name: 'Issue Stock', icon: 'IssueStockLogo', href: 'issue-stock' },
-    { name: 'Stock Ledger', icon: 'StockLedgerLogo', href: 'ledger' },
+    {
+      name: 'Order Stock',
+      icon: 'OrderStockLogo',
+      href: 'new-order',
+      roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+    },
+    {
+      name: 'Receive Stock',
+      icon: 'ReceiveStockLogo',
+      href: 'receive-stock',
+      roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+    },
+    {
+      name: 'Issue Stock',
+      icon: 'IssueStockLogo',
+      href: 'issue-stock',
+      roles: ['SUB_COUNTY_STORE_MANAGER'],
+    },
+    {
+      name: 'Stock Ledger',
+      icon: 'StockLedgerLogo',
+      href: 'ledger',
+      roles: ['All'],
+    },
   ]
 
   const columns = [
@@ -73,10 +91,22 @@ export default function StockManagement() {
     setResults(filtered)
   }
 
+  const filteredStats = stats.filter((item) => {
+    return (
+      item.roles.includes(user?.practitionerRole) || item.roles.includes('All')
+    )
+  })
+
+  const createGrid = () => {
+    const length = filteredStats.length
+    return length === 1
+      ? `sm:grid-cols-1 md:grid-cols-${length}`
+      : `md:grid-cols-${length}`
+  }
   return (
     <div>
-      <dl className="mx-auto max-w-7xl px-6 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-4 py-12 rounded-lg shadow-lg border bg-white">
-        {stats.map((item) => {
+      <dl className={`mx-auto max-w-7xl px-6 sm:px-6 lg:px-8 mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 ${createGrid()} py-12 rounded-lg shadow-lg border bg-white`}>
+        {filteredStats.map((item) => {
           const IconComponent = iconComponents[item.icon]
           return (
             <Link
@@ -87,10 +117,10 @@ export default function StockManagement() {
               <IconComponent
                 height="50"
                 width="50"
-                fillColor="#292929"
+                fillColor="#163C94"
                 className="h-12 block mx-auto mb-5"
               />
-              <dt className="truncate mt-5 text-dark">{item.name}</dt>
+              <dt className="truncate mt-5 text-primary">{item.name}</dt>
             </Link>
           )
         })}

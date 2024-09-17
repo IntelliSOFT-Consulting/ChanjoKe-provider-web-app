@@ -278,11 +278,11 @@ export default function ClientDetails() {
 
               <Form.Item
                 name="gender"
-                label="Gender"
+                label="Sex"
                 rules={[
                   {
                     required: true,
-                    message: 'Please select gender',
+                    message: 'Please select sex',
                   },
                 ]}
               >

@@ -123,7 +123,7 @@ export const roleGroups = [
     locations: ['COUNTY'],
   },
   {
-    label: 'Sub-County System Administrator',
+    label: 'Sub-County HRIO',
     value: 'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
     creators: [
       'ADMINISTRATOR',

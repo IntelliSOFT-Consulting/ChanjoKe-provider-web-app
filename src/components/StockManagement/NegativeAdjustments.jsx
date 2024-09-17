@@ -134,6 +134,13 @@ export default function NegativeAdjustments() {
               updateBatch(index, vaccineBatch)
             }}
             placeholder="Select Vaccine"
+            showSearch
+            filterOption={(input, option) =>
+              option.label
+                ?.toString()
+                ?.toLowerCase()
+                .includes(input.toLowerCase())
+            }
           >
             {batchOptions?.map((vaccine) => (
               <Select.Option
@@ -250,7 +257,11 @@ export default function NegativeAdjustments() {
               name="reason"
               rules={[{ required: true, message: 'Please select a reason' }]}
             >
-              <Select placeholder="Reason for Adjustment" options={reasons} />
+              <Select
+                placeholder="Reason for Adjustment"
+                options={reasons}
+                showSearch
+              />
             </Form.Item>
 
             <Form.Item
@@ -266,6 +277,13 @@ export default function NegativeAdjustments() {
                     label: location.name,
                     value: location.key,
                   }))}
+                showSearch
+                filterOption={(input, option) =>
+                  option.label
+                    ?.toString()
+                    ?.toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               />
             </Form.Item>
 

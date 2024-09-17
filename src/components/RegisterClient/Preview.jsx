@@ -28,7 +28,7 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
           value: values.lastName,
         },
         {
-          label: 'Gender',
+          label: 'Sex',
           value: titleCase(values.gender),
         },
         {

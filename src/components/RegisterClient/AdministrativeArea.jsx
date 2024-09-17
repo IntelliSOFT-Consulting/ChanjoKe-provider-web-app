@@ -88,6 +88,7 @@ export default function AdministrativeArea({
         <Form.Item
           name="estateOrHouseNo"
           label="Estate & House Number/Village/Landmark"
+          rules={[{ required: true, message: 'Please input estate or house number/village/landmark' }]}
         >
           <Input
             placeholder="eg Jamii House, House Number 14"

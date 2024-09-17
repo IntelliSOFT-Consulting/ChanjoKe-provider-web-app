@@ -271,6 +271,13 @@ export default function PositiveAdjustments() {
                 placeholder="Origin"
                 options={locations}
                 onChange={handleLocationChange}
+                showSearch
+                filterOption={(input, option) =>
+                  option.label
+                    ?.toString()
+                    ?.toLowerCase()
+                    .includes(input.toLowerCase())
+                }
               />
             </Form.Item>
             <Form.Item name="id" hidden>
@@ -286,7 +293,7 @@ export default function PositiveAdjustments() {
                 },
               ]}
             >
-              <Select placeholder="Reason for Adjustment" options={reasons} />
+              <Select placeholder="Reason for Adjustment" options={reasons} showSearch />
             </Form.Item>
 
             <Form.Item

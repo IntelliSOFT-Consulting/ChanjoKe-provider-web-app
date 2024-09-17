@@ -254,7 +254,7 @@ const AdministerCampaign = () => {
       },
     },
     {
-      title: 'Gender',
+      title: 'Sex',
       dataIndex: 'gender',
       key: 'gender',
       render: (text) => titleCase(text),
