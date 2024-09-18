@@ -88,8 +88,10 @@ export const formatRecommendationsToObject = (recommendation) => {
   const dependentVaccine = dependent?.[0]
   const dependencyPeriod = dependent?.[1] ? parseInt(dependent?.[1]) : null
 
+  const vaccineName = vaccine.replace(/\s\d+$/, '')
+
   return {
-    vaccine,
+    vaccine: vaccineName,
     doseNumber: doseNumberPositiveInt,
     dueDate,
     lastDate,

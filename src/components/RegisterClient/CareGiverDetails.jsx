@@ -1,14 +1,8 @@
-import {
-  Button,
-  Form,
-  Input,
-  Popconfirm,
-  Select
-} from 'antd'
+import { Button, Form, Input, Popconfirm, Select } from 'antd'
 import { countryCodes } from '../../data/countryCodes'
 import {
   caregiverIdentificationTypes,
-  caregiverTypes
+  caregiverTypes,
 } from '../../data/options/clientDetails'
 import { titleCase } from '../../utils/methods'
 import Table from '../DataTable'
@@ -21,7 +15,12 @@ export default function CaregiverDetails({
   setDraftCaregiver,
 }) {
   const handleEdit = (record) => {
-    form.setFieldsValue(record)
+    const phoneCode = record.phoneNumber.slice(0, -9)
+    const phoneNumber = record.phoneNumber.replace(phoneCode, '')
+    form.setFieldsValue({
+      ...record,
+      phoneNumber,
+    })
     setCaregivers(caregivers.filter((item) => item !== record))
   }
 

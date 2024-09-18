@@ -96,8 +96,6 @@ export default function CreateAEFI() {
       })
   }
 
-  console.log('currentStep', currentStep)
-
   return (
     <>
       <div className="divide-y divide-gray-200 overflow-visible rounded-lg bg-white shadow mt-5">

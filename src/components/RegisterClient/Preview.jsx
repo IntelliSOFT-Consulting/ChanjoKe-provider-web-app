@@ -60,7 +60,7 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
             label: camelToTitle(label)?.replace('Caregiver', caregiverType()),
             value:
               label === 'phoneNumber' && caregiver[label]
-                ? `${caregiver.phoneCode}${caregiver[label]}`
+                ? `${caregiver[label]}`
                 : caregiver[label],
           }
         })

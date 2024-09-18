@@ -620,7 +620,13 @@ export default function ClientDetails() {
                         return
                       }
 
-                      setCaregivers([...caregivers, caregiverData])
+                      setCaregivers([
+                        ...caregivers,
+                        {
+                          ...caregiverData,
+                          phoneNumber: `${form.getFieldValue('phoneCode')}${caregiverData.phoneNumber}`?.replace(/undefined/g, ''),
+                        },
+                      ])
                       caregiverForm.resetFields()
                     }
                     setDraftCaregiver(false)
