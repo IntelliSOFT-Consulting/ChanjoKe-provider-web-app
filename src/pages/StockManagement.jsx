@@ -72,10 +72,10 @@ export default function StockManagement() {
     },
     { title: 'Vaccine', dataIndex: 'vaccine', key: 'vaccine' },
     {
-      title: 'Quantity (Vials)',
+      title: 'Quantity (Doses)',
       dataIndex: 'quantity',
       key: 'quantity',
-      render: (_, record) => dosesToVials(record.vaccine, record.quantity),
+      render: (_, record) => record.quantity?.toLocaleString(),
     },
   ]
 

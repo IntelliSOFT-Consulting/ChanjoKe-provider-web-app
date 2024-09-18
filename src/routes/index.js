@@ -28,8 +28,8 @@ import CreateAEFI from '../components/AEFI/CreateAEFI'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
-import PositiveAdjustments from '../components/StockManagement/PositiveAdjustments'
-import NegativeAdjustments from '../components/StockManagement/NegativeAdjustments'
+// import PositiveAdjustments from '../components/StockManagement/PositiveAdjustments'
+// import NegativeAdjustments from '../components/StockManagement/NegativeAdjustments'
 import Wastage from '../components/StockManagement/Wastage'
 import NewOrder from '../components/StockManagement/NewOrder'
 import ReceivedOrders from '../components/StockManagement/ReceivedOrders'
@@ -73,10 +73,16 @@ const AuthRoute = ({ element }) => {
 
   const location = useLocation()
 
-  const dashboardRoles = ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR']
+  const dashboardRoles = [
+    'ADMINISTRATOR',
+    'NATIONAL_SYSTEM_ADMINISTRATOR',
+    'COUNTY_SYSTEM_ADMINISTRATOR',
+  ]
 
   return user?.access_token && authRoutes.includes(location.pathname) ? (
-    <Navigate to={dashboardRoles.includes(user?.practitionerRole) ? '/dashboard' : '/'} />
+    <Navigate
+      to={dashboardRoles.includes(user?.practitionerRole) ? '/dashboard' : '/'}
+    />
   ) : (
     element
   )
@@ -313,32 +319,32 @@ const router = createBrowserRouter([
               />
             ),
           },
-          {
-            path: '/stock-management/positive-adjustment',
-            element: (
-              <RoleBasedRoute
-                element={<PositiveAdjustments />}
-                allowedRoles={[
-                  'SUB_COUNTY_STORE_MANAGER',
-                  'FACILITY_STORE_MANAGER',
-                  'FACILITY_SYSTEM_ADMINISTRATOR',
-                ]}
-              />
-            ),
-          },
-          {
-            path: '/stock-management/negative-adjustment',
-            element: (
-              <RoleBasedRoute
-                element={<NegativeAdjustments />}
-                allowedRoles={[
-                  'SUB_COUNTY_STORE_MANAGER',
-                  'FACILITY_STORE_MANAGER',
-                  'FACILITY_SYSTEM_ADMINISTRATOR',
-                ]}
-              />
-            ),
-          },
+          // {
+          //   path: '/stock-management/positive-adjustment',
+          //   element: (
+          //     <RoleBasedRoute
+          //       element={<PositiveAdjustments />}
+          //       allowedRoles={[
+          //         'SUB_COUNTY_STORE_MANAGER',
+          //         'FACILITY_STORE_MANAGER',
+          //         'FACILITY_SYSTEM_ADMINISTRATOR',
+          //       ]}
+          //     />
+          //   ),
+          // },
+          // {
+          //   path: '/stock-management/negative-adjustment',
+          //   element: (
+          //     <RoleBasedRoute
+          //       element={<NegativeAdjustments />}
+          //       allowedRoles={[
+          //         'SUB_COUNTY_STORE_MANAGER',
+          //         'FACILITY_STORE_MANAGER',
+          //         'FACILITY_SYSTEM_ADMINISTRATOR',
+          //       ]}
+          //     />
+          //   ),
+          // },
           {
             path: '/stock-management/wastage',
             element: (

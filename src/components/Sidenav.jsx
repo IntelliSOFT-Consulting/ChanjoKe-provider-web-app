@@ -310,18 +310,18 @@ export default function Sidenav() {
             icon: <SignatureOutlined />,
             roles: ['SUB_COUNTY_STORE_MANAGER'],
           },
-          {
-            name: 'Receive from another facility',
-            href: '/stock-management/positive-adjustment',
-            icon: <PlusCircleOutlined />,
-            roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
-          },
-          {
-            name: 'Share with another facility',
-            href: '/stock-management/negative-adjustment',
-            icon: <MinusCircleOutlined />,
-            roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
-          },
+          // {
+          //   name: 'Receive from another facility',
+          //   href: '/stock-management/positive-adjustment',
+          //   icon: <PlusCircleOutlined />,
+          //   roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+          // },
+          // {
+          //   name: 'Share with another facility',
+          //   href: '/stock-management/negative-adjustment',
+          //   icon: <MinusCircleOutlined />,
+          //   roles: ['FACILITY_STORE_MANAGER', 'FACILITY_SYSTEM_ADMINISTRATOR'],
+          // },
           {
             name: 'Stock Count',
             href: '/stock-management/stock-count',

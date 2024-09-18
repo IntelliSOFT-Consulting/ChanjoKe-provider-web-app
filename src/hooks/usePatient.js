@@ -101,6 +101,27 @@ export default function usePatient() {
               url: 'caregiver_id_number',
               valueString: caregiver.caregiverID,
             },
+            ...caregiver.kins?.map((kin) => ({
+              url: 'next-of-kin',
+              extension: [
+                {
+                  url: 'name',
+                  valueString: kin.kinName,
+                },
+                {
+                  url: 'phone',
+                  valueString: kin.kinPhoneNumber,
+                },
+                {
+                  url: 'relationship',
+                  valueString: kin.kinRelationship,
+                },
+                {
+                  url: 'created',
+                  valueDateTime: new Date().toISOString(),
+                },
+              ],
+            })) || [],
           ],
         }
       }),
