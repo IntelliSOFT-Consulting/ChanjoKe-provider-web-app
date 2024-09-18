@@ -89,9 +89,7 @@ export default function usePatient() {
           telecom: [
             {
               system: 'phone',
-              value: caregiver.phoneNumber
-                ? `${caregiver.phoneCode}${caregiver.phoneNumber}`
-                : '',
+              value: caregiver.phoneNumber || '',
             },
           ],
           extension: [

@@ -49,21 +49,17 @@ export default function SearchInterface({ searchType }) {
 
     setLoading(true)
 
-    let queryParam = keyword
-      ? isNaN(Number(keyword))
-        ? `name=${keyword}`
-        : `identifier=${keyword}`
-      : ''
-
-    if (keyword.startsWith('07')) {
-      queryParam = `telecom=${keyword}`
-    }
-
     let data = await get(
-      `${endpoint}?${queryParam}&_sort=-_lastUpdated${params}`
+      `${endpoint}?telecom=${encodeURIComponent(keyword)}&_sort=-_lastUpdated${params}`
     )
 
-    if (!data?.entry && isNaN(Number(keyword))) {
+    if (!data?.entry) {
+      data = await get(
+        `${endpoint}?name=${keyword}&_sort=-_lastUpdated${params}`
+      )
+    }
+
+    if (!data?.entry) {
       data = await get(
         `${endpoint}?identifier=${keyword}&_sort=-_lastUpdated${params}`
       )
