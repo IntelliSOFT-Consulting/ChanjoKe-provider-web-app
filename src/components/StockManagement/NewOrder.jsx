@@ -328,6 +328,9 @@ export default function NewOrder() {
                       date.add(30, 'days')
                     )
                   }}
+                  disabledDate={(current) =>
+                    current && current < moment().startOf('days')
+                  }
                   format="DD-MM-YYYY"
                 />
               </Form.Item>

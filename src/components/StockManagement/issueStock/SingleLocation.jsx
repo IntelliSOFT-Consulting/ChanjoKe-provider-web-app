@@ -517,6 +517,7 @@ const SingleLocation = () => {
             onConfirm={() => form.submit()}
             okText="Yes"
             cancelText="No"
+            placement="topRight"
           >
             <Button type="primary" loading={submitting}>
               Submit

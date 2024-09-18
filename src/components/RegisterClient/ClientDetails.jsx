@@ -310,8 +310,8 @@ export default function ClientDetails() {
                 ]}
               >
                 <Radio.Group onChange={handleClientType}>
-                  <Radio value="Routine">Routine</Radio>
-                  <Radio value="Non-Routine">Non-Routine</Radio>
+                  <Radio value="Routine">Under 5 years</Radio>
+                  <Radio value="Non-Routine">Above 5 years</Radio>
                 </Radio.Group>
               </Form.Item>
 

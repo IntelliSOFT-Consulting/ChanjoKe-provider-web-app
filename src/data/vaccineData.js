@@ -601,7 +601,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 1',
+    vaccineName: 'Tetanus Diphtheria 1',
     vaccineCode: 'IMTD-1',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -617,7 +617,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 2',
+    vaccineName: 'Tetanus Diphtheria 2',
     vaccineCode: 'IMTD-2',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -635,7 +635,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 3',
+    vaccineName: 'Tetanus Diphtheria 3',
     vaccineCode: 'IMTD-3',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -653,7 +653,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 4',
+    vaccineName: 'Tetanus Diphtheria 4',
     vaccineCode: 'IMTD-4',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -671,7 +671,7 @@ export const nonRoutineVaccines = [
     },
   },
   {
-    vaccineName: 'Tetanus 5',
+    vaccineName: 'Tetanus Diphtheria 5',
     vaccineCode: 'IMTD-5',
     nhddCode: '50732',
     diseaseTarget: 'Tetanus',
@@ -848,8 +848,7 @@ export const uniqueVaccines = [
   'Pfizer/BioNTech',
   'Moderna',
   'Sinopharm',
-  'Tetanus',
-  'Yellow Fever',
+  'Tetanus Diphtheria',
   'Rabies',
   'Influenza',
 ]
