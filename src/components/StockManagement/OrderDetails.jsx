@@ -1,11 +1,13 @@
-import { Card, Descriptions } from 'antd'
+import { CloudDownloadOutlined } from '@ant-design/icons'
+import { Button, Card, Descriptions, Tag } from 'antd'
+import html2PDF from 'jspdf-html2canvas'
+import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useParams } from 'react-router-dom'
-import useWindowSize from '../../hooks/useWindowSize'
-import useStock from '../../hooks/useStock'
-import moment from 'moment'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
+import useStock from '../../hooks/useStock'
+import useWindowSize from '../../hooks/useWindowSize'
 import Table from '../DataTable'
 
 const useStyles = createUseStyles({
@@ -43,6 +45,24 @@ export default function OrderDetails() {
     }
     fetchOrderDetails()
   }, [orderID])
+
+  const handleDownload = () => {
+    const page = document.getElementById('print-order-page')
+    const order_id = orderDetails?.orderNumber
+    html2PDF(page, {
+      jsPDF: { format: 'a4' },
+      margin: { top: 20, right: 20, bottom: 20, left: 20 },
+      imageType: 'image/jpeg',
+      output: `./pdf/ORDER-${order_id}-${
+        new Date().toISOString().split('T')[0]
+      }.pdf`,
+      success: (pdf) => {
+        pdf.save(
+          `ORDER-${order_id}-${new Date().toISOString().split('T')[0]}.pdf`
+        )
+      },
+    })
+  }
 
   const extractVaccines = (order) => {
     const vaccineExtension = order.extension?.find((item) =>
@@ -93,7 +113,7 @@ export default function OrderDetails() {
     const isCanceled = order?.status === 'cancelled'
     const cancelDate = isCanceled
       ? moment(order?.meta?.lastUpdated).format('DD-MM-YYYY')
-      : '-'
+      : null
     const preferredPickupDate = order?.extension?.find((item) =>
       item.url?.includes('preferredPickupDate')
     )?.valueDateTime
@@ -109,8 +129,24 @@ export default function OrderDetails() {
         ? moment(preferredPickupDate).format('DD-MM-YYYY')
         : '-',
       packDate: moment(order?.occurrencePeriod?.end).format('DD-MM-YYYY'),
-      status: order?.status,
+      status: getStatus(order),
       orderItems,
+    }
+  }
+
+  const getStatus = (order) => {
+    if (order?.status === 'completed') {
+      return 'Delivered'
+    } else if (order?.status === 'cancelled') {
+      return 'Cancelled'
+    } else if (order?.status === 'active') {
+      const dispatched = order?.meta?.tag?.find(
+        (item) => item.code === 'dispatched'
+      )
+      if (dispatched) {
+        return 'Dispatched'
+      }
+      return 'Pending'
     }
   }
 
@@ -191,14 +227,41 @@ export default function OrderDetails() {
     },
   ]
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Pending':
+        return 'orange'
+      case 'Dispatched':
+        return 'blue'
+      case 'Delivered':
+        return 'green'
+      case 'Cancelled':
+        return 'red'
+      default:
+        return 'default'
+    }
+  }
+
   return (
-    <Card title={orderDetails?.orderNumber || orderID} className="mt-5">
+    <Card
+      title={orderDetails?.orderNumber || orderID}
+      className="mt-5"
+      extra={
+        <Button
+          type="primary"
+          onClick={handleDownload}
+          icon={<CloudDownloadOutlined />}
+        >
+          Download
+        </Button>
+      }
+    >
       {!orderDetails ? (
         <div className="flex justify-center items-center h-96">
           <LoadingArrows />
         </div>
       ) : (
-        <>
+        <div id="print-order-page">
           <div className="bg-[#163c9412] p-3 mx-4 my-5">
             <h3 className="text-[#707070] font-semibold text-base">
               Order Details
@@ -232,11 +295,13 @@ export default function OrderDetails() {
             >
               {orderDetails?.fulfillingStore}
             </Descriptions.Item>
-            <Descriptions.Item
-              label={<span className={classes.label}>Cancel Date</span>}
-            >
-              {orderDetails?.cancelDate || '-'}
-            </Descriptions.Item>
+            {orderDetails?.cancelDate && (
+              <Descriptions.Item
+                label={<span className={classes.label}>Cancel Date</span>}
+              >
+                {orderDetails?.cancelDate || '-'}
+              </Descriptions.Item>
+            )}
             <Descriptions.Item
               label={
                 <span className={classes.label}>Preferred Pickup Date</span>
@@ -247,7 +312,9 @@ export default function OrderDetails() {
             <Descriptions.Item
               label={<span className={classes.label}>Status</span>}
             >
-              {orderDetails?.status}
+              <Tag color={getStatusColor(orderDetails?.status)}>
+                {orderDetails?.status}
+              </Tag>
             </Descriptions.Item>
             <Descriptions.Item
               label={<span className={classes.label}>Pack Date</span>}
@@ -272,7 +339,7 @@ export default function OrderDetails() {
               size="small"
             />
           </div>
-        </>
+        </div>
       )}
     </Card>
   )

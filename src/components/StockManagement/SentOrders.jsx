@@ -8,6 +8,8 @@ import usePaginatedQuery from '../../hooks/usePaginatedQuery'
 import { useSelector } from 'react-redux'
 import Table from '../DataTable'
 import { titleCase } from '../../utils/methods'
+import ExcelJS from 'exceljs'
+import { CloudDownloadOutlined } from '@ant-design/icons'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -110,6 +112,98 @@ export default function SentOrders() {
   useEffect(() => {
     fetchStock()
   }, [])
+
+  const handleExportToExcel = () => {
+    /*
+format the worksheet as a following:
+    1. Make the header row bold
+    2. Make the first column (ID) a link that can be used to navigate to the order details page
+    3. The status column should be colored according to the status:
+      - Pending: light grey
+      - Dispatched: light blue
+      - Received: light green
+      - Cancelled: red
+      - Delivered: green
+   */
+
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Orders')
+
+    // Add headers
+    worksheet.columns = [
+      { header: 'Order ID', key: 'identifier', width: 10 },
+      { header: 'Date', key: 'date', width: 15 },
+      { header: 'Supplied To', key: 'facility', width: 20 },
+      { header: 'Status', key: 'status', width: 15 },
+      { header: 'Antigens', key: 'vaccines', width: 20 },
+      { header: 'Supplier', key: 'supplier', width: 20 },
+    ]
+
+    // Add data
+    worksheet.addRows(results)
+
+    // Make only the first row headers bold
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) {
+        row.font = { bold: true }
+      }
+    })
+
+    // Add conditional formatting for the status column
+    const statusColumn = worksheet.getColumn('status')
+    statusColumn.eachCell((cell, rowNumber) => {
+      if (rowNumber !== 1) {
+        // Skip the header row
+        const status = cell.text
+        if (status === 'Pending') {
+          cell.font = {
+            color: { argb: 'FF707070' },
+          }
+        } else if (status === 'Dispatched') {
+          cell.font = {
+            color: { argb: 'FF163C94' },
+          }
+        } else if (status === 'Received') {
+          cell.font = {
+            color: { argb: 'FF186E03' },
+          }
+        } else if (status === 'cancelled') {
+          cell.font = {
+            color: { argb: 'FFFF0000' },
+          }
+        }
+      }
+    })
+
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' },
+        }
+      })
+    })
+
+    workbook.xlsx
+      .writeBuffer()
+      .then((buffer) => {
+        const blob = new Blob([buffer], { type: 'application/octet-stream' })
+
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = 'sent_orders.xlsx'
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+      })
+      .catch((error) => {
+        console.error('Error exporting to Excel:', error)
+      })
+  }
 
   const handleStatusChange = (value) => {
     if (value) {
@@ -246,14 +340,10 @@ export default function SentOrders() {
           </div>
         }
       >
-        <Form layout="vertical" className="p-4 flex w-full justify-end">
-          <Form.Item
-            label="Filter by Status"
-            name="filterByStatus"
-            className="w-1/4"
-          >
+        <Form layout="vertical" className="p-4 flex w-full justify-between">
+          <Form.Item name="filterByStatus" className="w-1/4">
             <Select
-              placeholder="Select Status"
+              placeholder="Filter by Status"
               className="w-full"
               allowClear
               onChange={handleStatusChange}
@@ -263,6 +353,14 @@ export default function SentOrders() {
               ]}
             />
           </Form.Item>
+          <Button
+            onClick={handleExportToExcel}
+            icon={<CloudDownloadOutlined />}
+            size="small"
+            disabled={!filteredResults.length}
+          >
+            Export
+          </Button>
         </Form>
 
         <div className="hidden sm:block sm:px-4 mb-10">
@@ -281,80 +379,6 @@ export default function SentOrders() {
               total: totalItems - 1,
             }}
           />
-        </div>
-
-        <div className="sm:hidden mt-5">
-          {results?.map((result) => (
-            <div
-              key={result.id}
-              className="w-full grid grid-cols-5 gap-3 border border-1 border-gray-200"
-            >
-              <div className="py-5 pr-6 col-span-4">
-                <div className="mt-1 pl-5 text-xs leading-5 text-gray-800">
-                  ID: <span className="font-bold">{result.identifier}</span>
-                </div>
-                <div className="text-sm pl-5 leading-6 text-gray-900">
-                  {result.date}
-                </div>
-                <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">
-                  {result.facility}
-                </div>
-                <div
-                  className={`text-sm pl-5 leading-6 font-semibold ${
-                    result.status === 'Pending'
-                      ? 'text-[#efd406]'
-                      : 'text-[#186e03]'
-                  }`}
-                >
-                  {result.status}
-                </div>
-                <div className="mt-1 pl-5 text-sm leading-5 text-gray-800">
-                  Quantity: <span className="font-bold">{result.quantity}</span>
-                </div>
-                <div className="text-sm pl-5 leading-6 text-gray-900">
-                  Products: <span className="font-bold">{result.products}</span>
-                </div>
-              </div>
-              <div className="py-5 max-w-auto right-5">
-                <div className="flex flex-col items-start">
-                  <a
-                    href={`/stock-management/order-details/${result.id}`}
-                    className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-                  >
-                    View
-                  </a>
-                  {result.status === 'Received' ? (
-                    <Button
-                      type="link"
-                      disabled
-                      className="text-[#163C94] font-semibold p-0"
-                    >
-                      Receive
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() =>
-                        navigate(
-                          `/stock-management/receive-stock/${result.id}`,
-                          {
-                            state: {
-                              orderNumber: result.identifier,
-                              origin: result.facility,
-                              selectedOriginId: result.id,
-                              supplierId: result.supplier,
-                            },
-                          }
-                        )
-                      }
-                      className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500 border-none p-0"
-                    >
-                      Receive
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </Card>
     </>
