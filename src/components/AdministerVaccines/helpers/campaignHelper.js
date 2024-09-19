@@ -17,10 +17,10 @@ export const checkIfVaccineIsAlreadyAdministered = (
       const vaccineName = rec.vaccineCode?.[0]?.text
       if (
         vaccineName &&
-        selectedVaccineNames.some((name) => vaccineName.startsWith(name))
+        selectedVaccineNames.some((name) => vaccineName.includes(name))
       ) {
         const vaccine = selectedVaccineNames.find((name) =>
-          vaccineName.startsWith(name)
+          vaccineName.includes(name)
         )
         groupedVaccines[vaccine] = [...(groupedVaccines[vaccine] || []), rec]
       }
@@ -42,7 +42,7 @@ export const checkIfVaccineIsAlreadyAdministered = (
 
     const unadministeredVaccine = sortedRecs[administeredCount] || sortedRecs[0]
     const selectedVaccine = selectedVaccines.find((v) =>
-      unadministeredVaccine.vaccineCode?.[0]?.text?.startsWith(v.vaccine)
+      unadministeredVaccine.vaccineCode?.[0]?.text?.includes(v.vaccine)
     )
 
     return {

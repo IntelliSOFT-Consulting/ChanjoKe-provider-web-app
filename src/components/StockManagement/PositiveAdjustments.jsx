@@ -241,6 +241,7 @@ export default function PositiveAdjustments() {
               onConfirm={() => form.submit()}
               okText="Yes"
               cancelText="No"
+              placement="top"
             >
               <Button type="primary">Receive</Button>
             </Popconfirm>

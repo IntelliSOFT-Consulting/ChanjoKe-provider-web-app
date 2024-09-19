@@ -350,6 +350,7 @@ export default function NonRoutineVaccines({
                               }}
                               cancelText="view AEFIs"
                               className="absolute right-0 -top-2"
+                              placement="top"
                             >
                               <Button
                                 className="text-[#163C94] absolute"

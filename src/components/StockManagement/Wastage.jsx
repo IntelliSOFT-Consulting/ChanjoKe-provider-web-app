@@ -256,6 +256,7 @@ export default function Wastage() {
               onConfirm={handleSubmit}
               okText="Yes"
               cancelText="No"
+              placement="top"
             >
               <Button disabled={isSubmitDisabled}>Submit</Button>
             </Popconfirm>

@@ -54,6 +54,7 @@ export default function Campaigns() {
             {activeTab === '1' && canAccess('CREATE_CAMPAIGN') && (
               <Popconfirm
                 title="Are you sure you want to archive this campaign?"
+                placement="top"
                 onConfirm={() => {
                   updateCampaign(
                     record?.id,
@@ -120,7 +121,7 @@ export default function Campaigns() {
         ) : (
           <Tooltip
             color="red"
-            className='p-0'
+            className="p-0"
             title={
               user?.location !== 'Campaign'
                 ? 'Only Campaign users can select campaigns'

@@ -859,9 +859,7 @@ export const vaccineOptions = allVaccines.map((vaccine) => ({
 }))
 
 export const uniqueVaccineOptions = uniqueVaccines.map((vaccine) => {
-  const vaccineData = allVaccines.find(
-    (v) => v.vaccineName.includes(vaccine) && v.vaccineName.startsWith(vaccine)
-  )
+  const vaccineData = allVaccines.find((v) => v.vaccineName.includes(vaccine))
   return {
     label: vaccine,
     value: vaccine,

@@ -295,7 +295,7 @@ export const updateInventoryReport = (inventoryReport, vaccineBatches) => {
       ) {
         inventoryExtension.extension.forEach((vaccineExtension) => {
           const vaccineCode = vaccineExtension.extension.find((ext) =>
-            vaccine?.startsWith(ext?.valueCodeableConcept?.text)
+            vaccine?.includes(ext?.valueCodeableConcept?.text)
           )
 
           if (vaccineCode) {

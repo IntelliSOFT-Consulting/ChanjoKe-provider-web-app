@@ -261,6 +261,7 @@ export default function NotAdministered() {
             }}
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <Button
               className="ml-4 btn-success text-sm font-semibold"

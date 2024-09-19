@@ -218,6 +218,7 @@ export default function Contraindications() {
             }}
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <Button
               type="primary"

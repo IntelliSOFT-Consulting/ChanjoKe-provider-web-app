@@ -230,6 +230,7 @@ export default function StockCount() {
               onConfirm={handleSubmit}
               okText="Yes"
               cancelText="No"
+              placement="top"
             >
               <Button
                 disabled={isSubmitDisabled}

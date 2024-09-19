@@ -276,6 +276,7 @@ export default function RoutineVaccines({
               {open && (
                 <Popconfirm
                   title="Please select an action"
+                  placement="top"
                   onConfirm={() => {
                     dispatch(setSelectedVaccines(administered))
                     navigate(`/aefi-report/${administered?.[0]?.id}`)

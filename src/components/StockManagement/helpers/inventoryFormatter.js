@@ -44,10 +44,7 @@ export const formatInventoryToTable = (items) => {
 }
 
 export const vaccineInventory = (vaccine, inventory) => {
-  const data = inventory?.filter(
-    (item) =>
-      vaccine?.startsWith(item.vaccine[0]) && vaccine?.includes(item.vaccine)
-  )
+  const data = inventory?.filter((item) => vaccine?.includes(item.vaccine))
   return data?.sort((a, b) => {
     return dayjs(a.expiryDate, 'DD-MM-YYYY').diff(
       dayjs(b.expiryDate, 'DD-MM-YYYY')

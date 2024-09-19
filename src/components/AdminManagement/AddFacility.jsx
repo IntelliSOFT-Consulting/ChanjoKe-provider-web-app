@@ -178,6 +178,7 @@ export default function AddFacility() {
             onConfirm={() => handleArchive(record.kmflCode, record.status)}
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <Button className="mx-0 p-0" type="link" danger>
               {record.status === 'inactive' ? 'Restore' : 'Archive'}

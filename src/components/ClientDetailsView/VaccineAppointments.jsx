@@ -108,6 +108,7 @@ export default function VaccineAppointments({
                 onConfirm={() => handleActionBtn(record)}
                 okText="Yes"
                 cancelText="No"
+                placement="top"
               >
                 <button className={`px-2 py-1 text-red-400`}>Cancel</button>
               </Popconfirm>

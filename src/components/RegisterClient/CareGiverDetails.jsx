@@ -86,6 +86,7 @@ export default function CaregiverDetails({
             }
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <Button type="link" className="px-0 ml-2" danger>
               Remove

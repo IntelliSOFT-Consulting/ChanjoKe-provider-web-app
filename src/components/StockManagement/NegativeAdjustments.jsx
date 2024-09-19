@@ -236,6 +236,7 @@ export default function NegativeAdjustments() {
               onConfirm={() => form.submit()}
               okText="Yes"
               cancelText="No"
+              placement="top"
             >
               <Button type="primary" disabled={isSubmitDisabled}>
                 Submit

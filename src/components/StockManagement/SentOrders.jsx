@@ -311,6 +311,7 @@ format the worksheet as a following:
             <Popconfirm
               title="Are you sure you want to cancel this order?"
               onConfirm={() => cancelOrder(record.id)}
+              placement="top"
             >
               <Button type="link" danger className="p-0">
                 Cancel

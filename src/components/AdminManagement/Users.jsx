@@ -87,6 +87,7 @@ export default function Users() {
             onConfirm={() => handleArchive(record.id)}
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <Button type="link" danger>
               {activeTab === '1' ? 'Archive' : 'Unarchive'}

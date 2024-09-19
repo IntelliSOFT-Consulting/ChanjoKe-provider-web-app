@@ -23,6 +23,7 @@ export default function RenderActionButton({ actions, onBtnAction, data }) {
             onConfirm={() => handleActionClick(action)}
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <button key={index} className={`${action.class} px-2 py-1 text-red-400`}>
               {action.title.charAt(0).toUpperCase() + action.title.slice(1)}

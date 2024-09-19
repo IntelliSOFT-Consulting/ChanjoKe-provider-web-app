@@ -229,6 +229,7 @@ const ReceiveStock = () => {
             onConfirm={() => form.submit()}
             okText="Yes"
             cancelText="No"
+            placement="top"
           >
             <Button
               className={classes.btnPrimary}
