@@ -3,7 +3,7 @@ import { useApiRequest } from '../api/useApiRequest'
 import { generateUniqueCode } from '../utils/methods'
 import moment from 'moment'
 
-const fhirEndpoint = '/hapi/fhir'
+const fhirEndpoint = '/chanjo-hapi/fhir'
 
 export default function usePatient() {
   const [patient, setPatient] = useState(null)
@@ -101,7 +101,7 @@ export default function usePatient() {
               url: 'caregiver_id_number',
               valueString: caregiver.caregiverID,
             },
-            ...caregiver.kins?.map((kin) => ({
+            ...(caregiver.kins?.map((kin) => ({
               url: 'next-of-kin',
               extension: [
                 {
@@ -121,7 +121,7 @@ export default function usePatient() {
                   valueDateTime: new Date().toISOString(),
                 },
               ],
-            })) || [],
+            })) || []),
           ],
         }
       }),

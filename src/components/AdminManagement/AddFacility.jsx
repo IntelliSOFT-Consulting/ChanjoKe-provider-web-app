@@ -62,7 +62,7 @@ export default function AddFacility() {
     const saved = localStorage.getItem('subCounties')
     if (!saved) {
       const response = await get(
-        `/hapi/fhir/Location?type:code=SUB-COUNTY&_count=5000`
+        `/chanjo-hapi/fhir/Location?type:code=SUB-COUNTY&_count=5000`
       )
       if (response) {
         const converted = convertLocations(response)
@@ -75,7 +75,7 @@ export default function AddFacility() {
     const saved = localStorage.getItem('wards')
     if (!saved) {
       const response = await get(
-        `/hapi/fhir/Location?type:code=WARD&_count=5000`
+        `/chanjo-hapi/fhir/Location?type:code=WARD&_count=5000`
       )
       if (response) {
         const converted = convertLocations(response)
@@ -93,7 +93,7 @@ export default function AddFacility() {
     const archivedQuery = archived ? `&status=inactive` : '&status:not=inactive'
     const offset = getOffset(currentPage)
     const response = await get(
-      `/hapi/fhir/Location?type:code=FACILITY&_count=12&_total=accurate&_offset=${offset}${query}${archivedQuery}`
+      `/chanjo-hapi/fhir/Location?type:code=FACILITY&_count=12&_total=accurate&_offset=${offset}${query}${archivedQuery}`
     )
     if (response) {
       setFacilities(formatFacilitiesToTable(response))
@@ -106,7 +106,7 @@ export default function AddFacility() {
   }
 
   const fetchData = async () => {
-    await fetchLocations('/hapi/fhir/Location?partof=0&_count=50')
+    await fetchLocations('/chanjo-hapi/fhir/Location?partof=0&_count=50')
     await Promise.all([fetchSubCounties(), fetchWards()])
   }
 
@@ -193,20 +193,23 @@ export default function AddFacility() {
     if (name === 'county') {
       const countyKey = counties.find((county) => county.name === value)?.key
       form.setFieldsValue({ subCounty: null, ward: null })
-      fetchLocations(`/hapi/fhir/Location?partof=${countyKey}`, 'county')
+      fetchLocations(`/chanjo-hapi/fhir/Location?partof=${countyKey}`, 'county')
     } else if (name === 'subCounty') {
       const subCountyKey = subCounties.find(
         (subCounty) => subCounty.name === value
       )?.key
       form.setFieldsValue({ ward: null })
-      fetchLocations(`/hapi/fhir/Location?partof=${subCountyKey}`, 'subCounty')
+      fetchLocations(
+        `/chanjo-hapi/fhir/Location?partof=${subCountyKey}`,
+        'subCounty'
+      )
     }
   }
 
   const handleSave = async (values) => {
     const payload = convertLocationToFhir(values)
     const response = await put(
-      `/hapi/fhir/Location/${values.kmflCode}`,
+      `/chanjo-hapi/fhir/Location/${values.kmflCode}`,
       payload
     )
     if (response) {
@@ -217,13 +220,13 @@ export default function AddFacility() {
   }
 
   const handleArchive = async (code, status = 'active') => {
-    const facility = await get(`/hapi/fhir/Location/${code}`)
+    const facility = await get(`/chanjo-hapi/fhir/Location/${code}`)
     const payload = {
       ...facility,
       status: status === 'active' ? 'inactive' : 'active',
     }
 
-    const response = await put(`/hapi/fhir/Location/${code}`, payload)
+    const response = await put(`/chanjo-hapi/fhir/Location/${code}`, payload)
     if (response) {
       await fetchFacilities(null, activeTab === '2')
       message.success('Facility archived successfully')

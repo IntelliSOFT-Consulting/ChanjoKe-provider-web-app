@@ -1,6 +1,6 @@
 import { useApiRequest } from '../api/useApiRequest'
 
-const fhirApi = '/hapi/fhir/Encounter'
+const fhirApi = '/chanjo-hapi/fhir/Encounter'
 
 export default function useEncounter() {
   const { post } = useApiRequest()

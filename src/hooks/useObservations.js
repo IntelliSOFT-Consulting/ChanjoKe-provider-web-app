@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 
-const fhirApi = '/hapi/fhir'
+const fhirApi = '/chanjo-hapi/fhir'
 export default function useObservations() {
   const { get, post, put } = useApiRequest()
   const [observations, setObservations] = useState([])
@@ -56,7 +56,9 @@ export default function useObservations() {
       const firstObservation = await getFirstObservation(values.clientID)
       if (firstObservation) {
         observation.encounter = {
-          reference: `Encounter/${firstObservation.encounter.reference.split('/')[1]}`,
+          reference: `Encounter/${
+            firstObservation.encounter.reference.split('/')[1]
+          }`,
         }
 
         observation.id = firstObservation.id

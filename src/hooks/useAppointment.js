@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 
-const appointmentsEndpoint = '/hapi/fhir/Appointment'
+const appointmentsEndpoint = '/chanjo-hapi/fhir/Appointment'
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
@@ -106,9 +106,6 @@ export default function useAppointment() {
         ? `${appointmentsEndpoint}?${facilityParam}&_count=5`
         : `${appointmentsEndpoint}?${facilityParam}&_count=5&_offset=${offset}`
     const response = await get(url)
-
-   
-   
   }
 
   return {

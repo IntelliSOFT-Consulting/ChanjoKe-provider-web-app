@@ -5,7 +5,7 @@ import { debounce, getOffset, passwordGenerator } from '../utils/methods'
 import { useLocations } from './useLocation'
 import { formatLocation } from '../utils/formatter'
 
-const practitionerRoute = '/hapi/fhir/Practitioner'
+const practitionerRoute = '/chanjo-hapi/fhir/Practitioner'
 const registerRoute = '/auth/provider/register'
 const providerRoute = '/auth/provider'
 

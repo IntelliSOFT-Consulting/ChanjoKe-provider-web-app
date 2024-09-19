@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { message } from 'antd'
 import { useParams } from 'react-router-dom'
 
-const FHIR_ENDPOINT = '/hapi/fhir/AdverseEvent'
+const FHIR_ENDPOINT = '/chanjo-hapi/fhir/AdverseEvent'
 
 const createAefiPayload = (values, currentPatient, user, selectedVaccines) => ({
   resourceType: 'AdverseEvent',
@@ -84,9 +84,9 @@ export default function useAefi() {
 
   const { post, get } = useApiRequest()
 
-  const {currentPatient} = useSelector((state) => state.currentPatient)
+  const { currentPatient } = useSelector((state) => state.currentPatient)
   const { user } = useSelector((state) => state.userInfo)
-  const {selectedVaccines } = useSelector((state) => state.vaccineSchedules)
+  const { selectedVaccines } = useSelector((state) => state.vaccineSchedules)
 
   const { clientID } = useParams()
 

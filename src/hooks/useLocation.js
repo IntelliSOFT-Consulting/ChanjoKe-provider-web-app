@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { convertLocations } from '../utils/formatter'
 
-const fhirRoute = '/hapi/fhir/Location'
+const fhirRoute = '/chanjo-hapi/fhir/Location'
 
 export const useLocations = (form) => {
   const [locations, setLocations] = useState(null)

@@ -1,7 +1,7 @@
 import { useApiRequest } from '../api/useApiRequest'
 import { useState } from 'react'
 
-const endpoint = '/hapi/fhir/AuditEvent'
+const endpoint = '/chanjo-hapi/fhir/AuditEvent'
 
 export const useAudit = () => {
   const [audits, setAudits] = useState(null)

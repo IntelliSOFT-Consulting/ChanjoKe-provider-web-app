@@ -5,8 +5,8 @@ import { nonRoutineVaccines, routineVaccines } from '../data/vaccineData'
 import { formatCardTitle } from '../utils/methods'
 import { generateDueDates } from '../utils/calculators/vaccineDates'
 
-const recommendationsEndpoint = '/hapi/fhir/ImmunizationRecommendation'
-const immunizationsEndpoint = '/hapi/fhir/Immunization'
+const recommendationsEndpoint = '/chanjo-hapi/fhir/ImmunizationRecommendation'
+const immunizationsEndpoint = '/chanjo-hapi/fhir/Immunization'
 
 export default function useVaccination() {
   const { post, get, put } = useApiRequest()

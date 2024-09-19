@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { getOffset } from '../utils/methods'
 
-const path = '/hapi/fhir/ServiceRequest'
+const path = '/chanjo-hapi/fhir/ServiceRequest'
 
 const useReferral = () => {
   const [referrals, setReferrals] = useState([])
@@ -11,7 +11,7 @@ const useReferral = () => {
 
   const { get } = useApiRequest()
 
-  const getReferralsToFacility = async (facility, page = 0, date=null) => {
+  const getReferralsToFacility = async (facility, page = 0, date = null) => {
     setLoading(true)
     const facilityCode = facility?.replace(/Location\//g, '')
     const offset = getOffset(page)

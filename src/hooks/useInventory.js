@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { useApiRequest } from '../api/useApiRequest'
 import { formatLocation } from '../utils/formatter'
 
-const ENDPOINT = '/hapi/fhir/Basic'
+const ENDPOINT = '/chanjo-hapi/fhir/Basic'
 
 export default function useInventory() {
   const [inventoryReport, setInventoryReport] = useState(null)

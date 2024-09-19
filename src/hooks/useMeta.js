@@ -1,6 +1,6 @@
 import { useApiRequest } from '../api/useApiRequest'
 
-const metaRoute = '/hapi/fhir'
+const metaRoute = '/chanjo-hapi/fhir'
 export const useMeta = () => {
   const { post } = useApiRequest()
 

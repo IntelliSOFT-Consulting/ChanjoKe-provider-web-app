@@ -45,12 +45,14 @@ export default function SearchInterface({ searchType }) {
 
   const handleSearch = async (offset = 0, keyword = '') => {
     const params = `&_count=${pageSize}&_total=accurate&_offset=${offset}`
-    const endpoint = '/hapi/fhir/Patient'
+    const endpoint = '/chanjo-hapi/fhir/Patient'
 
     setLoading(true)
 
     let data = await get(
-      `${endpoint}?telecom=${encodeURIComponent(keyword)}&_sort=-_lastUpdated${params}`
+      `${endpoint}?telecom=${encodeURIComponent(
+        keyword
+      )}&_sort=-_lastUpdated${params}`
     )
 
     if (!data?.entry) {

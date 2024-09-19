@@ -6,9 +6,9 @@ import { useLocations } from './useLocation'
 import { formatLocation } from '../utils/formatter'
 import { message } from 'antd'
 
-const inventoryPath = '/hapi/fhir/InventoryItem'
-const deliveryPath = '/hapi/fhir/SupplyDelivery'
-const supplyRequestPath = '/hapi/fhir/SupplyRequest'
+const inventoryPath = '/chanjo-hapi/fhir/InventoryItem'
+const deliveryPath = '/chanjo-hapi/fhir/SupplyDelivery'
+const supplyRequestPath = '/chanjo-hapi/fhir/SupplyRequest'
 
 const useStock = () => {
   const [stock, setStock] = useState([])
@@ -340,7 +340,9 @@ const useStock = () => {
 
   const updateRequestStatus = async (id, status) => {
     const request = await get(`${supplyRequestPath}/${id}`)
-    const dispatched = request.meta?.tag?.find((tag) => tag.code === 'dispatched')
+    const dispatched = request.meta?.tag?.find(
+      (tag) => tag.code === 'dispatched'
+    )
     if (dispatched && status === 'cancelled') {
       return message.error('Stock has already been dispatched')
     }

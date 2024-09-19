@@ -2,7 +2,7 @@ import { useApiRequest } from '../api/useApiRequest'
 import { useState } from 'react'
 import dayjs from 'dayjs'
 
-const fhirApi = '/hapi/fhir/CarePlan'
+const fhirApi = '/chanjo-hapi/fhir/CarePlan'
 
 export default function useCampaign() {
   const { get, post, put } = useApiRequest()
