@@ -7,7 +7,7 @@ import {
 } from '../../data/options/clientDetails'
 import { titleCase } from '../../utils/methods'
 import Table from '../DataTable'
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons'
+import { CloseCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
 export default function CaregiverDetails({
   setCaregivers,
@@ -101,169 +101,172 @@ export default function CaregiverDetails({
       <h3 className="text-xl font-medium mb-6">Caregiver Details</h3>
       <Form form={form} layout="vertical" initialValues={{ phoneCode: '+254' }}>
         <div className="grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
-          <Form.Item
-            name="caregiverType"
-            label="Caregiver Relationship"
-            rules={[
-              {
-                required: true,
-                message: `Please select the caregiver relationship`,
-              },
-            ]}
-            extra="Select the relationship of the caregiver to the client"
-          >
-            <Select
-              placeholder={`Select Caregiver Relationship`}
-              options={caregiverTypes}
-              showSearch
-              searchable
-              allowClear
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="caregiverName"
-            label="Caregiver Name"
-            rules={[
-              {
-                required: true,
-                message: `Please input the caregiver name`,
-              },
-            ]}
-          >
-            <Input
-              placeholder="eg John Doe"
-              autoComplete="off"
-              onBlur={() => {
-                const name = form.getFieldValue('caregiverName')
-                form.setFieldValue('caregiverName', titleCase(name))
-              }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="caregiverIdentificationType"
-            label="ID Type"
-            rules={[
-              {
-                required: true,
-                message: `Please select the caregiver ID type`,
-              },
-            ]}
-          >
-            <Select
-              placeholder="Select ID Type"
-              options={caregiverIdentificationTypes}
-              showSearch
-              searchable
-              allowClear
-              onChange={(value) => {
-                setIdentificationType(value)
-                if (value === 'None') {
-                  form.setFieldValue('kins', [
-                    { kinName: '', kinRelationship: '', kinPhoneNumber: '' },
-                  ])
-                } else {
-                  form.setFieldValue('kins', [])
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            name="caregiverID"
-            label={`Caregiver ID Number`}
-            rules={[
-              ({ getFieldValue }) => ({
-                required: !['Father', 'Mother'].includes(
-                  getFieldValue('caregiverType')
-                ),
-                message: `Please input the Caregiver ID number`,
-              }),
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (value) {
-                    if (
-                      getFieldValue('caregiverIdentificationType') ===
-                      'National ID'
-                    ) {
-                      if (!/^\d+$/.test(value)) {
-                        return Promise.reject(
-                          new Error('ID number must be numerical')
-                        )
-                      }
-                      if (value.length < 6) {
-                        return Promise.reject(
-                          new Error('ID number must be at least 6 digits')
-                        )
-                      }
-                    }
-                  }
-                  return Promise.resolve()
+          <div className="col-span-2 grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 border p-2 rounded-md">
+            <Form.Item
+              name="caregiverType"
+              label="Caregiver Relationship"
+              rules={[
+                {
+                  required: true,
+                  message: `Please select the caregiver relationship`,
                 },
-              }),
-            ]}
-          >
-            <Input
-              placeholder="eg 12345678"
-              autoComplete="off"
-              className="w-full"
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
-                form.setFieldValue('caregiverID', value)
-              }}
-            />
-          </Form.Item>
+              ]}
+              extra="Select the relationship of the caregiver to the client"
+            >
+              <Select
+                placeholder={`Select Caregiver Relationship`}
+                options={caregiverTypes}
+                showSearch
+                searchable
+                allowClear
+              />
+            </Form.Item>
 
-          <Form.Item
-            label="Phone Number"
-            name="phoneNumber"
-            rules={[
-              {
-                pattern: /^(\+?)([0-9]{7,15})$/,
-                message: 'Please enter a valid phone number!',
-              },
-              ({ getFieldValue }) => ({
-                required: !['Father', 'Mother'].includes(
-                  getFieldValue('caregiverType')
-                ),
-                message: `Please input the Caregiver phone number`,
-              }),
-            ]}
-            className="mb-0"
-          >
-            <Input
-              placeholder="7xxxxxxxx"
-              addonBefore={
-                <Form.Item name="phoneCode" noStyle>
-                  <Select
-                    style={{ width: 120 }}
-                    showSearch
-                    options={countryCodes}
-                    filterOption={(input, option) =>
-                      option.label.toLowerCase().indexOf(input.toLowerCase()) >=
-                      0
-                    }
-                    placeholder="Code"
-                  />
-                </Form.Item>
-              }
-              onChange={(e) => {
-                e.target.value = e.target.value.replace(/\D/g, '')
-                if (e.target.value.length > 9) {
-                  e.target.value = e.target.value.slice(0, 9)
+            <Form.Item
+              name="caregiverName"
+              label="Caregiver Name"
+              rules={[
+                {
+                  required: true,
+                  message: `Please input the caregiver name`,
+                },
+              ]}
+            >
+              <Input
+                placeholder="eg John Doe"
+                autoComplete="off"
+                onBlur={() => {
+                  const name = form.getFieldValue('caregiverName')
+                  form.setFieldValue('caregiverName', titleCase(name))
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="caregiverIdentificationType"
+              label="ID Type"
+              rules={[
+                {
+                  required: true,
+                  message: `Please select the caregiver ID type`,
+                },
+              ]}
+            >
+              <Select
+                placeholder="Select ID Type"
+                options={caregiverIdentificationTypes}
+                showSearch
+                searchable
+                allowClear
+                onChange={(value) => {
+                  setIdentificationType(value)
+                  if (value === 'None') {
+                    form.setFieldValue('kins', [
+                      { kinName: '', kinRelationship: '', kinPhoneNumber: '' },
+                    ])
+                  } else {
+                    form.setFieldValue('kins', [])
+                  }
+                }}
+              />
+            </Form.Item>
+            {identificationType !== 'None' && (
+              <Form.Item
+                name="caregiverID"
+                label={`Caregiver ID Number`}
+                rules={[
+                  ({ getFieldValue }) => ({
+                    required: !['Father', 'Mother'].includes(
+                      getFieldValue('caregiverType')
+                    ),
+                    message: `Please input the Caregiver ID number`,
+                  }),
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (value) {
+                        if (
+                          getFieldValue('caregiverIdentificationType') ===
+                          'National ID'
+                        ) {
+                          if (!/^\d+$/.test(value)) {
+                            return Promise.reject(
+                              new Error('ID number must be numerical')
+                            )
+                          }
+                          if (value.length < 6) {
+                            return Promise.reject(
+                              new Error('ID number must be at least 6 digits')
+                            )
+                          }
+                        }
+                      }
+                      return Promise.resolve()
+                    },
+                  }),
+                ]}
+              >
+                <Input
+                  placeholder="eg 12345678"
+                  autoComplete="off"
+                  className="w-full"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+                    form.setFieldValue('caregiverID', value)
+                  }}
+                />
+              </Form.Item>
+            )}
+
+            <Form.Item
+              label="Phone Number"
+              name="phoneNumber"
+              rules={[
+                {
+                  pattern: /^(\+?)([0-9]{7,15})$/,
+                  message: 'Please enter a valid phone number!',
+                },
+                {
+                  required: identificationType !== 'None',
+                  message: `Please input the Caregiver phone number`,
+                },
+              ]}
+              className="mb-0"
+            >
+              <Input
+                placeholder="7xxxxxxxx"
+                addonBefore={
+                  <Form.Item name="phoneCode" noStyle>
+                    <Select
+                      style={{ width: 120 }}
+                      showSearch
+                      options={countryCodes}
+                      filterOption={(input, option) =>
+                        option.label
+                          .toLowerCase()
+                          .indexOf(input.toLowerCase()) >= 0
+                      }
+                      placeholder="Code"
+                    />
+                  </Form.Item>
                 }
-                form.setFieldValue('phoneNumber', e.target.value.slice(0, 9))
-              }}
-            />
-          </Form.Item>
+                onChange={(e) => {
+                  e.target.value = e.target.value.replace(/\D/g, '')
+                  if (e.target.value.length > 9) {
+                    e.target.value = e.target.value.slice(0, 9)
+                  }
+                  form.setFieldValue('phoneNumber', e.target.value.slice(0, 9))
+                }}
+              />
+            </Form.Item>
+          </div>
           {identificationType === 'None' && (
             <Form.List name="kins">
               {(fields, { add, remove }) => (
-                <div>
+                <div className="col-span-2 grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 my-4">
                   {fields.map((field) => (
                     <div
                       key={field.key}
-                      className="col-span-2 grid gap-x-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 border border-gray-300 p-4 rounded-md relative"
+                      className=" grid gap-x-10  border border-gray-300 p-4 rounded-md relative my-2"
                     >
                       <Form.Item
                         key={field.key}
@@ -281,7 +284,7 @@ export default function CaregiverDetails({
                       </Form.Item>
 
                       <Form.Item
-                        name={[fields.key, 'kinRelationship']}
+                        name={[field.name, 'kinRelationship']}
                         label="Kin Relationship"
                       >
                         <Select placeholder="Relationship with Caregiver">
@@ -292,10 +295,11 @@ export default function CaregiverDetails({
                         </Select>
                       </Form.Item>
                       <Form.Item
-                        name={[fields.key, 'kinPhoneNumber']}
+                        name={[field.name, 'kinPhoneNumber']}
                         label="Kin Phone Number"
                         rules={[
                           {
+                            required: true,
                             pattern: /^(\+?)([0-9]{7,15})$/,
                             message: 'Please enter a valid phone number!',
                           },
@@ -308,7 +312,7 @@ export default function CaregiverDetails({
                         className="absolute top-0 right-0"
                         onClick={() => remove(field.key)}
                         danger
-                        icon={<CloseOutlined />}
+                        icon={<CloseCircleOutlined />}
                       />
                     </div>
                   ))}

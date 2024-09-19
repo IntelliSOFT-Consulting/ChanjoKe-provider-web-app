@@ -80,16 +80,44 @@ export default function ClientRecords() {
     const ward =
       getPatientAddress(patient, 2) || patient?.address?.[0]?.state || ''
 
-    const caregiverName = patient?.contact?.[0]?.name
-    const caregiverFullName = `${caregiverName?.given?.join(' ') || ''} ${
-      caregiverName?.family || ''
-    }`?.trim()
-    const caregiverType = patient?.contact?.[0]?.relationship?.[0]?.text || ''
     const phoneNumber = patient?.contact?.[0]?.telecom?.[0]?.value || ''
     const communityUnit = patient?.address?.[0]?.line?.[3]
     const townCenter = patient?.address?.[0]?.line?.[4]
     const estateOrHouseNo = patient?.address?.[0]?.line?.[5]
 
+    const caregivers = patient?.contact?.map((caregiver) => {
+      const name = caregiver.name
+      const identificationType = caregiver.extension?.find(
+        (item) => item.url === 'caregiver_id_type'
+      )?.valueString
+      const identificationNumber = caregiver.extension?.find(
+        (item) => item.url === 'caregiver_id_number'
+      )?.valueString
+      const kins = caregiver.extension?.filter(
+        (item) => item.url === 'next-of-kin'
+      )
+
+      return {
+        'Caregiver Name':
+          name?.text ||
+          `${name?.given?.join(' ') || ''} ${name?.family || ''}`.trim(),
+        'Caregiver Relationship': caregiver.relationship?.[0]?.text || '',
+        'Caregiver Phone Number': caregiver.telecom?.[0]?.value || '',
+        'Caregiver Identification Type': identificationType || '',
+        'Caregiver Identification Number': identificationNumber || '',
+        'Next of Kin': kins?.map((kin) => ({
+          'Next of Kin Name': kin?.extension?.find(
+            (item) => item.url === 'name'
+          )?.valueString,
+          'Next of Kin Relationship': kin?.extension?.find(
+            (item) => item.url === 'relationship'
+          )?.valueString,
+          'Next of Kin Phone Number': kin?.extension?.find(
+            (item) => item.url === 'phone'
+          )?.valueString,
+        })),
+      }
+    })
     return {
       'First Name': firstName,
       'Middle Name': middleName,
@@ -105,9 +133,7 @@ export default function ClientRecords() {
       'Town/Trading Center': townCenter,
       'Community Unit': communityUnit,
       'Estate & House Number/Village': estateOrHouseNo,
-      'Caregiver Name': caregiverFullName,
-      'Caregiver Relationship': caregiverType,
-      'Caregiver Phone Number': phoneNumber,
+      caregivers,
     }
   }
 
@@ -138,6 +164,17 @@ export default function ClientRecords() {
       title: 'Phone Number',
       dataIndex: 'Caregiver Phone Number',
       key: 'Caregiver Phone Number',
+    },
+    {
+      title: 'Caregiver Identification Type',
+      dataIndex: 'Caregiver Identification Type',
+      key: 'Caregiver Identification Type',
+    },
+    {
+      title: 'Caregiver Identification Number',
+      dataIndex: 'Caregiver Identification Number',
+      key: 'Caregiver Identification Number',
+      render: (text) => text || '-',
     },
   ]
   return (
@@ -229,15 +266,40 @@ export default function ClientRecords() {
 
               <Table
                 columns={columns}
-                dataSource={[
-                  {
-                    'Caregiver Name': details['Caregiver Name'],
-                    'Caregiver Relationship': details['Caregiver Relationship'],
-                    'Caregiver Phone Number': details['Caregiver Phone Number'],
-                  },
-                ]}
+                dataSource={details?.caregivers || []}
                 size="small"
                 pagination={false}
+                expandable={{
+                  expandedRowRender: (record) => {
+                    return (
+                      <div className="flex flex-col">
+                        {record['Next of Kin']?.map((kin) => (
+                          <div className="flex space-x-4">
+                            <div>
+                              <b>Name:</b>
+                              <span className="ml-2">
+                                {kin['Next of Kin Name']}
+                              </span>
+                            </div>
+                            <div>
+                              <b>Relationship:</b>
+                              <span className="ml-2">
+                                {kin['Next of Kin Relationship']}
+                              </span>
+                            </div>
+                            <div>
+                              <b>Phone Number:</b>
+                              <span className="ml-2">
+                                {kin['Next of Kin Phone Number']}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  },
+                  rowExpandable: (record) => record['Next of Kin']?.length > 0,
+                }}
               />
             </div>
           </div>

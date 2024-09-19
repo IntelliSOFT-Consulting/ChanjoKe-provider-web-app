@@ -8,7 +8,6 @@ import { Provider } from 'react-redux'
 import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import store from './redux/store'
-import reportWebVitals from './reportWebVitals'
 import routes from './routes/index'
 import { debounce } from './utils/methods'
 dayjs.extend(customParseFormat)
@@ -132,7 +131,6 @@ const App = () => {
                 colorPrimary: defaultData.colorPrimary,
                 algorithm: defaultData.algorithm,
                 cellActiveWithRangeBg: defaultData.colorPrimary,
-  
               },
               Descriptions: {
                 borderRadius: 0,
@@ -159,7 +157,3 @@ const App = () => {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />)
-
-// If you want to start measuring performance in your app, pass a function
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()

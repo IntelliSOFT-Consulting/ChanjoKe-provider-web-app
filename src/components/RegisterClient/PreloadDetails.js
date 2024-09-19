@@ -175,6 +175,13 @@ export default function PreloadDetails({
       caregiverIdentificationNumber: caregiver.extension?.find(
         (item) => item.url === 'caregiver_id_number'
       )?.valueString,
+      kin: caregiver.extension?.find(
+        (item) => item.url === 'next-of-kin'
+      )?.extension?.map((item) => ({
+        kinName: item.valueString,
+        kinPhoneNumber: item.valueString,
+        kinRelationship: item.valueString,
+      }))
     }))
 
   const updateFormAndState = (
