@@ -19,9 +19,10 @@ import useReferral from '../hooks/useReferral'
 import useVaccination from '../hooks/useVaccination'
 import { useReports } from '../hooks/useReports'
 import CanvasJSReact from '@canvasjs/react-charts'
-
 import { formatPopulation } from '../utils/formatters/formatMonitoring'
 
+
+let CanvasJS = CanvasJSReact.CanvasJS;
 let CanvasJSChart = CanvasJSReact.CanvasJSChart
 
 const allShortcuts = [
