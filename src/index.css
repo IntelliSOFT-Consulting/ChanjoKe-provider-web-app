@@ -49,6 +49,10 @@ code {
   cursor: not-allowed !important;
 }
 
+.canvasjs-chart-credit {
+  display: none !important;
+}
+
 .btn-disabled .ant-float-btn-body {
   background-color: #747f9a !important;
   border-color: #747f9a !important;

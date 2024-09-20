@@ -18,8 +18,11 @@ import useAppointment from '../hooks/useAppointment'
 import useReferral from '../hooks/useReferral'
 import useVaccination from '../hooks/useVaccination'
 import { useReports } from '../hooks/useReports'
-import { Chart } from 'react-google-charts'
+import CanvasJSReact from '@canvasjs/react-charts'
+
 import { formatPopulation } from '../utils/formatters/formatMonitoring'
+
+let CanvasJSChart = CanvasJSReact.CanvasJSChart
 
 const allShortcuts = [
   {
@@ -162,6 +165,37 @@ export default function Home() {
     )
   }, [user])
 
+  const options = {
+    animationEnabled: true,
+    theme: 'light2',
+    axisX: {
+      valueFormatString: 'MMM',
+      intervalType: 'month',
+      interval: 1,
+    },
+    axisY: {
+      title: 'Population',
+    },
+    toolTip: {
+      shared: true,
+    },
+    legend: {
+      cursor: 'pointer',
+      itemclick: function (e) {
+        if (
+          typeof e.dataSeries.visible === 'undefined' ||
+          e.dataSeries.visible
+        ) {
+          e.dataSeries.visible = false
+        } else {
+          e.dataSeries.visible = true
+        }
+        e.chart.render()
+      },
+    },
+    data: formatPopulation(monitoring),
+  }
+
   return (
     <>
       {!immunizations ? (
@@ -206,31 +240,7 @@ export default function Home() {
               <h3 className="font-bold text-primary border-b-2 pb-2 mb-4">
                 Population Coverage
               </h3>
-              {monitoring && (
-                <Chart
-                  chartType="LineChart"
-                  data={formatPopulation(monitoring)?.targetPopulation}
-                  options={{
-                    chartArea: { width: '50%' },
-                    hAxis: {
-                      title: 'Month',
-                      viewWindow: { minValue: 0, maxValue: 'DEC' },
-                      minValue: 'JAN',
-                      maxValue: 'DEC',
-                    },
-                    vAxis: {
-                      title: 'Population',
-                      viewWindow: { minValue: 0 },
-                      minValue: 0,
-                    },
-                    legend: 'none',
-                    chartArea: { width: '90%', height: '75%' },
-                  }}
-                  legendToggle={false}
-                  width="100%"
-                  height="300px"
-                />
-              )}
+              {monitoring && <CanvasJSChart options={options} />}
             </div>
           </div>
         </div>

@@ -21,23 +21,33 @@ export const formatPopulation = (reports) => {
   },
     ]
 
-    format to work with @ant-design/plots
+    format to work with @canvasjs/react-charts
     
     */
-  const target =
-    reports?.map((report) => {
-      return [
-        report.month?.toUpperCase()?.substring(0, 3),
-        report['DO%_IMDPT1_IMDPT3_cumulative'],
-        report['DO%_IMDPT1_IMMEAS0_cumulative'],
-        report['DO%_IMDPT1_IMDPT3_cumulative'],
-      ]
-    }) || []
 
-  return {
-    targetPopulation: [
-      ['Month', 'DPT-Hep B-Hib 1,', 'DPT-Hep B-Hib 3', 'Measles Rubella 1'],
-      ...target,
-    ],
-  }
+  const periods = reports?.map((report, index) => {
+    return new Date(report?.year, index, 1)
+  })
+  const reportTypes = [
+    { name: 'DPT-Hep B-Hib 1', key: 'IMDPT-1_cumulative' },
+    { name: 'DPT-Hep B-Hib 3', key: 'IMDPT-3_cumulative' },
+    { name: 'Measles Rubella 1', key: 'IMMEAS-0_cumulative' },
+  ]
+
+  const target =
+    reportTypes?.map((reportType) => {
+      return {
+        type: 'line',
+        name: reportType?.name,
+        showInLegend: true,
+        yValueFormatString: '#,###',
+        dataPoints: periods?.map((period, index) => {
+          return {
+            x: period,
+            y: reports[index][reportType?.key],
+          }
+        }),
+      }
+    }) || []
+  return target
 }
