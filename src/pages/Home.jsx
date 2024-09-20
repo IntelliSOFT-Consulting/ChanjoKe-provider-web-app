@@ -17,13 +17,6 @@ import LoadingArrows from '../common/spinners/LoadingArrows'
 import useAppointment from '../hooks/useAppointment'
 import useReferral from '../hooks/useReferral'
 import useVaccination from '../hooks/useVaccination'
-import { useReports } from '../hooks/useReports'
-import CanvasJSReact from '@canvasjs/react-charts'
-import { formatPopulation } from '../utils/formatters/formatMonitoring'
-
-
-let CanvasJS = CanvasJSReact.CanvasJS;
-let CanvasJSChart = CanvasJSReact.CanvasJSChart
 
 const allShortcuts = [
   {
@@ -117,7 +110,7 @@ const allShortcuts = [
 
 export default function Home() {
   const { user } = useSelector((state) => state.userInfo)
-  const { getMonitoring, monitoring } = useReports()
+
   const { getFacilityImmunizations, immunizations } = useVaccination()
   const { getFacilityAppointments, facilityAppointments } = useAppointment()
   const { getReferralsToFacility, referrals } = useReferral()
@@ -128,7 +121,6 @@ export default function Home() {
     getFacilityImmunizations(user?.orgUnit?.code || '0', `&date=${today}`)
     getFacilityAppointments(today)
     getReferralsToFacility(user?.orgUnit?.code || '0', 0, today)
-    getMonitoring({})
   }, [user?.orgUnit?.code])
 
   const statsTwo = [
@@ -165,37 +157,6 @@ export default function Home() {
         shortcut.roles.includes('ALL')
     )
   }, [user])
-
-  const options = {
-    animationEnabled: true,
-    theme: 'light2',
-    axisX: {
-      valueFormatString: 'MMM',
-      intervalType: 'month',
-      interval: 1,
-    },
-    axisY: {
-      title: 'Population',
-    },
-    toolTip: {
-      shared: true,
-    },
-    legend: {
-      cursor: 'pointer',
-      itemclick: function (e) {
-        if (
-          typeof e.dataSeries.visible === 'undefined' ||
-          e.dataSeries.visible
-        ) {
-          e.dataSeries.visible = false
-        } else {
-          e.dataSeries.visible = true
-        }
-        e.chart.render()
-      },
-    },
-    data: formatPopulation(monitoring),
-  }
 
   return (
     <>
@@ -236,13 +197,28 @@ export default function Home() {
 
           <br />
 
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-            <div className="bg-white rounded-lg shadow-xl border p-4">
-              <h3 className="font-bold text-primary border-b-2 pb-2 mb-4">
-                Population Coverage
-              </h3>
-              {monitoring && <CanvasJSChart options={options} />}
-            </div>
+          <div>
+            <h3 className="mt-5 text-[#163C94] text-2xl mx-auto max-w-7xl">
+              Quick Access
+            </h3>
+            <dl className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:mt-10 mt-3 grid grid-cols-2 gap-5 sm:grid-cols-3 p-6 rounded-lg shadow-xl border bg-white">
+              {allowedShortcuts.map((item) => (
+                <Link
+                  to={item.href}
+                  key={item.name}
+                  className="overflow-hidden text-center rounded-lg bg-white px-4 py-5 shadow sm:p-6 border border-[#5370B0]"
+                >
+                  <img
+                    className="h-12 mx-auto mb-5"
+                    src={item.icon}
+                    alt={item.name}
+                  />
+                  <dt className="truncate text-sm font-normal text-gray-500">
+                    {item.name}
+                  </dt>
+                </Link>
+              ))}
+            </dl>
           </div>
         </div>
       )}
