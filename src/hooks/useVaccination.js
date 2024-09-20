@@ -135,7 +135,7 @@ export default function useVaccination() {
       }`
     )
 
-    const resources = responses?.entry?.map((entry) => entry.resource)
+    const resources = responses?.entry?.map((entry) => entry.resource) || []
 
     setImmunizations(resources)
     return resources
