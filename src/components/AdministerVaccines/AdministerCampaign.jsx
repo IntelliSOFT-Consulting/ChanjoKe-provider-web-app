@@ -393,7 +393,7 @@ const AdministerCampaign = () => {
           onConfirm={() => form.submit()}
           okText="Yes"
           cancelText="No"
-          placement="top"
+          placement="topRight"
         >
           <Button
             loading={loading}

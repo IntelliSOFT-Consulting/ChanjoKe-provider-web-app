@@ -401,7 +401,7 @@ export default function Administer() {
             onConfirm={() => form.submit()}
             okText="Yes"
             cancelText="No"
-            placement="top"
+            placement="topRight"
           >
             <Button
               loading={loading}
