@@ -226,7 +226,11 @@ export const updateVaccineDueDates = (
 
       const formatted = formatVaccines(dependentVaccines)
 
-      let startDate = nextDate ? moment(nextDate) : moment()
+      let startDate = nextDate
+        ? moment(nextDate)
+        : selectedVaccine?.dateOfLastDose
+        ? moment(selectedVaccine?.dateOfLastDose)
+        : moment()
 
       formatted.forEach((dependentVaccine) => {
         const difference = moment(dependentVaccine.latestDate).diff(

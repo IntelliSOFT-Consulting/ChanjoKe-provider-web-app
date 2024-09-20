@@ -97,7 +97,10 @@ export default function UpdateVaccineHistory() {
         const response = await createImmunization(resource[0])
 
         const updatedDueDates = updateVaccineDueDates(recommendations, [
-          selectedVaccine,
+          {
+            ...selectedVaccine,
+            dateOfLastDose: item.dateOfLastDose?.format('YYYY-MM-DD'),
+          },
         ])
 
         drafrRecommendations = updatedDueDates
@@ -113,7 +116,7 @@ export default function UpdateVaccineHistory() {
       const timeout = setTimeout(() => {
         setDialogOpen(false)
         navigate(`/client-details/${clientID}/routineVaccines`)
-      }, 1500)
+      }, 500)
 
       return () => {
         clearTimeout(timeout)
