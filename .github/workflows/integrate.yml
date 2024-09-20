@@ -24,9 +24,7 @@ env:
 jobs:
   build_frontend_app:
     runs-on: ubuntu-latest
-    env:
-      EXAMPLE: example # environment variable
-
+    environment: production
     steps:
       # checkout the repository content to github runner
       - name: Checkout

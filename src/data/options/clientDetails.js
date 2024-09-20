@@ -42,6 +42,7 @@ export const manufacturerOptions = [
   { label: 'KEMRI', value: 'KEMRI' },
   { label: 'Kenya Biovax Institute', value: 'Kenya Biovax Institute' },
   { label: 'GlaxoSmithKline (GSK)', value: 'GlaxoSmithKline (GSK)' },
+  { label: 'LG Chem', value: 'LG Chem' },
   { label: 'Pfizer', value: 'Pfizer' },
   { label: 'AstraZeneca', value: 'AstraZeneca' },
   { label: 'Sanofi Pasteur', value: 'Sanofi Pasteur' },
