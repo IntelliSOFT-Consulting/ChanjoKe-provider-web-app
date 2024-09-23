@@ -159,68 +159,69 @@ const Home = () => {
               bordered
             />
           </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card title="Total Population" size="small" className="mb-6">
+              {monitoring && (
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={formatPopulation(monitoring)}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="DPT-Hep B-Hib 1"
+                        stroke="#0088FE"
+                        activeDot={{ r: 8 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="DPT-Hep B-Hib 3"
+                        stroke="#00C49F"
+                        activeDot={{ r: 8 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="Measles Rubella 1"
+                        stroke="#FF8042"
+                        activeDot={{ r: 8 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </Card>
 
-          <Card title="Total Population" size="small" className="mb-6">
-            {monitoring && (
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={formatPopulation(monitoring)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="DPT-Hep B-Hib 1"
-                      stroke="#0088FE"
-                      activeDot={{ r: 8 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="DPT-Hep B-Hib 3"
-                      stroke="#00C49F"
-                      activeDot={{ r: 8 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="Measles Rubella 1"
-                      stroke="#FF8042"
-                      activeDot={{ r: 8 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </Card>
-
-          <Card title="Dropout Rate" size="small" className="mb-6">
-            {monitoring && (
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={formatPopulation(monitoring)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="% DO DPT-Hep B-Hib"
-                      stroke="#0088FE"
-                      activeDot={{ r: 8 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="% DO Measles Rubella"
-                      stroke="#FF8042"
-                      activeDot={{ r: 8 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-          </Card>
+            <Card title="Dropout Rate" size="small" className="mb-6">
+              {monitoring && (
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={formatPopulation(monitoring)}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="% DO DPT-Hep B-Hib"
+                        stroke="#0088FE"
+                        activeDot={{ r: 8 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="% DO Measles Rubella"
+                        stroke="#FF8042"
+                        activeDot={{ r: 8 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </Card>
+          </div>
         </section>
       </div>
     </>
