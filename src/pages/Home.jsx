@@ -89,9 +89,9 @@ const Home = () => {
       },
       ...moment.months().flatMap((month) => [
         {
-          title: month,
-          key: month.toLowerCase(),
-          dataIndex: month.toLowerCase(),
+          title: month?.substring(0, 3),
+          key: month?.substring(0, 3).toLowerCase(),
+          dataIndex: month?.substring(0, 3).toLowerCase(),
           width: '15px',
           onCell: (_record, index) =>
             index > 2 ? { className: 'bg-blue-200' } : {},
@@ -99,8 +99,8 @@ const Home = () => {
         },
         {
           title: 'Cum Total',
-          key: `${month.toLowerCase()}_cumulative`,
-          dataIndex: `${month.toLowerCase()}_cumulative`,
+          key: `${month?.substring(0, 3).toLowerCase()}_cumulative`,
+          dataIndex: `${month?.substring(0, 3).toLowerCase()}_cumulative`,
           width: '15px',
         },
       ]),
