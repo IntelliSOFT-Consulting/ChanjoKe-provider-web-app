@@ -41,7 +41,7 @@ export const useReports = () => {
     return response
   }
 
-  const getMonitoring = async (filters) => {
+  const getMonitoring = async (filters = {}) => {
     const queryString = Object.entries(filters)
       .filter(([key, value]) => value)
       .map(([key, value]) => `${key}=${value}`)

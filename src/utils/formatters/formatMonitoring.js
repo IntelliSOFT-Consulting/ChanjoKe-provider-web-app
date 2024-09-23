@@ -1,53 +1,73 @@
 export const formatPopulation = (reports) => {
-  /*
-    reports = [
-          {
-    "DO%_IMDPT1_IMDPT3_cumulative": 0,
-    "DO%_IMDPT1_IMDPT3_monthly": 0,
-    "DO%_IMDPT1_IMMEAS0_cumulative": 0,
-    "DO%_IMDPT1_IMMEAS0_monthly": 0,
-    "DO_IMDPT1_IMDPT3_cumulative": 0,
-    "DO_IMDPT1_IMDPT3_monthly": 0,
-    "DO_IMDPT1_IMMEAS0_cumulative": 0,
-    "DO_IMDPT1_IMMEAS0_monthly": 0,
-    "IMDPT-1_cumulative": 0,
-    "IMDPT-1_monthly": 0,
-    "IMDPT-3_cumulative": 0,
-    "IMDPT-3_monthly": 0,
-    "IMMEAS-0_cumulative": 0,
-    "IMMEAS-0_monthly": 0,
-    "month": "October",
-    "year": 2024
-  },
-    ]
+  return reports?.map((report) => ({
+    month: report?.month?.substring(0, 3),
+    'DPT-Hep B-Hib 1': report?.['IMDPT-1_cumulative'],
+    'DPT-Hep B-Hib 3': report?.['IMDPT-3_cumulative'],
+    'Measles Rubella 1': report?.['IMMEAS-0_cumulative'],
+    '% DO DPT-Hep B-Hib': report?.['DO%_IMDPT1_IMDPT3_cumulative'],
+    '% DO Measles Rubella': report?.['DO%_IMDPT1_IMMEAS0_cumulative'],
+  }))
+}
 
-    format to work with @canvasjs/react-charts
-    
-    */
+const getMonthData = (month, reports, field) => {
+  const report = reports.find((r) => r.month.substring(0, 3) === month)
+  return report ? report[field] : null
+}
 
-  const periods = reports?.map((report, index) => {
-    return new Date(report?.year, index, 1)
-  })
-  const reportTypes = [
-    { name: 'DPT-Hep B-Hib 1', key: 'IMDPT-1_cumulative' },
-    { name: 'DPT-Hep B-Hib 3', key: 'IMDPT-3_cumulative' },
-    { name: 'Measles Rubella 1', key: 'IMMEAS-0_cumulative' },
+const getMonthlyData = (month, reports, field) => ({
+  [month.toLowerCase()]: getMonthData(month, reports, `${field}_monthly`),
+  [`${month.toLowerCase()}_cumulative`]: getMonthData(
+    month,
+    reports,
+    `${field}_cumulative`
+  ),
+})
+
+const createRow = (title, reports, field) => {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ]
+  const monthlyData = months.reduce((acc, month) => {
+    return { ...acc, ...getMonthlyData(month, reports, field) }
+  }, {})
+  return { title, ...monthlyData }
+}
+
+export const formatPopulationTable = (reports) => {
+  if (!reports) return []
+
+  const rows = [
+    { title: 'Total Immunized DPT-Hep B-Hib 1', field: 'IMDPT-1' },
+    { title: 'Total Immunized DPT-Hep B-Hib 3', field: 'IMDPT-3' },
+    { title: 'Total Immunized Measles Rubella 1', field: 'IMMEAS-0' },
+    {
+      title: 'Drop Out (DO)= (DPT-Hep B-Hib 1 - DPT-Hep B-Hib 3)',
+      field: 'DO_IMDPT1_IMDPT3',
+    },
+    {
+      title: 'Drop Out % (DO / DPT-Hep B-Hib 1) x 100',
+      field: 'DO%_IMDPT1_IMDPT3',
+    },
+    {
+      title: 'Drop Out (DO)= (DPT-Hep B-Hib 1 - Measles Rubella 1)',
+      field: 'DO_IMDPT1_IMMEAS0',
+    },
+    {
+      title: 'Drop Out % (DO / DPT-Hep B-Hib 1) x 100',
+      field: 'DO%_IMDPT1_IMMEAS0',
+    },
   ]
 
-  const target =
-    reportTypes?.map((reportType) => {
-      return {
-        type: 'line',
-        name: reportType?.name,
-        showInLegend: true,
-        yValueFormatString: '#,###',
-        dataPoints: periods?.map((period, index) => {
-          return {
-            x: period,
-            y: reports[index][reportType?.key],
-          }
-        }),
-      }
-    }) || []
-  return target
+  return rows.map(({ title, field }) => createRow(title, reports, field))
 }
