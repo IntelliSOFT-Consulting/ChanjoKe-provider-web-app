@@ -113,7 +113,7 @@ const App = () => {
             components: {
               Button: {
                 colorPrimary: defaultData.Button?.colorPrimary,
-                algorithm: defaultData.Button?.algorithm,
+
               },
               Input: {
                 colorPrimary: defaultData.Input?.colorPrimary,

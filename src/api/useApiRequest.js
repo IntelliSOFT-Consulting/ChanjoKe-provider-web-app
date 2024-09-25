@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { refreshTokenIfNeeded, getAccessToken } from './tokenUtils'
 
 const server = axios.create({
-  baseURL: 'https://chanjoke.intellisoftkenya.com',
+  baseURL: import.meta.env.VITE_SERVER_BASE_URL,
   headers: {
     'Cache-Control': 'no-cache',
     'Content-Type': 'application/json',

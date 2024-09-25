@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useCallback } from 'react'
 import { embedDashboard } from '@superset-ui/embedded-sdk'
 import { useApiRequest } from '../api/useApiRequest'
 
-const DASHBOARD_ID = process.env.REACT_APP_DASHBOARD_ID
-const SUPERSET_DOMAIN = process.env.REACT_APP_SUPERSET_DOMAIN
+const DASHBOARD_ID = import.meta.env.VITE_DASHBOARD_ID
+const SUPERSET_DOMAIN = import.meta.env.VITE_SUPERSET_DOMAIN
 
 const SupersetDashboard = () => {
   const dashboardRef = useRef(null)

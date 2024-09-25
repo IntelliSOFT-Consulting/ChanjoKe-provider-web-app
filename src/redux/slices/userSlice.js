@@ -3,7 +3,7 @@ import axios from 'axios'
 import { message } from 'antd'
 import { formatLocation } from '../../utils/formatter'
 
-const BASE_URL = 'https://chanjoke.intellisoftkenya.com'
+const BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
 
 const createAxiosInstance = () => {
   const token = JSON.parse(localStorage.getItem('user') || '{}')
