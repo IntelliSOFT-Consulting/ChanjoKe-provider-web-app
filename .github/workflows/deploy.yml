@@ -41,15 +41,12 @@ jobs:
             VITE_DASHBOARD_ID=${{ secrets.VITE_DASHBOARD_ID }}
             VITE_SUPERSET_DOMAIN=${{ secrets.VITE_SUPERSET_DOMAIN }}
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
       - name: Deploy to Dev server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
             CONTAINER_NAME=chanjoke
             IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/chanjoke:latest
 
@@ -76,21 +73,19 @@ jobs:
             
             echo "Dev deployment completed successfully"
           EOF
+          rm -f private_key
 
   deploy_prod:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-
       - name: Deploy to Production server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
             CONTAINER_NAME=chanjoke
             IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/chanjoke:latest
 
@@ -117,3 +112,4 @@ jobs:
             
             echo "Production deployment completed successfully"
           EOF
+          rm -f private_key
