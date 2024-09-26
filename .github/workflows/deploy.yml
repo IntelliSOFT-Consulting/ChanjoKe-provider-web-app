@@ -1,15 +1,23 @@
 name: React App Deployment
+
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - production
+          - Dev
 
 jobs:
-  build_and_deploy_dev:
-    if: github.ref == 'refs/heads/develop'
+  deploy:
     runs-on: ubuntu-latest
-    environment: Dev
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'Dev') }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -41,7 +49,7 @@ jobs:
             VITE_DASHBOARD_ID=${{ secrets.VITE_DASHBOARD_ID }}
             VITE_SUPERSET_DOMAIN=${{ secrets.VITE_SUPERSET_DOMAIN }}
 
-      - name: Deploy to Dev server
+      - name: Deploy to server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
         run: |
@@ -71,45 +79,6 @@ jobs:
             sudo docker run -d --name \$CONTAINER_NAME -p 8099:3000 \$IMAGE_NAME
             sudo docker logout
             
-            echo "Dev deployment completed successfully"
-          EOF
-          rm -f private_key
-
-  deploy_prod:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Deploy to Production server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
-            CONTAINER_NAME=chanjoke
-            IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/chanjoke:latest
-
-            if docker ps -a --format '{{.Names}}' | grep -q \$CONTAINER_NAME; then
-              echo "Stopping and removing existing container"
-              docker stop \$CONTAINER_NAME || true
-              docker rm \$CONTAINER_NAME || true
-            fi
-            
-            echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-            if [ \$? -ne 0 ]; then
-              echo "Error: Docker login failed"
-              exit 1
-            fi
-            
-            docker pull --quiet \$IMAGE_NAME
-            if [ \$? -ne 0 ]; then
-              echo "Error: Failed to pull Docker image \$IMAGE_NAME"
-              exit 1
-            fi
-            
-            sudo docker run -d --name \$CONTAINER_NAME -p 8099:3000 \$IMAGE_NAME
-            sudo docker logout
-            
-            echo "Production deployment completed successfully"
+            echo "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'Dev') }} deployment completed successfully"
           EOF
           rm -f private_key
