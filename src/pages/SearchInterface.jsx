@@ -25,7 +25,7 @@ export default function SearchInterface({ searchType }) {
   }, [searchType])
 
   useEffect(() => {
-    handleSearch()
+    handleSearch(0, '', user?.orgUnit?.code || '')
   }, [])
 
   const updateTitle = (type) => {
@@ -43,7 +43,8 @@ export default function SearchInterface({ searchType }) {
   const formatEntry = (entry) =>
     entry.map((patient) => deconstructPatientData(patient, searchType))
 
-  const handleSearch = async (offset = 0, keyword = '') => {
+  const handleSearch = async (offset = 0, keyword = '', tag = '') => {
+    const tagParam = tag ? `&_tag=${tag}` : ''
     const params = `&_count=${pageSize}&_total=accurate&_offset=${offset}`
     const endpoint = '/chanjo-hapi/fhir/Patient'
 
@@ -52,18 +53,18 @@ export default function SearchInterface({ searchType }) {
     let data = await get(
       `${endpoint}?telecom=${encodeURIComponent(
         keyword
-      )}&_sort=-_lastUpdated${params}`
+      )}${tagParam}&_sort=-_lastUpdated${params}`
     )
 
     if (!data?.entry) {
       data = await get(
-        `${endpoint}?name=${keyword}&_sort=-_lastUpdated${params}`
+        `${endpoint}?name=${keyword}${tagParam}&_sort=-_lastUpdated${params}`
       )
     }
 
     if (!data?.entry) {
       data = await get(
-        `${endpoint}?identifier=${keyword}&_sort=-_lastUpdated${params}`
+        `${endpoint}?identifier=${keyword}${tagParam}&_sort=-_lastUpdated${params}`
       )
     }
 

@@ -8,11 +8,22 @@ const fhirEndpoint = '/chanjo-hapi/fhir'
 export default function usePatient() {
   const [patient, setPatient] = useState(null)
   const { get, post, put } = useApiRequest()
+  const { user } = useSelector((state) => state.userInfo)
 
   const createPatient = async (data) => {
     const givenNames = [data.firstName, data.middleName].filter((name) => name)
     let patientResource = {
       resourceType: 'Patient',
+      meta: {
+        tag: [
+          {
+            system:
+              'http://terminology.hl7.org/CodeSystem/location-physical-type',
+            code: user?.orgUnit?.code,
+            display: user?.orgUnit?.name,
+          },
+        ],
+      },
       identifier: [
         {
           type: {
