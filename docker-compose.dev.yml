@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: docker-chanjokewebapp-container
+    image: docker-chanjokewebapp-image
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3020:3020

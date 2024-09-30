@@ -1,8 +1,19 @@
-body {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' 0, 'opsz' 20;
+}
+
+input {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -10,4 +21,216 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.ant-form-item-label {
+  font-weight: 600 !important;
+  position: relative;
+}
+
+.ant-form-item-label label::before {
+  right: 0;
+  position: absolute;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ant-btn-primary {
+  background-color: #163c94 !important;
+  border-color: #163c94 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.btn-disabled {
+  background-color: #44464b !important;
+  border-color: #9398a2 !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
+}
+
+.canvasjs-chart-credit {
+  display: none !important;
+}
+
+.btn-disabled .ant-float-btn-body {
+  background-color: #747f9a !important;
+  border-color: #747f9a !important;
+  color: #fff !important;
+}
+
+.ant-modal-title {
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.ant-select input:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+:where(.css-dev-only-do-not-override-1drr2mu).ant-form-item
+  .ant-form-item-label
+  > label.ant-form-item-required:not(
+    .ant-form-item-required-mark-optional
+  )::before {
+  display: none;
+}
+
+:where(.css-dev-only-do-not-override-arsac9).ant-input-group
+  > .ant-input:first-child,
+:where(.css-dev-only-do-not-override-arsac9).ant-input-group
+  .ant-input-group-addon:first-child {
+  border-start-end-radius: 0 !important;
+  border-end-end-radius: 0 !important;
+  border-width: 1px;
+}
+
+.ant-radio-wrapper input[type='radio']:checked + .ant-radio-inner {
+  background-color: #163c94;
+  border-color: #163c94;
+}
+
+.ant-radio-wrapper:hover .ant-radio-inner,
+.ant-radio:hover .ant-radio-inner,
+.ant-radio-input:focus + .ant-radio-inner {
+  border-color: #163c94;
+}
+
+.vaccination-status > span {
+  padding: 6px !important;
+}
+
+.ant-input-group-addon .ant-form-item {
+  margin-bottom: 0px !important;
+}
+
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltipright {
+  visibility: hidden;
+  min-width: 320px;
+  width: fit-content;
+  top: -5px;
+  left: 105%;
+  background-color: #163c94;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  overflow: visible;
+  position: absolute;
+  z-index: 10000;
+}
+
+.tooltip .tooltipleft {
+  top: -5px;
+  right: 105%;
+  width: fit-content;
+  visibility: hidden;
+  min-width: 320px;
+  background-color: #4765ac;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  overflow: visible;
+  position: absolute;
+  z-index: 10000;
+}
+
+.tooltip:hover .tooltipleft {
+  visibility: visible;
+}
+
+.tooltip:hover .tooltipright {
+  visibility: visible;
+}
+
+.radio-group-container {
+  display: inline-block; /* Ensures the container remains inline */
+  width: 250px; /* Set a fixed width for the container */
+}
+
+.ant-radio-group {
+  white-space: nowrap; /* Prevents the radio buttons from wrapping */
+}
+
+.ant-radio-group .ant-radio-button-wrapper {
+  display: inline-flex !important; /* Ensures radio buttons remain inline */
+  margin-right: 8px; /* Add some spacing between radio buttons */
+}
+
+.btn-success {
+  background-color: #0b7114 !important;
+  border-color: #0b7114 !important;
+  outline-color: #0b7114 !important;
+  color: #fff !important;
+}
+
+.btn-success:hover {
+  background-color: #0b7114 !important;
+  border-color: #0b7114 !important;
+  outline-color: #0b7114 !important;
+  color: #fff !important;
+}
+
+.login-bg {
+  background-image: url(./assets/login-bg.png);
+  background-size: 100% 100%;
+  background-position: left;
+  background-repeat: no-repeat;
+}
+
+.ant-input-number-group-addon .ant-form-item {
+  margin: 0px !important;
+}
+
+.alert-col {
+  grid-template-columns: 2rem auto;
+}
+
+.editable-cell {
+  position: relative;
+}
+
+.editable-cell-value-wrap {
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editable-row:hover .editable-cell-value-wrap {
+  padding: 4px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  height: 32px;
+}
+
+.ant-checkbox input[type='checkbox']:disabled + .ant-checkbox-inner {
+  border: 1px solid rgb(168, 168, 168) !important;
+}
+
+.ant-picker-cell:hover .ant-picker-cell-inner {
+  background-color: #163c94 !important;
+  color: #fff !important;
+}
+
+.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-range-end .ant-picker-cell-inner,
+.ant-picker-cell-in-range .ant-picker-cell-inner {
+  background-color: #163c94 !important;
+  color: #fff !important;
+}
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner {
+  border-color: #163c94;
+  background-color: #fff;
+  color: #163c94;
+}
+
+.superset-dashboard iframe {
+  width: 100%;
+  height: 100vh;
 }

@@ -1,0 +1,77 @@
+export const accessRules = {
+  ADMINISTRATOR: {
+    cannot: [
+      'ADMINISTER_VACCINE',
+      'VACCINATION_HISTORY',
+      'REGISTER_CLIENT',
+      'REQUEST_STOCK',
+      'CREATE_CAMPAIGN',
+      'DELETE_VACCINATION',
+      'UPDATE_CLIENT',
+      'CREATE_AEFI',
+    ],
+  },
+  NATIONAL_SYSTEM_ADMINISTRATOR: {
+    cannot: [
+      'ADMINISTER_VACCINE',
+      'VACCINATION_HISTORY',
+      'REGISTER_CLIENT',
+      'REQUEST_STOCK',
+      'CREATE_CAMPAIGN',
+      'DELETE_VACCINATION',
+      'UPDATE_CLIENT',
+      'CREATE_AEFI',
+    ],
+  },
+  COUNTY_SYSTEM_ADMINISTRATOR: {
+    cannot: [
+      'ADMINISTER_VACCINE',
+      'VACCINATION_HISTORY',
+      'REGISTER_CLIENT',
+      'REQUEST_STOCK',
+      'DELETE_VACCINATION',
+      'UPDATE_CLIENT',
+      'CREATE_AEFI',
+    ],
+  },
+  SUB_COUNTY_SYSTEM_ADMINISTRATOR: {
+    cannot: [
+      'ADMINISTER_VACCINE',
+      'VACCINATION_HISTORY',
+      'REGISTER_CLIENT',
+      'CREATE_CAMPAIGN',
+      'DELETE_VACCINATION',
+      'UPDATE_CLIENT',
+      'CREATE_AEFI',
+    ],
+  },
+  SUB_COUNTY_STORE_MANAGER: {
+    cannot: [
+      'ADMINISTER_VACCINE',
+      'VACCINATION_HISTORY',
+      'REGISTER_CLIENT',
+      'CREATE_CAMPAIGN',
+      'DELETE_VACCINATION',
+      'UPDATE_CLIENT',
+      'CREATE_AEFI',
+    ],
+  },
+  FACILITY_SYSTEM_ADMINISTRATOR: {
+    cannot: ['CREATE_CAMPAIGN'],
+  },
+  FACILITY_STORE_MANAGER: {
+    cannot: [
+      'CREATE_CAMPAIGN',
+      'DELETE_VACCINATION',
+      'UPDATE_CLIENT',
+      'CREATE_AEFI',
+    ],
+  },
+
+  CLERK: {
+    cannot: ['CREATE_CAMPAIGN', 'DELETE_VACCINATION'],
+  },
+  NURSE: {
+    cannot: ['CREATE_CAMPAIGN', 'DELETE_VACCINATION'],
+  },
+}
