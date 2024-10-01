@@ -97,7 +97,7 @@ export default function Sidenav() {
         href: '/',
         current: true,
         icon: 'homeLogo',
-        roles: ['ALL'],
+        roles: ['ADMINISTRATOR','ALL'],
       },
       {
         name: 'Dashboard',
