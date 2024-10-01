@@ -80,9 +80,7 @@ const AuthRoute = ({ element }) => {
   ]
 
   return user?.access_token && authRoutes.includes(location.pathname) ? (
-    <Navigate
-      to={dashboardRoles.includes(user?.practitionerRole) ? '/dashboard' : '/'}
-    />
+    <Navigate to={'/'} />
   ) : (
     element
   )

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { generateUniqueCode } from '../utils/methods'
 import moment from 'moment'
+import { useSelector } from 'react-redux'
 
 const fhirEndpoint = '/chanjo-hapi/fhir'
 
