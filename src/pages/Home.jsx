@@ -94,7 +94,7 @@ const Home = () => {
           dataIndex: month?.substring(0, 3).toLowerCase(),
           width: '15px',
           onCell: (_record, index) =>
-            index > 2 ? { className: 'bg-blue-200' } : {},
+            index > 2 ? { className: 'bg-blue-200 hover:!bg-blue-200' } : {},
           render: (text, _record, index) => (index > 2 ? null : text),
         },
         {

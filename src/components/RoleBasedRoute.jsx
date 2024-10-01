@@ -6,14 +6,14 @@ const RoleBasedRoute = ({ allowedRoles, element }) => {
   const { user } = useSelector((state) => state.userInfo)
 
   if (
-    !user ||
-    (!allowedRoles.includes(user.practitionerRole) &&
-      !allowedRoles.includes('ALL'))
+    user &&
+    (allowedRoles.includes(user.practitionerRole) ||
+      allowedRoles.includes('ALL'))
   ) {
-    return <Navigate to="/404" />
+    return element
   }
 
-  return element
+  return <Navigate to="/404" />
 }
 
 export default RoleBasedRoute
