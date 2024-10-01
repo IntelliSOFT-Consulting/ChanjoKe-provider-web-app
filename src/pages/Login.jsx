@@ -32,12 +32,7 @@ export default function Login() {
   const onFinish = async (values) => {
     dispatch(login(values))
     if (user?.access_token) {
-      const dashboardRoles = ['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR', 'COUNTY_SYSTEM_ADMINISTRATOR']
-      if (dashboardRoles.includes(user?.practitionerRole)) {
-        navigate('/dashboard')
-      } else {
-        navigate('/')
-      }
+      navigate('/')
     }
   }
 
