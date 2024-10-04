@@ -69,14 +69,18 @@ jobs:
               echo "Error: Docker login failed"
               exit 1
             fi
-            
-            docker pull --quiet \$IMAGE_NAME
-            if [ \$? -ne 0 ]; then
-              echo "Error: Failed to pull Docker image \$IMAGE_NAME"
-              exit 1
+
+            if [ "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'Dev') }}" == "Dev" ]; then
+              cd /opt/ChanjoKe-HIE/hie
+            else
+              cd /opt/chanjoke-hie/hie
             fi
-            
-            sudo docker run -d --name \$CONTAINER_NAME -p 8099:3000 \$IMAGE_NAME
+
+            sudo docker compose pull provider
+
+            # recreate the provider service with the new image
+            sudo docker compose up -d provider --force-recreate
+
             sudo docker logout
             
             echo "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'production' || 'Dev') }} deployment completed successfully"
