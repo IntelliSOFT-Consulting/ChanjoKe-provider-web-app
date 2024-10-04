@@ -145,16 +145,16 @@ export default function CaregiverDetails({
 
             <Form.Item
               name="caregiverIdentificationType"
-              label="ID Type"
+              label="Document Identification Type"
               rules={[
                 {
                   required: true,
-                  message: `Please select the caregiver ID type`,
+                  message: `Please select the caregiver Document Identification Type`,
                 },
               ]}
             >
               <Select
-                placeholder="Select ID Type"
+                placeholder="Select Document Identification Type"
                 options={caregiverIdentificationTypes}
                 showSearch
                 searchable
@@ -174,13 +174,13 @@ export default function CaregiverDetails({
             {identificationType !== 'None' && (
               <Form.Item
                 name="caregiverID"
-                label={`Caregiver ID Number`}
+                label="Document Identification Number"
                 rules={[
                   ({ getFieldValue }) => ({
                     required: !['Father', 'Mother'].includes(
                       getFieldValue('caregiverType')
                     ),
-                    message: `Please input the Caregiver ID number`,
+                      message: `Please input the Caregiver Document Identification Number`,
                   }),
                   ({ getFieldValue }) => ({
                     validator(_, value) {
@@ -191,12 +191,12 @@ export default function CaregiverDetails({
                         ) {
                           if (!/^\d+$/.test(value)) {
                             return Promise.reject(
-                              new Error('ID number must be numerical')
+                              new Error('Document Identification Number must be numerical')
                             )
                           }
                           if (value.length < 6) {
                             return Promise.reject(
-                              new Error('ID number must be at least 6 digits')
+                              new Error('Document Identification Number must be at least 6 digits')
                             )
                           }
                         }
