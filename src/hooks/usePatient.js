@@ -23,6 +23,11 @@ export default function usePatient() {
             code: user?.orgUnit?.code,
             display: user?.orgUnit?.name,
           },
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/registration-location',
+            code: user?.location,
+            display: user?.location,
+          }
         ],
       },
       identifier: [
