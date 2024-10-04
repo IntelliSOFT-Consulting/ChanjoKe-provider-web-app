@@ -192,10 +192,12 @@ const ReceiveStock = () => {
     {
       title: 'Stock Quantity',
       dataIndex: 'stockQuantity',
+      render: (_, record) => record.stockQuantity?.toLocaleString(),
     },
     {
-      title: 'Received Quantity',
+      title: 'Received Quantity (Doses)',
       dataIndex: 'quantity',
+      render: (_, record) => vialsToDoses(record.vaccine, record.quantity)?.toLocaleString(),
     },
     {
       title: 'VVM Status',

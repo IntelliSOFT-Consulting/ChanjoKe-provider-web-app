@@ -86,7 +86,7 @@ export default function SearchInterface({ searchType }) {
       key: 'clientName',
     },
     {
-      title: 'ID Number',
+      title: 'Document ID',
       dataIndex: 'idNumber',
       key: 'idNumber',
     },
