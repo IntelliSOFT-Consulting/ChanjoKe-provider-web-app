@@ -47,6 +47,7 @@ const NewOrderTable = ({
           style={{ width: '100%' }}
           options={uniqueVaccineOptions}
           value={record.vaccine}
+          allowClear
           placeholder="Select Antigen"
           status={hasErrors?.[index.toString()]?.vaccine ? 'error' : 'default'}
           onChange={(value) => {
@@ -131,7 +132,7 @@ const NewOrderTable = ({
     {
       title: null,
       dataIndex: 'action',
-      hidden: tableData.length === 1,
+      hidden: tableData?.length === 1,
       render: (_, __, index) => (
         <>
           {index > 0 && (
@@ -164,7 +165,7 @@ const NewOrderTable = ({
       />
 
       <div className="flex flex-col items-end">
-        {Object.values(hasErrors).length > 0 && (
+        {Object.values(hasErrors)?.length > 0 && (
           <div className="bg-red-50 shadow p-2 mb-4">
             <p className="text-red-500 text-sm">
               {hasErrors?.empty
@@ -177,7 +178,7 @@ const NewOrderTable = ({
           className="!bg-green !text-white hover:text-white"
           onClick={() => {
             const err = handleValidate()
-            if (!Object.values(err).length) {
+            if (!Object.values(err)?.length) {
               setTableData([
                 ...tableData,
                 {
