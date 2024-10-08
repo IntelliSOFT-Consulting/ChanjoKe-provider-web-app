@@ -180,7 +180,7 @@ export default function CaregiverDetails({
                     required: !['Father', 'Mother'].includes(
                       getFieldValue('caregiverType')
                     ),
-                      message: `Please input the Caregiver Document Identification Number`,
+                    message: `Please input the Caregiver Document Identification Number`,
                   }),
                   ({ getFieldValue }) => ({
                     validator(_, value) {
@@ -191,12 +191,16 @@ export default function CaregiverDetails({
                         ) {
                           if (!/^\d+$/.test(value)) {
                             return Promise.reject(
-                              new Error('Document Identification Number must be numerical')
+                              new Error(
+                                'Document Identification Number must be numerical'
+                              )
                             )
                           }
                           if (value.length < 6) {
                             return Promise.reject(
-                              new Error('Document Identification Number must be at least 6 digits')
+                              new Error(
+                                'Document Identification Number must be at least 6 digits'
+                              )
                             )
                           }
                         }
@@ -306,7 +310,15 @@ export default function CaregiverDetails({
                           },
                         ]}
                       >
-                        <Input placeholder="Kin Phone Number" />
+                        <Input
+                          placeholder="Kin Phone Number"
+                          onChange={(e) => {
+                            e.target.value = e.target.value.replace(/\D/g, '')
+                            if (e.target.value.length > 9) {
+                              e.target.value = e.target.value.slice(0, 9)
+                            }
+                          }}
+                        />
                       </Form.Item>
                       <Button
                         type="link"

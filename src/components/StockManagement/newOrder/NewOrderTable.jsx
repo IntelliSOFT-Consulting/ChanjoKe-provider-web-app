@@ -1,19 +1,20 @@
-import { Button, InputNumber, Select } from 'antd'
-import { uniqueVaccineOptions } from '../../../data/vaccineData'
-import Table from '../../DataTable'
+import React from 'react';
+import { Button, InputNumber, Select, Table, Typography, Space } from 'antd';
+import { Link } from 'react-router-dom';
+import { uniqueVaccineOptions } from '../../../data/vaccineData';
+
+const { Text } = Typography;
 
 const getVaccineQuantity = (inventory, vaccine) => {
-  const vaccineInventory = inventory?.find((item) => item.vaccine === vaccine)
-  return vaccineInventory?.quantity ?? 0
-}
+  const vaccineInventory = inventory?.find((item) => item.vaccine === vaccine);
+  return vaccineInventory?.quantity ?? 0;
+};
 
-const InputColumn = ({
-  value,
-  onChange,
-  placeholder,
-  disabled = false,
-  status,
-}) => (
+const getVaccineLevel = (vaccine, vaccineLevels) => {
+  return vaccineLevels?.find((item) => item.name === vaccine);
+};
+
+const InputColumn = ({ value, onChange, placeholder, disabled = false, status, ...rest }) => (
   <InputNumber
     style={{ width: '100%' }}
     placeholder={placeholder}
@@ -22,8 +23,9 @@ const InputColumn = ({
     disabled={disabled}
     min={0}
     status={status}
+    {...rest}
   />
-)
+);
 
 const NewOrderTable = ({
   inventoryItems,
@@ -31,17 +33,19 @@ const NewOrderTable = ({
   setTableData,
   hasErrors,
   handleValidate,
+  vaccineLevels,
 }) => {
   const handleChange = (index, key, value) => {
-    const newData = [...tableData]
-    newData[index][key] = value
-    setTableData(newData)
-  }
+    const newData = [...tableData];
+    newData[index][key] = value;
+    setTableData(newData);
+  };
 
   const columns = [
     {
       title: 'Antigen',
       dataIndex: 'vaccine',
+      width: '20%',
       render: (_, record, index) => (
         <Select
           style={{ width: '100%' }}
@@ -49,27 +53,36 @@ const NewOrderTable = ({
           value={record.vaccine}
           allowClear
           placeholder="Select Antigen"
-          status={hasErrors?.[index.toString()]?.vaccine ? 'error' : 'default'}
+          status={hasErrors?.[index]?.vaccine ? 'error' : undefined}
           onChange={(value) => {
-            const qty = getVaccineQuantity(inventoryItems, value)
-            handleChange(index, 'vaccine', value)
-            handleChange(index, 'dosesInStock', qty)
+            const qty = getVaccineQuantity(inventoryItems, value);
+            const vaccineLevel = getVaccineLevel(value, vaccineLevels);
+
+            if (vaccineLevel) {
+              handleChange(index, 'minimum', Number(vaccineLevel.min));
+              handleChange(index, 'maximum', Number(vaccineLevel.max));
+              const recommendedStock = Math.floor((vaccineLevel.max - vaccineLevel.min) / 2) + vaccineLevel.min;
+              handleChange(index, 'recommendedStock', recommendedStock);
+            } else {
+              handleChange(index, 'minimum', 0);
+              handleChange(index, 'maximum', 0);
+              handleChange(index, 'recommendedStock', 0);
+            }
+            handleChange(index, 'vaccine', value);
+            handleChange(index, 'dosesInStock', qty);
           }}
         />
       ),
-      width: '20%',
     },
     {
       title: 'Doses in Stock',
       dataIndex: 'dosesInStock',
-      render: (value, _record, index) => (
+      render: (value, _, index) => (
         <InputColumn
           value={value}
           placeholder="Doses in Stock"
           disabled
-          status={
-            hasErrors?.[index.toString()]?.dosesInStock ? 'error' : 'default'
-          }
+          status={hasErrors?.[index]?.dosesInStock ? 'error' : undefined}
         />
       ),
     },
@@ -84,8 +97,9 @@ const NewOrderTable = ({
         <InputColumn
           value={value}
           placeholder="Minimum"
+          disabled
           onChange={(value) => handleChange(index, 'minimum', value)}
-          status={hasErrors?.[index.toString()]?.minimum ? 'error' : 'default'}
+          status={hasErrors?.[index]?.minimum ? 'error' : undefined}
         />
       ),
     },
@@ -96,8 +110,9 @@ const NewOrderTable = ({
         <InputColumn
           value={value}
           placeholder="Maximum"
+          disabled
           onChange={(value) => handleChange(index, 'maximum', value)}
-          status={hasErrors?.[index.toString()]?.maximum ? 'error' : 'default'}
+          status={hasErrors?.[index]?.maximum ? 'error' : undefined}
         />
       ),
     },
@@ -108,54 +123,77 @@ const NewOrderTable = ({
         <InputColumn
           value={value}
           placeholder="Recommended Stock"
+          disabled
           onChange={(value) => handleChange(index, 'recommendedStock', value)}
-          status={
-            hasErrors?.[index.toString()]?.recommendedStock
-              ? 'error'
-              : 'default'
-          }
+          status={hasErrors?.[index]?.recommendedStock ? 'error' : undefined}
         />
       ),
     },
     {
       title: 'Ordered Amount',
       dataIndex: 'quantity',
-      render: (value, _, index) => (
-        <InputColumn
-          value={value}
-          placeholder="Ordered Amount"
-          onChange={(value) => handleChange(index, 'quantity', value)}
-          status={hasErrors?.[index.toString()]?.quantity ? 'error' : 'default'}
-        />
+      render: (value, record, index) => (
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <InputColumn
+            value={value}
+            placeholder="Ordered Amount"
+            min={record.minimum || 0}
+            max={record.maximum || 0}
+            readOnly={!record.minimum || !record.maximum}
+            onBlur={(e) => {
+              const { value } = e.target;
+              const min = record.minimum || 0;
+              const max = record.maximum || 0;
+              if (value < min) {
+                handleChange(index, 'quantity', min);
+              } else if (value > max) {
+                handleChange(index, 'quantity', max);
+              } else {
+                handleChange(index, 'quantity', value);
+              }
+            }}
+            onChange={(value) => handleChange(index, 'quantity', value)}
+            status={
+              hasErrors?.[index]?.quantity ||
+              (!record.minimum && !record.maximum && record.vaccine)
+                ? 'error'
+                : undefined
+            }
+          />
+          {(!record.minimum || !record.maximum) && record.vaccine && (
+            <Text type="danger" style={{ fontSize: '12px' }}>
+              Please set minimum and maximum values for this vaccine{' '}
+              <Link to="/stock-management/stock-configuration" style={{ textDecoration: 'underline' }}>
+                here
+              </Link>
+            </Text>
+          )}
+        </Space>
       ),
     },
     {
       title: null,
       dataIndex: 'action',
-      hidden: tableData?.length === 1,
       render: (_, __, index) => (
-        <>
-          {index > 0 && (
-            <Button
-              type="link"
-              disabled={index === 0}
-              onClick={() => {
-                const newData = [...tableData]
-                newData.splice(index, 1)
-                setTableData(newData)
-              }}
-              danger
-            >
-              Delete
-            </Button>
-          )}
-        </>
+        index > 0 && (
+          <Button
+            type="link"
+            onClick={() => {
+              const newData = [...tableData];
+              newData.splice(index, 1);
+              setTableData(newData);
+            }}
+            danger
+          >
+            Delete
+          </Button>
+        )
       ),
     },
-  ]
+  ];
 
   return (
-    <div className="">
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <Table
         size="small"
         columns={columns}
@@ -163,36 +201,29 @@ const NewOrderTable = ({
         pagination={false}
         rowKey={(_, index) => index}
       />
-
-      <div className="flex flex-col items-end">
-        {Object.values(hasErrors)?.length > 0 && (
-          <div className="bg-red-50 shadow p-2 mb-4">
-            <p className="text-red-500 text-sm">
-              {hasErrors?.empty
-                ? 'Please add at least one row to proceed.'
-                : 'Please complete all required fields to proceed.'}
-            </p>
-          </div>
+      <Space direction="vertical" align="end" style={{ width: '100%' }}>
+        {Object.keys(hasErrors).length > 0 && (
+          <Text type="danger" style={{ padding: '8px', backgroundColor: '#fff1f0' }}>
+            {hasErrors.empty
+              ? 'Please add at least one row to proceed.'
+              : 'Please complete all required fields to proceed.'}
+          </Text>
         )}
         <Button
-          className="!bg-green !text-white hover:text-white"
+          type="primary"
+          style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
           onClick={() => {
-            const err = handleValidate()
-            if (!Object.values(err)?.length) {
-              setTableData([
-                ...tableData,
-                {
-                  vaccine: '',
-                },
-              ])
+            const err = handleValidate();
+            if (Object.keys(err).length === 0) {
+              setTableData([...tableData, { vaccine: '' }]);
             }
           }}
         >
           Add Row
         </Button>
-      </div>
-    </div>
-  )
-}
+      </Space>
+    </Space>
+  );
+};
 
-export default NewOrderTable
+export default NewOrderTable;

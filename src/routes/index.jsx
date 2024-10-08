@@ -28,6 +28,7 @@ import CreateAEFI from '../components/AEFI/CreateAEFI'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
+import StockConfiguration from '../components/StockManagement/StockConfiguration'
 // import PositiveAdjustments from '../components/StockManagement/PositiveAdjustments'
 // import NegativeAdjustments from '../components/StockManagement/NegativeAdjustments'
 import Wastage from '../components/StockManagement/Wastage'
@@ -314,6 +315,15 @@ const router = createBrowserRouter([
                   'FACILITY_STORE_MANAGER',
                   'FACILITY_SYSTEM_ADMINISTRATOR',
                 ]}
+              />
+            ),
+          },
+          {
+            path: '/stock-management/stock-configuration',
+            element: (
+              <RoleBasedRoute
+                element={<StockConfiguration />}
+                allowedRoles={['FACILITY_SYSTEM_ADMINISTRATOR', 'ADMINISTRATOR']}
               />
             ),
           },

@@ -72,7 +72,7 @@ export default function Preview({ form, caregivers, counties, caregiverType }) {
       data: [
         {
           label: 'County of Residence',
-          value: counties.find((county) => county.key === values.county)?.name,
+          value: counties?.find((county) => county.key === values.county)?.name,
         },
         {
           label: 'Subcounty',

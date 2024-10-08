@@ -1,3 +1,8 @@
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import { createUseStyles } from 'react-jss'
+import dayjs from 'dayjs'
 import {
   Button,
   Card,
@@ -7,13 +12,10 @@ import {
   notification,
   Select,
   Popconfirm,
+  Typography,
+  Space,
+  Divider,
 } from 'antd'
-import dayjs from 'dayjs'
-import moment from 'moment'
-import { useEffect, useState } from 'react'
-import { createUseStyles } from 'react-jss'
-import { useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
 import LoadingArrows from '../../common/spinners/LoadingArrows'
 import useInventory from '../../hooks/useInventory'
 import useStock from '../../hooks/useStock'
@@ -21,39 +23,55 @@ import { titleCase } from '../../utils/methods'
 import { supplyRequestBuilder } from './helpers/stockResourceBuilder'
 import NewOrderTable from './newOrder/NewOrderTable'
 import { formatLocation } from '../../utils/formatter'
+import { useVaccineLevels } from '../../hooks/useVaccineLevels'
 
+const { Title, Text } = Typography
 const { useForm } = Form
 
 const useStyles = createUseStyles({
-  btnSuccess: {
-    backgroundColor: '#169416',
-    borderColor: '#169416',
-    color: 'white',
-    '&:hover': {
-      backgroundColor: '#169416',
-      borderColor: '#169416',
-      color: 'white',
-    },
+  card: {
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    borderRadius: '8px',
+    margin: '16px 0px',
   },
-  btnPrimary: {
+  header: {
+    background: '#f0f2f5',
+    padding: '5px 16px',
+    borderBottom: '1px solid #e8e8e8',
+    fontSize: '16px',
+  },
+  formSection: {
+    background: '#fafafa',
+    padding: '16px',
+    marginBottom: '24px',
+    borderRadius: '4px',
+  },
+  button: {
+    minWidth: '120px',
+  },
+  primaryButton: {
     backgroundColor: '#163C94',
     borderColor: '#163C94',
-    color: 'white',
     '&:hover': {
-      backgroundColor: '#163C94 !important',
-      borderColor: '#163C94',
-      color: 'white !important',
+      backgroundColor: '#122f73',
+      borderColor: '#122f73',
     },
   },
 })
 
-export default function NewOrder() {
+const NewOrder = () => {
   const classes = useStyles()
   const [form] = useForm()
   const [hasErrors, setHasErrors] = useState({})
   const [tableData, setTableData] = useState([{}])
   const [requestDetails, setRequestDetails] = useState(null)
+  const { vaccineLevels } = useSelector((state) => state.vaccineSchedules)
+  const { user } = useSelector((state) => state.userInfo)
 
+  const navigate = useNavigate()
+  const { orderID } = useParams()
+
+  useVaccineLevels()
   const {
     loading,
     createSupplyRequest,
@@ -63,10 +81,6 @@ export default function NewOrder() {
     countSupplyRequests,
     requestItem,
   } = useStock()
-  const { user } = useSelector((state) => state.userInfo)
-
-  const navigate = useNavigate()
-  const { orderID } = useParams()
   const { getAggregateInventoryItems, inventoryItems } = useInventory()
 
   useEffect(() => {
@@ -74,10 +88,24 @@ export default function NewOrder() {
     getLastOrderRequest()
   }, [])
 
+  useEffect(() => {
+    if (orderID) {
+      getOrderDetails()
+    }
+  }, [orderID])
+
+  useEffect(() => {
+    if (requestItem) {
+      form.setFieldsValue({
+        lastOrderDate: dayjs(requestItem.occurrenceDateTime),
+      })
+    }
+  }, [requestItem])
+
   const getOrderDetails = async () => {
-    const details = await getSupplyRequestById(orderID);
-    setRequestDetails(details);
-  
+    const details = await getSupplyRequestById(orderID)
+    setRequestDetails(details)
+
     const findExtension = (url) => details.extension?.find((item) => item.url.includes(url));
   
     const extensionData = {
@@ -112,20 +140,7 @@ export default function NewOrder() {
       catchmentPopulation: extensionData.catchmentPopulation?.valueInteger,
       children: extensionData.children?.valueInteger,
     });
-  };
-
-  useEffect(() => {
-    if (orderID) {
-      getOrderDetails()
-    }
-  }, [orderID])
-
-  useEffect(() => {
-    if (requestItem) {
-      const { occurrenceDateTime } = requestItem
-      form.setFieldValue('lastOrderDate', dayjs(occurrenceDateTime))
-    }
-  }, [requestItem])
+  }
 
   const handleValidate = () => {
     const required = [
@@ -136,13 +151,8 @@ export default function NewOrder() {
       'quantity',
     ]
     if (!tableData?.length) {
-      setHasErrors({
-        empty: true,
-      })
-
-      return {
-        empty: true,
-      }
+      setHasErrors({ empty: true })
+      return { empty: true }
     }
     const errors = tableData.reduce((acc, row, index) => {
       const rowErrors = required.reduce((acc, field) => {
@@ -166,7 +176,7 @@ export default function NewOrder() {
   const onSubmit = async (data) => {
     try {
       const err = handleValidate()
-      if (!Object.values(err).length) {
+      if (Object.keys(err).length === 0) {
         const combinedData = {
           ...data,
           tableData,
@@ -215,187 +225,177 @@ export default function NewOrder() {
         navigate('/stock-management/sent-orders', { replace: true })
       }
     } catch (err) {
-      console.log(err)
+      console.error(err)
       notification.error({
         message: 'Error creating order',
       })
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <LoadingArrows />
+      </div>
+    )
+  }
+
   return (
-    <Card
-      className="mt-5"
-      title={
-        <div className="text-xl font-semibold">
-          {`New Order for ${titleCase(user?.orgUnit?.name)} (${
-            user?.orgUnit?.code?.split('/')[1]
-          })`}
-        </div>
-      }
-      actions={[
-        <div className="flex w-full justify-end px-6">
-          <Button
-            type="primary"
-            className="mr-4"
-            onClick={() => form.resetFields()}
-            ghost
-          >
-            Cancel
-          </Button>
-          <Popconfirm
-            title="Are you sure you want to submit this order?"
-            onConfirm={() => form.submit()}
-            okText="Yes"
-            cancelText="No"
-            placement="topRight"
-          >
-            <Button className={classes.btnPrimary}>Submit</Button>
-          </Popconfirm>
-        </div>,
-      ]}
-    >
-      {loading ? (
-        <div className="flex justify-center items-center h-96">
-          <LoadingArrows />
-        </div>
-      ) : (
-        <>
-          <div className="bg-[#163c9412] p-3 mx-4">
-            <h3 className="text-[#707070] font-semibold text-base">
-              Order Details
-            </h3>
+    <Card className={classes.card} size="small">
+      <div className={classes.header}>
+        <Title level={4}>
+          New Order for {titleCase(user?.orgUnit?.name)} (
+          {user?.orgUnit?.code?.split('/')[1]})
+        </Title>
+      </div>
+      <Form
+        layout="vertical"
+        form={form}
+        onFinish={onSubmit}
+        initialValues={{
+          authoredOn: dayjs(),
+          expectedDateOfNextOrder: dayjs().add(30, 'days'),
+          level: 'Sub-County',
+          facility: user.subCountyName,
+        }}
+        autoComplete="off"
+      >
+        <div className={classes.formSection}>
+          <Title level={4}>Order Details</Title>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Form.Item
+              label="Level"
+              name="level"
+              rules={[{ required: true, message: 'Please select the level' }]}
+            >
+              <Select
+                placeholder="Select Level"
+                options={[{ label: 'Sub-County', value: 'Sub-County' }]}
+              />
+            </Form.Item>
+
+            <Form.Item label="Order Location" name="facility">
+              <Input disabled />
+            </Form.Item>
+
+            <Form.Item label="Date of Last Order:" name="lastOrderDate">
+              <DatePicker
+                className="w-full"
+                placeholder="Date of Last Order"
+                disabledDate={(current) =>
+                  current &&
+                  current > dayjs().subtract(1, 'days').startOf('day')
+                }
+                format="DD-MM-YYYY"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Date of This Order:"
+              name="authoredOn"
+              rules={[
+                { required: true, message: 'Please input the order date' },
+              ]}
+            >
+              <DatePicker
+                className="w-full"
+                placeholder="Date of This Order"
+                onChange={(date) => {
+                  form.setFieldsValue({
+                    expectedDateOfNextOrder: date.add(30, 'days'),
+                  })
+                }}
+                disabledDate={(current) =>
+                  current && current < dayjs().startOf('day')
+                }
+                format="DD-MM-YYYY"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Preferred Pickup Date:"
+              name="preferredPickupDate"
+            >
+              <DatePicker
+                className="w-full"
+                placeholder="Preferred Pickup Date"
+                disabledDate={(current) =>
+                  current && current < dayjs().startOf('day')
+                }
+                format="DD-MM-YYYY"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Expected Date of Next Order:"
+              name="expectedDateOfNextOrder"
+            >
+              <DatePicker
+                className="w-full"
+                placeholder="Expected Date of Next Order"
+                disabledDate={(current) =>
+                  current && current < dayjs().startOf('day')
+                }
+                format="DD-MM-YYYY"
+              />
+            </Form.Item>
           </div>
-          <Form
-            layout="vertical"
+        </div>
+
+        <Divider />
+
+        <div className={classes.formSection}>
+          <Title level={4}>Population Information</Title>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Form.Item label="Catchment Population" name="totalPopulation">
+              <Input placeholder="Catchment Population" />
+            </Form.Item>
+
+            <Form.Item label="Children Aged 0-11 Months" name="children">
+              <Input placeholder="Children Aged 0-11 Months (under 1 year)" />
+            </Form.Item>
+
+            <Form.Item label="Pregnant Women" name="pregnantWomen">
+              <Input placeholder="Pregnant Women" />
+            </Form.Item>
+          </div>
+        </div>
+
+        <div className={classes.formSection}>
+          <Title level={4}>Antigen Details</Title>
+          <NewOrderTable
             form={form}
-            onFinish={onSubmit}
-            className="p-4"
-            initialValues={{
-              authoredOn: dayjs(),
-              expectedDateOfNextOrder: dayjs().add(30, 'days'),
-              level: 'Sub-County',
-              facility: user.subCountyName,
-            }}
-            autoComplete="off"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
-              <Form.Item
-                label="Level"
-                name="level"
-                rules={[{ required: true, message: 'Please select the level' }]}
+            tableData={tableData}
+            setTableData={setTableData}
+            inventoryItems={inventoryItems}
+            hasErrors={hasErrors}
+            handleValidate={handleValidate}
+            vaccineLevels={vaccineLevels?.parameter || []}
+          />
+        </div>
+
+        <div className="flex justify-end mt-6">
+          <Space>
+            <Button onClick={() => form.resetFields()}>Reset</Button>
+            <Popconfirm
+              title="Are you sure you want to submit this order?"
+              onConfirm={() => form.submit()}
+              okText="Yes"
+              cancelText="No"
+              placement="topRight"
+            >
+              <Button
+                type="primary"
+                className={`${classes.button} ${classes.primaryButton}`}
               >
-                <Select
-                  placeholder="Select Level"
-                  options={[
-                    // { label: 'Central', value: 'Central' },
-                    // { label: 'Regional', value: 'Regional' },
-                    { label: 'Sub-County', value: 'Sub-County' },
-                    // { label: 'Health Facility', value: 'Health Facility' },
-                  ]}
-                  allowClear
-                />
-              </Form.Item>
-
-              <Form.Item label="Order Location" name="facility">
-                <Input disabled />
-              </Form.Item>
-
-              <Form.Item label="Date of Last Order:" name="lastOrderDate">
-                <DatePicker
-                  className="w-full"
-                  placeholder="Date of Last Order"
-                  disabledDate={(current) =>
-                    current &&
-                    current > moment().subtract(1, 'days').startOf('days')
-                  }
-                  format="DD-MM-YYYY"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Date of This Order:"
-                name="authoredOn"
-                rules={[
-                  { required: true, message: 'Please input the order date' },
-                ]}
-              >
-                <DatePicker
-                  className="w-full"
-                  placeholder="Date of This Order"
-                  onChange={(date) => {
-                    form.setFieldValue(
-                      'expectedDateOfNextOrder',
-                      date.add(30, 'days')
-                    )
-                  }}
-                  disabledDate={(current) =>
-                    current && current < moment().startOf('days')
-                  }
-                  format="DD-MM-YYYY"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Preferred Pickup Date:"
-                name="preferredPickupDate"
-              >
-                <DatePicker
-                  className="w-full"
-                  placeholder="Preferred Pickup Date"
-                  disabledDate={(current) =>
-                    current && current < moment().startOf('days')
-                  }
-                  format="DD-MM-YYYY"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Expected Date of Next Order:"
-                name="expectedDateOfNextOrder"
-              >
-                <DatePicker
-                  className="w-full"
-                  placeholder="Expected Date of Next Order"
-                  disabledDate={(current) =>
-                    current && current < moment().startOf('days')
-                  }
-                  format="DD-MM-YYYY"
-                />
-              </Form.Item>
-            </div>
-            <div className="border-2 mb-10"></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-6 mb-6">
-              <Form.Item label="Catchment Population" name="totalPopulation">
-                <Input placeholder="Catchment Population" />
-              </Form.Item>
-
-              <Form.Item
-                label="Children Aged 0-11 Months (under 1 year)"
-                name="children"
-              >
-                <Input placeholder="Children Aged 0-11 Months (under 1 year)" />
-              </Form.Item>
-
-              <Form.Item label="Pregnant Women" name="pregnantWomen">
-                <Input placeholder="Pregnant Women" />
-              </Form.Item>
-            </div>
-            <div className="bg-[#163c9412] p-3 mb-10">
-              <h3 className="text-[#707070] font-semibold text-base">
-                Antigen Details
-              </h3>
-            </div>
-            <NewOrderTable
-              form={form}
-              tableData={tableData}
-              setTableData={setTableData}
-              inventoryItems={inventoryItems}
-              hasErrors={hasErrors}
-              handleValidate={handleValidate}
-            />
-          </Form>
-        </>
-      )}
+                Submit Order
+              </Button>
+            </Popconfirm>
+          </Space>
+        </div>
+      </Form>
     </Card>
   )
 }
+
+export default NewOrder
