@@ -362,7 +362,7 @@ export default function Sidenav() {
             name: 'Stock Configuration',
             href: '/stock-management/stock-configuration',
             icon: <SettingOutlined />,
-            roles: ['FACILITY_SYSTEM_ADMINISTRATOR', 'ADMINISTRATOR'],
+            roles: ['FACILITY_SYSTEM_ADMINISTRATOR', 'FACILITY_STORE_MANAGER'],
           },
         ],
       },

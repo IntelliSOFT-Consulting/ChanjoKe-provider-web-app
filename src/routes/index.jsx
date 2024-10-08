@@ -323,7 +323,7 @@ const router = createBrowserRouter([
             element: (
               <RoleBasedRoute
                 element={<StockConfiguration />}
-                allowedRoles={['FACILITY_SYSTEM_ADMINISTRATOR', 'ADMINISTRATOR']}
+                allowedRoles={['FACILITY_SYSTEM_ADMINISTRATOR', 'FACILITY_STORE_MANAGER']}
               />
             ),
           },
