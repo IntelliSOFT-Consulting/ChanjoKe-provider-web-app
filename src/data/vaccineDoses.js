@@ -19,3 +19,19 @@ export const vaccineDoses = {
   Rabies: 1,
   Influenza: 1,
 }
+
+const diluentVaccines = ['Measles-Rubella', 'BCG', 'Yellow Fever']
+
+const dropperVaccines = ['OPV', 'Rotavaq']
+
+const calculateDiluentsDroppers = (vaccine, dosesAvailable) => {
+  const dosesPerVial = vaccineDoses[vaccine]
+
+  if (diluentVaccines.includes(vaccine)) {
+    return dosesAvailable
+  } else if (dropperVaccines.includes(vaccine)) {
+    return Math.ceil(dosesAvailable / dosesPerVial)
+  } else {
+    return null
+  }
+}

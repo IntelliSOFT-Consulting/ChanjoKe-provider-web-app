@@ -38,6 +38,8 @@ const StockConfiguration = () => {
   useEffect(() => {
     if (vaccineLevels?.id) {
       setLevels(vaccineLevels.parameter)
+    } else {
+      setLevels([])
     }
   }, [vaccineLevels?.id])
 
