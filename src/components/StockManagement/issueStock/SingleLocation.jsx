@@ -21,7 +21,6 @@ import useInventory from '../../../hooks/useInventory'
 import { titleCase } from '../../../utils/methods'
 import { useMeta } from '../../../hooks/useMeta'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { dosesToVials, vialsToDoses } from '../helpers/stockUtils'
 
 const { Option } = Select
 
@@ -174,8 +173,8 @@ const SingleLocation = () => {
               (ext) => ext.url === 'quantity'
             )
             quantity.valueQuantity.value =
-              quantity.valueQuantity.value -
-              vialsToDoses(findBatch.vaccine, findBatch.quantity)
+              quantity.valueQuantity.value - findBatch.quantity
+
             return item
           }
           return null
@@ -264,7 +263,7 @@ const SingleLocation = () => {
     return {
       batchNumber: batchNumber.valueString,
       expiryDate: dayjs(expiryDate.valueDateTime),
-      availableQuantity: dosesToVials(vaccine, quantity.valueQuantity?.value),
+      availableQuantity: quantity.valueQuantity?.value,
       manufacturerDetails: manufacturer.valueString,
       vvmStatus: vvmStatus.valueString,
     }

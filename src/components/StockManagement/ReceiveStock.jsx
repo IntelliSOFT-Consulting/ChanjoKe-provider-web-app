@@ -26,7 +26,6 @@ import {
   deliveriesLocations,
   formatDeliveryToTable,
 } from './helpers/stockUtils'
-import { vialsToDoses } from './helpers/stockUtils'
 
 const useStyles = createUseStyles({
   btnSuccess: {
@@ -120,7 +119,7 @@ const ReceiveStock = () => {
         vaccines: selectedOrder.vaccines.map((item) => {
           return {
             ...item,
-            quantity: vialsToDoses(item.vaccine, item.quantity),
+            quantity: item.quantity,
           }
         }),
         facility: {
@@ -197,7 +196,7 @@ const ReceiveStock = () => {
     {
       title: 'Received Quantity (Doses)',
       dataIndex: 'quantity',
-      render: (_, record) => vialsToDoses(record.vaccine, record.quantity)?.toLocaleString(),
+      render: (_, record) => record.quantity?.toLocaleString(),
     },
     {
       title: 'VVM Status',

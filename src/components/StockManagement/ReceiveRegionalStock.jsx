@@ -9,7 +9,7 @@ import {
   Select,
 } from 'antd'
 import dayjs from 'dayjs'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -25,7 +25,7 @@ import {
   inventoryItemBuilder,
   inventoryReportBuilder,
 } from './helpers/stockResourceBuilder'
-import { dosesToVials, vialsToDoses } from './helpers/stockUtils'
+
 const useStyles = createUseStyles({
   btnSuccess: {
     backgroundColor: '#169416',
@@ -57,11 +57,8 @@ const ReceiveRegionalStock = () => {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const {
-    getAggregateInventoryItems,
-    createInventory,
-    inventoryItems,
-  } = useInventory()
+  const { getAggregateInventoryItems, createInventory, inventoryItems } =
+    useInventory()
 
   const navigate = useNavigate()
 
@@ -81,7 +78,7 @@ const ReceiveRegionalStock = () => {
         vaccines: items.map((item) => ({
           ...item,
           vaccine: item.vaccine,
-          quantity: vialsToDoses(item.vaccine, item.quantity),
+          quantity: item.quantity,
         })),
       }
 
@@ -139,7 +136,7 @@ const ReceiveRegionalStock = () => {
               inventoryItems?.find((batch) => batch.vaccine === value)
                 ?.quantity ?? 0
             updatedItems[index].vaccine = value
-            updatedItems[index].stockQuantity = dosesToVials(value, vaccineQty)
+            updatedItems[index].stockQuantity = vaccineQty
             setItems(updatedItems)
           }}
         />
