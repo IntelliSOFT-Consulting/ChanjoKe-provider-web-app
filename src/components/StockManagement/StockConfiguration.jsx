@@ -37,11 +37,13 @@ const StockConfiguration = () => {
 
   useEffect(() => {
     if (vaccineLevels?.id) {
-      setLevels(vaccineLevels.parameter)
+      setLevels(vaccineLevels.parameter || [])
     } else {
       setLevels([])
     }
   }, [vaccineLevels?.id])
+
+  console.log(vaccineLevels)
 
   const edit = (record) => {
     form.setFieldsValue({ ...record })
