@@ -39,7 +39,7 @@ const StockConfiguration = () => {
     if (vaccineLevels?.id) {
       setLevels(vaccineLevels.parameter)
     }
-  }, [vaccineLevels])
+  }, [vaccineLevels?.id])
 
   const edit = (record) => {
     form.setFieldsValue({ ...record })

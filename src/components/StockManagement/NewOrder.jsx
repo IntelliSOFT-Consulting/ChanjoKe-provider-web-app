@@ -374,7 +374,7 @@ const NewOrder = () => {
           />
         </div>
 
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-end mt-6 pb-4 px-4">
           <Space>
             <Button onClick={() => form.resetFields()}>Reset</Button>
             <Popconfirm
