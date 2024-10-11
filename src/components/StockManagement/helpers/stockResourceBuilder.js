@@ -4,7 +4,7 @@ import { allVaccines, uniqueVaccines } from '../../../data/vaccineData'
 
 export const supplyRequestBuilder = (values) => {
   const {
-    tableData,
+    vaccines,
     level,
     lastOrderDate,
     authoredOn,
@@ -15,7 +15,7 @@ export const supplyRequestBuilder = (values) => {
     children,
   } = values
 
-  const orderItems = tableData.map((tableValue) => {
+  const orderItems = vaccines.map((tableVaccine) => {
     const {
       vaccine,
       dosesInStock,
@@ -24,7 +24,7 @@ export const supplyRequestBuilder = (values) => {
       maximum,
       recommendedStock,
       quantity,
-    } = tableValue
+    } = tableVaccine
 
     return {
       url: 'http://example.org/fhir/StructureDefinition/supplyrequest-vaccine',

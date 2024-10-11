@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { createUseStyles } from 'react-jss'
 import dayjs from 'dayjs'
@@ -24,6 +24,7 @@ import { supplyRequestBuilder } from './helpers/stockResourceBuilder'
 import NewOrderTable from './newOrder/NewOrderTable'
 import { formatLocation } from '../../utils/formatter'
 import { useVaccineLevels } from '../../hooks/useVaccineLevels'
+import { populateVaccines, clearNewOrder } from '../../redux/slices/stockSlice'
 
 const { Title, Text } = Typography
 const { useForm } = Form
@@ -63,12 +64,13 @@ const NewOrder = () => {
   const classes = useStyles()
   const [form] = useForm()
   const [hasErrors, setHasErrors] = useState({})
-  const [tableData, setTableData] = useState([{}])
   const [requestDetails, setRequestDetails] = useState(null)
   const { vaccineLevels } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
+  const { vaccines } = useSelector((state) => state.newOrder)
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { orderID } = useParams()
 
   useVaccineLevels()
@@ -106,40 +108,52 @@ const NewOrder = () => {
     const details = await getSupplyRequestById(orderID)
     setRequestDetails(details)
 
-    const findExtension = (url) => details.extension?.find((item) => item.url.includes(url));
-  
+    const findExtension = (url) =>
+      details.extension?.find((item) => item.url.includes(url))
+
     const extensionData = {
       vaccine: findExtension('supplyrequest-vaccine'),
       level: details.extension[1],
       lastOrderDate: findExtension('supplyrequest-lastOrderDate'),
       preferredPickupDate: findExtension('supplyrequest-preferredPickupDate'),
-      expectedDateOfNextOrder: findExtension('supplyrequest-expectedDateOfNextOrder'),
+      expectedDateOfNextOrder: findExtension(
+        'supplyrequest-expectedDateOfNextOrder'
+      ),
       catchmentPopulation: findExtension('supplyrequest-catchmentPopulation'),
-      children: findExtension('supplyrequest-childrenAged0-11Months')
-    };
-  
-    const formattedAntigens = extensionData.vaccine?.extension?.map((antigen) => {
-      const findAntigenExtension = (url) => antigen?.extension?.find((item) => item.url.includes(url));
-  
-      return {
-        vaccine: findAntigenExtension('vaccine')?.valueCodeableConcept?.text,
-        minimum: findAntigenExtension('minimum')?.valueQuantity?.value,
-        maximum: findAntigenExtension('maximum')?.valueQuantity?.value,
-        recommendedStock: findAntigenExtension('recommendedStock')?.valueQuantity?.value,
-        quantity: findAntigenExtension('quantity')?.valueQuantity?.value,
-      };
-    });
-  
-    setTableData(formattedAntigens);
-  
+      children: findExtension('supplyrequest-childrenAged0-11Months'),
+    }
+
+    const formattedAntigens = extensionData.vaccine?.extension?.map(
+      (antigen) => {
+        const findAntigenExtension = (url) =>
+          antigen?.extension?.find((item) => item.url.includes(url))
+
+        return {
+          vaccine: findAntigenExtension('vaccine')?.valueCodeableConcept?.text,
+          minimum: findAntigenExtension('minimum')?.valueQuantity?.value,
+          maximum: findAntigenExtension('maximum')?.valueQuantity?.value,
+          recommendedStock:
+            findAntigenExtension('recommendedStock')?.valueQuantity?.value,
+          quantity: findAntigenExtension('quantity')?.valueQuantity?.value,
+        }
+      }
+    )
+
+    dispatch(populateVaccines(formattedAntigens))
+
+
     form.setFieldsValue({
       level: extensionData.level?.valueString,
       lastOrderDate: dayjs(extensionData.lastOrderDate?.valueDateTime),
-      preferredPickupDate: dayjs(extensionData.preferredPickupDate?.valueDateTime),
-      expectedDateOfNextOrder: dayjs(extensionData.expectedDateOfNextOrder?.valueDateTime),
+      preferredPickupDate: dayjs(
+        extensionData.preferredPickupDate?.valueDateTime
+      ),
+      expectedDateOfNextOrder: dayjs(
+        extensionData.expectedDateOfNextOrder?.valueDateTime
+      ),
       catchmentPopulation: extensionData.catchmentPopulation?.valueInteger,
       children: extensionData.children?.valueInteger,
-    });
+    })
   }
 
   const handleValidate = () => {
@@ -150,13 +164,13 @@ const NewOrder = () => {
       'recommendedStock',
       'quantity',
     ]
-    if (!tableData?.length) {
+    if (!vaccines?.length) {
       setHasErrors({ empty: true })
       return { empty: true }
     }
-    const errors = tableData.reduce((acc, row, index) => {
+    const errors = vaccines.reduce((acc, vaccine, index) => {
       const rowErrors = required.reduce((acc, field) => {
-        if (!row[field]) {
+        if (!vaccine[field]) {
           acc[field] = true
         }
         return acc
@@ -179,7 +193,7 @@ const NewOrder = () => {
       if (Object.keys(err).length === 0) {
         const combinedData = {
           ...data,
-          tableData,
+          vaccines,
           deliverFrom: {
             reference: formatLocation(user?.subCounty),
             display: user?.subCountyName,
@@ -218,6 +232,7 @@ const NewOrder = () => {
         }
 
         form.resetFields()
+        dispatch(clearNewOrder())
 
         notification.success({
           message: 'Order created successfully',
@@ -365,8 +380,6 @@ const NewOrder = () => {
           <Title level={4}>Antigen Details</Title>
           <NewOrderTable
             form={form}
-            tableData={tableData}
-            setTableData={setTableData}
             inventoryItems={inventoryItems}
             hasErrors={hasErrors}
             handleValidate={handleValidate}

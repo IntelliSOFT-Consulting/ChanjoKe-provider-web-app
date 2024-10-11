@@ -16,14 +16,16 @@ import {
 import { uniqueVaccineOptions } from '../../data/vaccineData'
 import { useVaccineLevels } from '../../hooks/useVaccineLevels'
 import { minMaxLevelBuilder } from './helpers/stockResourceBuilder'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const { Title } = Typography
 
 const StockConfiguration = () => {
+  const { state } = useLocation()
   const [levels, setLevels] = useState(null)
   const [form] = Form.useForm()
   const [editingKey, setEditingKey] = useState('')
-
+  const navigate = useNavigate()
   const { vaccineLevels } = useSelector((state) => state.vaccineSchedules)
   const { user } = useSelector((state) => state.userInfo)
 
@@ -42,8 +44,6 @@ const StockConfiguration = () => {
       setLevels([])
     }
   }, [vaccineLevels?.id])
-
-  console.log(vaccineLevels)
 
   const edit = (record) => {
     form.setFieldsValue({ ...record })
@@ -78,6 +78,9 @@ const StockConfiguration = () => {
         await createVaccineLevel(newLevels)
       }
       message.success('Stock configuration saved successfully')
+      if (state?.isOrder) {
+        navigate('/stock-management/new-order', { replace: true })
+      }
     } catch (error) {
       message.error('Failed to save stock configuration')
     }

@@ -17,7 +17,7 @@ import {
   manufacturerOptions,
   vvmStatuses,
 } from '../../data/options/clientDetails'
-import { uniqueVaccineOptions } from '../../data/vaccineData'
+import { uniqueVaccineOptionsWithDiluentDropper } from '../../data/vaccineData'
 import useInventory from '../../hooks/useInventory'
 import { formatLocation } from '../../utils/formatter'
 import Table from '../DataTable'
@@ -129,7 +129,7 @@ const ReceiveRegionalStock = () => {
         <Select
           placeholder="Select Vaccine"
           className="w-full"
-          options={uniqueVaccineOptions}
+          options={uniqueVaccineOptionsWithDiluentDropper}
           onChange={(value) => {
             const updatedItems = [...items]
             const vaccineQty =

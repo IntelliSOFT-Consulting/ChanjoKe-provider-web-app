@@ -173,3 +173,7 @@ export const getLocations = (user) => {
   }
   return userLocation
 }
+
+export const isDiluentOrDropper = (vaccine) => {
+  return vaccine?.includes('diluent') || vaccine?.includes('dropper')
+}
