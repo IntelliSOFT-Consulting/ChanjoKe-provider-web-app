@@ -121,6 +121,12 @@ const ReceiveRegionalStock = () => {
     }
   }
 
+  const removeItem = (index) => {
+    const updatedItems = [...items]
+    updatedItems.splice(index, 1)
+    setItems(updatedItems)
+  }
+
   const columns = [
     {
       title: 'Vaccine/Diluents',
@@ -235,6 +241,16 @@ const ReceiveRegionalStock = () => {
         />
       ),
     },
+    {
+      title: null,
+      dataIndex: 'actions',
+      hidden: items.length === 1,
+      render: (_text, _record, index) => (
+        <Button type="link" onClick={() => removeItem(index)} danger>
+          Remove
+        </Button>
+      ),
+    },
   ]
 
   return (
@@ -306,6 +322,7 @@ const ReceiveRegionalStock = () => {
           dataSource={items}
           pagination={false}
           size="small"
+          scroll={{ x: true }}
         />
         <div className="flex justify-end mt-5">
           <Button
