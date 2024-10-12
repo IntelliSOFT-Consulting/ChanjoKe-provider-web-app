@@ -9,7 +9,6 @@ import {
 } from 'antd'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { uniqueVaccineOptions } from '../../../data/vaccineData'
 import {
   addVaccine,
@@ -17,6 +16,12 @@ import {
   removeVaccine,
 } from '../../../redux/slices/stockSlice'
 import { isDiluentOrDropper } from '../../../utils/methods'
+import {
+  getMaximumQuantity,
+  getMinimumQuantity,
+  minMaxNotSet,
+  ValidationMessage,
+} from './Validations'
 
 const { Text } = Typography
 
@@ -28,26 +33,6 @@ const getVaccineQuantity = (inventory, vaccine) => {
 const getVaccineLevel = (vaccine, vaccineLevels) => {
   return vaccineLevels?.find((item) => item.name === vaccine)
 }
-
-const InputColumn = ({
-  value,
-  onChange,
-  placeholder,
-  disabled = false,
-  status,
-  ...rest
-}) => (
-  <InputNumber
-    style={{ width: '100%' }}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    disabled={disabled}
-    min={0}
-    status={status}
-    {...rest}
-  />
-)
 
 const NewOrderTable = ({
   inventoryItems,
@@ -83,19 +68,25 @@ const NewOrderTable = ({
                   vaccineLevel.min
                 record = {
                   ...record,
-                  minimum: Number(vaccineLevel.min),
-                  maximum: Number(vaccineLevel.max),
+                  minimum: getMinimumQuantity(
+                    { ...record, minimum: vaccineLevel.min },
+                    qty
+                  ),
+                  maximum: getMaximumQuantity(
+                    { ...record, maximum: vaccineLevel.max },
+                    qty
+                  ),
                   recommendedStock,
                   vaccine: value,
                   dosesInStock: qty,
                   quantity: null,
-                  index,  
+                  index,
                 }
               } else {
                 record = {
                   ...record,
-                  minimum: 0,
-                  maximum: 0,
+                  minimum: null,
+                  maximum: null,
                   recommendedStock: 0,
                   vaccine: value,
                   dosesInStock: qty,
@@ -114,10 +105,11 @@ const NewOrderTable = ({
       title: 'Doses in Stock',
       dataIndex: 'dosesInStock',
       render: (value, _, index) => (
-        <InputColumn
+        <InputNumber
           value={value}
           placeholder="Doses in Stock"
           disabled
+          className='w-full'
           status={hasErrors?.[index]?.dosesInStock ? 'error' : undefined}
         />
       ),
@@ -130,10 +122,11 @@ const NewOrderTable = ({
       title: 'Minimum',
       dataIndex: 'minimum',
       render: (value, _, index) => (
-        <InputColumn
+        <InputNumber
           value={value}
           placeholder="Minimum"
           disabled
+          className='w-full'
           status={hasErrors?.[index]?.minimum ? 'error' : undefined}
         />
       ),
@@ -142,10 +135,11 @@ const NewOrderTable = ({
       title: 'Maximum',
       dataIndex: 'maximum',
       render: (value, _, index) => (
-        <InputColumn
+        <InputNumber
           value={value}
           placeholder="Maximum"
           disabled
+          className='w-full'
           status={hasErrors?.[index]?.maximum ? 'error' : undefined}
         />
       ),
@@ -154,10 +148,11 @@ const NewOrderTable = ({
       title: 'Recommended Stock',
       dataIndex: 'recommendedStock',
       render: (value, _, index) => (
-        <InputColumn
+        <InputNumber
           value={value}
           placeholder="Recommended Stock"
           disabled
+          className='w-full'
           status={hasErrors?.[index]?.recommendedStock ? 'error' : undefined}
         />
       ),
@@ -167,31 +162,15 @@ const NewOrderTable = ({
       dataIndex: 'quantity',
       render: (value, record, index) => (
         <Space direction="vertical" style={{ width: '100%' }}>
-          <Tooltip
-            color="red"
-            title={
-              (!record.minimum || !record.maximum) &&
-              record.vaccine && (
-                <Text style={{ fontSize: '12px' }}>
-                  Set min and max values for this vaccine{' '}
-                  <Link
-                    to="/stock-management/stock-configuration"
-                    style={{ textDecoration: 'underline' }}
-                    state={{ isOrder: true }}
-                  >
-                    here
-                  </Link>
-                </Text>
-              )
-            }
-          >
-            <InputColumn
+          <Tooltip color="red" title={ValidationMessage(record)}>
+            <InputNumber
               value={value}
+              className="w-full"
               placeholder="Ordered Amount"
               disabled={isDiluentOrDropper(record.vaccine)}
-              min={record.minimum || 0}
-              max={record.maximum || 0}
-              readOnly={!record.minimum || !record.maximum}
+              min={record.minimum}
+              max={record.maximum}
+              readOnly={minMaxNotSet(record)}
               onChange={(value) => {
                 dispatch(
                   changeVaccineQuantity({
@@ -215,7 +194,8 @@ const NewOrderTable = ({
       title: null,
       dataIndex: 'action',
       render: (_, record, index) =>
-        index > 0 && !isDiluentOrDropper(record.vaccine) && (
+        index > 0 &&
+        !isDiluentOrDropper(record.vaccine) && (
           <Button
             type="link"
             onClick={() => {
