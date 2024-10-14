@@ -124,12 +124,12 @@ export default function NewAppointment() {
 
     const recs = recommendations?.recommendation
     const vaccineNames = vaccinesAppointments.map(
-      (vaccine) => vaccine?.vaccineCode?.[0]?.text
+      (vaccine) => vaccine?.vaccineCode?.[0]?.text?.replace(/\s\d+$/, '')
     )
     const newRecommendations = recs.map((recommendation) => {
       if (vaccineNames.includes(recommendation?.vaccineCode?.[0]?.text)) {
         const found = vaccinesAppointments.find(
-          (vaccine) => vaccine?.vaccineCode?.[0]?.text
+          (vaccine) => vaccine?.vaccineCode?.[0]?.text?.replace(/\s\d+$/, '')
         )
         recommendation.dateCriterion[0].value = moment(
           found.appointmentDate,
@@ -162,7 +162,7 @@ export default function NewAppointment() {
     setVaccineAppointments([...vaccinesAppointments, vaccine])
 
     const vaccines = vaccinesToAppoint.filter(
-      (item) => item?.vaccineCode?.[0]?.text !== e
+      (item) => item?.vaccineCode?.[0]?.text?.replace(/\s\d+$/, '') !== e
     )
     setAppointmentList(vaccines)
   }
@@ -173,7 +173,7 @@ export default function NewAppointment() {
     )
 
     const updatedVaccineAppointments = vaccinesAppointments.filter(
-      (item) => item?.vaccineCode?.[0]?.text !== e
+      (item) => item?.vaccineCode?.[0]?.text?.replace(/\s\d+$/, '') !== e
     )
     setVaccineAppointments(updatedVaccineAppointments)
 
