@@ -43,6 +43,7 @@ const AddUser = ({
       fetchPractitionerDetails(visible.id)
     } else {
       resetForm()
+
     }
   }, [visible])
 
@@ -72,6 +73,7 @@ const AddUser = ({
         await handleCreatePractitioner(values)
       }
       resetForm()
+      setVisible(false)
       await fetchPractitioners(null, activeTab === '1', currentPage)
     } catch (error) {
       console.error('Error handling form submission:', error)
@@ -86,7 +88,6 @@ const AddUser = ({
     form.resetFields()
     setPractitionerData(null)
     setRole(null)
-    setVisible(false)
   }
 
   const loadLocationHierarchy = async (userData) => {

@@ -7,6 +7,7 @@ import { generateDueDates } from '../utils/calculators/vaccineDates'
 
 const recommendationsEndpoint = '/chanjo-hapi/fhir/ImmunizationRecommendation'
 const immunizationsEndpoint = '/chanjo-hapi/fhir/Immunization'
+const parametersEndpoint = '/chanjo-hapi/fhir/Parameters'
 
 export default function useVaccination() {
   const { post, get, put } = useApiRequest()
@@ -183,6 +184,38 @@ export default function useVaccination() {
       label: vaccine.vaccineName,
     }))
   }, [])
+
+  const isVaccineAvailableInLocation = async (vaccines) => {
+    const payload = {
+      resourceType: 'Parameters',
+      parameter: vaccines.map((vaccine) => ({
+        name: vaccine.vaccine,
+        part: {
+          name: 'location',
+          valueCodeableConcept: {
+            coding: [
+              {
+                code: vaccine.location?.code,
+                display: vaccine.location?.display,
+              },
+            ],
+            text: vaccine.location?.display,
+          },
+        },
+      })),
+    }
+    const response = await post(parametersEndpoint, payload)
+    return response
+  }
+
+  const checkVaccineAvailability = async (vaccine) => {
+    const paramaters = await get(parametersEndpoint)
+
+    if (!paramaters?.entry) return []
+
+    const vaccines = paramaters.map((paramater) => paramater.name)
+    return paramaters
+  }
 
   return {
     createRecommendations,
