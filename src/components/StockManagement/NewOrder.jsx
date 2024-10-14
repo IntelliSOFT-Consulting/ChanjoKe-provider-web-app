@@ -158,10 +158,6 @@ const NewOrder = () => {
 
   const handleValidate = () => {
     const required = [
-      'vaccine',
-      'minimum',
-      'maximum',
-      'recommendedStock',
       'quantity',
     ]
     if (!vaccines?.length) {
