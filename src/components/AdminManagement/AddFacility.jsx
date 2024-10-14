@@ -19,7 +19,6 @@ import {
   formatFacilitiesToTable,
 } from '../../utils/formatter'
 import { debounce, getOffset } from '../../utils/methods'
-import { PlusIcon } from '@heroicons/react/24/solid'
 
 export default function AddFacility() {
   const [visible, setVisible] = useState(false)
@@ -249,16 +248,6 @@ export default function AddFacility() {
           </div>
         }
         className="mt-10"
-        extra={
-          <Button
-            type="primary"
-            onClick={() => setVisible(true)}
-            className="rounded-md outline bg-[#163C94] flex items-center"
-            icon={<PlusIcon className="text-white w-5 h-5 font-semibold" />}
-          >
-            Add Facility
-          </Button>
-        }
       >
         <div className="px-4 py-5 sm:p-6">
           <Tabs
