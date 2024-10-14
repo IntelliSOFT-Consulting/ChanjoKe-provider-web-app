@@ -37,7 +37,7 @@ export const routineVaccines = [
     vaccineCode: 'IMDPT-1',
     nhddCode: '14676',
     diseaseTarget:
-      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+      'Diphtheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '1',
     status: 'upcoming',
     category: '6_weeks',
@@ -95,7 +95,7 @@ export const routineVaccines = [
     vaccineCode: 'IMDPT-2',
     nhddCode: '14676',
     diseaseTarget:
-      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+      'Diphtheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
     status: 'upcoming',
     category: '10_weeks',
@@ -164,7 +164,7 @@ export const routineVaccines = [
     vaccineCode: 'IMDPT-3',
     nhddCode: '50732',
     diseaseTarget:
-      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+      'Diphtheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '3',
     status: 'upcoming',
     category: '14_weeks',
