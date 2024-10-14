@@ -29,10 +29,7 @@ export default function CaregiverDetails({
 
   const columns = [
     {
-      title:
-        caregiverType() === 'Caregiver'
-          ? `${caregiverType()} Type`
-          : `Relationship with ${caregiverType()}`,
+      title: `Relationship with ${caregiverType()}`,
       dataIndex: 'caregiverType',
       key: 'caregiverType',
     },
