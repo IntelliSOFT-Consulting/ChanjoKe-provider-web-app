@@ -269,6 +269,12 @@ const SingleLocation = () => {
     }
   }
 
+  const handleRemove = (index) => {
+    const newOrderItems = [...orderItems]
+    newOrderItems.splice(index, 1)
+    setOrderItems(newOrderItems)
+  }
+
   const columns = [
     {
       title: 'Vaccine',
@@ -392,6 +398,16 @@ const SingleLocation = () => {
           options={manufacturerOptions}
         />
       ),
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: (_text, record, index) =>
+        index > 0 && (
+          <Button type="link" onClick={() => handleRemove(index)} danger>
+            Remove
+          </Button>
+        ),
     },
   ]
 
