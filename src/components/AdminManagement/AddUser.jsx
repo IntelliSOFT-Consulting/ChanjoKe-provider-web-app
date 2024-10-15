@@ -43,7 +43,12 @@ const AddUser = ({
       fetchPractitionerDetails(visible.id)
     } else {
       resetForm()
+    }
 
+    if (user?.orgUnit?.level === 'facility') {
+      form.setFieldsValue({
+        facility: user?.orgUnit?.code?.replace('Location/', ''),
+      })
     }
   }, [visible])
 
@@ -67,6 +72,12 @@ const AddUser = ({
 
   const handleFinish = async (values) => {
     try {
+      if (user?.orgUnit?.level === 'facility') {
+        values.facility = user?.orgUnit?.code?.replace('Location/', '')
+        values.subCounty = user?.subCounty
+        values.county = user?.county
+        values.ward = user?.ward
+      }
       if (visible?.id) {
         await handleUpdatePractitioner(values)
       } else {
@@ -288,30 +299,44 @@ const AddUser = ({
     return renderSection(
       'Location Details',
       <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10">
-        {locationTypes.slice(0, roleLocationIndex + 1).map((locationType) => {
-          const fieldName = hyphenToCamel(locationType.toLowerCase())
-          return (
-            <Form.Item
-              key={fieldName}
-              label={`Select ${titleCase(locationType)}`}
-              name={fieldName}
-              rules={[
-                { required: true, message: `Please select a ${fieldName}` },
-              ]}
-            >
-              <Select
-                placeholder={`Select ${titleCase(locationType)}`}
-                options={getOptions(fieldName)}
-                showSearch
-                allowClear
-                filterOption={(input, option) =>
-                  option?.label.toLowerCase().includes(input.toLowerCase())
-                }
-                onChange={(value) => handleLocationChange(value, fieldName)}
-              />
-            </Form.Item>
-          )
-        })}
+        {user?.orgUnit?.level === 'facility' ? (
+          <Form.Item
+            label="Facility"
+            name="facility"
+          >
+            <Input
+              placeholder="Select Facility"
+              showSearch
+              defaultValue={user?.orgUnit?.name}
+              disabled
+            />
+          </Form.Item>
+        ) : (
+          locationTypes.slice(0, roleLocationIndex + 1).map((locationType) => {
+            const fieldName = hyphenToCamel(locationType.toLowerCase())
+            return (
+              <Form.Item
+                key={fieldName}
+                label={`Select ${titleCase(locationType)}`}
+                name={fieldName}
+                rules={[
+                  { required: true, message: `Please select a ${fieldName}` },
+                ]}
+              >
+                <Select
+                  placeholder={`Select ${titleCase(locationType)}`}
+                  options={getOptions(fieldName)}
+                  showSearch
+                  allowClear
+                  filterOption={(input, option) =>
+                    option?.label.toLowerCase().includes(input.toLowerCase())
+                  }
+                  onChange={(value) => handleLocationChange(value, fieldName)}
+                />
+              </Form.Item>
+            )
+          })
+        )}
       </div>
     )
   }

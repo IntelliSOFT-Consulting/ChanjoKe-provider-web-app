@@ -121,14 +121,14 @@ export const refreshToken = createAsyncThunk(
         refresh_token: token.refresh_token,
       })
 
-      const user = JSON.parse(localStorage.getItem('user') || '{}')
-      user.access_token = response.data.access_token
-      user.refresh_token = response.data.refresh_token
-      if (user.access_token) {
-        localStorage.setItem('user', JSON.stringify(user))
-      }
+      // const user = JSON.parse(localStorage.getItem('user') || '{}')
+      // user.access_token = response.data.access_token
+      // user.refresh_token = response.data.refresh_token
+      // if (user.access_token) {
+      //   localStorage.setItem('user', JSON.stringify(user))
+      // }
 
-      return response.data
+      // return response.data
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.error || 'Failed to refresh token'

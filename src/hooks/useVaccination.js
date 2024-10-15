@@ -197,7 +197,6 @@ export default function useVaccination() {
   }, [])
 
   const isVaccineAvailableInLocation = async (parameter) => {
-    console.log({ parameter })
     const payload = {
       resourceType: 'Parameters',
       parameter: parameter.vaccines.map((vaccine) => ({
