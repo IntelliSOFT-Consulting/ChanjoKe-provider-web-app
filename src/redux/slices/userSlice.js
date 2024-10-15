@@ -123,7 +123,10 @@ export const refreshToken = createAsyncThunk(
 
       const user = JSON.parse(localStorage.getItem('user') || '{}')
       user.access_token = response.data.access_token
-      localStorage.setItem('user', JSON.stringify(user))
+      user.refresh_token = response.data.refresh_token
+      if (user.access_token) {
+        localStorage.setItem('user', JSON.stringify(user))
+      }
 
       return response.data
     } catch (error) {
@@ -164,6 +167,7 @@ const userSlice = createSlice({
         const newToken = action.payload
         const user = JSON.parse(localStorage.getItem('user') || '{}')
         user.access_token = newToken.access_token
+        user.refresh_token = newToken.refresh_token
         state.user = user
         localStorage.setItem('user', JSON.stringify(user))
       })
