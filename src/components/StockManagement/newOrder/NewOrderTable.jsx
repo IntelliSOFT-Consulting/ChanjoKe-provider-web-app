@@ -147,6 +147,7 @@ const NewOrderTable = ({
     {
       title: 'Recommended Stock',
       dataIndex: 'recommendedStock',
+      hidden: true,
       render: (value, _, index) => (
         <InputNumber
           value={value}
