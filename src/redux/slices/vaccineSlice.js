@@ -6,6 +6,7 @@ const vaccineSlice = createSlice({
     selectedVaccines: [],
     vaccineSchedules: [],
     vaccineLevels: {},
+    vaccineAccess: {},
   },
   reducers: {
     setSelectedVaccines(state, action) {
@@ -17,10 +18,17 @@ const vaccineSlice = createSlice({
     setVaccineLevels(state, action) {
       state.vaccineLevels = action.payload
     },
+    setVaccineAccess(state, action) {
+      state.vaccineAccess = action.payload
+    },
   },
 })
 
-export const { setSelectedVaccines, setVaccineSchedules, setVaccineLevels } =
-  vaccineSlice.actions
+export const {
+  setSelectedVaccines,
+  setVaccineSchedules,
+  setVaccineLevels,
+  setVaccineAccess,
+} = vaccineSlice.actions
 
 export default vaccineSlice.reducer

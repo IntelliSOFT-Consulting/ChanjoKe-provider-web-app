@@ -33,6 +33,7 @@ import SearchLogo from '../common/icons/searchLogo'
 import UpdateClientLogo from '../common/icons/updateClientLogo'
 import VaccinationReportLogo from '../common/icons/vaccinationReportLogo'
 import ProfileDropdown from './ProfileDropdown'
+import { LockOutlined } from '@ant-design/icons'
 
 const iconComponents = {
   aefiLogo: AefiLogo,
@@ -144,6 +145,15 @@ export default function Sidenav() {
               'NATIONAL_SYSTEM_ADMINISTRATOR',
             ],
           },
+          {
+            name: 'Vaccine Restrictions',
+            href: '/vaccine-access',
+            icon: <LockOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+            ],
+          }
         ],
       },
       {

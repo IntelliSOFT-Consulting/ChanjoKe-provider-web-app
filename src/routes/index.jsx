@@ -60,6 +60,7 @@ import ReceiveRegionalStock from '../components/StockManagement/ReceiveRegionalS
 import Error404 from '../common/Error404'
 import AdministerCampaign from '../components/AdministerVaccines/AdministerCampaign'
 import SupersetDashboard from '../pages/Dashboards'
+import VaccineAccess from '../pages/VaccineAccess'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -163,6 +164,18 @@ const router = createBrowserRouter([
               'NATIONAL_SYSTEM_ADMINISTRATOR',
               'COUNTY_SYSTEM_ADMINISTRATOR',
               'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
+      },
+      {
+        path: '/vaccine-access',
+        element: (
+          <RoleBasedRoute
+            element={<VaccineAccess />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
