@@ -66,7 +66,9 @@ server.interceptors.response.use(
           grant_type: 'refresh_token',
           refresh_token: token.refresh_token,
         })
-        localStorage.setItem('user', JSON.stringify(response.data))
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        user.access_token = response.data.access_token
+        localStorage.setItem('user', JSON.stringify(user))
         server.defaults.headers.common[
           'Authorization'
         ] = `Bearer ${response.data.access_token}`
@@ -119,8 +121,14 @@ export const refreshToken = createAsyncThunk(
         refresh_token: token.refresh_token,
       })
 
-      localStorage.setItem('user', JSON.stringify(response.data))
-      return response.data
+      // const user = JSON.parse(localStorage.getItem('user') || '{}')
+      // user.access_token = response.data.access_token
+      // user.refresh_token = response.data.refresh_token
+      // if (user.access_token) {
+      //   localStorage.setItem('user', JSON.stringify(user))
+      // }
+
+      // return response.data
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.error || 'Failed to refresh token'
@@ -157,8 +165,11 @@ const userSlice = createSlice({
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         const newToken = action.payload
-        state.user = { ...state.user, ...newToken }
-        localStorage.setItem('user', JSON.stringify(newToken))
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        user.access_token = newToken.access_token
+        user.refresh_token = newToken.refresh_token
+        state.user = user
+        localStorage.setItem('user', JSON.stringify(user))
       })
       .addCase(refreshToken.rejected, (state) => {
         state.user = null

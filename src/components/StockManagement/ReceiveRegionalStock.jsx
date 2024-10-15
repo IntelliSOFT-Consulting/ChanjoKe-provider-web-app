@@ -9,7 +9,7 @@ import {
   Select,
 } from 'antd'
 import dayjs from 'dayjs'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createUseStyles } from 'react-jss'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -17,7 +17,7 @@ import {
   manufacturerOptions,
   vvmStatuses,
 } from '../../data/options/clientDetails'
-import { uniqueVaccineOptions } from '../../data/vaccineData'
+import { uniqueVaccineOptionsWithDiluentDropper } from '../../data/vaccineData'
 import useInventory from '../../hooks/useInventory'
 import { formatLocation } from '../../utils/formatter'
 import Table from '../DataTable'
@@ -25,7 +25,7 @@ import {
   inventoryItemBuilder,
   inventoryReportBuilder,
 } from './helpers/stockResourceBuilder'
-import { dosesToVials, vialsToDoses } from './helpers/stockUtils'
+
 const useStyles = createUseStyles({
   btnSuccess: {
     backgroundColor: '#169416',
@@ -57,11 +57,8 @@ const ReceiveRegionalStock = () => {
 
   const { user } = useSelector((state) => state.userInfo)
 
-  const {
-    getAggregateInventoryItems,
-    createInventory,
-    inventoryItems,
-  } = useInventory()
+  const { getAggregateInventoryItems, createInventory, inventoryItems } =
+    useInventory()
 
   const navigate = useNavigate()
 
@@ -81,7 +78,7 @@ const ReceiveRegionalStock = () => {
         vaccines: items.map((item) => ({
           ...item,
           vaccine: item.vaccine,
-          quantity: vialsToDoses(item.vaccine, item.quantity),
+          quantity: item.quantity,
         })),
       }
 
@@ -124,6 +121,12 @@ const ReceiveRegionalStock = () => {
     }
   }
 
+  const removeItem = (index) => {
+    const updatedItems = [...items]
+    updatedItems.splice(index, 1)
+    setItems(updatedItems)
+  }
+
   const columns = [
     {
       title: 'Vaccine/Diluents',
@@ -132,14 +135,14 @@ const ReceiveRegionalStock = () => {
         <Select
           placeholder="Select Vaccine"
           className="w-full"
-          options={uniqueVaccineOptions}
+          options={uniqueVaccineOptionsWithDiluentDropper}
           onChange={(value) => {
             const updatedItems = [...items]
             const vaccineQty =
               inventoryItems?.find((batch) => batch.vaccine === value)
                 ?.quantity ?? 0
             updatedItems[index].vaccine = value
-            updatedItems[index].stockQuantity = dosesToVials(value, vaccineQty)
+            updatedItems[index].stockQuantity = vaccineQty
             setItems(updatedItems)
           }}
         />
@@ -238,6 +241,16 @@ const ReceiveRegionalStock = () => {
         />
       ),
     },
+    {
+      title: null,
+      dataIndex: 'actions',
+      hidden: items.length === 1,
+      render: (_text, _record, index) => (
+        <Button type="link" onClick={() => removeItem(index)} danger>
+          Remove
+        </Button>
+      ),
+    },
   ]
 
   return (
@@ -309,6 +322,7 @@ const ReceiveRegionalStock = () => {
           dataSource={items}
           pagination={false}
           size="small"
+          scroll={{ x: true }}
         />
         <div className="flex justify-end mt-5">
           <Button

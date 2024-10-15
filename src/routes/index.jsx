@@ -28,6 +28,7 @@ import CreateAEFI from '../components/AEFI/CreateAEFI'
 import ReceiveStock from '../components/StockManagement/ReceiveStock'
 import IssueStock from '../components/StockManagement/IssueStock'
 import StockCount from '../components/StockManagement/StockCount'
+import StockConfiguration from '../components/StockManagement/StockConfiguration'
 // import PositiveAdjustments from '../components/StockManagement/PositiveAdjustments'
 // import NegativeAdjustments from '../components/StockManagement/NegativeAdjustments'
 import Wastage from '../components/StockManagement/Wastage'
@@ -59,6 +60,7 @@ import ReceiveRegionalStock from '../components/StockManagement/ReceiveRegionalS
 import Error404 from '../common/Error404'
 import AdministerCampaign from '../components/AdministerVaccines/AdministerCampaign'
 import SupersetDashboard from '../pages/Dashboards'
+import VaccineAccess from '../pages/VaccineAccess'
 
 function SearchInterfaceWrapper() {
   const { searchType } = useParams()
@@ -162,6 +164,18 @@ const router = createBrowserRouter([
               'NATIONAL_SYSTEM_ADMINISTRATOR',
               'COUNTY_SYSTEM_ADMINISTRATOR',
               'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
+            ]}
+          />
+        ),
+      },
+      {
+        path: '/vaccine-access',
+        element: (
+          <RoleBasedRoute
+            element={<VaccineAccess />}
+            allowedRoles={[
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
             ]}
           />
         ),
@@ -314,6 +328,15 @@ const router = createBrowserRouter([
                   'FACILITY_STORE_MANAGER',
                   'FACILITY_SYSTEM_ADMINISTRATOR',
                 ]}
+              />
+            ),
+          },
+          {
+            path: '/stock-management/stock-configuration',
+            element: (
+              <RoleBasedRoute
+                element={<StockConfiguration />}
+                allowedRoles={['FACILITY_SYSTEM_ADMINISTRATOR', 'FACILITY_STORE_MANAGER']}
               />
             ),
           },

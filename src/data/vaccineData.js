@@ -37,7 +37,7 @@ export const routineVaccines = [
     vaccineCode: 'IMDPT-1',
     nhddCode: '14676',
     diseaseTarget:
-      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+      'Diphtheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '1',
     status: 'upcoming',
     category: '6_weeks',
@@ -95,7 +95,7 @@ export const routineVaccines = [
     vaccineCode: 'IMDPT-2',
     nhddCode: '14676',
     diseaseTarget:
-      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+      'Diphtheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '2',
     status: 'upcoming',
     category: '10_weeks',
@@ -164,7 +164,7 @@ export const routineVaccines = [
     vaccineCode: 'IMDPT-3',
     nhddCode: '50732',
     diseaseTarget:
-      'Diptheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
+      'Diphtheria, Pertussis, Tetanus, Hepatitis B, Influenza type B',
     doseNumber: '3',
     status: 'upcoming',
     category: '14_weeks',
@@ -853,6 +853,42 @@ export const uniqueVaccines = [
   'Influenza',
 ]
 
+export const diluentVaccines = [
+  {
+    label: 'Measles-Rubella (diluent)',
+    value: 'Measles-Rubella (diluent)',
+    nhddCode: '24014',
+    disease: 'Measles, Rubella',
+  },
+  {
+    label: 'BCG (diluent)',
+    value: 'BCG (diluent)',
+    nhddCode: '16488',
+    disease: 'Tuberculosis',
+  },
+  {
+    label: 'Yellow Fever (diluent)',
+    value: 'Yellow Fever (diluent)',
+    nhddCode: '1002',
+    disease: 'Yellow Fever',
+  },
+]
+
+export const dropperVaccines = [
+  {
+    label: 'OPV (dropper)',
+    value: 'OPV (dropper)',
+    nhddCode: '1001',
+    disease: 'Polio',
+  },
+  {
+    label: 'Rotavaq (dropper)',
+    value: 'Rotavaq (dropper)',
+    nhddCode: '1003',
+    disease: 'Rotavirus',
+  },
+]
+
 export const vaccineOptions = allVaccines.map((vaccine) => ({
   label: vaccine.vaccineName?.replace(/\s\d+$/, ''),
   value: vaccine.vaccineCode?.replace(/\s\d+$/, ''),
@@ -867,3 +903,9 @@ export const uniqueVaccineOptions = uniqueVaccines.map((vaccine) => {
     disease: vaccineData?.diseaseTarget,
   }
 })
+
+export const uniqueVaccineOptionsWithDiluentDropper = [
+  ...uniqueVaccineOptions,
+  ...diluentVaccines,
+  ...dropperVaccines,
+]

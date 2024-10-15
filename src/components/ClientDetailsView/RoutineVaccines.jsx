@@ -13,7 +13,7 @@ import {
 import dayjs from 'dayjs'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import OptionsDialog from '../../common/dialog/OptionsDialog'
 import Loader from '../../common/spinners/LoadingArrows'
@@ -21,7 +21,7 @@ import { useAccess } from '../../hooks/useAccess'
 import useAefi from '../../hooks/useAefi'
 import { setCurrentPatient } from '../../redux/slices/patientSlice'
 import { setSelectedVaccines } from '../../redux/slices/vaccineSlice'
-import { formatCardTitle } from '../../utils/methods'
+import { formatCardTitle, titleCase } from '../../utils/methods'
 import { datePassed, lockVaccine } from '../../utils/validate'
 import Table from '../DataTable'
 import {
@@ -40,6 +40,8 @@ export default function RoutineVaccines({
   const [vaccinesToAdminister, setVaccinesToAdminister] = useState([])
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [alerts, setAlerts] = useState(null)
+  const { vaccineAccess } = useSelector((state) => state.vaccineSchedules)
+  const { user } = useSelector((state) => state.userInfo)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -80,7 +82,13 @@ export default function RoutineVaccines({
     })
   }
 
-  const statusMessage = (record, locked = false) => {
+  const statusMessage = (record, locked = false, isUnavailable = false) => {
+    if (isUnavailable) {
+      return `The vaccine is not currently available in ${titleCase(
+        user?.countyName
+      )} county`
+    }
+
     if (patientDetails?.deceased && record.status !== 'completed') {
       return 'Client is deceased'
     }
@@ -128,16 +136,33 @@ export default function RoutineVaccines({
       render: (_text, record) => {
         const isCompleted = record.status === 'completed'
         const isLocked = lockVaccine(record.dueDate, record.lastDate)
+
+        const findVaccineAccess = vaccineAccess?.locations?.find(
+          (location) => location.vaccine === record.vaccine
+        )
+
+        const isAvailable = findVaccineAccess?.locations
+          ?.map((l) => l.valueCode)
+          .includes(user?.county)
+
         const isDisabled =
           isCompleted ||
           patientDetails?.deceased ||
           (isLocked &&
             !['Rescheduled', 'Not Administered'].includes(record.status)) ||
           record.contraindicated ||
-          !isCovidQualified(allVaccines, record)
+          !isCovidQualified(allVaccines, record) ||
+          (findVaccineAccess && !isAvailable)
 
         return (
-          <Tooltip title={statusMessage(record, isLocked)} color="#163c94">
+          <Tooltip
+            title={statusMessage(
+              record,
+              isLocked,
+              findVaccineAccess && !isAvailable
+            )}
+            color="#163c94"
+          >
             <Checkbox
               name={record.vaccine}
               value={record.vaccine}

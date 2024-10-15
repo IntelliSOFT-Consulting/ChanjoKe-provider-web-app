@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Alert, Button, DatePicker, Form, Input } from 'antd'
+import { Alert, Button, DatePicker, Form, Input, Tag } from 'antd'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApiRequest } from '../api/useApiRequest'
@@ -73,6 +73,12 @@ export default function SearchInterface({ searchType }) {
     setLoading(false)
   }
 
+  const colors = {
+    Facility: 'blue',
+    Campaign: 'green',
+    OutReach: 'yellow',
+  }
+
   const columns = [
     {
       title: 'Client Name',
@@ -80,7 +86,7 @@ export default function SearchInterface({ searchType }) {
       key: 'clientName',
     },
     {
-      title: 'ID Number',
+      title: 'Document ID',
       dataIndex: 'idNumber',
       key: 'idNumber',
     },
@@ -88,6 +94,12 @@ export default function SearchInterface({ searchType }) {
       title: 'Phone Number',
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
+    },
+    {
+      title: 'Location Registered',
+      dataIndex: 'location',
+      key: 'location',
+      render: (_, record) => <Tag color={colors[record.location]}>{record.location}</Tag>,
     },
     {
       title: 'Actions',

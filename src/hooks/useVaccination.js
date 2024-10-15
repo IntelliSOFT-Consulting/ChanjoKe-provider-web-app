@@ -1,18 +1,30 @@
 import moment from 'moment'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
 import { nonRoutineVaccines, routineVaccines } from '../data/vaccineData'
 import { formatCardTitle } from '../utils/methods'
 import { generateDueDates } from '../utils/calculators/vaccineDates'
+import { useDispatch, useSelector } from 'react-redux'
+import { setVaccineAccess } from '../redux/slices/vaccineSlice'
 
 const recommendationsEndpoint = '/chanjo-hapi/fhir/ImmunizationRecommendation'
 const immunizationsEndpoint = '/chanjo-hapi/fhir/Immunization'
+const parametersEndpoint = '/chanjo-hapi/fhir/Parameters'
 
 export default function useVaccination() {
   const { post, get, put } = useApiRequest()
   const [recommendations, setRecommendations] = useState(null)
   const [immunizations, setImmunizations] = useState(null)
   const [immunization, setImmunization] = useState(null)
+  const [vaccineLocations, setVaccineLocations] = useState(null)
+
+  const dispatch = useDispatch()
+  const { vaccineAccess } = useSelector((state) => state.vaccineSchedules)
+  useEffect(() => {
+    if (!vaccineAccess?.id) {
+      getVaccineAvailability()
+    }
+  }, [])
 
   const isEligibleBySex = (patientSex, vaccineSex) => {
     if (!vaccineSex) return true
@@ -184,6 +196,48 @@ export default function useVaccination() {
     }))
   }, [])
 
+  const isVaccineAvailableInLocation = async (parameter) => {
+    const payload = {
+      resourceType: 'Parameters',
+      parameter: parameter.vaccines.map((vaccine) => ({
+        name: vaccine.vaccine,
+        part: vaccine?.locations?.map(({ name, valueCode }) => ({
+          name,
+          valueCode,
+        })),
+      })),
+    }
+    if (parameter.id) {
+      payload.id = parameter.id
+    }
+    const response = parameter.id
+      ? await put(`${parametersEndpoint}/${parameter.id}`, payload)
+      : await post(parametersEndpoint, payload)
+    dispatch(setVaccineAccess(response))
+    return response
+  }
+
+  const getVaccineAvailability = async () => {
+    const paramaters = await get(parametersEndpoint)
+
+    if (!paramaters?.entry) {
+      setVaccineLocations({})
+      return null
+    }
+    const resource = paramaters.entry?.[0]?.resource
+
+    const data = {
+      id: resource.id,
+      locations: resource?.parameter?.map((parameter) => ({
+        vaccine: parameter.name,
+        locations: parameter.part,
+      })) || [],
+    }
+    setVaccineLocations(data)
+    dispatch(setVaccineAccess(data))
+    return data
+  }
+
   return {
     createRecommendations,
     updateRecommendations,
@@ -199,5 +253,8 @@ export default function useVaccination() {
     immunization,
     getFacilityImmunizations,
     getAllVaccines,
+    getVaccineAvailability,
+    isVaccineAvailableInLocation,
+    vaccineLocations,
   }
 }

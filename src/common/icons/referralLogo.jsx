@@ -17,9 +17,9 @@ export default function ReferralIcon({
         transform="translate(24.072 32.734)"
         fill="none"
         stroke={color}
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
       />
       <path
         id="Vector-2"
@@ -28,9 +28,9 @@ export default function ReferralIcon({
         transform="translate(17.626 39.029)"
         fill="none"
         stroke={color}
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
       />
       <path
         id="Vector-3"
@@ -39,9 +39,9 @@ export default function ReferralIcon({
         transform="translate(20.144 5.036)"
         fill="none"
         stroke={color}
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
       />
       <path
         id="Vector-4"
@@ -50,9 +50,9 @@ export default function ReferralIcon({
         transform="translate(40.288 5.036)"
         fill="none"
         stroke={color}
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
       />
       <path
         id="Vector-5"
@@ -61,9 +61,9 @@ export default function ReferralIcon({
         transform="translate(7.392 8.611)"
         fill="none"
         stroke={color}
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
       />
       <path
         id="Vector-6"

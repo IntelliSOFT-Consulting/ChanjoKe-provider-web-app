@@ -350,7 +350,7 @@ export default function Administer() {
                         >
                           <Form.Item
                             name={[field.name, 'batchNumber']}
-                            label="Batch Number"
+                            label={`Batch Number for ${selectedVaccines[index].vaccine}`}
                             rules={[
                               {
                                 required: true,

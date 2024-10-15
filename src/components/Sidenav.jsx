@@ -10,6 +10,7 @@ import {
   PlusCircleOutlined,
   ReconciliationOutlined,
   SelectOutlined,
+  SettingOutlined,
   SignatureOutlined,
   SoundOutlined,
   TruckOutlined,
@@ -32,6 +33,7 @@ import SearchLogo from '../common/icons/searchLogo'
 import UpdateClientLogo from '../common/icons/updateClientLogo'
 import VaccinationReportLogo from '../common/icons/vaccinationReportLogo'
 import ProfileDropdown from './ProfileDropdown'
+import { LockOutlined } from '@ant-design/icons'
 
 const iconComponents = {
   aefiLogo: AefiLogo,
@@ -143,6 +145,15 @@ export default function Sidenav() {
               'NATIONAL_SYSTEM_ADMINISTRATOR',
             ],
           },
+          {
+            name: 'Vaccine Restrictions',
+            href: '/vaccine-access',
+            icon: <LockOutlined />,
+            roles: [
+              'ADMINISTRATOR',
+              'NATIONAL_SYSTEM_ADMINISTRATOR',
+            ],
+          }
         ],
       },
       {
@@ -356,6 +367,12 @@ export default function Sidenav() {
               'DOCTOR',
               'CLERK',
             ],
+          },
+          {
+            name: 'Stock Configuration',
+            href: '/stock-management/stock-configuration',
+            icon: <SettingOutlined />,
+            roles: ['FACILITY_SYSTEM_ADMINISTRATOR', 'FACILITY_STORE_MANAGER'],
           },
         ],
       },

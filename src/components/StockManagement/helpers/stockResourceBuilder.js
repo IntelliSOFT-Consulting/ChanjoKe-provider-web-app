@@ -4,7 +4,7 @@ import { allVaccines, uniqueVaccines } from '../../../data/vaccineData'
 
 export const supplyRequestBuilder = (values) => {
   const {
-    tableData,
+    vaccines,
     level,
     lastOrderDate,
     authoredOn,
@@ -15,7 +15,7 @@ export const supplyRequestBuilder = (values) => {
     children,
   } = values
 
-  const orderItems = tableData.map((tableValue) => {
+  const orderItems = vaccines.map((tableVaccine) => {
     const {
       vaccine,
       dosesInStock,
@@ -24,7 +24,7 @@ export const supplyRequestBuilder = (values) => {
       maximum,
       recommendedStock,
       quantity,
-    } = tableValue
+    } = tableVaccine
 
     return {
       url: 'http://example.org/fhir/StructureDefinition/supplyrequest-vaccine',
@@ -456,4 +456,51 @@ export const receiveAuditBuilder = (vaccines, values, type = 'count') => {
   }
 
   return resource
+}
+
+export const minMaxLevelBuilder = (levels, facility) => {
+  return {
+    resourceType: 'Library',
+    status: 'active',
+    name: `${facility?.name} Vaccine Min-Max Levels`,
+    type: {
+      coding: [
+        {
+          system: 'http://terminology.hl7.org/CodeSystem/min-max-level',
+          code: 'min-max-level',
+        },
+      ],
+      text: 'Min-Max Level',
+    },
+    identifier: [
+      {
+        value: facility?.code,
+      },
+    ],
+    parameter: levels?.map((level) => ({
+      name: level.name,
+      min: level.min,
+      max: level.max,
+      type: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/min-max-level',
+            code: 'min-max-level',
+          },
+        ],
+        text: 'Min-Max Level',
+      },
+      use: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/min-max-level',
+            code: 'min-max-level',
+          },
+        ],
+        text: 'Min-Max Level',
+      },
+      description:
+        'The minimum and maximum amount of vaccine to be maintained in stock',
+    })),
+  }
 }

@@ -18,7 +18,8 @@ export const refreshTokenIfNeeded = async () => {
     try {
       await store.dispatch(refreshToken()).unwrap()
     } catch (error) {
-      store.dispatch(logout())
+      // store.dispatch(logout())
+      console.log('Session expired. Please login again.')
       throw new Error('Session expired. Please login again.')
     }
   }

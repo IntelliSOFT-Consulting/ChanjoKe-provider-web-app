@@ -222,6 +222,12 @@ function deconstructPatientData(data, searchType) {
     ]
   }
 
+  const location = data?.resource?.meta?.tag?.find(
+    (tag) =>
+      tag.system ===
+      'http://terminology.hl7.org/CodeSystem/registration-location'
+  )
+
   return {
     id: data?.resource?.id,
     clientName: `${data?.resource?.name?.[0]?.given?.join(' ')} ${
@@ -236,6 +242,7 @@ function deconstructPatientData(data, searchType) {
       ? `${data?.resource?.contact?.[0]?.telecom?.[0]?.value} (${data?.resource?.contact?.[0]?.relationship?.[0]?.text})`
       : '-',
     actions,
+    location: location?.display || 'Facility',
   }
 }
 

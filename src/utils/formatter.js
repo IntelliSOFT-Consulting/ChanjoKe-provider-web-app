@@ -109,7 +109,6 @@ export const getLocationId = (location) => {
   return location?.replace('Location/', '')
 }
 
-// create a function that takes a string and formats camel case to hyphenated e.g. camelCase to camel-case
 export const camelToHyphen = (str) => {
   return str.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)
 }
