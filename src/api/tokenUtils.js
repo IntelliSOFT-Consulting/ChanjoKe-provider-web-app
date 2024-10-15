@@ -20,7 +20,7 @@ export const refreshTokenIfNeeded = async () => {
     } catch (error) {
       // store.dispatch(logout())
       console.log('Session expired. Please login again.')
-      throw new Error('Session expired. Please login again.')
+      // throw new Error('Session expired. Please login again.')
     }
   }
 }
