@@ -72,6 +72,8 @@ const NewOrderTable = ({
                     { ...record, minimum: vaccineLevel.min },
                     qty
                   ),
+                  minValue: vaccineLevel.min,
+                  maxValue: vaccineLevel.max,
                   maximum: getMaximumQuantity(
                     { ...record, maximum: vaccineLevel.max },
                     qty
@@ -104,15 +106,6 @@ const NewOrderTable = ({
     {
       title: 'Doses in Stock',
       dataIndex: 'dosesInStock',
-      render: (value, _, index) => (
-        <InputNumber
-          value={value}
-          placeholder="Doses in Stock"
-          disabled
-          className='w-full'
-          status={hasErrors?.[index]?.dosesInStock ? 'error' : undefined}
-        />
-      ),
     },
     {
       title: 'Consumed last month',
@@ -120,43 +113,11 @@ const NewOrderTable = ({
     },
     {
       title: 'Minimum',
-      dataIndex: 'minimum',
-      render: (value, _, index) => (
-        <InputNumber
-          value={value}
-          placeholder="Minimum"
-          disabled
-          className='w-full'
-          status={hasErrors?.[index]?.minimum ? 'error' : undefined}
-        />
-      ),
+      dataIndex: 'minValue',
     },
     {
       title: 'Maximum',
-      dataIndex: 'maximum',
-      render: (value, _, index) => (
-        <InputNumber
-          value={value}
-          placeholder="Maximum"
-          disabled
-          className='w-full'
-          status={hasErrors?.[index]?.maximum ? 'error' : undefined}
-        />
-      ),
-    },
-    {
-      title: 'Recommended Stock',
-      dataIndex: 'recommendedStock',
-      hidden: true,
-      render: (value, _, index) => (
-        <InputNumber
-          value={value}
-          placeholder="Recommended Stock"
-          disabled
-          className='w-full'
-          status={hasErrors?.[index]?.recommendedStock ? 'error' : undefined}
-        />
-      ),
+      dataIndex: 'maxValue',
     },
     {
       title: 'Ordered Amount',
@@ -166,10 +127,10 @@ const NewOrderTable = ({
           <Tooltip color="red" title={ValidationMessage(record)}>
             <InputNumber
               value={value}
-              className="w-full"
+              className="w-full !text-black"
               placeholder="Ordered Amount"
               disabled={isDiluentOrDropper(record.vaccine)}
-              min={record.minimum}
+              min={!isDiluentOrDropper(record.vaccine) ? record.minimum : 0}
               max={record.maximum}
               readOnly={minMaxNotSet(record)}
               onChange={(value) => {
@@ -181,8 +142,9 @@ const NewOrderTable = ({
                 )
               }}
               status={
-                hasErrors?.[index]?.quantity ||
-                (!record.minimum && !record.maximum && record.vaccine)
+                !isDiluentOrDropper(record.vaccine) &&
+                (hasErrors?.[index]?.quantity ||
+                  (!record.minimum && !record.maximum && record.vaccine))
                   ? 'error'
                   : undefined
               }
