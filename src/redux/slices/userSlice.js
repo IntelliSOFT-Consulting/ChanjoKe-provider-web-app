@@ -60,22 +60,22 @@ server.interceptors.response.use(
       }
 
       originalRequest._retry = true
-      try {
-        const token = JSON.parse(localStorage.getItem('user') || '{}')
-        const response = await server.post('/auth/token', {
-          grant_type: 'refresh_token',
-          refresh_token: token.refresh_token,
-        })
-        const user = JSON.parse(localStorage.getItem('user') || '{}')
-        user.access_token = response.data.access_token
-        localStorage.setItem('user', JSON.stringify(user))
-        server.defaults.headers.common[
-          'Authorization'
-        ] = `Bearer ${response.data.access_token}`
-        return server(originalRequest)
-      } catch (refreshError) {
-        return Promise.reject(refreshError)
-      }
+      // try {
+      //   const token = JSON.parse(localStorage.getItem('user') || '{}')
+      //   const response = await server.post('/auth/token', {
+      //     grant_type: 'refresh_token',
+      //     refresh_token: token.refresh_token,
+      //   })
+      //   const user = JSON.parse(localStorage.getItem('user') || '{}')
+      //   user.access_token = response.data.access_token
+      //   localStorage.setItem('user', JSON.stringify(user))
+      //   server.defaults.headers.common[
+      //     'Authorization'
+      //   ] = `Bearer ${response.data.access_token}`
+      //   return server(originalRequest)
+      // } catch (refreshError) {
+      //   return Promise.reject(refreshError)
+      // }
     }
     return Promise.reject(error)
   }
@@ -115,11 +115,11 @@ export const refreshToken = createAsyncThunk(
   'user/refreshToken',
   async (_, { rejectWithValue }) => {
     try {
-      const token = JSON.parse(localStorage.getItem('user') || '{}')
-      const response = await server.post('/auth/provider/refresh_token', {
-        grant_type: 'refresh_token',
-        refresh_token: token.refresh_token,
-      })
+      // const token = JSON.parse(localStorage.getItem('user') || '{}')
+      // const response = await server.post('/auth/provider/refresh_token', {
+      //   grant_type: 'refresh_token',
+      //   refresh_token: token.refresh_token,
+      // })
 
       // const user = JSON.parse(localStorage.getItem('user') || '{}')
       // user.access_token = response.data.access_token

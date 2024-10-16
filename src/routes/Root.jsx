@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { useLocation, Outlet, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Sidenav from '../components/Sidenav'
 import { SharedStateProvider } from '../shared/sharedState'
 import { useSelector } from 'react-redux'
 import AutoLogout from '../components/AutoLogout'
 import { useStockCheck } from '../hooks/useStockCheck'
-import { Alert } from 'antd'
-
+import { Alert, Breadcrumb, Button } from 'antd'
+import { DoubleLeftOutlined } from '@ant-design/icons'
 export default function Root() {
   const { user } = useSelector((state) => state.userInfo)
 
@@ -19,6 +19,10 @@ export default function Root() {
       navigate('/auth')
     }
   }, [user, navigate])
+
+  const { pathname } = useLocation()
+
+  const isHome = pathname === '/' || pathname === '/dashboard'
 
   const showAlert = () => {
     if (belowMinimumStock?.length > 0) {
@@ -51,6 +55,18 @@ export default function Root() {
             {showAlert()}
             <div className="px-4 mt-2 sm:px-6 lg:px-8">
               <Navbar />
+              {!isHome && (
+                <div className="flex items-center gap-2 my-2">
+                  <Button
+                    type="primary"
+                    className="text-gray-500 font-semibold bg-gray-100"
+                    onClick={() => navigate(-1)}
+                    icon={<DoubleLeftOutlined />}
+                  >
+                    Back
+                  </Button>
+                </div>
+              )}
 
               <Outlet />
             </div>
