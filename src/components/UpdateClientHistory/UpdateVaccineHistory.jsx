@@ -79,6 +79,7 @@ export default function UpdateVaccineHistory() {
     const lateVaccines = await Promise.all(
       values.vaccines.map(async (item) => {
         item.description = 'Late vaccination entry.'
+        item.batchNumber = item.batchNumber?.[0]
         item.occurrence = new Date(
           item.dateOfLastDose?.format('YYYY-MM-DD')
         ).toISOString()
@@ -154,9 +155,9 @@ export default function UpdateVaccineHistory() {
           >
             <Form.List name="vaccines">
               {(fields, { add, remove }) => (
-                <div className="px-4 py-2 sm:p-6">
+                <div className="px-2 py-2 sm:p-6">
                   {fields.map(({ key, name, ...restField }) => (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 relative border-b mb-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 relative border mb-2 border-gray-200 p-4 rounded-lg">
                       <Form.Item
                         label="Vaccine Type"
                         rules={[
@@ -200,8 +201,21 @@ export default function UpdateVaccineHistory() {
                       <Form.Item
                         label="Batch Number"
                         name={[name, 'batchNumber']}
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Please select a batch number',
+                          },
+                        ]}
                       >
-                        <Input placeholder="Enter batch number" />
+                        <Select
+                          placeholder="Enter batch number"
+                          mode="tags"
+                          options={[{ label: 'Unknown', value: 'Unknown' }]}
+                          maxLength={1}
+                          maxCount={1}
+                          showSearch={false}
+                        />
                       </Form.Item>
 
                       <Form.Item
@@ -216,7 +230,9 @@ export default function UpdateVaccineHistory() {
                           allowClear
                           className="w-full"
                           disabledDate={(current) =>
-                            (current && current > moment().endOf('day')) ||
+                            (current &&
+                              current >
+                                moment().subtract(1, 'day').startOf('day')) ||
                             current < moment(patient?.birthDate).startOf('day')
                           }
                         />
