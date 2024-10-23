@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Alert, Button, DatePicker, Form, Input, Tag } from 'antd'
+import { Alert, Button, DatePicker, Form, Input, Tag, Tooltip } from 'antd'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useApiRequest } from '../api/useApiRequest'
@@ -99,7 +99,9 @@ export default function SearchInterface({ searchType }) {
       title: 'Location Registered',
       dataIndex: 'location',
       key: 'location',
-      render: (_, record) => <Tag color={colors[record.location]}>{record.location}</Tag>,
+      render: (_, record) => (
+        <Tag color={colors[record.location]}>{record.location}</Tag>
+      ),
     },
     {
       title: 'Actions',
@@ -221,13 +223,22 @@ export default function SearchInterface({ searchType }) {
                   <p className="text-gray-400 text-sm my-2">
                     Client not found!
                   </p>
-                  <Button
-                    type="primary"
-                    onClick={() => navigate('/register-client')}
-                    icon={<PlusOutlined />}
+                  <Tooltip
+                    title={
+                      user?.orgUnit?.level != 'facility'
+                        ? 'You must be a facility user to register new clients'
+                        : null
+                    }
                   >
-                    Register new client
-                  </Button>
+                    <Button
+                      type="primary"
+                      onClick={() => navigate('/register-client')}
+                      icon={<PlusOutlined />}
+                      disabled={user?.orgUnit?.level != 'facility'}
+                    >
+                      Register new client
+                    </Button>
+                  </Tooltip>
                 </div>
               ),
             }}
