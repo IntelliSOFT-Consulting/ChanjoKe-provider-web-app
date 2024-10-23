@@ -41,7 +41,7 @@ export default function ForgotPassword() {
 
         setTimeout(() => {
           localStorage.clear()
-          navigate('/auth')
+          navigate('/user-auth')
         }, 3000)
       }
     }

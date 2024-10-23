@@ -64,7 +64,7 @@ export const useApiRequest = () => {
     } catch (error) {
       if (error?.response?.status === 401) {
         localStorage.clear()
-        navigate('/auth')
+        navigate('/user-auth')
       }
     }
   }
@@ -78,7 +78,7 @@ export const useApiRequest = () => {
     } catch (error) {
       if (error?.response?.status === 401) {
         localStorage.clear()
-        navigate('/auth')
+        navigate('/user-auth')
       }
     }
   }
@@ -92,7 +92,7 @@ export const useApiRequest = () => {
     } catch (error) {
       if (error?.response?.status === 401) {
         localStorage.clear()
-        navigate('/auth')
+        navigate('/user-auth')
       }
     }
   }
@@ -106,7 +106,7 @@ export const useApiRequest = () => {
     } catch (error) {
       if (error?.response?.status === 401) {
         localStorage.clear()
-        navigate('/auth')
+        navigate('/user-auth')
       }
     }
   }
