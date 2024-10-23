@@ -71,7 +71,7 @@ function SearchInterfaceWrapper() {
 const AuthRoute = ({ element }) => {
   const { user } = useSelector((state) => state.userInfo)
 
-  const authRoutes = ['/auth', '/forgot-password']
+  const authRoutes = ['/user-auth', '/forgot-password']
 
   const location = useLocation()
 
@@ -173,10 +173,7 @@ const router = createBrowserRouter([
         element: (
           <RoleBasedRoute
             element={<VaccineAccess />}
-            allowedRoles={[
-              'ADMINISTRATOR',
-              'NATIONAL_SYSTEM_ADMINISTRATOR',
-            ]}
+            allowedRoles={['ADMINISTRATOR', 'NATIONAL_SYSTEM_ADMINISTRATOR']}
           />
         ),
       },
@@ -336,7 +333,10 @@ const router = createBrowserRouter([
             element: (
               <RoleBasedRoute
                 element={<StockConfiguration />}
-                allowedRoles={['FACILITY_SYSTEM_ADMINISTRATOR', 'FACILITY_STORE_MANAGER']}
+                allowedRoles={[
+                  'FACILITY_SYSTEM_ADMINISTRATOR',
+                  'FACILITY_STORE_MANAGER',
+                ]}
               />
             ),
           },
@@ -824,7 +824,7 @@ const router = createBrowserRouter([
   },
 
   {
-    path: '/auth',
+    path: '/user-auth',
     element: <AuthRoute element={<Login />} />,
   },
   {

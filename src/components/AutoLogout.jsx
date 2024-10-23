@@ -18,7 +18,7 @@ const AutoLogout = () => {
     timeoutRef.current = setTimeout(() => {
       if (user) {
         dispatch(logout())
-        navigate('/auth')
+        navigate('/user-auth')
       }
     }, AUTO_LOGOUT_TIME)
   }

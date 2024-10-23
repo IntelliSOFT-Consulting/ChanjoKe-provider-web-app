@@ -16,7 +16,7 @@ export default function Root() {
 
   useEffect(() => {
     if (!user?.access_token) {
-      navigate('/auth')
+      navigate('/user-auth')
     }
   }, [user, navigate])
 
