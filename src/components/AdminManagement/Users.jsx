@@ -68,6 +68,11 @@ export default function Users() {
       key: 'name',
     },
     {
+      title: 'ID Number',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_text, record) => (
