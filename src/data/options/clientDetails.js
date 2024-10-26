@@ -36,6 +36,7 @@ export const identificationOptions = [
   { label: 'National ID', value: 'ID_number', minAge: 18, maxAge: Infinity },
   { label: 'NEMIS Number', value: 'Nemis', minAge: 3, maxAge: 17.9 },
   { label: 'Passport', value: 'Passport', minAge: 0, maxAge: Infinity },
+  { label: 'None', value: 'None', minAge: 0, maxAge: Infinity },
 ]
 
 export const manufacturerOptions = [
@@ -155,7 +156,7 @@ export const roleGroups = [
     locations: ['FACILITY'],
   },
   {
-    label: 'Facility Store Manager',
+    label: 'Facility EPI Logistician',
     value: 'FACILITY_STORE_MANAGER',
     creators: [
       'ADMINISTRATOR',
@@ -164,12 +165,6 @@ export const roleGroups = [
       'SUB_COUNTY_SYSTEM_ADMINISTRATOR',
       'FACILITY_SYSTEM_ADMINISTRATOR',
     ],
-    locations: ['FACILITY'],
-  },
-  {
-    label: 'Clerk',
-    value: 'CLERK',
-    creators: ['ADMINISTRATOR', 'FACILITY_SYSTEM_ADMINISTRATOR'],
     locations: ['FACILITY'],
   },
   {

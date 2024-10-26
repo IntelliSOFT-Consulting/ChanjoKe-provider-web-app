@@ -5,6 +5,7 @@ import { PlusIcon } from '@heroicons/react/24/solid'
 import { usePractitioner } from '../../hooks/usePractitioner'
 import AddUser from './AddUser'
 import moment from 'moment'
+import { useSelector } from 'react-redux'
 
 export default function Users() {
   const [activeTab, setActiveTab] = useState('1')
@@ -12,6 +13,8 @@ export default function Users() {
   const [currentPage, setCurrentPage] = useState(1)
   const [users, setUsers] = useState([])
   const [practitionerData, setPractitionerData] = useState(null)
+
+  const { user } = useSelector((state) => state.userInfo)
 
   const {
     fetchPractitioners,
@@ -29,18 +32,23 @@ export default function Users() {
   }, [currentPage, activeTab])
 
   const formatPractitionersToTable = (practitioners) => {
-    return practitioners.map((practitioner) => {
-      return {
-        key: practitioner.resource.id,
-        name: `${practitioner.resource.name[0]?.given?.join(' ')} ${
-          practitioner.resource.name[0]?.family
-        }`,
-        createdAt: moment(practitioner.resource.meta?.lastUpdated).format(
-          'DD-MM-YYYY'
-        ),
-        id: practitioner.resource.identifier?.[0]?.value,
-      }
-    })
+    // filter the current loggedin user
+    return practitioners
+      .filter(
+        (practitioner) => practitioner.resource.id !== user?.fhirPractitionerId
+      )
+      .map((practitioner) => {
+        return {
+          key: practitioner.resource.id,
+          name: `${practitioner.resource.name[0]?.given?.join(' ')} ${
+            practitioner.resource.name[0]?.family
+          }`,
+          createdAt: moment(practitioner.resource.meta?.lastUpdated).format(
+            'DD-MM-YYYY'
+          ),
+          id: practitioner.resource.identifier?.[0]?.value,
+        }
+      })
   }
 
   useEffect(() => {

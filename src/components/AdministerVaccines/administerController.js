@@ -4,9 +4,15 @@ export const getBodyWeight = (observation) => {
   const unit = observation?.valueQuantity?.unit
   const value = observation?.valueQuantity?.value
 
+  const height = observation?.component?.find(
+    (component) => component.code.coding[0].code === 'height'
+  )?.valueQuantity
+
   return {
-    weightUnit: unit,
+    weightMetric: unit,
     currentWeight: value,
+    heightMetric: height?.unit,
+    currentHeight: height?.value,
   }
 }
 
