@@ -12,7 +12,7 @@ export default function useObservations() {
   const { user } = useSelector((state) => state.userInfo)
 
   const createObservation = async (values, patient, encounter=null) => {
-    const { weightMetric, currentWeight } = values
+    const { weightMetric, currentWeight, heightMetric, currentHeight } = values
 
     const observation = {
       resourceType: 'Observation',
@@ -56,7 +56,30 @@ export default function useObservations() {
         system: 'http://unitsofmeasure.org',
         code: weightMetric,
       },
-
+      component: [
+        {
+          code: {
+            coding: [{ code: 'height' }],
+          },
+          valueQuantity: {
+            value: currentHeight,
+            unit: heightMetric,
+            system: 'http://unitsofmeasure.org',
+            code: heightMetric,
+          },
+        },
+        {
+          code: {
+            coding: [{ code: 'weight' }],
+          },
+          valueQuantity: {
+            value: currentWeight,
+            unit: weightMetric,
+            system: 'http://unitsofmeasure.org',
+            code: weightMetric,
+          },
+        },
+      ],
     }
 
     if (values.clientID) {
