@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import ConfirmDialog from '../../common/dialog/ConfirmDialog'
-import { Button, DatePicker, Form, Input, Select } from 'antd'
+import { Button, DatePicker, Form, Input, InputNumber, Select } from 'antd'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
 import useVaccination from '../../hooks/useVaccination'
@@ -13,6 +13,7 @@ import {
 } from '../AdministerVaccines/administerController'
 import usePatient from '../../hooks/usePatient'
 import { MinusCircleOutlined } from '@ant-design/icons'
+import useObservations from '../../hooks/useObservations'
 
 export default function UpdateVaccineHistory() {
   const navigate = useNavigate()
@@ -25,6 +26,8 @@ export default function UpdateVaccineHistory() {
   const { user } = useSelector((state) => state.userInfo)
 
   const { getPatient, patient } = usePatient()
+
+  const { createObservation } = useObservations()
 
   const {
     getRecommendations,
@@ -111,6 +114,20 @@ export default function UpdateVaccineHistory() {
     )
     await updateRecommendations(drafrRecommendations)
 
+    const vitals = values.vaccines.map((vaccine) => {
+      return {
+        ...vaccine,
+        currentHeight: null,
+        currentWeight: null,
+      }
+    })
+
+    await Promise.all(
+      vitals.map(async (vital) => {
+        await createObservation(vital, clientID)
+      })
+    )
+
     if (lateVaccines) {
       setDialogOpen(true)
 
@@ -157,7 +174,7 @@ export default function UpdateVaccineHistory() {
               {(fields, { add, remove }) => (
                 <div className="px-2 py-2 sm:p-6">
                   {fields.map(({ key, name, ...restField }) => (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 relative border mb-2 border-gray-200 p-4 rounded-lg">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 relative border mb-2 border-gray-200 p-4 rounded-lg">
                       <Form.Item
                         label="Vaccine Type"
                         rules={[
@@ -215,6 +232,38 @@ export default function UpdateVaccineHistory() {
                           maxLength={1}
                           maxCount={1}
                           showSearch={false}
+                        />
+                      </Form.Item>
+
+                      <Form.Item
+                        name="currentWeight"
+                        label="Weight at time of vaccination"
+                        className="w-full addon"
+                        rules={[
+                          {
+                            required: true,
+                            message: 'Please enter weight',
+                          },
+                        ]}
+                      >
+                        <InputNumber
+                          placeholder="Enter weight"
+                          className="w-full"
+                          controls={false}
+                          addonAfter={
+                            <Form.Item
+                              name="weightMetric"
+                              style={{ margin: '0px !important' }}
+                            >
+                              <Select
+                                defaultValue="kg"
+                                style={{ width: 70, margin: '0px !important' }}
+                              >
+                                <Select.Option value="kg">Kg</Select.Option>
+                                <Select.Option value="g">g</Select.Option>
+                              </Select>
+                            </Form.Item>
+                          }
                         />
                       </Form.Item>
 
