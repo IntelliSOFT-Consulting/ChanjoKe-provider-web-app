@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useApiRequest } from '../api/useApiRequest'
+import { useSelector } from 'react-redux'
 
 const fhirApi = '/chanjo-hapi/fhir'
 export default function useObservations() {
@@ -8,7 +9,9 @@ export default function useObservations() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const createObservation = async (values, patient, encounter) => {
+  const { user } = useSelector((state) => state.userInfo)
+
+  const createObservation = async (values, patient, encounter=null) => {
     const { weightMetric, currentWeight } = values
 
     const observation = {
@@ -44,12 +47,16 @@ export default function useObservations() {
         reference: `Patient/${patient}`,
       },
       effectiveDateTime: new Date().toISOString(),
+      performer: {
+        reference: `Practitioner/${user.fhirPractitionerId}`,
+      },
       valueQuantity: {
         value: currentWeight,
         unit: weightMetric,
         system: 'http://unitsofmeasure.org',
         code: weightMetric,
       },
+
     }
 
     if (values.clientID) {
