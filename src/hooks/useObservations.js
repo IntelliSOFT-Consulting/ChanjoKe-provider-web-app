@@ -80,7 +80,6 @@ export default function useObservations() {
           },
         },
       ],
-
     }
 
     if (values.clientID) {
