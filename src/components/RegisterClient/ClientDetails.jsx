@@ -40,6 +40,7 @@ export default function ClientDetails() {
   const [isAdult, setIsAdult] = useState(false)
   const [saving, setSaving] = useState(false)
   const [idOptions, setIdOptions] = useState([])
+  const [idNone, setIdNone] = useState(false)
   const [caregivers, setCaregivers] = useState([])
   const [isDocumentTypeSelected, setIsDocumentTypeSelected] = useState(false)
   const [estimatedAge, setEstimatedAge] = useState(true)
@@ -236,6 +237,7 @@ export default function ClientDetails() {
           validateTrigger="onBlur"
           form={form}
           initialValues={{ age: 0, phoneCode: '+254' }}
+          onValuesChange={() => setErrors(null)}
         >
           <div className={currentStep === 1 ? 'block' : 'hidden'}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-10">
@@ -446,6 +448,11 @@ export default function ClientDetails() {
                   onChange={(value) => {
                     if (value) {
                       setIsDocumentTypeSelected(true)
+                      if (value === 'None') {
+                        setIdNone(true)
+                      } else {
+                        setIdNone(false)
+                      }
                     } else {
                       setIsDocumentTypeSelected(false)
                     }
@@ -454,29 +461,31 @@ export default function ClientDetails() {
                 />
               </Form.Item>
 
-              <Form.Item
-                name="identificationNumber"
-                label="Document Identification Number"
-                rules={[
-                  {
-                    message: 'Please input identifier number',
-                  },
-                  {
-                    validator: handleValidateId,
-                  },
-                ]}
-              >
-                <Input
-                  disabled={!isDocumentTypeSelected}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
-                    form.setFieldValue('identificationNumber', value)
-                  }}
-                  placeholder="Document Document Identification Number"
-                  autoComplete="off"
-                  className="w-full"
-                />
-              </Form.Item>
+              {!idNone && (
+                <Form.Item
+                  name="identificationNumber"
+                  label="Document Identification Number"
+                  rules={[
+                    {
+                      message: 'Please input identifier number',
+                    },
+                    {
+                      validator: handleValidateId,
+                    },
+                  ]}
+                >
+                  <Input
+                    disabled={!isDocumentTypeSelected}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+                      form.setFieldValue('identificationNumber', value)
+                    }}
+                    placeholder="Document Document Identification Number"
+                    autoComplete="off"
+                    className="w-full"
+                  />
+                </Form.Item>
+              )}
 
               {isAdult && (
                 <Form.Item
@@ -624,7 +633,9 @@ export default function ClientDetails() {
                         ...caregivers,
                         {
                           ...caregiverData,
-                          phoneNumber: `${form.getFieldValue('phoneCode')}${caregiverData.phoneNumber}`?.replace(/undefined/g, ''),
+                          phoneNumber: `${form.getFieldValue('phoneCode')}${
+                            caregiverData.phoneNumber
+                          }`?.replace(/undefined/g, ''),
                         },
                       ])
                       caregiverForm.resetFields()
