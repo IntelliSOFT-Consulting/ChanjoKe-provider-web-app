@@ -53,6 +53,8 @@ export const manufacturerOptions = [
   { label: 'Bharat Biotech', value: 'Bharat Biotech' },
   { label: 'Sinovac Biotech', value: 'Sinovac Biotech' },
   { label: 'Biovac Institute', value: 'Biovac Institute' },
+  { label: 'Biological E Ltd', value: 'Biological E Ltd' },
+  { label: 'Merck Sharp & Dohme B V', value: 'Merck Sharp & Dohme B V' },
 ]
 
 export const vvmStatuses = [
