@@ -55,6 +55,7 @@ export const manufacturerOptions = [
   { label: 'Biovac Institute', value: 'Biovac Institute' },
   { label: 'Biological E Ltd', value: 'Biological E Ltd' },
   { label: 'Merck Sharp & Dohme B V', value: 'Merck Sharp & Dohme B V' },
+  { label: 'Nutricorp International', value: 'Nutricorp International' },
 ]
 
 export const vvmStatuses = [
