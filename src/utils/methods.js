@@ -177,3 +177,24 @@ export const getLocations = (user) => {
 export const isDiluentOrDropper = (vaccine) => {
   return vaccine?.includes('diluent') || vaccine?.includes('dropper')
 }
+
+
+export const getRoleFilters = (user) => {
+  const filters = {}
+  const orgUnit = user?.orgUnit
+
+  switch (orgUnit?.level) {
+    case 'county':
+      filters.county = orgUnit?.code?.split('/')[1]
+      break
+    case 'subCounty':
+      filters.subcounty = orgUnit?.code?.split('/')[1]
+      break
+    case 'facility':
+      filters.facility = orgUnit?.code?.split('/')[1]
+      break
+    default:
+      break
+  }
+  return filters
+}
