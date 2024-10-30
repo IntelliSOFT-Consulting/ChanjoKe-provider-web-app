@@ -13,6 +13,8 @@ export default function MOH525() {
 
   const { moh525, getMoh525 } = useReports()
 
+  console.log(moh525)
+
   const { user } = useSelector((state) => state.userInfo)
 
   const handleDates = (values = {}) => {
@@ -68,6 +70,7 @@ export default function MOH525() {
       title: 'Date',
       dataIndex: 'Date',
       key: 'Date',
+      render: (text) => moment(text).format('DD-MM-YYYY'),
     },
     {
       title: 'Serial No (MOH510)',

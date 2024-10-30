@@ -63,6 +63,7 @@ export const vvmStatuses = [
   { label: 'Stage 2', value: 'Stage 2' },
   { label: 'Stage 3', value: 'Stage 3' },
   { label: 'Stage 4', value: 'Stage 4' },
+  { label: 'None', value: 'None' },
 ]
 
 export const reasons = [

@@ -26,8 +26,8 @@ export const useReports = () => {
       .join('&')
 
     const response = await get(`${path}/moh_710_report?${queryString}`)
-    setMoh710(response)
-    return response
+    setMoh710(response?.data)
+    return response?.data
   }
 
   const getMoh525 = async (filters) => {
@@ -48,8 +48,8 @@ export const useReports = () => {
       .join('&')
 
     const response = await get(`${path}/monitoring_report?${queryString}`)
-    setMonitoring(response)
-    return response
+    setMonitoring(response?.data)
+    return response?.data
   }
 
   return {
