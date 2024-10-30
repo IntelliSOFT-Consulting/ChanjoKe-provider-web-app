@@ -1,5 +1,7 @@
 import { useApiRequest } from '../api/useApiRequest'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { getRoleFilters } from '../utils/methods'
 
 const path = '/reports/api'
 
@@ -8,6 +10,8 @@ export const useReports = () => {
   const [moh710, setMoh710] = useState(null)
   const [moh525, setMoh525] = useState(null)
   const [monitoring, setMonitoring] = useState(null)
+
+  const { user } = useSelector((state) => state.userInfo)
 
   const { get } = useApiRequest()
 
@@ -42,7 +46,8 @@ export const useReports = () => {
   }
 
   const getMonitoring = async (filters = {}) => {
-    const queryString = Object.entries(filters)
+    let filter = getRoleFilters(user)
+    const queryString = Object.entries({ ...filter, ...filters })
       .filter(([key, value]) => value)
       .map(([key, value]) => `${key}=${value}`)
       .join('&')
