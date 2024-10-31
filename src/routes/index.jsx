@@ -493,7 +493,7 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: '/reports',
+        path: '/chanjo-reports',
         element: (
           <RoleBasedRoute
             element={<VaccinationReports />}
@@ -502,11 +502,11 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/reports/moh-710',
+        path: '/chanjo-reports/moh-710',
         element: <RoleBasedRoute element={<MOH710 />} allowedRoles={['ALL']} />,
       },
       {
-        path: '/reports/moh-525',
+        path: '/chanjo-reports/moh-525',
         element: <RoleBasedRoute element={<MOH525 />} allowedRoles={['ALL']} />,
       },
       {

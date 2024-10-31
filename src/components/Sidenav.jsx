@@ -164,13 +164,13 @@ export default function Sidenav() {
         children: [
           {
             name: 'MOH 710',
-            href: '/reports/moh-710',
+            href: '/chanjo-reports/moh-710',
             icon: <BarChartOutlined />,
             roles: ['ALL'],
           },
           {
             name: 'MOH 525',
-            href: '/reports/moh-525',
+            href: '/chanjo-reports/moh-525',
             icon: <DotChartOutlined />,
             roles: ['ALL'],
           },
