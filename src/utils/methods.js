@@ -152,23 +152,23 @@ export const convertCamelCaseString = (inputString) => {
 
 export const getLocations = (user) => {
   const userLocation = {
-    facility_code: user?.orgUnit?.code?.split('/')[1],
+    facility: user?.orgUnit?.code?.split('/')[1],
   }
   const availableLevel = user?.orgUnit?.level
 
   switch (availableLevel) {
     case 'county':
-      delete userLocation.facility_code
+      delete userLocation.facility
       userLocation.county = user.orgUnit?.code?.split('/')[1]
       break
     case 'subCounty':
-      delete userLocation.facility_code
+      delete userLocation.facility
       userLocation.subcounty = user.orgUnit?.code?.split('/')[1]
       break
     case 'facility':
       break
     default:
-      delete userLocation.facility_code
+      delete userLocation.facility
       break
   }
   return userLocation
