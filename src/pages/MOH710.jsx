@@ -98,7 +98,35 @@ export default function MOH710() {
     if (date?.length) {
       const start = date[0]?.format('YYYY-MM-DD')
       const end = date[1]?.format('YYYY-MM-DD')
-      handleDates({ ...values, start, end })
+      const hierarchy = ['facility', 'ward', 'subcounty', 'county']
+      let location = {}
+      for (const key of hierarchy) {
+        if (values?.[key]) {
+          if (key === 'facility') {
+            location[key] = values[key]
+            break
+          } else if (key === 'ward') {
+            const locationName = wards?.find(
+              (ward) => ward?.key === values[key]
+            )?.name
+            location[key] = locationName
+            break
+          } else if (key === 'subcounty') {
+            const locationName = subCounties?.find(
+              (subcounty) => subcounty?.key === values[key]
+            )?.name
+            location[key] = locationName
+            break
+          } else if (key === 'county') {
+            const locationName = counties?.find(
+              (county) => county?.key === values[key]
+            )?.name
+            location[key] = locationName
+            break
+          }
+        }
+      }
+      handleDates({ ...location, start, end, location })
     }
   }
 
