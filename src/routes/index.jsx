@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
   useParams,
   Navigate,
   useLocation,
@@ -88,7 +88,7 @@ const AuthRoute = ({ element }) => {
   )
 }
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <Root />,
