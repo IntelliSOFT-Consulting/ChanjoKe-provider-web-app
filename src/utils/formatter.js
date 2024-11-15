@@ -123,3 +123,10 @@ export const locationToOptions = (locations) => {
     value: location.key,
   }))
 }
+
+export const snakeToTitle = (str) => {
+  return str
+    .split('_')
+    .map((word) => toTitleCase(word))
+    .join(' ')
+}

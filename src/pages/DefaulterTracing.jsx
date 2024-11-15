@@ -5,6 +5,7 @@ import { useApiRequest } from '../api/useApiRequest'
 import { debounce } from '../utils/methods'
 import moment from 'moment'
 import { routineVaccines, nonRoutineVaccines } from '../data/vaccineData'
+import { snakeToTitle } from '../utils/formatter'
 
 export default function DefaulterTracing() {
   const [defaulters, setDefaulters] = useState([])
@@ -70,36 +71,47 @@ export default function DefaulterTracing() {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'family_name',
-      key: 'family_name',
+      dataIndex: 'familyName',
+      key: 'familyName',
       render: (_text, record) =>
-        formatName(record.given_name, record.family_name),
+        formatName(record.givenName, record.familyName),
+    },
+    {
+      title: 'Document Type',
+      dataIndex: 'documentType',
+      key: 'documentType',
+      render: (text) => snakeToTitle(text) || 'N/A',
     },
     {
       title: 'ID Number',
-      dataIndex: 'national_id',
-      key: 'national_id',
+      dataIndex: 'documentId',
+      key: 'documentId',
     },
     {
       title: 'Phone Number',
-      dataIndex: 'phone',
-      key: 'phone',
+      dataIndex: 'phonePrimary',
+      key: 'phonePrimary',
     },
     {
       title: 'Vaccines Missed',
-      dataIndex: 'vaccine_name',
-      key: 'vaccine_name',
+      dataIndex: 'vaccineName',
+      key: 'vaccineName',
     },
     {
       title: 'Dose',
-      dataIndex: 'the_dose',
-      key: 'the_dose',
+      dataIndex: 'doseNumber',
+      key: 'doseNumber',
     },
     {
       title: 'Scheduled Date',
-      dataIndex: 'due_date',
-      key: 'due_date',
+      dataIndex: 'scheduleDueDate',
+      key: 'scheduleDueDate',
       render: (text) => moment(text).format('DD-MM-YYYY'),
+    },
+    {
+      title: 'Village',
+      dataIndex: 'village',
+      key: 'village',
     },
   ]
 
