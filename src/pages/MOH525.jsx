@@ -13,8 +13,6 @@ export default function MOH525() {
 
   const { moh525, getMoh525 } = useReports()
 
-  console.log(moh525)
-
   const { user } = useSelector((state) => state.userInfo)
 
   const handleDates = (values = {}) => {
