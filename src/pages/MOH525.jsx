@@ -6,6 +6,8 @@ import { useReports } from '../hooks/useReports'
 import Table from '../components/DataTable'
 import dayjs from 'dayjs'
 import { getLocations } from '../utils/methods'
+import { CSVLink } from 'react-csv'
+import { DownloadOutlined } from '@ant-design/icons'
 
 export default function MOH525() {
   const [dates, setDates] = useState([])
@@ -135,8 +137,41 @@ export default function MOH525() {
     },
   ]
 
+  const headers = [
+    { label: 'Date', key: 'Date' },
+    { label: 'Serial No (MOH510)', key: 'Serial No (MOH510)' },
+    { label: "Child's No", key: "Child's No" },
+    { label: 'Name of the Child', key: 'Name of the Child' },
+    { label: 'Sex (F/M)', key: 'Sex (F/M)' },
+    { label: 'Age in Months of the Child', key: 'Age in Months of the Child' },
+    { label: 'Name of Parent/Caregiver', key: 'Name of Parent/Caregiver' },
+    { label: 'Telephone No.', key: 'Telephone No.' },
+    {
+      label: 'Name of Village/Estate/Landmark',
+      key: 'Name of Village/Estate/Landmark',
+    },
+    { label: 'Vaccines Missed', key: 'Vaccines Missed' },
+    { label: 'Traced (YES/NO)', key: 'Traced (YES/NO)' },
+    { label: 'Outcome', key: 'Outcome' },
+    { label: 'Remarks', key: 'Remarks' },
+  ]
+
   return (
-    <Card title="MOH 525" className="mt-5">
+    <Card
+      title="MOH 525"
+      className="mt-5"
+      extra={
+        <CSVLink
+          data={moh525 || []}
+          headers={headers}
+          filename={`MOH_525_${moment().format('DD-MM-YYYY')}.csv`}
+        >
+          <Button type="primary" icon={<DownloadOutlined />} disabled={!moh525}>
+            Download CSV
+          </Button>
+        </CSVLink>
+      }
+    >
       <div className="px-4 font-semibold py-5 sm:px-6">
         <Form
           layout="vertical"
