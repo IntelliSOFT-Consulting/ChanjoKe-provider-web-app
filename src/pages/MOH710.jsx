@@ -7,6 +7,8 @@ import dayjs from 'dayjs'
 import { useLocations } from '../hooks/useLocation'
 import { getLocations } from '../utils/methods'
 import { locationToOptions } from '../utils/formatter'
+import Exceljs from 'exceljs'
+import { DownloadOutlined } from '@ant-design/icons'
 
 export default function MOH710() {
   const [dates, setDates] = useState([])
@@ -177,8 +179,104 @@ export default function MOH710() {
     },
   ]
 
+  const exportToExcel = async () => {
+    const workbook = new Exceljs.Workbook()
+    const sheet = workbook.addWorksheet('MOH 710')
+    const data = moh710.map((item) => {
+      const row = {
+        Antigen: item.antigen,
+        Age: item.ageGroup,
+        ...item,
+      }
+      delete row.antigen
+      delete row.ageGroup
+      return row
+    })
+    const columns = [
+      {
+        header: 'Antigen',
+        key: 'Antigen',
+        width: 20,
+      },
+      {
+        header: 'Age',
+        key: 'Age',
+        width: 20,
+      },
+      ...dates.map((date) => {
+        const key = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+        return {
+          header: date,
+          key,
+          width: 10,
+        }
+      }),
+      {
+        header: 'Total Static',
+        key: 'facility_count',
+        width: 20,
+      },
+      {
+        header: 'Total Outreach',
+        key: 'outreach_count',
+        width: 20,
+      },
+      {
+        header: 'Grand Total',
+        key: 'total',
+        width: 20,
+      },
+    ]
+
+    sheet.columns = columns
+    sheet.addRows(
+      data?.map((item) => ({
+        ...item,
+        ...dates.reduce((acc, date) => {
+          const key = moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD')
+          acc[key] = item?.[key]?.total || 0
+          return acc
+        }, {}),
+      }))
+    )
+
+    sheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true }
+    })
+    sheet.getRow(1).freeze = true
+
+    for (let i = 2; i <= data.length + 1; i += 2) {
+      sheet.mergeCells(`A${i}:A${i + 1}`)
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `MOH-710-${
+      user?.orgUnit?.name || user?.subCounty || user?.facility || 'All'
+    }-${dayjs().format('DD-MM-YYYY')}.xlsx`
+    a.click()
+  }
+
   return (
-    <Card title="MOH 710" className="mt-5">
+    <Card
+      title="MOH 710"
+      className="mt-5"
+      extra={
+        <Button
+          type="primary"
+          icon={<DownloadOutlined />}
+          onClick={exportToExcel}
+          disabled={!moh710}
+        >
+          Export to Excel
+        </Button>
+      }
+    >
       <div className="px-4 font-semibold py-5 sm:px-6">
         <Form
           layout="vertical"

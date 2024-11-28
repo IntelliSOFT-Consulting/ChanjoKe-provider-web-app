@@ -368,7 +368,7 @@ const SingleLocation = () => {
             tableErrors[index.toString()]?.vvmStatus ? 'error' : 'success'
           }
         >
-          {['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4'].map((stage) => (
+          {['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'None'].map((stage) => (
             <Option key={stage.toLowerCase()} value={stage.toLowerCase()}>
               {stage}
             </Option>
